@@ -1,6 +1,6 @@
 # DanceCompetitionHelper
 
-Helper for Dance Competiton Organizer and Volunteers
+Helper for Dance Competiton Organizers and Volunteers
 
 ## Purpose of this project
 
