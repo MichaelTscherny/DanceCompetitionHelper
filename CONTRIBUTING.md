@@ -4,7 +4,7 @@ Contributions to this project are [released](https://help.github.com/articles/gi
 to the public under the [project's open source license](LICENSE.md).
 
 Everyone is welcome to contribute to **Dance Competition Helper**. 
-Contributing doesn't just mean submitting pull requests—there are many 
+Contributing doesn't just mean submitting pull requestsâ€”there are many 
 different ways for you to get involved, including answering questions, 
 reporting or triaging [issues](https://github.com/MichaelTscherny/DanceCompetitionHelper/issues).
 

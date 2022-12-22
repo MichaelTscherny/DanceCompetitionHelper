@@ -11,17 +11,37 @@ During my work - over the last 10 years - I was facing
 some major "issues" where organizer and volunteers always struggle
 with: 
 
-* winners ^(1)^ and "promoted couples" ^(2)^ dancing in a higher 
+* (class) winners [^1]</sup> and "promoted couples" [^2] dancing in a higher 
 * Time-Table of a competition
 
 This projects aim is to privide an *"easy" to use software* where
 roganizer and volunteers are able to get these information out
 of lists of staring participants.
 
-- ^(1)^ in austria it's possible that the winner is allowed to dance
+[^1]: in austria it's possible that the winner is allowed to dance
   in the next/higher competitive classifications
-- ^(2)^ cuple accumulated enough points to compete in the next/higher 
+[^2]: cuple accumulated enough points to compete in the next/higher 
   competitive classifications
+
+### Competition organization in Austria
+
+The [ﾃ穆terreichicher TanzSport Verband (ﾃ傍SV)](https://www.tanzsportverband.at/) 
+is "the head" origanization of competitive ballroom dancesport in Austria and
+member of [WDSF](https://www.worlddancesport.org/). In Austria its common 
+that a club request
+a competition with a various number of classes (age, classification, etc.).
+If accepted, couples who are member of ﾃ傍SV (by joining a club which is 
+member of ﾃ傍SV) are able to *register via ﾃ傍SV* to participate at this 
+competition. When the registration is closed - in common 10 days before
+the competition - the club who is in charge of the competition needs 
+to create at least a time-schedule for the participants. This is done 
+based on the registration counts by *starting class*. Because the count 
+of couples differ at each competition (based on possible classes, 
+location, etc.) it is always a *different story*.
+
+In other countries it is common that the time-schedule is needed as acceptence criteria
+for a competition registration. 
+
 
 ## Technical base
 
@@ -29,6 +49,8 @@ of lists of staring participants.
 - [ASP.NET Core-Web SDK](https://learn.microsoft.com/de-de/aspnet/core/razor-pages/web-sdk?view=aspnetcore-7.0) for HTTP interfaces
 - [Entity Framework 7](https://learn.microsoft.com/en-us/ef/core/) - [SQLite](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.Sqlite)
 - [MigraDoc](http://www.pdfsharp.net/migradocoverview.ashx?AspxAutoDetectCookieSupport=1) for PDFs
+- [NUnit](https://www.nuget.org/packages/NUnit)
+- [SpecFlow](https://www.nuget.org/packages/SpecFlow/)
 
 ## Contribute
 
@@ -39,9 +61,9 @@ If you like to help on this project, please check
 
 following sources helped to get this project "on track":
 
-- [ﾖsterreichicher TanzSport Verband](https://www.tanzsportverband.at/)
-- [USA Dance](https://usadance.org/)
+- [ﾃ穆terreichicher TanzSport Verband (ﾃ傍SV)](https://www.tanzsportverband.at/)
 - [WDSF](https://www.worlddancesport.org/)
+- [USA Dance](https://usadance.org/)
 
 ## License
 

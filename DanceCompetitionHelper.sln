@@ -9,8 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
 		CONTRIBUTING.md = CONTRIBUTING.md
-		docs\Index.md = docs\Index.md
-		LICENSE = LICENSE
+		LICENSE.md = LICENSE.md
 		README.md = README.md
 		SECURITY.md = SECURITY.md
 	EndProjectSection
@@ -23,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanceCompetitionHelper.Data
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanceCompetitionHelper.Database.Test", "test\DanceCompetitionHelper.Database.Test\DanceCompetitionHelper.Database.Test.csproj", "{D051C67B-CB75-44CC-929C-CB1211D16288}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanceCompetitionHelper", "src\DanceCompetitionHelper\DanceCompetitionHelper.csproj", "{5A7B5011-937C-4BDC-8F81-86FC0DF89A89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanceCompetitionHelper", "src\DanceCompetitionHelper\DanceCompetitionHelper.csproj", "{5A7B5011-937C-4BDC-8F81-86FC0DF89A89}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{D79A0E07-5857-4363-8502-E39637928671}"
 	ProjectSection(SolutionItems) = preProject
