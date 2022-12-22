@@ -1,0 +1,70 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanceCompetitionHelper.Web", "src\DanceCompetitionHelper.Web\DanceCompetitionHelper.Web.csproj", "{801C51DA-1AF1-4ACE-8F74-934BE4E32552}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{68E7A2BC-061D-4648-B383-EA2FF45D6D8C}"
+	ProjectSection(SolutionItems) = preProject
+		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+		SECURITY.md = SECURITY.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{5ABE609A-B8B3-4505-8CE3-99BD0FAE09D6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanceCompetitionHelper.Test", "test\DanceCompetitionHelper.Test\DanceCompetitionHelper.Test.csproj", "{8627D149-2C44-4C9C-A461-C1292C62DADE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanceCompetitionHelper.Database", "src\DanceCompetitionHelper.Database\DanceCompetitionHelper.Database.csproj", "{3D567A06-A734-427F-9C20-B8DB946A8BAB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanceCompetitionHelper.Database.Test", "test\DanceCompetitionHelper.Database.Test\DanceCompetitionHelper.Database.Test.csproj", "{D051C67B-CB75-44CC-929C-CB1211D16288}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanceCompetitionHelper", "src\DanceCompetitionHelper\DanceCompetitionHelper.csproj", "{5A7B5011-937C-4BDC-8F81-86FC0DF89A89}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{D79A0E07-5857-4363-8502-E39637928671}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Index.md = docs\Index.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{801C51DA-1AF1-4ACE-8F74-934BE4E32552}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{801C51DA-1AF1-4ACE-8F74-934BE4E32552}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{801C51DA-1AF1-4ACE-8F74-934BE4E32552}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{801C51DA-1AF1-4ACE-8F74-934BE4E32552}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8627D149-2C44-4C9C-A461-C1292C62DADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8627D149-2C44-4C9C-A461-C1292C62DADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8627D149-2C44-4C9C-A461-C1292C62DADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8627D149-2C44-4C9C-A461-C1292C62DADE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D567A06-A734-427F-9C20-B8DB946A8BAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D567A06-A734-427F-9C20-B8DB946A8BAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D567A06-A734-427F-9C20-B8DB946A8BAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D567A06-A734-427F-9C20-B8DB946A8BAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D051C67B-CB75-44CC-929C-CB1211D16288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D051C67B-CB75-44CC-929C-CB1211D16288}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D051C67B-CB75-44CC-929C-CB1211D16288}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D051C67B-CB75-44CC-929C-CB1211D16288}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A7B5011-937C-4BDC-8F81-86FC0DF89A89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A7B5011-937C-4BDC-8F81-86FC0DF89A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A7B5011-937C-4BDC-8F81-86FC0DF89A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A7B5011-937C-4BDC-8F81-86FC0DF89A89}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8627D149-2C44-4C9C-A461-C1292C62DADE} = {5ABE609A-B8B3-4505-8CE3-99BD0FAE09D6}
+		{D051C67B-CB75-44CC-929C-CB1211D16288} = {5ABE609A-B8B3-4505-8CE3-99BD0FAE09D6}
+		{D79A0E07-5857-4363-8502-E39637928671} = {68E7A2BC-061D-4648-B383-EA2FF45D6D8C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2126F2F8-24B9-40A6-B60F-06A18EB2F1BC}
+	EndGlobalSection
+EndGlobal
