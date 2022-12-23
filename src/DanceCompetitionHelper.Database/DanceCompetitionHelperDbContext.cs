@@ -1,36 +1,45 @@
-﻿using DanceCompetitionHelper.Database.Tables;
+﻿using DanceCompetitionHelper.Database.Config;
+using DanceCompetitionHelper.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 
 namespace DanceCompetitionHelper.Database
 {
     public class DanceCompetitionHelperDbContext : DbContext
     {
-        public string SqLiteDbFile { get; } = string.Empty;
+        private readonly ILogger<DanceCompetitionHelperDbContext>? _logger;
+
+        public IDbConfig SqLiteDbConfig { get; }
         public static string User { get; set; } = Environment.UserName;
 
         public virtual DbSet<Competition> Competitions { get; set; }
         public virtual DbSet<CompetitionClass> CompetitionClasses { get; set; }
         public virtual DbSet<Participant> Participants { get; set; }
-
-        public DanceCompetitionHelperDbContext()
-            : base()
-        {
-            SavingChanges += OnSavingChanges;
-        }
+        public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; }
 
         public DanceCompetitionHelperDbContext(
-            string sqLiteDbFile)
-            : this()
+            IDbConfig sqLiteDbConfig,
+            ILogger<DanceCompetitionHelperDbContext>? logger)
+            : base()
         {
-            SqLiteDbFile = sqLiteDbFile;
+            SqLiteDbConfig = sqLiteDbConfig;
+            _logger = logger;
 
-            if (string.IsNullOrEmpty(SqLiteDbFile)
-                || string.IsNullOrWhiteSpace(SqLiteDbFile))
+            if (SqLiteDbConfig == null
+                || string.IsNullOrEmpty(SqLiteDbConfig.SqLiteDbFile)
+                || string.IsNullOrWhiteSpace(SqLiteDbConfig.SqLiteDbFile))
             {
                 throw new ArgumentNullException(
-                    nameof(sqLiteDbFile));
+                    nameof(sqLiteDbConfig));
             }
+
+            SavingChanges += OnSavingChanges;
+
+            _logger?.LogTrace(
+                "{0}() done",
+                nameof(DanceCompetitionHelperDbContext));
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -39,13 +48,22 @@ namespace DanceCompetitionHelper.Database
                 .UseSqlite(
                     string.Format(
                         "Data Source='{0}'",
-                        SqLiteDbFile));
+                        SqLiteDbConfig.SqLiteDbFile));
+
+            _logger?.LogTrace(
+                "{0}() done",
+                nameof(OnConfiguring));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
             base.OnModelCreating(modelBuilder);
+
+            _logger?.LogTrace(
+                "{0}() done",
+                nameof(OnModelCreating));
+
         }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -57,7 +75,22 @@ namespace DanceCompetitionHelper.Database
             */
 
             base.ConfigureConventions(configurationBuilder);
+
+            _logger?.LogTrace(
+                "{0}() done",
+                nameof(ConfigureConventions));
         }
+
+        #region Usefull methods
+
+        public void Migrate()
+            => Database.Migrate();
+
+        public IDbContextTransaction BeginTransaction()
+            => Database.BeginTransaction();
+
+        #endregion Usefull methods
+
 
         #region Helpers
 
@@ -73,6 +106,10 @@ namespace DanceCompetitionHelper.Database
                     curEntity,
                     useDateTime);
             }
+
+            _logger?.LogTrace(
+                "{0}() done",
+                nameof(OnSavingChanges));
         }
 
 

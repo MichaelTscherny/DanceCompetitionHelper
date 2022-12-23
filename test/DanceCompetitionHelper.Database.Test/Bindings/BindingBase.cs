@@ -1,10 +1,4 @@
 ﻿using DanceCompetitionHelper.Database.Test.Pocos;
-using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TestHelper.Extensions;
 
 namespace DanceCompetitionHelper.Database.Test.Bindings

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("The classes of a " + nameof(Competition))]
-    [Index(nameof(CompetitionId), nameof(OrgClassId), IsUnique = true)]
+    [Index(nameof(CompetitionId), nameof(OrgClassId), nameof(Version), IsUnique = true)]
     public class CompetitionClass : TableBase
     {
         [Required]
@@ -18,6 +18,9 @@ namespace DanceCompetitionHelper.Database.Tables
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         [Comment("'Internal' Org-Id of class of " + nameof(CompetitionClass))]
         public string OrgClassId { get; set; } = default!;
+
+        [Required]
+        public int Version { get; set; }
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

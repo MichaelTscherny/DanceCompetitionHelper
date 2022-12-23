@@ -48,6 +48,11 @@ Generated\ Files/
 TestResult.xml
 nunit-*.xml
 
+# SpecFlow Stuff
+Features.Generated/
+*.feature.cs
+*.feature.xlsx.*
+
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/

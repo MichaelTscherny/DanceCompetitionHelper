@@ -5,12 +5,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("The Participants of a " + nameof(Competition))]
+    [PrimaryKey(nameof(ParticipantId), nameof(Version))]
     public class Participant : TableBase
     {
         [Required]
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid ParticipantId { get; set; }
+
+        [Required]
+        public int Version { get; set; }
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

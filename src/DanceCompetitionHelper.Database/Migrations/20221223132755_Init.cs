@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -38,6 +37,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                 {
                     CompetitionClassId = table.Column<Guid>(type: "TEXT", nullable: false),
                     OrgClassId = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false, comment: "'Internal' Org-Id of class of CompetitionClass"),
+                    Version = table.Column<int>(type: "INTEGER", nullable: false),
                     CompetitionId = table.Column<Guid>(type: "TEXT", nullable: false, comment: "Ref to Competition"),
                     Discipline = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true),
                     AgeClass = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true),
@@ -63,10 +63,34 @@ namespace DanceCompetitionHelper.Database.Migrations
                 comment: "The classes of a Competition");
 
             migrationBuilder.CreateTable(
+                name: "TableVersionInfos",
+                columns: table => new
+                {
+                    CompetitionId = table.Column<Guid>(type: "TEXT", nullable: false, comment: "Ref to Competition"),
+                    TableName = table.Column<string>(type: "TEXT", maxLength: 512, nullable: false),
+                    CurrentVersion = table.Column<int>(type: "INTEGER", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false, comment: "Row created at (UTC)"),
+                    CreatedBy = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false, comment: "Row created by"),
+                    LastModified = table.Column<DateTime>(type: "TEXT", nullable: false, comment: "Row last modified at (UTC)"),
+                    LastModifiedBy = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false, comment: "Row last modified by")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TableVersionInfos", x => new { x.CompetitionId, x.TableName, x.CurrentVersion });
+                    table.ForeignKey(
+                        name: "FK_TableVersionInfos_Competitions_CompetitionId",
+                        column: x => x.CompetitionId,
+                        principalTable: "Competitions",
+                        principalColumn: "CompetitionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Participants",
                 columns: table => new
                 {
                     ParticipantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Version = table.Column<int>(type: "INTEGER", nullable: false),
                     CompetitionId = table.Column<Guid>(type: "TEXT", nullable: false, comment: "Ref to Competition"),
                     CompetitionClassId = table.Column<Guid>(type: "TEXT", nullable: false, comment: "Ref to CompetitionClass"),
                     NamePartA = table.Column<string>(type: "TEXT", nullable: false),
@@ -85,7 +109,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Participants", x => x.ParticipantId);
+                    table.PrimaryKey("PK_Participants", x => new { x.ParticipantId, x.Version });
                     table.ForeignKey(
                         name: "FK_Participants_CompetitionClasses_CompetitionClassId",
                         column: x => x.CompetitionClassId,
@@ -102,9 +126,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                 comment: "The Participants of a Competition");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompetitionClasses_CompetitionId_OrgClassId",
+                name: "IX_CompetitionClasses_CompetitionId_OrgClassId_Version",
                 table: "CompetitionClasses",
-                columns: new[] { "CompetitionId", "OrgClassId" },
+                columns: new[] { "CompetitionId", "OrgClassId", "Version" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -129,6 +153,9 @@ namespace DanceCompetitionHelper.Database.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Participants");
+
+            migrationBuilder.DropTable(
+                name: "TableVersionInfos");
 
             migrationBuilder.DropTable(
                 name: "CompetitionClasses");

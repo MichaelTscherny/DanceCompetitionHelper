@@ -1,14 +1,38 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DanceCompetitionHelper.Database.Config;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using TestHelper.Logging;
 
 namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
 {
     [TestFixture]
     public class DanceCompetitionHelperDbContextTests
     {
-        private static long _dbCounter = 0;
+        private readonly IHost _useHost;
 
-        private readonly List<string> _createdDbs = new List<string>();
+        public DanceCompetitionHelperDbContextTests()
+        {
+            _useHost = Host.CreateDefaultBuilder()
+                .ConfigureServices((_, config) =>
+                {
+                    config.AddDbContext<DanceCompetitionHelperDbContext>();
+                    config.AddTransient<IDbConfig>(
+                        (srvProv) => new SqLiteDbConfig()
+                        {
+                            SqLiteDbFile = GetNewDbName(),
+                        });
+                    config.AddSingleton<ILoggerProvider, NUnitLoggerProvider>();
+                })
+                .ConfigureLogging((_, config) =>
+                {
+                    config.SetMinimumLevel(LogLevel.Debug);
+                })
+                .Build();
+        }
+
+        private static long _dbCounter = 0;
 
         public string GetNewDbName()
         {
@@ -19,9 +43,6 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
 
             Console.WriteLine(
                 "NewDb: {0}",
-                newDb);
-
-            _createdDbs.Add(
                 newDb);
 
             return newDb;
@@ -39,27 +60,19 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             }
         }
 
-        [OneTimeTearDown]
-        public void CleanUpDbs()
-        {
-            foreach (var curDb in _createdDbs)
-            {
-                TryDeleteDb(
-                    curDb);
-            }
-        }
-
         public void TryDeleteDb(
             string dbName)
         {
-            if (File.Exists(dbName) == false)
+            if (File.Exists(
+                dbName) == false)
             {
                 return;
             }
 
             try
             {
-                File.Delete(dbName);
+                File.Delete(
+                    dbName);
 
                 Console.WriteLine(
                     "Deleted '{0}'",
@@ -77,14 +90,12 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
         [Test]
         public void SimpleCreate()
         {
-            var useDb = GetNewDbName();
+            using var dbCtx = _useHost.Services
+                .GetRequiredService<DanceCompetitionHelperDbContext>();
 
-            using var dbCtx = new DanceCompetitionHelperDbContext(
-                useDb);
+            dbCtx.Migrate();
 
-            dbCtx.Database.Migrate();
-
-            using var dbTrans = dbCtx.Database.BeginTransaction();
+            using var dbTrans = dbCtx.BeginTransaction();
 
             try
             {
@@ -112,7 +123,6 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             }
             catch
             {
-                _createdDbs.Remove(useDb);
                 dbTrans.Rollback();
 
                 throw;
