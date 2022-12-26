@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\Competition - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\CompetitionClass - Copy.feature.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,21 +35,30 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DanceCompetitionHelper.Database\DanceCompetitionHelper.Database.csproj" />
+    <ProjectReference Include="..\..\src\DanceCompetitionHelper\DanceCompetitionHelper.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Extensions\" />
+    <Folder Include="Tests\SpecFlow\DanceCompHelper\" />
     <Folder Include="ValueRetriever\" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Tests\SpecFlow\Database\Participants.feature.cs">
+      <DependentUpon>Participants.feature</DependentUpon>
+    </Compile>
     <Compile Update="Tests\SpecFlow\Database\CompetitionClass.feature.cs">
       <DependentUpon>CompetitionClass.feature</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\Database\Participants.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Tests\SpecFlow\Database\CompetitionClass.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

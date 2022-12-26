@@ -22,5 +22,9 @@ namespace DanceCompetitionHelper.Database.Tables
         [Required]
         public int CurrentVersion { get; set; }
 
+        [Required]
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsLarge)]
+        public string Comment { get; set; } = default!;
+
     }
 }

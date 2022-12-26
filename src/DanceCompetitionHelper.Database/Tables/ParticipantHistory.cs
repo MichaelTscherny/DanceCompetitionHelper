@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DanceCompetitionHelper.Database.Tables
 {
-    [Comment("The Participants of a " + nameof(Competition))]
-    public class Participant : TableBase
+    [Comment("History of Participants of a " + nameof(Competition))]
+    [Index(nameof(CompetitionId), nameof(ParticipantId), nameof(Version), IsUnique = true)]
+    [Keyless]
+    public class ParticipantHistory : TableBase
     {
         [Required]
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid ParticipantId { get; set; }
 
         [Required]
@@ -20,13 +20,15 @@ namespace DanceCompetitionHelper.Database.Tables
         [ForeignKey(nameof(CompetitionId))]
         public Competition Competition { get; set; } = default!;
 
-        [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Comment("Ref to " + nameof(CompetitionClass))]
-        public Guid CompetitionClassId { get; set; }
+        public Guid? CompetitionClassId { get; set; }
 
         [ForeignKey(nameof(CompetitionClassId))]
-        public CompetitionClass CompetitionClass { get; set; } = default!;
+        public CompetitionClass? CompetitionClass { get; set; }
+
+        [Required]
+        public int Version { get; set; }
 
         [Required]
         public int StartNumber { get; set; }
@@ -36,17 +38,17 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [Required]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
-        [Comment("'Internal' Org-Id of class of " + nameof(CompetitionClass))]
+        [Comment("'Internal' Org-Id of PartA")]
         public string? OrgIdPartA { get; set; }
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? NamePartB { get; set; }
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
-        public string? OrgIdPartB { get; set; }
+        public string? OrgIdPartB { get; set; } = default!;
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
-        public string? OrgIdClub { get; set; }
+        public string? OrgIdClub { get; set; } = default!;
 
         public int OrgPointsPartA { get; set; }
         public int OrgStartsPartA { get; set; }

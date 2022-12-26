@@ -4,14 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DanceCompetitionHelper.Database.Tables
 {
-    [Comment("The classes of a " + nameof(Competition))]
-    [Index(nameof(CompetitionId), nameof(OrgClassId), IsUnique = true)]
-    [Index(nameof(CompetitionId), nameof(CompetitionClassName), IsUnique = true)]
-    public class CompetitionClass : TableBase
+    [Comment("History of Classes of a " + nameof(Competition))]
+    [Index(nameof(CompetitionId), nameof(OrgClassId), nameof(Version), IsUnique = true)]
+    [Index(nameof(CompetitionId), nameof(CompetitionClassName), nameof(Version), IsUnique = true)]
+    [Keyless]
+    public class CompetitionClassHistory : TableBase
     {
         [Required]
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid CompetitionClassId { get; set; }
 
         [Required]
@@ -26,6 +25,9 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [ForeignKey(nameof(CompetitionId))]
         public Competition Competition { get; set; } = default!;
+
+        [Required]
+        public int Version { get; set; }
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]
         public string CompetitionClassName { get; set; } = default!;

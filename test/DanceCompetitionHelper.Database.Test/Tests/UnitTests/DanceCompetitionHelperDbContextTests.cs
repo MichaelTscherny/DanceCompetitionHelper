@@ -49,7 +49,7 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
         }
 
         [OneTimeSetUp]
-        public void CleanUpOldDbs()
+        public static void CleanUpOldDbs()
         {
             foreach (var oldDb in Directory.EnumerateFiles(
                 ".",
@@ -60,7 +60,7 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             }
         }
 
-        public void TryDeleteDb(
+        public static void TryDeleteDb(
             string dbName)
         {
             if (File.Exists(

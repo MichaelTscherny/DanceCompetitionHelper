@@ -39,6 +39,26 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             return toRet.DanceCompetitionHelperDbContext;
         }
 
+        public IDanceCompetitionHelper GetDanceCompetitionHelper(
+            string danceCompHelper)
+        {
+            var toRet = _scenarioContext.GetFromScenarioContext<IDanceCompetitionHelper>(
+                SpecFlowConstants.DanceCompetitionHelper,
+                danceCompHelper);
+
+            if (toRet == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(danceCompHelper),
+                    string.Format(
+                        "{0} '{1}' not found!",
+                        nameof(IDanceCompetitionHelper),
+                        danceCompHelper));
+            }
+
+            return toRet;
+        }
+
         #region Dispose Stuff
 
         public void AddToDispose(object toDispose)

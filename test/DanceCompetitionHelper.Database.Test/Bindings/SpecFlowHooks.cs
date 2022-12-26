@@ -1,5 +1,4 @@
-﻿using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.Assist;
+﻿using DanceCompetitionHelper.Database.Test.Tests.UnitTests;
 
 namespace DanceCompetitionHelper.Database.Test.Bindings
 {
@@ -12,6 +11,8 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
         public static void BeforeTestRun()
         {
             // Service.Instance.ValueRetrievers.Register(new MyCustomValueRetriever());
+
+            DanceCompetitionHelperDbContextTests.CleanUpOldDbs();
         }
 
         [AfterTestRun]

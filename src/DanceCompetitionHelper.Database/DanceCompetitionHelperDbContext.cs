@@ -9,23 +9,27 @@ namespace DanceCompetitionHelper.Database
 {
     public class DanceCompetitionHelperDbContext : DbContext
     {
-        private readonly ILogger<DanceCompetitionHelperDbContext>? _logger;
+        private readonly ILogger<DanceCompetitionHelperDbContext> _logger;
 
         public IDbConfig SqLiteDbConfig { get; }
         public static string User { get; set; } = Environment.UserName;
 
         public virtual DbSet<Competition> Competitions { get; set; }
         public virtual DbSet<CompetitionClass> CompetitionClasses { get; set; }
+        public virtual DbSet<CompetitionClassHistory> CompetitionClassesHistory { get; set; }
         public virtual DbSet<Participant> Participants { get; set; }
+        public virtual DbSet<ParticipantHistory> ParticipantsHistory { get; set; }
         public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; }
 
         public DanceCompetitionHelperDbContext(
             IDbConfig sqLiteDbConfig,
-            ILogger<DanceCompetitionHelperDbContext>? logger)
+            ILogger<DanceCompetitionHelperDbContext> logger)
             : base()
         {
             SqLiteDbConfig = sqLiteDbConfig;
-            _logger = logger;
+            _logger = logger
+                ?? throw new ArgumentNullException(
+                    nameof(logger)); ;
 
             if (SqLiteDbConfig == null
                 || string.IsNullOrEmpty(SqLiteDbConfig.SqLiteDbFile)
@@ -37,7 +41,7 @@ namespace DanceCompetitionHelper.Database
 
             SavingChanges += OnSavingChanges;
 
-            _logger?.LogTrace(
+            _logger.LogTrace(
                 "{0}() done",
                 nameof(DanceCompetitionHelperDbContext));
         }
@@ -50,7 +54,7 @@ namespace DanceCompetitionHelper.Database
                         "Data Source='{0}'",
                         SqLiteDbConfig.SqLiteDbFile));
 
-            _logger?.LogTrace(
+            _logger.LogTrace(
                 "{0}() done",
                 nameof(OnConfiguring));
         }
@@ -60,7 +64,7 @@ namespace DanceCompetitionHelper.Database
 
             base.OnModelCreating(modelBuilder);
 
-            _logger?.LogTrace(
+            _logger.LogTrace(
                 "{0}() done",
                 nameof(OnModelCreating));
 
@@ -76,7 +80,7 @@ namespace DanceCompetitionHelper.Database
 
             base.ConfigureConventions(configurationBuilder);
 
-            _logger?.LogTrace(
+            _logger.LogTrace(
                 "{0}() done",
                 nameof(ConfigureConventions));
         }
@@ -107,7 +111,7 @@ namespace DanceCompetitionHelper.Database
                     useDateTime);
             }
 
-            _logger?.LogTrace(
+            _logger.LogTrace(
                 "{0}() done",
                 nameof(OnSavingChanges));
         }
