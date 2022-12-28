@@ -1,4 +1,5 @@
 ﻿using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Info;
 
 namespace DanceCompetitionHelper
 {
@@ -7,8 +8,23 @@ namespace DanceCompetitionHelper
         void Migrate();
         IEnumerable<Competition> GetCompetitions();
         IEnumerable<CompetitionClass> GetCompetitionClasses(
-            string competitionName);
+            Guid? competitionId);
         IEnumerable<Participant> GetParticipants(
-            string competitionName);
+            Guid? competitionId);
+        IEnumerable<Participant> GetParticipants(
+            Guid? competitionId,
+            Guid? competitionClassId);
+
+        Guid? GetCompetition(
+            string byName);
+        Guid? GetCompetitionClass(
+            string byName);
+
+        IEnumerable<CompetitionClassInfo> GetCompetitionClassInfos(
+            Guid competitionId,
+            IEnumerable<Guid>? competitionClassIds);
+
+        IEnumerable<(List<Participant> Participant, List<CompetitionClass> CompetitionClasses)> GetMultipleStarter(
+            Guid competitionId);
     }
 }

@@ -44,5 +44,7 @@ namespace DanceCompetitionHelper.Database.Tables
 
         public int MinStartsForPromotion { get; set; }
         public int MinPointsForPromotion { get; set; }
+
+        public bool Ignore { get; set; }
     }
 }

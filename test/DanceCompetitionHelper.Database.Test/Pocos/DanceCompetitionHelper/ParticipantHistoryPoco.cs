@@ -1,6 +1,6 @@
 ﻿namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
 {
-    internal class ParticipantsHistoryPoco
+    internal class ParticipantHistoryPoco
     {
         public string CompetitionName { get; set; } = default!;
         public string CompetitionClassName { get; set; } = default!;
@@ -20,7 +20,7 @@
         public override string ToString()
         {
             return string.Format(
-                "{0} ('{1}'/'{2}'/'{3}') PartA/B '{4}'/'{5}'",
+                "{0} ('{1}'/'{2}'/#'{3}') PartA/B '{4}'/'{5}'",
                 CompetitionName,
                 CompetitionClassName,
                 Version,

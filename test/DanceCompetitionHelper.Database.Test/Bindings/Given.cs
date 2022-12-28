@@ -1,4 +1,5 @@
 ﻿using DanceCompetitionHelper.Database.Config;
+using DanceCompetitionHelper.Database.Diagnostic;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
@@ -6,9 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using System.Diagnostics;
 using TechTalk.SpecFlow.Assist;
 using TestHelper.Extensions;
-using TestHelper.Logging;
 
 namespace DanceCompetitionHelper.Database.Test.Bindings
 {
@@ -31,9 +32,12 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                         (srvProv) => new SqLiteDbConfig()
                         {
                             SqLiteDbFile = GetNewDbName(),
+                            // LogAllSqls = true,
                         });
-                    config.AddSingleton<ILoggerProvider, NUnitLoggerProvider>();
+                    // config.AddSingleton<ILoggerProvider, NUnitLoggerProvider>();
                     config.AddTransient<IDanceCompetitionHelper, DanceCompetitionHelper>();
+                    config.AddTransient<IObserver<DiagnosticListener>, DbDiagnosticObserver>();
+                    config.AddTransient<IObserver<KeyValuePair<string, object?>>, DbKeyValueObserver>();
                 })
                 .ConfigureLogging((_, config) =>
                 {
@@ -258,8 +262,7 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             string danceCompHelperDb,
             Table table)
         {
-            var newParticipants = table.CreateSet<ParticipantsPoco>();
-
+            var newParticipants = table.CreateSet<ParticipantPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
@@ -327,7 +330,7 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             string danceCompHelperDb,
             Table table)
         {
-            var newParticipantsHistory = table.CreateSet<ParticipantsHistoryPoco>();
+            var newParticipantsHistory = table.CreateSet<ParticipantHistoryPoco>();
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);

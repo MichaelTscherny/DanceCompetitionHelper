@@ -1,3 +1,8 @@
+using DanceCompetitionHelper.Database;
+using DanceCompetitionHelper.Database.Config;
+using DanceCompetitionHelper.Database.Diagnostic;
+using System.Diagnostics;
+
 namespace DanceCompetitionHelper.Web
 {
     public class Program
@@ -7,7 +12,21 @@ namespace DanceCompetitionHelper.Web
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services
+                .AddDbContext<DanceCompetitionHelperDbContext>()
+                .AddSingleton<IDanceCompetitionHelper, DanceCompetitionHelper>()
+                .AddSingleton<IObserver<DiagnosticListener>, DbDiagnosticObserver>()
+                .AddSingleton<IObserver<KeyValuePair<string, object?>>, DbKeyValueObserver>()
+                // GO ON WITH CONFIG!..
+                .AddSingleton<IDbConfig>(
+                    builder.Configuration
+                        // .GetSection(SqLiteDbConfig.Name)
+                        .GetValue<IDbConfig>(SqLiteDbConfig.Name))
+                .AddControllersWithViews();
+            builder.Services
+                .Configure<IDbConfig>(
+                    builder.Configuration
+                        .GetSection(SqLiteDbConfig.Name));
 
             var app = builder.Build();
 

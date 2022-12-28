@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DanceCompetitionHelper.Database.Migrations
 {
     [DbContext(typeof(DanceCompetitionHelperDbContext))]
-    [Migration("20221226173311_Init")]
+    [Migration("20221228141450_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -119,6 +119,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Ignore")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("TEXT")
                         .HasComment("Row last modified at (UTC)");
@@ -195,6 +198,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Ignore")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("TEXT")
                         .HasComment("Row last modified at (UTC)");
@@ -255,6 +261,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("Row created by");
+
+                    b.Property<bool>("Ignore")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("TEXT")
@@ -334,6 +343,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("Row created by");
+
+                    b.Property<bool>("Ignore")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("TEXT")

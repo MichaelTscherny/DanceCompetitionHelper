@@ -116,6 +116,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Ignore")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("TEXT")
                         .HasComment("Row last modified at (UTC)");
@@ -192,6 +195,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Ignore")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("TEXT")
                         .HasComment("Row last modified at (UTC)");
@@ -252,6 +258,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("Row created by");
+
+                    b.Property<bool>("Ignore")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("TEXT")
@@ -331,6 +340,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("Row created by");
+
+                    b.Property<bool>("Ignore")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("TEXT")

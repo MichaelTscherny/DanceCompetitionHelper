@@ -6,11 +6,19 @@ namespace DanceCompetitionHelper.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            IDanceCompetitionHelper danceCompHelper,
+            ILogger<HomeController> logger)
         {
-            _logger = logger;
+            _danceCompHelper = danceCompHelper
+                ?? throw new ArgumentNullException(
+                    nameof(danceCompHelper));
+            _logger = logger
+                ?? throw new ArgumentNullException(
+                    nameof(logger));
         }
 
         public IActionResult Index()
