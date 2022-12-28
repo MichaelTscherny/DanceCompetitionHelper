@@ -1,4 +1,4 @@
-﻿namespace DanceCompetitionHelper
+﻿namespace TestHelper
 {
     public class Class1
     {

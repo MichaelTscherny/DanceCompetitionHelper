@@ -52,6 +52,34 @@ for a competition registration.
 - [NUnit](https://www.nuget.org/packages/NUnit)
 - [SpecFlow](https://www.nuget.org/packages/SpecFlow/)
 
+### Folder struct
+
+    - docs  -> documentation for this project
+    - src   -> code of software projects
+    - test  -> test of software projects
+
+## EU General Data Protection Regulation (GDPR)
+
+Some info about this software according to [EU-GDPR](https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=celex%3A32016R0679).
+This software is supposted to work with folloing information.
+
+### Participants List/Start numbers
+
+* Full Name (First-, Middle- Last-Name) or parts of it for the participants lists
+* Name (or Parts) of club or origanization the participant is member of
+* Nationality of participants and club/organizations ("available" via addresses)
+* Address/Location of the competition
+
+### Time Schedule
+
+* Nationality of club/organizations ("available" via addresses)
+* Address/Location of the competition
+
+### Please note
+
+It is not designed to work with adresses of participants at all. But it does not check
+if the imported or entered data contains parts of addresses or other personal data.
+
 ## Contribute
 
 If you like to help on this project, please check 
