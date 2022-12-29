@@ -118,8 +118,8 @@ namespace DanceCompetitionHelper.Database.Diagnostic
                 _logger.Log(
                     useLogLevel,
                     "Runtime of SQL from '{StartTime}': {Duration} {NL}" +
-                    "  {CommandText}{NL}" +
-                    "  Params: {Params}",
+                    "{CommandText}{NL}" +
+                    "Params: {Params}",
                     payload.StartTime,
                     payload.Duration.ToString("g"),
                     Environment.NewLine,

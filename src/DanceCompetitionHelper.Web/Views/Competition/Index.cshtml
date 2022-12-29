@@ -1,0 +1,66 @@
+﻿@using DanceCompetitionHelper.Database.Tables;
+
+@model IEnumerable<Competition>
+
+@{
+    ViewData["Title"] = "Competitions";
+}
+
+<div class="text-center">
+    <h1 class="display-6">Available Competitions</h1>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompetitionDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Organization)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompetitionName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompetitionInfo)
+                </th>
+                <th>
+                    Competition Classes
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <!-- what to use?.. @Html.DisplayFor(modelItem => item.CompetitionDate) -->
+                        @item.CompetitionDate.ToShortDateString()
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Organization)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CompetitionName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CompetitionInfo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CountCompetitionClasses)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.CompetitionId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.CompetitionId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.CompetitionId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<hr />
+<div class="text-center">
+    <div><a asp-action="ShowCreateNew">Create new</a></div>
+</div>

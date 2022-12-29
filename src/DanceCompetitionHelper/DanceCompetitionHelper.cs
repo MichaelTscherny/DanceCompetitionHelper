@@ -36,9 +36,20 @@ namespace DanceCompetitionHelper
                 nameof(Migrate));
         }
 
-        public IEnumerable<Competition> GetCompetitions()
+        public IEnumerable<Competition> GetCompetitions(
+            bool includeInfos = false)
         {
-            return _danceCompHelperDb.Competitions;
+            foreach (var curComp in _danceCompHelperDb.Competitions)
+            {
+                if (includeInfos)
+                {
+                    curComp.CountCompetitionClasses = _danceCompHelperDb.CompetitionClasses
+                        .Count(
+                            x => x.CompetitionId == curComp.CompetitionId);
+                }
+
+                yield return curComp;
+            }
         }
 
         public IEnumerable<CompetitionClass> GetCompetitionClasses(
@@ -311,6 +322,48 @@ namespace DanceCompetitionHelper
         }
 
         #endregion // Conversions/Lookups
+
+        #region Competition Crud
+
+        public void CreateCompetition(
+            string competitionName,
+            OrganizationEnum organization,
+            string orgCompetitionId,
+            string? competitionInfo,
+            DateTime competitionDate)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                _danceCompHelperDb.Competitions.Add(
+                    new Competition()
+                    {
+                        CompetitionName = competitionName,
+                        Organization = organization,
+                        OrgCompetitionId = orgCompetitionId,
+                        CompetitionInfo = competitionInfo,
+                        CompetitionDate = competitionDate,
+                    });
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(CreateCompetition),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+        }
+
+        #endregion //  Competition Crud
 
         #region IDisposable
 

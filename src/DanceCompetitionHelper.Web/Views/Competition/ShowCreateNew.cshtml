@@ -1,0 +1,132 @@
+﻿@using DanceCompetitionHelper.Database.Enum;
+@using DanceCompetitionHelper.Database.Tables;
+
+@{
+    ViewData["Title"] = "Create new Competition";
+
+    var errorText = ViewData["Error"] as string;
+}
+
+<div class="container text-center">
+    <h1 class="display-6">Create new Competition</h1>
+
+    @if (string.IsNullOrEmpty(errorText) == false)
+    {
+        <div class="row py-2 text-danger">
+            <div class="col-md">
+                @errorText
+            </div>
+        </div>
+    }
+
+    <form asp-action="CreateNew" method="post"
+          class="form-horizontal needs-validation"
+          enctype="multipart/form-data"
+          role="form">
+        <div class="row row-cols-3 py-1">
+            <div class="col-md">
+                CompetitionName
+            </div>
+            <div class="col-md-4">
+                <input type="text" 
+                       id="competitionName"
+                       name="competitionName"
+                       placeholder="Competition Name" 
+                       required
+                       value="@ViewData["competitionName"]"
+                       style="width: 100%" />
+            </div>
+            <div class="col-md">
+                <label for="competitionName" class="form-label">
+                    Name of the competition
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md">
+                Organization
+            </div>
+            <div class="col-md-4">
+                <input type="text"
+                       id="organization"
+                       name="organization"
+                       placeholder="Org"
+                       required
+                       readonly
+                       value="@OrganizationEnum.Oetsv.ToString()"
+                       style="width: 100%" />
+            </div>
+            <div class="col-md">
+                <label for="competitionName" class="form-label">
+                    Name of the competition
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md">
+                Origanization Id
+            </div>
+            <div class="col-md-4">
+                <input type="text" 
+                       id="orgCompetitionId"
+                       name="orgCompetitionId"
+                       placeholder="Internal Org Id" 
+                       required
+                       value="@ViewData["orgCompetitionId"]"
+                       style="width: 100%" />
+            </div>
+            <div class="col-md">
+                <label for="competitionName" class="form-label">
+                    Internal ID of your organization
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md">
+                Info
+            </div>
+            <div class="col-md-4">
+                <input type="text" 
+                       id="competitionInfo"
+                       name="competitionInfo"
+                       placeholder="Extra info"
+                       value="@ViewData["competitionInfo"]"
+                       style="width: 100%" />
+            </div>
+            <div class="col-md">
+                <label for="competitionInfo" class="form-label">
+                    Extra infos for this Competition
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md">
+                Competition Date
+            </div>
+            <div class="col-md-4">
+                <input type="date" 
+                       id="competitionDate"
+                       name="competitionDate"
+                       required
+                       value="@ViewData["competitionDate"]"
+                       style="width: 100%" />
+            </div>
+            <div class="col-md">
+                <label for="competitionDate" class="form-label">
+                    Date of this Competition
+                </label>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center py-1">
+            <div class="col">
+                <button class="btn btn-primary px-lg-4" type="submit">
+                    Save
+                </button>
+                &nbsp;
+                <a asp-action="Index" class="btn btn-secondary px-lg-4">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

@@ -13,6 +13,42 @@
     </p>
 }
 
+<h2 class ="text-danger">Model Errors</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                Value
+            </th>
+            <th>
+                Errors
+            </th>
+            <th>
+                Raw value
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var curModelError in Model.ModelErrors)
+        {
+            <tr>
+                <td>
+                    @curModelError.ValidationState
+                </td>
+                <td>
+                    @string.Join(
+                        "; ",
+                        curModelError.Errors
+                            .Select(x => x.ErrorMessage));
+                </td>
+                <td>
+                    @curModelError.RawValue
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 <h3>Development Mode</h3>
 <p>
     Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.

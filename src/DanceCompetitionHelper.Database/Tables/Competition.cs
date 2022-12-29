@@ -31,5 +31,8 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [Required]
         public DateTime CompetitionDate { get; set; }
+
+        [NotMapped]
+        public int CountCompetitionClasses { get; set; }
     }
 }
