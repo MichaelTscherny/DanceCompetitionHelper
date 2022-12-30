@@ -9,9 +9,11 @@
 
     <Copyright>2022 (c) Michael Tscherny</Copyright>
 
-    <AssemblyVersion>0.1.1</AssemblyVersion>
+    <AssemblyVersion>0.2.0</AssemblyVersion>
 
-    <FileVersion>0.1.1</FileVersion>
+    <FileVersion>0.2.0</FileVersion>
+
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,11 +49,16 @@
 
   <ItemGroup>
     <Folder Include="Extensions\" />
-    <Folder Include="Tests\SpecFlow\DanceCompHelper\" />
     <Folder Include="ValueRetriever\" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature.cs">
+      <Visible>true</Visible>
+      <DependentUpon>MultipleStarts.feature</DependentUpon>
+      <DesignTime>true</DesignTime>
+      <AutoGen>true</AutoGen>
+    </Compile>
     <Compile Update="Tests\SpecFlow\Database\Participants.feature.cs">
       <DependentUpon>Participants.feature</DependentUpon>
     </Compile>
@@ -61,6 +68,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Tests\SpecFlow\Database\Participants.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

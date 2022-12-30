@@ -1,6 +1,6 @@
 ﻿namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
 {
-    internal class ParticipantsPoco
+    internal class ParticipantPoco
     {
         public string CompetitionName { get; set; } = default!;
         public string CompetitionClassName { get; set; } = default!;
@@ -15,11 +15,12 @@
 
         public int? OrgPointsPartB { get; set; }
         public int? OrgStartsPartB { get; set; }
+        public bool Ignore { get; set; }
 
         public override string ToString()
         {
             return string.Format(
-                "{0} ('{1}'/'{2}'/'{3}') PartA/B '{4}'/'{5}'",
+                "{0} ('{1}'/'{2}'/#'{3}') PartA/B '{4}'/'{5}'",
                 CompetitionName,
                 CompetitionClassName,
                 "CURRENT",

@@ -1,8 +1,10 @@
 ﻿using DanceCompetitionHelper.Database.Config;
+using DanceCompetitionHelper.Database.Diagnostic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using System.Diagnostics;
 using TestHelper.Logging;
 
 namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
@@ -24,10 +26,13 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                             SqLiteDbFile = GetNewDbName(),
                         });
                     config.AddSingleton<ILoggerProvider, NUnitLoggerProvider>();
+                    config.AddTransient<IObserver<DiagnosticListener>, DbDiagnosticObserver>();
+                    config.AddTransient<IObserver<KeyValuePair<string, object?>>, DbKeyValueObserver>();
                 })
                 .ConfigureLogging((_, config) =>
                 {
-                    config.SetMinimumLevel(LogLevel.Debug);
+                    config.AddConsole();
+                    config.SetMinimumLevel(LogLevel.Trace);
                 })
                 .Build();
         }

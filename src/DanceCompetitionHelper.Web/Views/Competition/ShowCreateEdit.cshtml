@@ -1,0 +1,149 @@
+﻿@using DanceCompetitionHelper.Database.Enum;
+@using DanceCompetitionHelper.Database.Tables;
+
+@model CompetitionViewModel
+
+@{
+    var isCreate = Model.CompetitionId.HasValue == false;
+
+    ViewData["Title"] = string.Format(
+        "{0} Competition",
+        isCreate
+        ? "Create new "
+        : "Edit");
+
+    var formAction = isCreate
+        ? "CreateNew"
+        : "EditSave";
+}
+
+<div class="container text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    @if (string.IsNullOrEmpty(Model.Errors) == false)
+    {
+        <div class="row py-2 text-danger">
+            <div class="col-md">
+                @Model.Errors
+            </div>
+        </div>
+    }
+
+    <form asp-action="@formAction" method="post"
+          class="form-horizontal needs-validation"
+          enctype="multipart/form-data"
+          role="form">
+        <input asp-for="CompetitionId" />
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                CompetitionName
+            </div>
+            <div class="col-md-4">
+                <input asp-for="CompetitionName"
+                       class="a"
+                       placeholder="Competition Name" 
+                       required
+                       style="width: 100%" />
+                <span class="text-danger field-validation-valid"
+                      data-valmsg-for="@nameof(CompetitionViewModel.CompetitionName)"
+                      data-valmsg-replace="true"></span>
+            </div>
+            <div class="col-md text-start">
+                <label for="@nameof(CompetitionViewModel.CompetitionName)" 
+                       class="form-label">
+                    Name of the competition
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Organization
+            </div>
+            <div class="col-md-4">
+                <select asp-for="Organization" 
+                        class="form-select"
+                        placeholder="Org"
+                        required
+                        readonly                        
+                        style="width: 100%">
+                    <option selected value="@OrganizationEnum.Oetsv.ToString()">@OrganizationEnum.Oetsv.ToString()</option>
+                </select>
+                <span class="text-danger field-validation-valid"
+                      data-valmsg-for="@nameof(CompetitionViewModel.Organization)"
+                      data-valmsg-replace="true">
+                </span>
+            </div>
+            <div class="col-md text-start">
+                <label for="@nameof(CompetitionViewModel.Organization)" class="form-label">
+                    Name of the competition
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Origanization Id
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgCompetitionId"
+                       placeholder="Internal Org Id" 
+                       required
+                       style="width: 100%" />
+                <span class="text-danger field-validation-valid"
+                      data-valmsg-for="@nameof(CompetitionViewModel.OrgCompetitionId)"
+                      data-valmsg-replace="true">
+                </span>
+            </div>
+            <div class="col-md text-start">
+                <label for="@nameof(CompetitionViewModel.OrgCompetitionId)" class="form-label">
+                    Internal ID of your organization
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Info
+            </div>
+            <div class="col-md-4">
+                <input asp-for="CompetitionInfo"
+                       placeholder="Extra info"
+                       style="width: 100%" />
+            </div>
+            <div class="col-md text-start">
+                <label for="@nameof(CompetitionViewModel.CompetitionInfo)" class="form-label">
+                    Extra infos for this Competition
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Competition Date
+            </div>
+            <div class="col-md-4">
+                <input asp-for="CompetitionDate"
+                       required
+                       style="width: 100%" />
+                <span class="text-danger field-validation-valid"
+                      data-valmsg-for="@nameof(CompetitionViewModel.CompetitionDate)"
+                      data-valmsg-replace="true">
+                </span>
+
+            </div>
+            <div class="col-md text-start">
+                <label for="@nameof(CompetitionViewModel.CompetitionDate)" class="form-label">
+                    Date of this Competition
+                </label>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center py-1">
+            <div class="col">
+                <button class="btn btn-primary px-lg-4" type="submit">
+                    Save
+                </button>
+                &nbsp;
+                <a asp-action="Index" class="btn btn-secondary px-lg-4">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

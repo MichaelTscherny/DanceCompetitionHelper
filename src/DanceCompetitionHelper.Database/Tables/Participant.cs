@@ -53,5 +53,10 @@ namespace DanceCompetitionHelper.Database.Tables
 
         public int? OrgPointsPartB { get; set; }
         public int? OrgStartsPartB { get; set; }
+
+        public bool Ignore { get; set; }
+
+        [NotMapped]
+        public bool PossiblePromotion { get; set; }
     }
 }

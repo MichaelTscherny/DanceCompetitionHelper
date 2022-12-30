@@ -1,0 +1,61 @@
+﻿@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+
+@model CompetitionOverviewClassModel
+
+@{
+    var compInfo = Model.Competition;
+
+    var compInfoStr = string.Format(
+        "{0} ({1})",
+        compInfo?.CompetitionName ?? "??",
+        compInfo?.OrgCompetitionId ?? "??");
+
+    ViewData["Title"] = string.Format(
+        "Competition Classes of {0}",
+        compInfoStr);
+}
+
+<div class="text-center">
+    <h1 class="display-6">Available Competition Classes of @compInfoStr</h1>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompetitionClasses)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.CompetitionClasses ?? Enumerable.Empty<CompetitionClass>())
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CompetitionClassName)
+                    </td>                    
+                    <td>
+                        <a asp-controller="@CompetitionClassController.RefName"
+                           asp-action="@nameof(CompetitionClassController.Index)"
+                           asp-route-id="@item.CompetitionClassId">
+                           Edit
+                        </a> |
+                        <a asp-controller="@CompetitionClassController.RefName"
+                           asp-action="@nameof(CompetitionController.Delete)"
+                           asp-route-id="@item.CompetitionClassId">
+                           Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <hr />
+    <div class="row d-flex justify-content-center py-1">
+        <div class="col">
+            <a asp-action="ShowCreateNew" class="btn btn-primary">Create new</a>&nbsp;
+        </div>
+    </div>
+</div>
+

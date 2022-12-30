@@ -313,7 +313,7 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             string danceCompHelperDb,
             Table table)
         {
-            var checkParticipants = table.CreateSet<ParticipantsPoco>();
+            var checkParticipants = table.CreateSet<ParticipantPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
@@ -460,7 +460,7 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             string danceCompHelperDb,
             Table table)
         {
-            var checkParticipantsHist = table.CreateSet<ParticipantsHistoryPoco>();
+            var checkParticipantsHist = table.CreateSet<ParticipantHistoryPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
@@ -626,15 +626,31 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             {
                 Assert.Multiple(() =>
                 {
+                    var compId = useDanceCompHelper.GetCompetition(
+                        curChk.CompetitionName);
+
+                    Assert.That(
+                        compId,
+                        Is.Not.Null,
+                        "Nothign found for '{0}' '{1}' (1)",
+                        nameof(curChk.CompetitionName),
+                        curChk.CompetitionName);
+                    Assert.That(
+                        compId.HasValue,
+                        Is.True,
+                        "Nothign found for '{0}' '{1}' (1)",
+                        nameof(curChk.CompetitionName),
+                        curChk.CompetitionName);
+
                     Assert.That(
                         useDanceCompHelper.GetCompetitionClasses(
-                            curChk.CompetitionName)
+                            compId)
                             .Count(),
                         Is.EqualTo(curChk.CountClasses),
                         "Count CompClasses");
                     Assert.That(
                         useDanceCompHelper.GetParticipants(
-                            curChk.CompetitionName)
+                            compId)
                             .Count(),
                         Is.EqualTo(curChk.CountParticipants),
                         "Count Participtans");
@@ -642,6 +658,109 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             }
         }
 
+        [Then(@"following multiple starts exists in Competition ""([^""]*)"" of DanceCompetitionHelper ""([^""]*)""")]
+        public void ThenFollowingMultipleStartsExistsInCompetitionDanceCompetitionHelper(
+            string competitionName,
+            string danceCompHelper,
+            Table table)
+        {
+            var multiStartParticipants = table.CreateSet<ParticipantPoco>();
+            var useDanceCompHelper = GetDanceCompetitionHelper(
+                danceCompHelper);
+
+            var useComp = useDanceCompHelper.GetCompetition(
+                competitionName);
+
+            Assert.That(
+                useComp,
+                Is.Not.Null,
+                "{0} '{1}' not found!",
+                nameof(Competition),
+                competitionName);
+            Assert.That(
+                useComp.HasValue,
+                Is.True,
+                "{0} '{1}' not found",
+                nameof(Competition),
+                competitionName);
+
+            var curMultiStarter = useDanceCompHelper.GetMultipleStarter(
+                useComp.Value)
+                .ToList();
+
+            foreach (var chkMultiStart in multiStartParticipants)
+            {
+                chkMultiStart.CompetitionName = competitionName;
+                var foundStarter = false;
+
+                foreach (var curMuSt in curMultiStarter)
+                {
+                    var foundPart = curMuSt.Participant.FirstOrDefault(
+                        x => x.NamePartA == chkMultiStart.NamePartA
+                        && x.OrgIdPartA == chkMultiStart.OrgIdPartA
+                        && x.NamePartB == chkMultiStart.NamePartB
+                        && x.OrgIdPartB == chkMultiStart.OrgIdPartB
+                        && x.OrgIdClub == chkMultiStart.OrgIdClub
+                        && x.StartNumber == chkMultiStart.StartNumber);
+
+                    if (foundPart == null)
+                    {
+                        continue;
+                    }
+
+                    var foundClass = curMuSt.CompetitionClasses.FirstOrDefault(
+                        x => x.CompetitionClassName == chkMultiStart.CompetitionClassName);
+
+                    if (foundClass == null)
+                    {
+                        continue;
+                    }
+
+                    foundStarter = true;
+                }
+
+                Assert.That(
+                    foundStarter,
+                    Is.True,
+                    "Multiple Start '{0}' not found!",
+                    chkMultiStart);
+            }
+        }
+
+        [Then(@"none multiple starts exists in Competition ""([^""]*)"" of DanceCompetitionHelper ""([^""]*)""")]
+        public void ThenNoneMultipleStartsExistsInCompetitionDanceCompetitionHelper(
+            string competitionName,
+            string danceCompHelper)
+        {
+            var useDanceCompHelper = GetDanceCompetitionHelper(
+                danceCompHelper);
+
+            var useComp = useDanceCompHelper.GetCompetition(
+                competitionName);
+
+            Assert.That(
+                useComp,
+                Is.Not.Null,
+                "{0} '{1}' not found!",
+                nameof(Competition),
+                competitionName);
+            Assert.That(
+                useComp.HasValue,
+                Is.True,
+                "{0} '{1}' not found",
+                nameof(Competition),
+                competitionName);
+
+            var curMultiStarter = useDanceCompHelper.GetMultipleStarter(
+                useComp.Value)
+                .ToList();
+
+            Assert.That(
+                curMultiStarter.Count,
+                Is.EqualTo(0),
+                "Found '{0}' multiple starts instead of none!",
+                curMultiStarter.Count);
+        }
 
         #endregion Dance Competition Helper
 

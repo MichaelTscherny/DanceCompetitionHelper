@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database.Enum;
+﻿using DanceCompetitionHelper.Database.DisplayInfo;
+using DanceCompetitionHelper.Database.Enum;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -31,5 +32,8 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [Required]
         public DateTime CompetitionDate { get; set; }
+
+        [NotMapped]
+        public CompetitionDisplayInfo? DisplayInfo { get; set; }
     }
 }

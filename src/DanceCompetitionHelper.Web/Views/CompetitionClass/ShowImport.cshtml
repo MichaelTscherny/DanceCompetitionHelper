@@ -1,0 +1,32 @@
+﻿@using DanceCompetitionHelper.Database.Enum;
+@using DanceCompetitionHelper.Database.Tables;
+
+@{
+    var isCreate = Model.CompetitionId.HasValue == false;
+
+    ViewData["Title"] = "Import new Competition";
+
+    var formAction = "DoImport";
+}
+
+<div class="container text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    <form asp-action="@formAction" method="post"
+          class="form-horizontal needs-validation"
+          enctype="multipart/form-data"
+          role="form">
+        
+        <div class="row d-flex justify-content-center py-1">
+            <div class="col">
+                <button class="btn btn-primary px-lg-4" type="submit">
+                    Save
+                </button>
+                &nbsp;
+                <a asp-action="Index" class="btn btn-secondary px-lg-4">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

@@ -9,7 +9,7 @@ Scenario: Single Participant
         | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
     And following Competition Classes in "Dach_db_participants_01"
         | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-01    | 1       | Clas-01    | Allg. Sta D          | STA        | Allg     | 0        | D     | 10                    | 900                   |
+        | Test-Comp-01    | 1       | Class-01   | Allg. Sta D          | Sta        | Allg     | 0        | D     | 10                    | 900                   |
     And following Participants in "Dach_db_participants_01"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA        | OrgIdPartA | NamePartB       | OrgIdPartB | OrgIdClub |
         | Test-Comp-01    | Allg. Sta D          | 1           | Michael Tscherny | 1          | Margot Tscherny | 2          | 3         |
@@ -18,7 +18,7 @@ Scenario: Single Participant
         | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
     And following Competition Classes exists in "Dach_db_participants_01"
         | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-01    | 1       | Clas-01    | Allg. Sta D          | STA        | Allg     | 0        | D     | 10                    | 900                   |
+        | Test-Comp-01    | 1       | Class-01   | Allg. Sta D          | Sta        | Allg     | 0        | D     | 10                    | 900                   |
     And following Participants exists in "Dach_db_participants_01"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA        | OrgIdPartA | NamePartB       | OrgIdPartB | OrgIdClub |
         | Test-Comp-01    | Allg. Sta D          | 1           | Michael Tscherny | 1          | Margot Tscherny | 2          | 3         |
@@ -32,8 +32,8 @@ Scenario: Multiple Participants
     # Test-Comp-01
     And following Competition Classes in "Dach_db_participants_02"
         | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-01    | 1       | Clas-01    | Allg. Sta D          | STA        | Allg     | 0        | D     | 10                    | 900                   |
-        | Test-Comp-01    | 1       | Clas-02    | Allg. Sta C          | STA        | Allg     | 0        | C     | 10                    | 1800                  |
+        | Test-Comp-01    | 1       | Class-01   | Allg. Sta D          | Sta        | Allg     | 0        | D     | 10                    | 900                   |
+        | Test-Comp-01    | 1       | Class-02   | Allg. Sta C          | Sta        | Allg     | 0        | C     | 10                    | 1800                  |
     And following Participants in "Dach_db_participants_02"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA        | OrgIdPartA | NamePartB       | OrgIdPartB | OrgIdClub |
         | Test-Comp-01    | Allg. Sta D          | 1           | Michael Tscherny | 1          | Margot Tscherny | 2          | 10        |
@@ -41,8 +41,8 @@ Scenario: Multiple Participants
     # Test-Comp-02
     And following Competition Classes in "Dach_db_participants_02"
         | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-02    | 1       | Clas-01    | Allg. Sta A          | STA        | Allg     | 0        | A     | 10                    | 1800                  |
-        | Test-Comp-02    | 1       | Clas-02    | Allg. Sta S          | STA        | Allg     | 0        | S     | 10                    | 9999                  |
+        | Test-Comp-02    | 1       | Class-01   | Allg. Sta A          | Sta        | Allg     | 0        | A     | 10                    | 1800                  |
+        | Test-Comp-02    | 1       | Class-02   | Allg. Sta S          | Sta        | Allg     | 0        | S     | 10                    | 9999                  |
     And following Participants in "Dach_db_participants_02"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | OrgIdClub |
         | Test-Comp-02    | Allg. Sta A          | 10          | Dancer 01-A | 5          | Dancer 01-B | 6          | 10        |
@@ -55,16 +55,16 @@ Scenario: Multiple Participants
     # Test-Comp-01
     And following Competition Classes exists in "Dach_db_participants_02"
         | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-01    | 1       | Clas-01    | Allg. Sta D          | STA        | Allg     | 0        | D     | 10                    | 900                   |
-        | Test-Comp-01    | 1       | Clas-02    | Allg. Sta C          | STA        | Allg     | 0        | C     | 10                    | 1800                  |
+        | Test-Comp-01    | 1       | Class-01   | Allg. Sta D          | Sta        | Allg     | 0        | D     | 10                    | 900                   |
+        | Test-Comp-01    | 1       | Class-02   | Allg. Sta C          | Sta        | Allg     | 0        | C     | 10                    | 1800                  |
     And following Participants exists in "Dach_db_participants_02"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA        | OrgIdPartA | NamePartB       | OrgIdPartB | OrgIdClub |
         | Test-Comp-01    | Allg. Sta D          | 1           | Michael Tscherny | 1          | Margot Tscherny | 2          | 10        |
     # Test-Comp-02
     And following Competition Classes exists in "Dach_db_participants_02"
         | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-02    | 1       | Clas-01    | Allg. Sta A          | STA        | Allg     | 0        | A     | 10                    | 1800                  |
-        | Test-Comp-02    | 1       | Clas-02    | Allg. Sta S          | STA        | Allg     | 0        | S     | 10                    | 9999                  |
+        | Test-Comp-02    | 1       | Class-01   | Allg. Sta A          | Sta        | Allg     | 0        | A     | 10                    | 1800                  |
+        | Test-Comp-02    | 1       | Class-02   | Allg. Sta S          | Sta        | Allg     | 0        | S     | 10                    | 9999                  |
     And following Participants exists in "Dach_db_participants_02"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | OrgIdClub |
         | Test-Comp-02    | Allg. Sta A          | 10          | Dancer 01-A | 5          | Dancer 01-B | 6          | 10        |

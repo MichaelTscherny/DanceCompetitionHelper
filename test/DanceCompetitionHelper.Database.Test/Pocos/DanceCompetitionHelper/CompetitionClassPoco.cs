@@ -11,6 +11,7 @@
         public string? Class { get; set; }
         public int MinStartsForPromotion { get; set; }
         public int MinPointsForPromotion { get; set; }
+        public bool Ignore { get; set; }
 
         public override string ToString()
         {
