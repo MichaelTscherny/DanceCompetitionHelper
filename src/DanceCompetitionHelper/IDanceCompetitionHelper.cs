@@ -17,6 +17,8 @@ namespace DanceCompetitionHelper
             Guid? competitionId,
             Guid? competitionClassId);
 
+        Competition? GetCompetition(
+            Guid competitionId);
         Guid? GetCompetition(
             string byName);
         Guid? GetCompetitionClass(
@@ -37,6 +39,17 @@ namespace DanceCompetitionHelper
             string orgCompetitionId,
             string? competitionInfo,
             DateTime competitionDate);
+
+        void EditCompetition(
+            Guid competitionId,
+            string competitionName,
+            OrganizationEnum organization,
+            string orgCompetitionId,
+            string? competitionInfo,
+            DateTime competitionDate);
+
+        void RemoveCompetition(
+            Guid competitionId);
 
         #endregion //  Competition Crud
 

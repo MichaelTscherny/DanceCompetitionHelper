@@ -1,5 +1,6 @@
 ﻿using DanceCompetitionHelper.Config;
 using DanceCompetitionHelper.Database;
+using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Info;
@@ -30,25 +31,109 @@ namespace DanceCompetitionHelper
 
         public void Migrate()
         {
-            _danceCompHelperDb.Migrate();
             _logger.LogDebug(
                 "Do '{Method}'",
                 nameof(Migrate));
+
+            _danceCompHelperDb.Migrate();
+        }
+
+        public Competition? GetCompetition(
+            Guid competitionId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                return _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(GetCompetition) + "(Guid)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
+            }
+            finally
+            {
+                dbTrans.Rollback();
+            }
         }
 
         public IEnumerable<Competition> GetCompetitions(
             bool includeInfos = false)
         {
-            foreach (var curComp in _danceCompHelperDb.Competitions)
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            var countsOfCompClasses = new Dictionary<Guid, int>();
+            var countsOfParticipants = new Dictionary<Guid, int>();
+
+            try
             {
                 if (includeInfos)
                 {
-                    curComp.CountCompetitionClasses = _danceCompHelperDb.CompetitionClasses
-                        .Count(
-                            x => x.CompetitionId == curComp.CompetitionId);
+                    countsOfCompClasses = _danceCompHelperDb.CompetitionClasses
+                        .TagWith(
+                            nameof(GetCompetitions) + "(bool?)")
+                        .GroupBy(
+                            x => x.CompetitionId,
+                            (compId, items) => new
+                            {
+                                CompetitionId = compId,
+                                Count = items.Count(),
+                            })
+                        .ToDictionary(
+                            x => x.CompetitionId,
+                            x => x.Count);
+
+                    countsOfParticipants = _danceCompHelperDb.Participants
+                        .TagWith(
+                            nameof(GetCompetitions) + "(bool?)")
+                        .GroupBy(
+                            x => x.CompetitionId,
+                            (compId, items) => new
+                            {
+                                CompetitionId = compId,
+                                Count = items.Count(),
+                            })
+                        .ToDictionary(
+                            x => x.CompetitionId,
+                            x => x.Count);
                 }
 
-                yield return curComp;
+                foreach (var curComp in _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(GetCompetitions) + "(bool?)")
+                    .OrderByDescending(
+                        x => x.CompetitionDate)
+                    .ThenBy(
+                        x => x.OrgCompetitionId))
+                {
+                    if (includeInfos)
+                    {
+                        if (curComp.DisplayInfo == null)
+                        {
+                            curComp.DisplayInfo = new CompetitionDisplayInfo();
+                        }
+
+                        if (countsOfCompClasses.TryGetValue(
+                            curComp.CompetitionId,
+                            out var countCompClasses))
+                        {
+                            curComp.DisplayInfo.CountCompetitionClasses = countCompClasses;
+                        }
+
+                        if (countsOfParticipants.TryGetValue(
+                            curComp.CompetitionId,
+                            out var countParticipants))
+                        {
+                            curComp.DisplayInfo.CountParticipants = countParticipants;
+                        }
+                    }
+
+                    yield return curComp;
+                }
+            }
+            finally
+            {
+                dbTrans.Rollback();
             }
         }
 
@@ -60,16 +145,32 @@ namespace DanceCompetitionHelper
                 return Enumerable.Empty<CompetitionClass>();
             }
 
-            var foundComp = _danceCompHelperDb.Competitions.FirstOrDefault(
-                x => x.CompetitionId == competitionId);
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
-            if (foundComp == null)
+            try
             {
-                return Enumerable.Empty<CompetitionClass>();
-            }
+                var foundComp = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(GetCompetitionClasses) + "(Guid?)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
 
-            return _danceCompHelperDb.CompetitionClasses
-                .Where(x => x.Competition == foundComp);
+                if (foundComp == null)
+                {
+                    return Enumerable.Empty<CompetitionClass>();
+                }
+
+                return _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(GetCompetitionClasses) + "(Guid?)")
+                    .Include(x => x.Competition)
+                    .Where(
+                        x => x.CompetitionId == foundComp.CompetitionId);
+            }
+            finally
+            {
+                dbTrans.Rollback();
+            }
         }
 
         public IEnumerable<Participant> GetParticipants(
@@ -80,18 +181,32 @@ namespace DanceCompetitionHelper
                 return Enumerable.Empty<Participant>();
             }
 
-            var foundComp = _danceCompHelperDb.Competitions.FirstOrDefault(
-                x => x.CompetitionId == competitionId);
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
-            if (foundComp == null)
+            try
             {
-                return Enumerable.Empty<Participant>();
-            }
+                var foundComp = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(GetParticipants) + "(Guid?)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
 
-            return _danceCompHelperDb.Participants
-                .Where(
-                    x => x.Competition == foundComp
-                    && x.Ignore == false);
+                if (foundComp == null)
+                {
+                    return Enumerable.Empty<Participant>();
+                }
+
+                return _danceCompHelperDb.Participants
+                    .TagWith(
+                        nameof(GetParticipants) + "(Guid?)")
+                    .Where(
+                        x => x.Competition == foundComp
+                        && x.Ignore == false);
+            }
+            finally
+            {
+                dbTrans.Rollback();
+            }
         }
 
         public IEnumerable<Participant> GetParticipants(
@@ -104,152 +219,209 @@ namespace DanceCompetitionHelper
                 return Enumerable.Empty<Participant>();
             }
 
-            var foundComp = _danceCompHelperDb.Competitions.FirstOrDefault(
-                x => x.CompetitionId == competitionId);
-            var foundCompClass = _danceCompHelperDb.CompetitionClasses.FirstOrDefault(
-                x => x.CompetitionId == competitionId
-                && x.CompetitionClassId == competitionClassId
-                && x.Ignore == false);
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
-            if (foundComp == null
-                || foundCompClass == null)
+            try
             {
-                return Enumerable.Empty<Participant>();
-            }
+                var foundComp = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(GetParticipants) + "(Guid?, Guid?)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
+                var foundCompClass = _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(GetParticipants) + "(Guid?, Guid?)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId
+                        && x.CompetitionClassId == competitionClassId
+                        && x.Ignore == false);
 
-            return _danceCompHelperDb.Participants
-                .Where(
-                    x => x.Competition == foundComp
-                    && x.CompetitionClass == foundCompClass
-                    && x.Ignore == false);
+                if (foundComp == null
+                    || foundCompClass == null)
+                {
+                    return Enumerable.Empty<Participant>();
+                }
+
+                return _danceCompHelperDb.Participants
+                    .TagWith(
+                        nameof(GetParticipants) + "(Guid?, Guid?)")
+                    .Where(
+                        x => x.Competition == foundComp
+                        && x.CompetitionClass == foundCompClass
+                        && x.Ignore == false);
+            }
+            finally
+            {
+                dbTrans.Rollback();
+            }
         }
 
         public IEnumerable<CompetitionClassInfo> GetCompetitionClassInfos(
             Guid competitionId,
             IEnumerable<Guid>? competitionClassIds)
         {
-            var foundComp = _danceCompHelperDb.Competitions.FirstOrDefault(
-                x => x.CompetitionId == competitionId);
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
-            if (foundComp == null)
+            try
             {
-                yield break;
-            }
+                var foundComp = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(GetCompetitionClassInfos) + "(Guid, IEnumerable<Guid>?)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
 
-            var useCompClasses = _danceCompHelperDb.CompetitionClasses
-                .Where(x => x.Competition == foundComp);
-
-            if (competitionClassIds != null)
-            {
-                var useCompClassIds = new HashSet<Guid>(competitionClassIds);
-
-                if (useCompClassIds.Count >= 1)
+                if (foundComp == null)
                 {
-                    useCompClasses = useCompClasses.Where(
-                        x => useCompClassIds.Contains(x.CompetitionClassId));
-                }
-            }
-
-            var participtansByClassid = new Dictionary<Guid, List<Participant>>();
-            // var multipleStartsByPart = new Dictionary<Guid, >
-            var allPart = new List<Participant>();
-
-            foreach (var curPart in _danceCompHelperDb.Participants.Where(
-                x => x.Competition == foundComp
-                && x.Ignore == false))
-            {
-                allPart.Add(
-                    curPart);
-
-                if (participtansByClassid.TryGetValue(
-                    curPart.CompetitionClassId,
-                    out var curParts) == false)
-                {
-                    curParts = new List<Participant>();
-                    participtansByClassid[curPart.CompetitionClassId] = curParts;
+                    yield break;
                 }
 
-                curParts.Add(curPart);
-            }
+                var useCompClasses = _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(GetCompetitionClassInfos) + "(Guid, IEnumerable<Guid>?)")
+                    .Where(
+                        x => x.Competition == foundComp);
 
-            /*
-            var allPart = _danceCompHelperDb.Participants.Where(
-                x => x.Competition == foundComp
-                && x.Ignore == false)
-                .ToList();
-            */
+                if (competitionClassIds != null)
+                {
+                    var useCompClassIds = new HashSet<Guid>(competitionClassIds);
 
-            foreach (var curCompClass in useCompClasses.OrderBy(x => x.OrgClassId))
-            {
-                var extraPart = new ExtraParticipants();
-                var compSettings = new CompetitionClassSettings();
+                    if (useCompClassIds.Count >= 1)
+                    {
+                        useCompClasses = useCompClasses
+                            .TagWith(
+                                nameof(GetCompetitionClassInfos) + "(Guid, IEnumerable<Guid>?)")
+                            .Where(
+                                x => useCompClassIds.Contains(x.CompetitionClassId));
+                    }
+                }
 
-                var retCompClassInfo = new CompetitionClassInfo(
-                    this,
-                    curCompClass.Competition,
-                    curCompClass,
-                    GetExtraParticipants(
+                var participtansByClassid = new Dictionary<Guid, List<Participant>>();
+                // var multipleStartsByPart = new Dictionary<Guid, >
+                var allPart = new List<Participant>();
+
+                foreach (var curPart in _danceCompHelperDb.Participants
+                    .TagWith(
+                        nameof(GetCompetitionClassInfos) + "(Guid, IEnumerable<Guid>?)")
+                    .Where(
+                        x => x.Competition == foundComp
+                        && x.Ignore == false))
+                {
+                    allPart.Add(
+                        curPart);
+
+                    if (participtansByClassid.TryGetValue(
+                        curPart.CompetitionClassId,
+                        out var curParts) == false)
+                    {
+                        curParts = new List<Participant>();
+                        participtansByClassid[curPart.CompetitionClassId] = curParts;
+                    }
+
+                    curParts.Add(curPart);
+                }
+
+                /*
+                var allPart = _danceCompHelperDb.Participants.Where(
+                    x => x.Competition == foundComp
+                    && x.Ignore == false)
+                    .ToList();
+                */
+
+                foreach (var curCompClass in useCompClasses
+                    .TagWith(
+                        nameof(GetCompetitionClassInfos) + "(Guid, IEnumerable<Guid>?)")
+                    .OrderBy(
+                        x => x.OrgClassId))
+                {
+                    var extraPart = new ExtraParticipants();
+                    var compSettings = new CompetitionClassSettings();
+
+                    var retCompClassInfo = new CompetitionClassInfo(
+                        this,
+                        curCompClass.Competition,
                         curCompClass,
-                        participtansByClassid),
-                    GetCompetitionClassSettings(
-                        curCompClass));
+                        GetExtraParticipants(
+                            curCompClass,
+                            participtansByClassid),
+                        GetCompetitionClassSettings(
+                            curCompClass));
 
-                yield return retCompClassInfo;
+                    yield return retCompClassInfo;
+                }
+            }
+            finally
+            {
+                dbTrans.Rollback();
             }
         }
 
         public IEnumerable<(List<Participant> Participant, List<CompetitionClass> CompetitionClasses)> GetMultipleStarter(
             Guid competitionId)
         {
-            var foundComp = _danceCompHelperDb.Competitions.FirstOrDefault(
-                x => x.CompetitionId == competitionId);
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
-            if (foundComp == null)
+            try
             {
-                yield break;
-            }
+                var foundComp = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(GetMultipleStarter) + "(Guid)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
 
-            var multipleStarterGouping = _danceCompHelperDb.Participants
-                .TagWith(nameof(GetMultipleStarter))
-                .GroupBy(
-                x => new
+                if (foundComp == null)
                 {
-                    x.NamePartA,
-                    x.OrgIdPartA,
-                    x.NamePartB,
-                    x.OrgIdPartB,
-                    x.OrgIdClub,
-                })
-                .Where(
-                    x => x.Count() >= 2)
-                .Select(
-                    x => x.Key);
+                    yield break;
+                }
 
-            foreach (var curMultiStart in multipleStarterGouping)
-            {
-                var allPartInfo = _danceCompHelperDb.Participants
+                var multipleStarterGouping = _danceCompHelperDb.Participants
+                    .TagWith(
+                        nameof(GetMultipleStarter) + "(Guid)")
+                    .GroupBy(
+                        x => new
+                        {
+                            x.NamePartA,
+                            x.OrgIdPartA,
+                            x.NamePartB,
+                            x.OrgIdPartB,
+                            x.OrgIdClub,
+                        })
                     .Where(
-                        x => x.NamePartA == curMultiStart.NamePartA
-                        && x.OrgIdPartA == curMultiStart.OrgIdPartA
-                        && x.NamePartB == curMultiStart.NamePartB
-                        && x.OrgIdPartB == curMultiStart.OrgIdPartB
-                        && x.OrgIdClub == curMultiStart.OrgIdClub)
-                    .ToList();
-                var allComps = allPartInfo
-                    .Where(
-                        x => x.CompetitionClass != null)
+                        x => x.Count() >= 2)
                     .Select(
-                        x => x.CompetitionClass)
-                    .Distinct()
-                    .ToList();
+                        x => x.Key);
 
-                yield return (allPartInfo,
-                    allComps);
+                foreach (var curMultiStart in multipleStarterGouping)
+                {
+                    var allPartInfo = _danceCompHelperDb.Participants
+                        .TagWith(
+                            nameof(GetMultipleStarter) + "(Guid)")
+                        .Where(
+                            x => x.NamePartA == curMultiStart.NamePartA
+                            && x.OrgIdPartA == curMultiStart.OrgIdPartA
+                            && x.NamePartB == curMultiStart.NamePartB
+                            && x.OrgIdPartB == curMultiStart.OrgIdPartB
+                            && x.OrgIdClub == curMultiStart.OrgIdClub)
+                        .ToList();
+                    var allComps = allPartInfo
+                        .Where(
+                            x => x.CompetitionClass != null)
+                        .Select(
+                            x => x.CompetitionClass)
+                        .Distinct()
+                        .ToList();
+
+                    yield return (allPartInfo,
+                        allComps);
+                }
             }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(GetMultipleStarter));
 
-            _logger.LogTrace(
-                "{Method}() done",
-                nameof(GetMultipleStarter));
+                dbTrans.Rollback();
+            }
         }
 
         public ExtraParticipants GetExtraParticipants(
@@ -265,8 +437,6 @@ namespace DanceCompetitionHelper
 
             return new ExtraParticipants();
         }
-
-
 
         public CompetitionClassSettings GetCompetitionClassSettings(
             CompetitionClass competitionClass)
@@ -306,19 +476,49 @@ namespace DanceCompetitionHelper
 
         public Guid? GetCompetition(string byName)
         {
-            return _danceCompHelperDb.Competitions
-                .FirstOrDefault(
-                    x => x.CompetitionName == byName)
-                ?.CompetitionId;
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                return _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(GetCompetition) + "(string)")
+                    .FirstOrDefault(
+                        x => x.CompetitionName == byName)
+                    ?.CompetitionId;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(GetCompetition));
+
+                dbTrans.Rollback();
+            }
         }
 
         public Guid? GetCompetitionClass(string byName)
         {
-            return _danceCompHelperDb.CompetitionClasses
-                .FirstOrDefault(
-                    x => x.CompetitionClassName == byName
-                    && x.Ignore == false)
-                ?.CompetitionClassId;
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                return _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(GetCompetitionClass) + "(string)")
+                    .FirstOrDefault(
+                        x => x.CompetitionClassName == byName
+                        && x.Ignore == false)
+                    ?.CompetitionClassId;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(GetCompetitionClass));
+
+                dbTrans.Rollback();
+            }
         }
 
         #endregion // Conversions/Lookups
@@ -360,6 +560,116 @@ namespace DanceCompetitionHelper
                 dbTrans.Rollback();
 
                 throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(CreateCompetition));
+            }
+        }
+
+        public void EditCompetition(
+            Guid competitionId,
+            string competitionName,
+            OrganizationEnum organization,
+            string orgCompetitionId,
+            string? competitionInfo,
+            DateTime competitionDate)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundComp = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(EditCompetition) + "(Guid, ...)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
+
+                if (foundComp == null)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            "{0} with id '{1}' not found!",
+                            nameof(Competition),
+                            competitionId));
+                }
+
+                foundComp.CompetitionName = competitionName;
+                foundComp.Organization = organization;
+                foundComp.OrgCompetitionId = orgCompetitionId;
+                foundComp.CompetitionInfo = competitionInfo;
+                foundComp.CompetitionDate = competitionDate;
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(EditCompetition),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(EditCompetition));
+            }
+        }
+
+        public void RemoveCompetition(
+            Guid competitionId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundComp = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(RemoveCompetition) + "(Guid)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
+
+                if (foundComp == null)
+                {
+                    _logger.LogWarning(
+                        "{Competition} with id '{CompetitionId}' not found!",
+                        nameof(Competition),
+                        competitionId);
+                    return;
+                }
+
+                _danceCompHelperDb.Competitions.Remove(
+                    foundComp);
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(RemoveCompetition),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(RemoveCompetition));
             }
         }
 

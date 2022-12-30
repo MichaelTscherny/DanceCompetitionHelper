@@ -51,7 +51,7 @@ namespace DanceCompetitionHelper.Web
 
                 app.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Competition}/{action=Index}/{competitionId?}");
+                    pattern: "{controller=Competition}/{action=Index}/{id?}");
 
                 app.Run();
             }

@@ -1,5 +1,4 @@
-﻿using DanceCompetitionHelper.Database.Enum;
-using DanceCompetitionHelper.Web.Models;
+﻿using DanceCompetitionHelper.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Diagnostics;
@@ -8,6 +7,8 @@ namespace DanceCompetitionHelper.Web.Controllers
 {
     public class CompetitionController : Controller
     {
+        public const string RefName = "Competition";
+
         private static bool _initialMigrationDone = false;
 
         private readonly IDanceCompetitionHelper _danceCompHelper;
@@ -38,60 +39,139 @@ namespace DanceCompetitionHelper.Web.Controllers
                     true));
         }
 
-        public IActionResult ShowCreateNew(
-            string? errorText = null)
+        public IActionResult ShowCreateEdit()
         {
-            return View();
+            return View(
+                new CompetitionViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateNew(
-            string competitionName,
-            OrganizationEnum organization,
-            string orgCompetitionId,
-            string? competitionInfo,
-            DateTime competitionDate)
+            CompetitionViewModel createCompetition)
         {
             if (ModelState.IsValid == false)
             {
+                createCompetition.Errors = string.Join(
+                    "<br>",
+                    ModelState.Values
+                        .Where(
+                            x => x.ValidationState != ModelValidationState.Valid
+                            && x.Errors.Count >= 1)
+                        .SelectMany(
+                            x => x.Errors)
+                        .Select(
+                            x => x.ErrorMessage));
+
                 return View(
-                    nameof(Error),
-                    new ErrorViewModel
-                    {
-                        RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-                        ModelErrors = ModelState.Values
-                            .Where(
-                                x => x.ValidationState != ModelValidationState.Valid
-                                && x.Errors.Count >= 1)
-                            .ToList()
-                    });
+                    nameof(ShowCreateEdit),
+                    createCompetition);
             }
 
             try
             {
                 _danceCompHelper.CreateCompetition(
-                    competitionName,
-                    organization,
-                    orgCompetitionId,
-                    competitionInfo,
-                    competitionDate);
+                    createCompetition.CompetitionName,
+                    createCompetition.Organization,
+                    createCompetition.OrgCompetitionId,
+                    createCompetition.CompetitionInfo,
+                    createCompetition.CompetitionDate ?? DateTime.Now);
 
                 return RedirectToAction(
                     nameof(Index));
             }
             catch (Exception exc)
             {
-                ViewData["Error"] = exc.InnerException?.Message ?? exc.Message;
-                ViewData["competitionName"] = competitionName;
-                ViewData["organization"] = organization;
-                ViewData["orgCompetitionId"] = orgCompetitionId;
-                ViewData["competitionInfo"] = competitionInfo;
-                ViewData["competitionDate"] = competitionDate.ToShortDateString();
+                createCompetition.Errors = exc.InnerException?.Message ?? exc.Message;
 
                 return View(
-                    nameof(ShowCreateNew));
+                    nameof(ShowCreateEdit),
+                    createCompetition);
             }
+        }
+
+        public IActionResult ShowEdit(
+            Guid id)
+        {
+            var foundComp = _danceCompHelper.GetCompetition(
+                id);
+
+            if (foundComp == null)
+            {
+                return RedirectToAction(
+                    nameof(Index));
+            }
+
+            return View(
+                nameof(ShowCreateEdit),
+                new CompetitionViewModel()
+                {
+                    CompetitionId = foundComp.CompetitionId,
+                    CompetitionName = foundComp.CompetitionName,
+                    Organization = foundComp.Organization,
+                    OrgCompetitionId = foundComp.OrgCompetitionId,
+                    CompetitionInfo = foundComp.CompetitionInfo,
+                    CompetitionDate = foundComp.CompetitionDate,
+                });
+        }
+
+        public IActionResult EditSave(
+            CompetitionViewModel editCompetition)
+        {
+            if (ModelState.IsValid == false)
+            {
+                editCompetition.Errors = string.Join(
+                    "<br>",
+                    ModelState.Values
+                        .Where(
+                            x => x.ValidationState != ModelValidationState.Valid
+                            && x.Errors.Count >= 1)
+                        .SelectMany(
+                            x => x.Errors)
+                        .Select(
+                            x => x.ErrorMessage));
+
+                return View(
+                    nameof(ShowCreateEdit),
+                    editCompetition);
+            }
+
+            try
+            {
+                _danceCompHelper.EditCompetition(
+                    editCompetition.CompetitionId ?? Guid.Empty,
+                    editCompetition.CompetitionName,
+                    editCompetition.Organization,
+                    editCompetition.OrgCompetitionId,
+                    editCompetition.CompetitionInfo,
+                    editCompetition.CompetitionDate ?? DateTime.Now);
+
+                return RedirectToAction(
+                    nameof(Index));
+            }
+            catch (Exception exc)
+            {
+                editCompetition.Errors = exc.InnerException?.Message ?? exc.Message;
+
+                return View(
+                    nameof(ShowCreateEdit),
+                    editCompetition);
+            }
+        }
+
+        public IActionResult Delete(
+            Guid id)
+        {
+            _danceCompHelper.RemoveCompetition(
+                id);
+
+            return RedirectToAction(
+                nameof(Index));
+        }
+
+        public IActionResult ShowImport()
+        {
+            return View();
         }
 
         public IActionResult Privacy()

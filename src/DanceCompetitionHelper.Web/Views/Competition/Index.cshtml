@@ -1,4 +1,5 @@
 ﻿@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
 
 @model IEnumerable<Competition>
 
@@ -27,6 +28,9 @@
                 <th>
                     Competition Classes
                 </th>
+                <th>
+                    Participants
+                </th>
                 <th></th>
             </tr>
         </thead>
@@ -42,25 +46,45 @@
                         @Html.DisplayFor(modelItem => item.Organization)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.CompetitionName)
+                        @Html.DisplayFor(modelItem => item.CompetitionName)&nbsp;
+                        (@Html.DisplayFor(modelItem => item.OrgCompetitionId))
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.CompetitionInfo)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.CountCompetitionClasses)
+                        @(item.DisplayInfo?.CountCompetitionClasses ?? 0)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.CompetitionId">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.CompetitionId">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.CompetitionId">Delete</a>
+                        @(item.DisplayInfo?.CountParticipants ?? 0)
+                    </td>
+                    <td>
+                        <a asp-controller="@CompetitionController.RefName"
+                           asp-action="@nameof(CompetitionController.ShowEdit)" 
+                           asp-route-id="@item.CompetitionId">
+                           Edit
+                        </a> |
+                        <a asp-controller="@CompetitionClassController.RefName"
+                           asp-action="@nameof(CompetitionClassController.Index)"
+                           asp-route-id="@item.CompetitionId">
+                           Details
+                        </a> |
+                        <a asp-controller="@CompetitionController.RefName"
+                           asp-action="@nameof(CompetitionController.Delete)"
+                           asp-route-id="@item.CompetitionId">
+                           Delete
+                        </a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+    <hr />
+    <div class="row d-flex justify-content-center py-1">
+        <div class="col">
+            <a asp-action="@nameof(CompetitionController.ShowCreateEdit)" class="btn btn-primary">Create new</a>&nbsp;
+            <a asp-action="@nameof(CompetitionController.ShowImport)" class="btn btn-primary">Import new</a>
+        </div>
+    </div>
 </div>
-<hr />
-<div class="text-center">
-    <div><a asp-action="ShowCreateNew">Create new</a></div>
-</div>
+
