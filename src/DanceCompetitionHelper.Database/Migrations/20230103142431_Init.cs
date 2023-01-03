@@ -133,6 +133,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     NamePartB = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true),
                     OrgIdPartB = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true),
                     OrgIdClub = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true),
+                    ClubName = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true),
                     OrgPointsPartA = table.Column<int>(type: "INTEGER", nullable: false),
                     OrgStartsPartA = table.Column<int>(type: "INTEGER", nullable: false),
                     OrgPointsPartB = table.Column<int>(type: "INTEGER", nullable: true),

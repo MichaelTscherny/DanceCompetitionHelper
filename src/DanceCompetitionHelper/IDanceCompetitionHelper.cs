@@ -12,10 +12,9 @@ namespace DanceCompetitionHelper
             Guid? competitionId,
             bool includeInfos = false);
         IEnumerable<Participant> GetParticipants(
-            Guid? competitionId);
-        IEnumerable<Participant> GetParticipants(
             Guid? competitionId,
-            Guid? competitionClassId);
+            Guid? competitionClassId,
+            bool includeInfos = false);
 
         Competition? GetCompetition(
             Guid competitionId);
@@ -28,12 +27,6 @@ namespace DanceCompetitionHelper
             string byName);
         CompetitionClass? GetCompetitionClass(
             Guid competitionId);
-
-        /*
-        IEnumerable<CompetitionClassInfo> GetCompetitionClassInfos(
-            Guid competitionId,
-            IEnumerable<Guid>? competitionClassIds);
-        */
 
         IEnumerable<(List<Participant> Participant, List<CompetitionClass> CompetitionClasses)> GetMultipleStarter(
             Guid competitionId);

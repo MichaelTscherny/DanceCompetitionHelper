@@ -29,6 +29,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
 
+            ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
 
             return View(
@@ -55,7 +56,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return NotFound();
             }
 
-            ViewData["BackTo" + RefName] = foundCompId;
+            ViewData["Show" + ParticipantController.RefName] = foundCompId;
+            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
 
             return View(
                 new CompetitionClassViewModel()
@@ -128,7 +130,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     });
             }
 
-            ViewData["BackTo" + RefName] = foundCompClass.CompetitionId;
+            ViewData["Show" + ParticipantController.RefName] = foundCompClass.CompetitionId;
+            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompClass.CompetitionId;
 
             return View(
                 nameof(ShowCreateEdit),

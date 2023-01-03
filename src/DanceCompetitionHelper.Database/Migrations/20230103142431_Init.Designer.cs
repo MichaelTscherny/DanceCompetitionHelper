@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DanceCompetitionHelper.Database.Migrations
 {
     [DbContext(typeof(DanceCompetitionHelperDbContext))]
-    [Migration("20221228141450_Init")]
+    [Migration("20230103142431_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -242,6 +242,10 @@ namespace DanceCompetitionHelper.Database.Migrations
                 {
                     b.Property<Guid>("ParticipantId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClubName")
+                        .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CompetitionClassId")

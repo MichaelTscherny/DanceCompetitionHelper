@@ -11,9 +11,9 @@ Scenario: Simple Counts
         | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
         | Test-Comp-01    | 1       | Clas-01    | Allg. Sta D          | STA        | Allg     | 0        | D     | 10                    | 900                   |
     And following Participants in "DanceCompHelper-db"
-        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | OrgIdClub |
-        | Test-Comp-01    | Allg. Sta D          | 1           | Dancer 01-A | 1          | Dancer 01-B | 2          | 10        |
-        | Test-Comp-01    | Allg. Sta D          | 2           | Dancer 02-B | 3          | Dancer 02-B | 4          | 10        |
+        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
+        | Test-Comp-01    | Allg. Sta D          | 1           | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        |
+        | Test-Comp-01    | Allg. Sta D          | 2           | Dancer 02-B | 3          | Dancer 02-B | 4          | Test-Club-01 | 10        |
     Then following DanceCompetitionHelper "DanceCompHelper" counts exists
         | CompetitionName | CountClasses | CountParticipants |
         | Test-Comp-01    | 1            | 2                 |

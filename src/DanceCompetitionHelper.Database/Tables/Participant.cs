@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DanceCompetitionHelper.Database.DisplayInfo;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -48,7 +49,8 @@ namespace DanceCompetitionHelper.Database.Tables
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? OrgIdClub { get; set; }
 
-        // TODO: add OrgClubName...
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
+        public string? ClubName { get; set; }
 
         public int OrgPointsPartA { get; set; }
         public int OrgStartsPartA { get; set; }
@@ -59,6 +61,6 @@ namespace DanceCompetitionHelper.Database.Tables
         public bool Ignore { get; set; }
 
         [NotMapped]
-        public bool PossiblePromotion { get; set; }
+        public ParticipantDisplayInfo? DisplayInfo { get; set; }
     }
 }

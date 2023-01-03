@@ -241,6 +241,10 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ClubName")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("CompetitionClassId")
                         .HasColumnType("TEXT")
                         .HasComment("Ref to CompetitionClass");

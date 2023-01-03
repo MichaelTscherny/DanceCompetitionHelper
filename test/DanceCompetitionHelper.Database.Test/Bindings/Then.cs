@@ -650,7 +650,8 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                         "Count CompClasses");
                     Assert.That(
                         useDanceCompHelper.GetParticipants(
-                            compId)
+                            compId,
+                            null)
                             .Count(),
                         Is.EqualTo(curChk.CountParticipants),
                         "Count Participtans");
@@ -700,6 +701,7 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                         && x.OrgIdPartA == chkMultiStart.OrgIdPartA
                         && x.NamePartB == chkMultiStart.NamePartB
                         && x.OrgIdPartB == chkMultiStart.OrgIdPartB
+                        && x.ClubName == chkMultiStart.ClubName
                         && x.OrgIdClub == chkMultiStart.OrgIdClub
                         && x.StartNumber == chkMultiStart.StartNumber);
 
