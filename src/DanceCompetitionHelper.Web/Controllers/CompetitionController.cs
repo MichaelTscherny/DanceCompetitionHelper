@@ -35,8 +35,10 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult Index()
         {
             return View(
-                _danceCompHelper.GetCompetitions(
-                    true));
+                _danceCompHelper
+                    .GetCompetitions(
+                        true)
+                    .ToList());
         }
 
         public IActionResult ShowCreateEdit()

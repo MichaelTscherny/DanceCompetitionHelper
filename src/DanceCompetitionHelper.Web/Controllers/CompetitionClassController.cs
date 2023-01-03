@@ -29,13 +29,18 @@ namespace DanceCompetitionHelper.Web.Controllers
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
 
+            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+
             return View(
-                new CompetitionOverviewClassModel()
+                new CompetitionClassOverviewViewModel()
                 {
                     Competition = _danceCompHelper.GetCompetition(
                         foundCompId ?? Guid.Empty),
-                    CompetitionClasses = _danceCompHelper.GetCompetitionClasses(
-                        foundCompId),
+                    CompetitionClasses = _danceCompHelper
+                        .GetCompetitionClasses(
+                            foundCompId,
+                            true)
+                        .ToList(),
                 });
         }
 
@@ -82,7 +87,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     createCompetition.Discipline,
                     createCompetition.AgeClass,
                     createCompetition.AgeGroup,
-                    createCompetition.CompetitionClassName,
+                    createCompetition.Class,
                     createCompetition.MinStartsForPromotion,
                     createCompetition.MinPointsForPromotion,
                     createCompetition.Ignore);
@@ -136,6 +141,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     Discipline = foundCompClass.Discipline,
                     AgeClass = foundCompClass.AgeClass,
                     AgeGroup = foundCompClass.AgeGroup,
+                    Class = foundCompClass.Class,
                     MinStartsForPromotion = foundCompClass.MinStartsForPromotion,
                     MinPointsForPromotion = foundCompClass.MinPointsForPromotion,
                     Ignore = foundCompClass.Ignore,
@@ -202,6 +208,15 @@ namespace DanceCompetitionHelper.Web.Controllers
                 {
                     Id = helpCompClassId ?? Guid.Empty
                 });
+        }
+
+        public IActionResult ShowMultipleStarters(
+            Guid id)
+        {
+            var helpCompClassId = _danceCompHelper.FindCompetition(
+                    id);
+
+            return View();
         }
     }
 }

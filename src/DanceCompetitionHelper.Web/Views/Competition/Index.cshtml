@@ -31,6 +31,9 @@
                 <th>
                     Participants
                 </th>
+                <th>
+                    Multiple Starters
+                </th>
                 <th></th>
             </tr>
         </thead>
@@ -53,10 +56,13 @@
                         @Html.DisplayFor(modelItem => item.CompetitionInfo)
                     </td>
                     <td>
-                        @(item.DisplayInfo?.CountCompetitionClasses ?? 0)
+                        @(item.DisplayInfo?.CountCompetitionClasses ?? -1)
                     </td>
                     <td>
-                        @(item.DisplayInfo?.CountParticipants ?? 0)
+                        @(item.DisplayInfo?.CountParticipants ?? -1)
+                    </td>
+                    <td>
+                        @(item.DisplayInfo?.CountMultipleStarters ?? -1)
                     </td>
                     <td>
                         <a asp-controller="@CompetitionController.RefName"

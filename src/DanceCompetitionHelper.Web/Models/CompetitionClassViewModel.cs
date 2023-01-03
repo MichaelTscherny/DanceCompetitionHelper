@@ -52,9 +52,11 @@ namespace DanceCompetitionHelper.Web.Models
         public string? Class { get; set; } = default!;
 
         [FromForm]
+        [Range(0, int.MaxValue)]
         public int MinStartsForPromotion { get; set; }
 
         [FromForm]
+        [Range(0, int.MaxValue)]
         public int MinPointsForPromotion { get; set; }
 
         [FromForm]

@@ -1,7 +1,7 @@
 ﻿@using DanceCompetitionHelper.Database.Tables;
 @using DanceCompetitionHelper.Web.Controllers;
 
-@model CompetitionOverviewClassModel
+@model CompetitionClassOverviewViewModel
 
 @{
     var compInfo = Model.Competition;
@@ -33,7 +33,13 @@
                     Participants
                 </th>
                 <th>
-                    Possible extras
+                    Possible extras (W / P)
+                </th>
+                <th>
+                    Multi Starter
+                </th>
+                <th>
+                    Needed Rounds
                 </th>
                 <th></th>
             </tr>
@@ -53,7 +59,14 @@
                         @(item.DisplayInfo?.CountParticipants ?? -1)
                     </td>
                     <td>
-                        @(item.DisplayInfo?.CountExtraParticipants ?? -1)
+                        @(item.DisplayInfo?.ExtraParticipants.ByWinning ?? -1) /
+                        @(item.DisplayInfo?.ExtraParticipants.ByPromotion ?? -1)
+                    </td>
+                    <td>
+                        @(item.DisplayInfo?.CountMultipleStarters)
+                    </td>
+                    <td>
+                        @(item.DisplayInfo?.NeededRounds ?? -1)
                     </td>
                     
                     <td>

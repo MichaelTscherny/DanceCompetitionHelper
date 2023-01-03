@@ -2,7 +2,7 @@
 
 namespace DanceCompetitionHelper.Web.Models
 {
-    public class CompetitionOverviewClassModel
+    public class CompetitionClassOverviewViewModel
     {
         public Competition? Competition { get; set; }
         public IEnumerable<CompetitionClass>? CompetitionClasses { get; set; }
