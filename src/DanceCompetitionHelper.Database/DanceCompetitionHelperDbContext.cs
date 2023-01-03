@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace DanceCompetitionHelper.Database
 {
@@ -24,7 +23,6 @@ namespace DanceCompetitionHelper.Database
 
         public DanceCompetitionHelperDbContext(
             IDbConfig sqLiteDbConfig,
-            IObserver<DiagnosticListener> diagnosticObserver,
             ILogger<DanceCompetitionHelperDbContext> logger)
             : base()
         {
@@ -42,21 +40,6 @@ namespace DanceCompetitionHelper.Database
             }
 
             SavingChanges += OnSavingChanges;
-
-            // TODO: does this work out all the time?..
-            /*
-            if (_dbDiagnosticObserver == null)
-            {
-                _dbDiagnosticObserver = new DbDiagnosticObserver(
-                    _logger);
-
-                DiagnosticListener.AllListeners.Subscribe(
-                    _dbDiagnosticObserver);
-            }
-            */
-
-            DiagnosticListener.AllListeners.Subscribe(
-                diagnosticObserver);
 
             _logger.LogTrace(
                 "{Method}() done",

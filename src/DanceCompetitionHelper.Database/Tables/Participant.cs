@@ -48,6 +48,8 @@ namespace DanceCompetitionHelper.Database.Tables
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? OrgIdClub { get; set; }
 
+        // TODO: add OrgClubName...
+
         public int OrgPointsPartA { get; set; }
         public int OrgStartsPartA { get; set; }
 

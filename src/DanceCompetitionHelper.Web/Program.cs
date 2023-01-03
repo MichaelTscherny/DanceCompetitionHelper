@@ -25,14 +25,18 @@ namespace DanceCompetitionHelper.Web
                 builder.Services
                     .AddDbContext<DanceCompetitionHelperDbContext>()
                     .AddScoped<IDanceCompetitionHelper, DanceCompetitionHelper>()
-                    .AddScoped<IObserver<DiagnosticListener>, DbDiagnosticObserver>()
-                    .AddScoped<IObserver<KeyValuePair<string, object?>>, DbKeyValueObserver>()
+                    .AddSingleton<IObserver<DiagnosticListener>, DbDiagnosticObserver>()
+                    .AddSingleton<IObserver<KeyValuePair<string, object?>>, DbKeyValueObserver>()
                     .AddSingleton<IDbConfig>(myCfg)
                     .AddControllersWithViews();
 
                 builder.Host.UseNLog();
 
                 var app = builder.Build();
+
+                // for sql-tracing/loggings...
+                DiagnosticListener.AllListeners.Subscribe(
+                    app.Services.GetRequiredService<IObserver<DiagnosticListener>>());
 
                 // Configure the HTTP request pipeline.
                 if (app.Environment.IsDevelopment() == false)

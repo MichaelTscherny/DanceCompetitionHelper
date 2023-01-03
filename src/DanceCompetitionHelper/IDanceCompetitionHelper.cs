@@ -1,6 +1,5 @@
 ﻿using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
-using DanceCompetitionHelper.Info;
 
 namespace DanceCompetitionHelper
 {
@@ -10,7 +9,8 @@ namespace DanceCompetitionHelper
         IEnumerable<Competition> GetCompetitions(
             bool includeInfos = false);
         IEnumerable<CompetitionClass> GetCompetitionClasses(
-            Guid? competitionId);
+            Guid? competitionId,
+            bool includeInfos = false);
         IEnumerable<Participant> GetParticipants(
             Guid? competitionId);
         IEnumerable<Participant> GetParticipants(
@@ -19,14 +19,21 @@ namespace DanceCompetitionHelper
 
         Competition? GetCompetition(
             Guid competitionId);
+
+        Guid? FindCompetition(
+            Guid? byAnyId);
         Guid? GetCompetition(
             string byName);
         Guid? GetCompetitionClass(
             string byName);
+        CompetitionClass? GetCompetitionClass(
+            Guid competitionId);
 
+        /*
         IEnumerable<CompetitionClassInfo> GetCompetitionClassInfos(
             Guid competitionId,
             IEnumerable<Guid>? competitionClassIds);
+        */
 
         IEnumerable<(List<Participant> Participant, List<CompetitionClass> CompetitionClasses)> GetMultipleStarter(
             Guid competitionId);
@@ -52,6 +59,37 @@ namespace DanceCompetitionHelper
             Guid competitionId);
 
         #endregion //  Competition Crud
+
+        #region CompetitionClass Crud
+
+        void CreateCompetitionClass(
+            Guid competitionId,
+            string competitionClassName,
+            string orgClassId,
+            string? discipline,
+            string? ageClass,
+            string? ageGroup,
+            string? className,
+            int minStartsForPromotion,
+            int minPointsForPromotion,
+            bool ignore);
+
+        void EditCompetitionClass(
+            Guid competitionClassId,
+            string competitionClassName,
+            string orgClassId,
+            string? discipline,
+            string? ageClass,
+            string? ageGroup,
+            string? className,
+            int minStartsForPromotion,
+            int minPointsForPromotion,
+            bool ignore);
+
+        void RemoveCompetitionClass(
+            Guid competitionClassId);
+
+        #endregion //  CompetitionClass Crud
 
     }
 }

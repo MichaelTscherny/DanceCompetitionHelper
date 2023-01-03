@@ -1,5 +1,4 @@
 ﻿using DanceCompetitionHelper.Database.Config;
-using DanceCompetitionHelper.Database.Diagnostic;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Logging;
 
@@ -27,11 +26,6 @@ namespace DanceCompetitionHelper.Database
                 {
                     SqLiteDbFile = useSqLiteDbFile,
                 },
-                new DbDiagnosticObserver(
-                    new DbKeyValueObserver(
-                        new SqLiteDbConfig(),
-                        logFactory.CreateLogger<DbKeyValueObserver>()),
-                    logFactory.CreateLogger<DbDiagnosticObserver>()),
                 logFactory.CreateLogger<DanceCompetitionHelperDbContext>());
         }
     }

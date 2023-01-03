@@ -1,6 +1,6 @@
-﻿using DanceCompetitionHelper.Web.Models;
+﻿using DanceCompetitionHelper.Web.Extensions;
+using DanceCompetitionHelper.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Diagnostics;
 
 namespace DanceCompetitionHelper.Web.Controllers
@@ -35,8 +35,10 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult Index()
         {
             return View(
-                _danceCompHelper.GetCompetitions(
-                    true));
+                _danceCompHelper
+                    .GetCompetitions(
+                        true)
+                    .ToList());
         }
 
         public IActionResult ShowCreateEdit()
@@ -52,16 +54,7 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
             if (ModelState.IsValid == false)
             {
-                createCompetition.Errors = string.Join(
-                    "<br>",
-                    ModelState.Values
-                        .Where(
-                            x => x.ValidationState != ModelValidationState.Valid
-                            && x.Errors.Count >= 1)
-                        .SelectMany(
-                            x => x.Errors)
-                        .Select(
-                            x => x.ErrorMessage));
+                createCompetition.Errors = ModelState.GetErrorMessages();
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -115,21 +108,14 @@ namespace DanceCompetitionHelper.Web.Controllers
                 });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult EditSave(
             CompetitionViewModel editCompetition)
         {
             if (ModelState.IsValid == false)
             {
-                editCompetition.Errors = string.Join(
-                    "<br>",
-                    ModelState.Values
-                        .Where(
-                            x => x.ValidationState != ModelValidationState.Valid
-                            && x.Errors.Count >= 1)
-                        .SelectMany(
-                            x => x.Errors)
-                        .Select(
-                            x => x.ErrorMessage));
+                editCompetition.Errors = ModelState.GetErrorMessages();
 
                 return View(
                     nameof(ShowCreateEdit),

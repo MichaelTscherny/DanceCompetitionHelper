@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using DanceCompetitionHelper.Web.Controllers;
+
+@{
+    var backToCompClass = ViewData["BackTo" + CompetitionClassController.RefName] as Guid?;
+    var showMultipleStarters = ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] as Guid?;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -19,12 +26,31 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Competition" asp-action="Index">Competitions</a>
-                        </li>
+                        @if (backToCompClass !=  null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area=""
+                                   asp-controller="@CompetitionClassController.RefName"
+                                   asp-action="@nameof(CompetitionClassController.Index)"
+                                   asp-route-id="@backToCompClass">Competition Classes</a>
+                            </li>
+                        }
+
+                        @if (showMultipleStarters != null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area=""
+                                   asp-controller="@CompetitionClassController.RefName"
+                                   asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
+                                   asp-route-id="@showMultipleStarters">Multiple Starters</a>
+                            </li>
+                        }
+
+                        <!--
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Competition" asp-action="Privacy">Privacy</a>
                         </li>
+                        -->
                     </ul>
                 </div>
             </div>

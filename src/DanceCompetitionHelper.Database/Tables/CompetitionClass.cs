@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DanceCompetitionHelper.Database.DisplayInfo;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -46,5 +47,8 @@ namespace DanceCompetitionHelper.Database.Tables
         public int MinPointsForPromotion { get; set; }
 
         public bool Ignore { get; set; }
+
+        [NotMapped]
+        public CompetitionClassDisplayInfo? DisplayInfo { get; set; }
     }
 }
