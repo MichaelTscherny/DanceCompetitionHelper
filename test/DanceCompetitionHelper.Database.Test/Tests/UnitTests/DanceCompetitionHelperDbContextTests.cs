@@ -24,6 +24,7 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                         (srvProv) => new SqLiteDbConfig()
                         {
                             SqLiteDbFile = GetNewDbName(),
+                            // LogAllSqls = true,
                         });
                     config.AddSingleton<ILoggerProvider, NUnitLoggerProvider>();
                     config.AddTransient<IObserver<DiagnosticListener>, DbDiagnosticObserver>();
@@ -92,14 +93,22 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             }
         }
 
+        public DanceCompetitionHelperDbContext GetDanceCompetitionHelperDbContext()
+        {
+            var dbCtx = _useHost.Services
+                .GetRequiredService<DanceCompetitionHelperDbContext>();
+            // for DB-loggigns...
+            DiagnosticListener.AllListeners.Subscribe(
+                _useHost.Services.GetRequiredService<IObserver<DiagnosticListener>>());
+            dbCtx.Migrate();
+
+            return dbCtx;
+        }
+
         [Test]
         public void SimpleCreate()
         {
-            using var dbCtx = _useHost.Services
-                .GetRequiredService<DanceCompetitionHelperDbContext>();
-
-            dbCtx.Migrate();
-
+            using var dbCtx = GetDanceCompetitionHelperDbContext();
             using var dbTrans = dbCtx.BeginTransaction();
 
             try

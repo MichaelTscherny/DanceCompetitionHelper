@@ -81,6 +81,9 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
 
             var newDb = _useHost.Services
                 .GetRequiredService<DanceCompetitionHelperDbContext>();
+            // for DB-loggigns...
+            DiagnosticListener.AllListeners.Subscribe(
+                _useHost.Services.GetRequiredService<IObserver<DiagnosticListener>>());
             newDb.Migrate();
 
             var newDbPoco = new DanceCompetitionHelperDbContextPoco(

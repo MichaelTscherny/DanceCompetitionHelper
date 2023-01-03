@@ -138,11 +138,12 @@ namespace DanceCompetitionHelper
         }
 
         public IEnumerable<CompetitionClass> GetCompetitionClasses(
-            Guid? competitionId)
+            Guid? competitionId,
+            bool includeInfos = false)
         {
             if (competitionId == null)
             {
-                return Enumerable.Empty<CompetitionClass>();
+                yield break;
             }
 
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
@@ -157,15 +158,26 @@ namespace DanceCompetitionHelper
 
                 if (foundComp == null)
                 {
-                    return Enumerable.Empty<CompetitionClass>();
+                    yield break;
                 }
 
-                return _danceCompHelperDb.CompetitionClasses
+                foreach (var curCompClass in _danceCompHelperDb.CompetitionClasses
                     .TagWith(
                         nameof(GetCompetitionClasses) + "(Guid?)")
-                    .Include(x => x.Competition)
                     .Where(
-                        x => x.CompetitionId == foundComp.CompetitionId);
+                        x => x.CompetitionId == foundComp.CompetitionId)
+                    .OrderBy(
+                        x => x.OrgClassId)
+                    .ThenBy(
+                        x => x.CompetitionClassName))
+                {
+                    if (includeInfos)
+                    {
+                        curCompClass.DisplayInfo = new CompetitionClassDisplayInfo();
+                    }
+
+                    yield return curCompClass;
+                }
             }
             finally
             {
@@ -256,6 +268,7 @@ namespace DanceCompetitionHelper
             }
         }
 
+        /*
         public IEnumerable<CompetitionClassInfo> GetCompetitionClassInfos(
             Guid competitionId,
             IEnumerable<Guid>? competitionClassIds)
@@ -325,7 +338,7 @@ namespace DanceCompetitionHelper
                     x => x.Competition == foundComp
                     && x.Ignore == false)
                     .ToList();
-                */
+                *
 
                 foreach (var curCompClass in useCompClasses
                     .TagWith(
@@ -354,6 +367,7 @@ namespace DanceCompetitionHelper
                 dbTrans.Rollback();
             }
         }
+        */
 
         public IEnumerable<(List<Participant> Participant, List<CompetitionClass> CompetitionClasses)> GetMultipleStarter(
             Guid competitionId)
@@ -497,6 +511,43 @@ namespace DanceCompetitionHelper
             }
         }
 
+        public Guid? FindCompetition(
+            Guid? byAnyId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundCompId = _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(FindCompetition) + "(Guid)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == byAnyId
+                        || x.CompetitionClassId == byAnyId)
+                    ?.CompetitionId;
+
+                if (foundCompId == null)
+                {
+                    foundCompId = _danceCompHelperDb.Competitions
+                        .TagWith(
+                            nameof(FindCompetition) + "(Guid)")
+                        .FirstOrDefault(
+                            x => x.CompetitionId == byAnyId)
+                        ?.CompetitionId;
+                }
+
+                return foundCompId;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(FindCompetition));
+
+                dbTrans.Rollback();
+            }
+        }
+
         public Guid? GetCompetitionClass(string byName)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
@@ -510,6 +561,29 @@ namespace DanceCompetitionHelper
                         x => x.CompetitionClassName == byName
                         && x.Ignore == false)
                     ?.CompetitionClassId;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(GetCompetitionClass));
+
+                dbTrans.Rollback();
+            }
+        }
+
+        public CompetitionClass? GetCompetitionClass(
+            Guid competitionId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                return _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(GetCompetitionClass) + "(Guid)")
+                    .FirstOrDefault(
+                        x => x.CompetitionClassId == competitionId);
             }
             finally
             {
@@ -674,6 +748,191 @@ namespace DanceCompetitionHelper
         }
 
         #endregion //  Competition Crud
+
+        #region CompetitionClass Crud
+
+        public void CreateCompetitionClass(
+            Guid competitionId,
+            string competitionClassName,
+            string orgClassId,
+            string? discipline,
+            string? ageClass,
+            string? ageGroup,
+            string? className,
+            int minStartsForPromotion,
+            int minPointsForPromotion,
+            bool ignore)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundCompId = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(CreateCompetitionClass) + "(Guid,...)")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
+
+                if (foundCompId == null)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            "{0} with id '{1}' not found!",
+                            nameof(Competition),
+                            competitionId));
+                }
+
+                _danceCompHelperDb.CompetitionClasses.Add(
+                    new CompetitionClass()
+                    {
+                        Competition = foundCompId,
+                        OrgClassId = orgClassId,
+                        CompetitionClassName = competitionClassName,
+                        Discipline = discipline,
+                        AgeClass = ageClass,
+                        AgeGroup = ageGroup,
+                        Class = className,
+                        MinStartsForPromotion = minStartsForPromotion,
+                        MinPointsForPromotion = minPointsForPromotion,
+                        Ignore = ignore,
+                    });
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(CreateCompetitionClass),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(CreateCompetitionClass));
+            }
+        }
+
+        public void EditCompetitionClass(
+            Guid competitionClassId,
+            string competitionClassName,
+            string orgClassId,
+            string? discipline,
+            string? ageClass,
+            string? ageGroup,
+            string? className,
+            int minStartsForPromotion,
+            int minPointsForPromotion,
+            bool ignore)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundCompClass = _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(EditCompetitionClass) + "(Guid, ...)")
+                    .FirstOrDefault(
+                        x => x.CompetitionClassId == competitionClassId);
+
+                if (foundCompClass == null)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            "{0} with id '{1}' not found!",
+                            nameof(CompetitionClass),
+                            competitionClassId));
+                }
+
+                foundCompClass.OrgClassId = orgClassId;
+                foundCompClass.CompetitionClassName = competitionClassName;
+                foundCompClass.Discipline = discipline;
+                foundCompClass.AgeClass = ageClass;
+                foundCompClass.AgeGroup = ageGroup;
+                foundCompClass.Class = className;
+                foundCompClass.MinStartsForPromotion = minStartsForPromotion;
+                foundCompClass.MinPointsForPromotion = minPointsForPromotion;
+                foundCompClass.Ignore = ignore;
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(EditCompetitionClass),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(EditCompetitionClass));
+            }
+        }
+
+        public void RemoveCompetitionClass(
+            Guid competitionClassId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundCompClass = _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(RemoveCompetitionClass) + "(Guid)")
+                    .FirstOrDefault(
+                        x => x.CompetitionClassId == competitionClassId);
+
+                if (foundCompClass == null)
+                {
+                    _logger.LogWarning(
+                        "{CompetitionClass} with id '{CompetitionClassId}' not found!",
+                        nameof(CompetitionClass),
+                        competitionClassId);
+                    return;
+                }
+
+                _danceCompHelperDb.CompetitionClasses.Remove(
+                    foundCompClass);
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(RemoveCompetitionClass),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(RemoveCompetitionClass));
+            }
+        }
+
+        #endregion //  CompetitionClass Crud
 
         #region IDisposable
 

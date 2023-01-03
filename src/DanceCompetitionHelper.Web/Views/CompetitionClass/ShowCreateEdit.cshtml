@@ -1,0 +1,224 @@
+﻿@using DanceCompetitionHelper.Database.Enum;
+@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+
+@model CompetitionClassViewModel
+
+@{
+    var isCreate = Model.CompetitionClassId.HasValue == false;
+
+    ViewData["Title"] = string.Format(
+        "{0} Competition Class",
+        isCreate
+        ? "Create new "
+        : "Edit");
+
+    var formAction = isCreate
+        ? nameof(CompetitionClassController.CreateNew)
+        : nameof(CompetitionClassController.EditSave);
+}
+
+<div class="container text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    @if (string.IsNullOrEmpty(Model.Errors) == false)
+    {
+        <div class="row py-2 text-danger">
+            <div class="col-md">
+                @Model.Errors
+            </div>
+        </div>
+    }
+
+    <form asp-action="@formAction" method="post">
+        <input asp-for="CompetitionId" />
+        <input asp-for="CompetitionClassId" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Class Name
+            </div>
+            <div class="col-md-4">
+                <input asp-for="CompetitionClassName"
+                       class="form-control"
+                       placeholder="Competition Name" 
+                       style="width: 100%" />
+                <span asp-validation-for="CompetitionClassName"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="CompetitionClassName" 
+                       class="control-label">
+                    Name of the class
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Org Class Id
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgClassId"
+                       class="form-control"
+                       placeholder="Competition Name"
+                       style="width: 100%" />
+                <span asp-validation-for="OrgClassId"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgClassId"
+                       class="control-label">
+                    Internal ID of your organization
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Discipline
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Discipline"
+                       class="form-control"
+                       placeholder="Discipline"
+                       style="width: 100%" />
+                <span asp-validation-for="Discipline"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Discipline"
+                       class="control-label">
+                    Discipline (none = leave empty)
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Age Class
+            </div>
+            <div class="col-md-4">
+                <input asp-for="AgeClass"
+                       class="form-control"
+                       placeholder="Age Class"
+                       style="width: 100%" />
+                <span asp-validation-for="AgeClass"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="AgeClass"
+                       class="control-label">
+                    Age classification (none = leave empty)
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Age Group
+            </div>
+            <div class="col-md-4">
+                <input asp-for="AgeGroup"
+                       class="form-control"
+                       placeholder="Age group"                       
+                       style="width: 100%" />
+                <span asp-validation-for="AgeGroup"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="AgeGroup"
+                       class="control-label">
+                    Group of age class (none = leave empty)
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Class
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Class"
+                       class="form-control"
+                       placeholder="Class" 
+                       
+                       style="width: 100%" />
+                <span asp-validation-for="Class"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Class"
+                       class="control-label">
+                    Class (none = leave empty)
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Min Starts
+            </div>
+            <div class="col-md-4">
+                <input asp-for="MinStartsForPromotion"
+                       class="form-control"
+                       placeholder="Class" 
+                       
+                       style="width: 100%" />
+                <span asp-validation-for="MinStartsForPromotion"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="MinStartsForPromotion"
+                       class="control-label">
+                    Minimum starts before promotion is possible
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Min Points
+            </div>
+            <div class="col-md-4">
+                <input asp-for="MinPointsForPromotion"
+                       class="form-control"
+                       placeholder="Class" 
+                       
+                       style="width: 100%" />
+                <span asp-validation-for="MinPointsForPromotion"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="MinPointsForPromotion"
+                       class="control-label">
+                    Minimum points before promotion is possible
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Ignore
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Ignore"
+                       class="form-check"/>
+                <span asp-validation-for="Ignore"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Ignore"
+                       class="control-label">
+                    Ignore this Competition Class
+                </label>
+            </div>
+        </div>
+
+        <div class="row d-flex justify-content-center py-1">
+            <div class="col">
+                <input type="submit" value="Save" class="btn btn-primary px-lg-4" />
+                &nbsp;
+                <a asp-action="@nameof(CompetitionClassController.Index)"
+                   asp-route-id="@Model.CompetitionId"
+                   class="btn btn-secondary px-lg-4">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

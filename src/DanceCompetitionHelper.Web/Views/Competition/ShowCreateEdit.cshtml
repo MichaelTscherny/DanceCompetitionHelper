@@ -1,5 +1,6 @@
 ﻿@using DanceCompetitionHelper.Database.Enum;
 @using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
 
 @model CompetitionViewModel
 
@@ -13,8 +14,8 @@
         : "Edit");
 
     var formAction = isCreate
-        ? "CreateNew"
-        : "EditSave";
+        ? nameof(CompetitionController.CreateNew)
+        : nameof(CompetitionController.EditSave);
 }
 
 <div class="container text-center">
@@ -29,28 +30,27 @@
         </div>
     }
 
-    <form asp-action="@formAction" method="post"
-          class="form-horizontal needs-validation"
-          enctype="multipart/form-data"
-          role="form">
+    <form asp-action="@formAction" method="post">
         <input asp-for="CompetitionId" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
         <div class="row row-cols-3 py-1">
             <div class="col-md text-end">
                 CompetitionName
             </div>
             <div class="col-md-4">
                 <input asp-for="CompetitionName"
-                       class="a"
+                       class="form-control"
                        placeholder="Competition Name" 
-                       required
+                       
                        style="width: 100%" />
-                <span class="text-danger field-validation-valid"
-                      data-valmsg-for="@nameof(CompetitionViewModel.CompetitionName)"
-                      data-valmsg-replace="true"></span>
+                <span asp-validation-for="CompetitionName"
+                      class="text-danger"></span>
             </div>
             <div class="col-md text-start">
-                <label for="@nameof(CompetitionViewModel.CompetitionName)" 
-                       class="form-label">
+                <label asp-for="CompetitionName" 
+                       class="control-label">
                     Name of the competition
                 </label>
             </div>
@@ -63,18 +63,18 @@
                 <select asp-for="Organization" 
                         class="form-select"
                         placeholder="Org"
-                        required
+                        
                         readonly                        
                         style="width: 100%">
                     <option selected value="@OrganizationEnum.Oetsv.ToString()">@OrganizationEnum.Oetsv.ToString()</option>
                 </select>
-                <span class="text-danger field-validation-valid"
-                      data-valmsg-for="@nameof(CompetitionViewModel.Organization)"
-                      data-valmsg-replace="true">
+                <span asp-validation-for="Organization"
+                      class="text-danger">
                 </span>
             </div>
             <div class="col-md text-start">
-                <label for="@nameof(CompetitionViewModel.Organization)" class="form-label">
+                <label asp-for="Organization"
+                       class="control-label">
                     Name of the competition
                 </label>
             </div>
@@ -85,16 +85,17 @@
             </div>
             <div class="col-md-4">
                 <input asp-for="OrgCompetitionId"
+                       class="form-control"
                        placeholder="Internal Org Id" 
-                       required
+                       
                        style="width: 100%" />
-                <span class="text-danger field-validation-valid"
-                      data-valmsg-for="@nameof(CompetitionViewModel.OrgCompetitionId)"
-                      data-valmsg-replace="true">
+                <span asp-validation-for="OrgCompetitionId"
+                      class="text-danger">
                 </span>
             </div>
             <div class="col-md text-start">
-                <label for="@nameof(CompetitionViewModel.OrgCompetitionId)" class="form-label">
+                <label asp-for="OrgCompetitionId"
+                       class="control-label">
                     Internal ID of your organization
                 </label>
             </div>
@@ -105,11 +106,13 @@
             </div>
             <div class="col-md-4">
                 <input asp-for="CompetitionInfo"
+                       class="form-control"
                        placeholder="Extra info"
                        style="width: 100%" />
             </div>
             <div class="col-md text-start">
-                <label for="@nameof(CompetitionViewModel.CompetitionInfo)" class="form-label">
+                <label asp-for="CompetitionInfo"
+                       class="control-label">
                     Extra infos for this Competition
                 </label>
             </div>
@@ -120,27 +123,28 @@
             </div>
             <div class="col-md-4">
                 <input asp-for="CompetitionDate"
-                       required
+                       class="form-control"
+                       
                        style="width: 100%" />
-                <span class="text-danger field-validation-valid"
-                      data-valmsg-for="@nameof(CompetitionViewModel.CompetitionDate)"
-                      data-valmsg-replace="true">
+                <span asp-validation-for="CompetitionDate"
+                      class="text-danger">
                 </span>
 
             </div>
             <div class="col-md text-start">
-                <label for="@nameof(CompetitionViewModel.CompetitionDate)" class="form-label">
+                <label asp-for="CompetitionDate"
+                       class="control-label">
                     Date of this Competition
                 </label>
             </div>
         </div>
         <div class="row d-flex justify-content-center py-1">
             <div class="col">
-                <button class="btn btn-primary px-lg-4" type="submit">
-                    Save
-                </button>
+                <input type="submit" value="Save" class="btn btn-primary px-lg-4" />
                 &nbsp;
-                <a asp-action="Index" class="btn btn-secondary px-lg-4">
+                <a asp-controller="@CompetitionController.RefName"
+                   asp-action="@nameof(CompetitionController.Index)"
+                   class="btn btn-secondary px-lg-4">
                     Cancel
                 </a>
             </div>
