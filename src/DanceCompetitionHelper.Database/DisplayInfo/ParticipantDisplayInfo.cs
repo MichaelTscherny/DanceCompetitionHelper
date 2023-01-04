@@ -1,10 +1,8 @@
-﻿using DanceCompetitionHelper.Database.Tables;
-
-namespace DanceCompetitionHelper.Database.DisplayInfo
+﻿namespace DanceCompetitionHelper.Database.DisplayInfo
 {
     public class ParticipantDisplayInfo
     {
-        public List<CompetitionClass> MultipleStarts { get; set; } = new List<CompetitionClass>();
+        public bool MultipleStarts { get; set; }
         public bool PossiblePromotion { get; set; }
     }
 }

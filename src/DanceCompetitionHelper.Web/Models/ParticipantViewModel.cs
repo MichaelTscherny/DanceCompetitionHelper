@@ -1,75 +1,82 @@
-﻿using DanceCompetitionHelper.Database.DisplayInfo;
-using Microsoft.EntityFrameworkCore;
+﻿using DanceCompetitionHelper.Database;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DanceCompetitionHelper.Database.Tables
+namespace DanceCompetitionHelper.Web.Models
 {
-    [Comment("History of Participants of a " + nameof(Competition))]
-    [Index(nameof(CompetitionId), nameof(ParticipantId), nameof(Version), IsUnique = true)]
-    [Keyless]
-    public class ParticipantHistory : TableBase
+    public class ParticipantViewModel
     {
-        [Required]
-        public Guid ParticipantId { get; set; }
+        public string? Errors { get; set; }
 
         [Required]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Comment("Ref to " + nameof(Competition))]
+        [FromForm]
+        [HiddenInput]
         public Guid CompetitionId { get; set; }
 
-        [ForeignKey(nameof(CompetitionId))]
-        public Competition Competition { get; set; } = default!;
+        public string? CompetitionName { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Comment("Ref to " + nameof(CompetitionClass))]
+        [FromForm]
+        [HiddenInput]
         public Guid? CompetitionClassId { get; set; }
 
-        [ForeignKey(nameof(CompetitionClassId))]
-        public CompetitionClass? CompetitionClass { get; set; }
+        public List<SelectListItem> CompetitionClasses { get; set; } = new List<SelectListItem>();
+
+        [FromForm]
+        [HiddenInput]
+        public Guid? ParticipantId { get; set; }
 
         [Required]
-        [Range(0, int.MaxValue)]
-        public int Version { get; set; }
-
-        [Required]
+        [FromForm]
         [Range(0, int.MaxValue)]
         public int StartNumber { get; set; }
 
         [Required]
+        [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        [StringLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string NamePartA { get; set; } = default!;
 
-        [Required]
+        [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
-        [Comment("'Internal' Org-Id of PartA")]
+        [StringLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? OrgIdPartA { get; set; }
 
+        [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        [StringLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? NamePartB { get; set; }
 
+        [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
+        [StringLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? OrgIdPartB { get; set; }
 
+        [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        [StringLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? ClubName { get; set; }
 
+        [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
+        [StringLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? OrgIdClub { get; set; }
 
+        [FromForm]
         [Range(0, int.MaxValue)]
         public int OrgPointsPartA { get; set; }
+        [FromForm]
         [Range(0, int.MaxValue)]
         public int OrgStartsPartA { get; set; }
 
+        [FromForm]
         [Range(0, int.MaxValue)]
         public int? OrgPointsPartB { get; set; }
+        [FromForm]
         [Range(0, int.MaxValue)]
         public int? OrgStartsPartB { get; set; }
 
+        [FromForm]
         public bool Ignore { get; set; }
-
-        [NotMapped]
-        public ParticipantDisplayInfo? DisplayInfo { get; set; }
     }
 }

@@ -28,6 +28,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             if (_initialMigrationDone == false)
             {
                 danceCompHelper.Migrate();
+                danceCompHelper.AddTestData();
                 _initialMigrationDone = true;
             }
         }

@@ -41,6 +41,16 @@ namespace DanceCompetitionHelper.Database
 
             SavingChanges += OnSavingChanges;
 
+            var testSqlFile = new FileInfo(SqLiteDbConfig.SqLiteDbFile);
+            if (testSqlFile.Exists == false)
+            {
+                _logger.LogDebug(
+                    "Check/Create DB file-directory '{SqLiteDbFileDirectory}'",
+                    testSqlFile.Directory?.FullName);
+
+                testSqlFile.Directory?.Create();
+            }
+
             _logger.LogTrace(
                 "{Method}() done",
                 nameof(DanceCompetitionHelperDbContext));

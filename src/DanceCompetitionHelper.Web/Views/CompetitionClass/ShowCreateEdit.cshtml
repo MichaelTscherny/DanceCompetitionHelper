@@ -10,7 +10,7 @@
     ViewData["Title"] = string.Format(
         "{0} Competition Class",
         isCreate
-        ? "Create new "
+        ? "Create new"
         : "Edit");
 
     var formAction = isCreate
@@ -193,6 +193,26 @@
         </div>
         <div class="row row-cols-3 py-1">
             <div class="col-md text-end">
+                Win Points
+            </div>
+            <div class="col-md-4">
+                <input asp-for="PointsForWinning"
+                       class="form-control"
+                       placeholder="Class" 
+                       
+                       style="width: 100%" />
+                <span asp-validation-for="PointsForWinning"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="PointsForWinning"
+                       class="control-label">
+                    Point for Winner
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
                 Ignore
             </div>
             <div class="col-md-4">
@@ -211,7 +231,9 @@
 
         <div class="row d-flex justify-content-center py-1">
             <div class="col">
-                <input type="submit" value="Save" class="btn btn-primary px-lg-4" />
+                <input type="submit" 
+                       value="@(isCreate ? "Create" : "Save")" 
+                       class="btn btn-primary px-lg-4" />
                 &nbsp;
                 <a asp-action="@nameof(CompetitionClassController.Index)"
                    asp-route-id="@Model.CompetitionId"

@@ -696,7 +696,7 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
 
                 foreach (var curMuSt in curMultiStarter)
                 {
-                    var foundPart = curMuSt.Participant.FirstOrDefault(
+                    var foundPart = curMuSt.Participants.FirstOrDefault(
                         x => x.NamePartA == chkMultiStart.NamePartA
                         && x.OrgIdPartA == chkMultiStart.OrgIdPartA
                         && x.NamePartB == chkMultiStart.NamePartB

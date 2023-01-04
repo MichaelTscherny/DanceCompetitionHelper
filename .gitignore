@@ -356,3 +356,6 @@ MigrationBackup/
 
 # SqLite containers
 *.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite_old

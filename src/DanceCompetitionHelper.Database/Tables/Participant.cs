@@ -30,32 +30,38 @@ namespace DanceCompetitionHelper.Database.Tables
         public CompetitionClass CompetitionClass { get; set; } = default!;
 
         [Required]
+        [Range(0, int.MaxValue)]
         public int StartNumber { get; set; }
 
         [Required]
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string NamePartA { get; set; } = default!;
 
         [Required]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
-        [Comment("'Internal' Org-Id of class of " + nameof(CompetitionClass))]
+        [Comment("'Internal' Org-Id of PartA")]
         public string? OrgIdPartA { get; set; }
 
-        [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? NamePartB { get; set; }
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? OrgIdPartB { get; set; }
 
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? ClubName { get; set; }
+
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? OrgIdClub { get; set; }
 
-        [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
-        public string? ClubName { get; set; }
-
+        [Range(0, int.MaxValue)]
         public int OrgPointsPartA { get; set; }
+        [Range(0, int.MaxValue)]
         public int OrgStartsPartA { get; set; }
 
+        [Range(0, int.MaxValue)]
         public int? OrgPointsPartB { get; set; }
+        [Range(0, int.MaxValue)]
         public int? OrgStartsPartB { get; set; }
 
         public bool Ignore { get; set; }

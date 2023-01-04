@@ -1,0 +1,305 @@
+﻿@using DanceCompetitionHelper.Database.Enum;
+@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+
+@model ParticipantViewModel
+
+@{
+    var isCreate = Model.ParticipantId.HasValue == false;
+
+    ViewData["Title"] = string.Format(
+        "{0} Participant for {1}",
+        isCreate
+            ? "Create new"
+            : "Edit ",
+        Model.CompetitionName);
+
+    var formAction = isCreate
+        ? nameof(ParticipantController.CreateNew)
+        : nameof(ParticipantController.EditSave);
+}
+
+<div class="container text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    @if (string.IsNullOrEmpty(Model.Errors) == false)
+    {
+        <div class="row py-2 text-danger">
+            <div class="col-md">
+                @Model.Errors
+            </div>
+        </div>
+    }
+
+    <form asp-action="@formAction" method="post">
+        <input asp-for="CompetitionId" />
+        <input asp-for="ParticipantId" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Competition Class
+            </div>
+            <div class="col-md-4">
+                <select asp-for="CompetitionClassId"
+                        asp-items="Model.CompetitionClasses"
+                        class="form-select"
+                        style="width: 100%">
+                </select>
+                <span asp-validation-for="CompetitionClassId"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="CompetitionClassId"
+                       class="control-label">
+                    Competition Class
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Start Number
+            </div>
+            <div class="col-md-4">
+                <input asp-for="StartNumber"
+                       class="form-control"
+                       placeholder="Start Number"
+                       style="width: 100%" />
+                <span asp-validation-for="StartNumber"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="StartNumber"
+                       class="control-label">
+                    Start Number this/these Participant(s)
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-25">
+            <div class="col-md text-end">
+                Name Part-A
+            </div>
+            <div class="col-md-4">
+                <input asp-for="NamePartA"
+                       class="form-control"
+                       placeholder="Name Part-A"
+                       style="width: 100%" />
+                <span asp-validation-for="NamePartA"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="NamePartA"
+                       class="control-label">
+                    Name of Participant Part-A
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-10">
+            <div class="col-md text-end">
+                Org Id Part-A
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgIdPartA"
+                       class="form-control"
+                       placeholder="Org Id Part-A"
+                       style="width: 100%" />
+                <span asp-validation-for="OrgIdPartA"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgIdPartA"
+                       class="control-label">
+                    Organization Id of Part-A
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-25">
+            <div class="col-md text-end">
+                Points Part-A
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgPointsPartA"
+                       class="form-control"
+                       placeholder="Points Part-A"
+                       style="width: 100%" />
+                <span asp-validation-for="OrgPointsPartA"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgPointsPartA"
+                       class="control-label">
+                    Current Points of Part-A
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-10">
+            <div class="col-md text-end">
+                Starts Part-A
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgStartsPartA"
+                       class="form-control"
+                       placeholder="Starts Part-A"
+                       style="width: 100%" />
+                <span asp-validation-for="OrgStartsPartA"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgStartsPartA"
+                       class="control-label">
+                    Current Starts of Part-A
+                </label>
+            </div>
+        </div>
+
+        <div class="row row-cols-3 py-1 bg-warning bg-opacity-25">
+            <div class="col-md text-end">
+                Name Part-B
+            </div>
+            <div class="col-md-4">
+                <input asp-for="NamePartB"
+                       class="form-control"
+                       placeholder="Name Part-B"
+                       style="width: 100%" />
+                <span asp-validation-for="NamePartB"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="NamePartB"
+                       class="control-label">
+                    Name of Participant Part-B (none = leave empty)
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-warning bg-opacity-10">
+            <div class="col-md text-end">
+                Org Id Part-B
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgIdPartB"
+                       class="form-control"
+                       placeholder="Org Id Part-B"
+                       style="width: 100%" />
+                <span asp-validation-for="OrgIdPartB"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgIdPartB"
+                       class="control-label">
+                    Organization Id of Part-B (none = leave empty)
+                </label>
+            </div>
+        </div>        
+        <div class="row row-cols-3 py-1 bg-warning bg-opacity-25">
+            <div class="col-md text-end">
+                Points Part-B
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgPointsPartB"
+                       class="form-control"
+                       placeholder="Points Part-B"
+                       style="width: 100%" />
+                <span asp-validation-for="OrgPointsPartB"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgPointsPartB"
+                       class="control-label">
+                    Current Points of Part-B
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-warning bg-opacity-10">
+            <div class="col-md text-end">
+                Starts Part-B
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgStartsPartB"
+                       class="form-control"
+                       placeholder="Starts Part-B" 
+                       style="width: 100%" />
+                <span asp-validation-for="OrgStartsPartB"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgStartsPartB"
+                       class="control-label">
+                    Current Starts of Part-B
+                </label>
+            </div>
+        </div>
+
+        <div class="row row-cols-3 py-1 bg-black bg-opacity-25">
+            <div class="col-md text-end">
+                Club Name
+            </div>
+            <div class="col-md-4">
+                <input asp-for="ClubName"
+                       class="form-control"
+                       placeholder="Name of Club"
+                       style="width: 100%" />
+                <span asp-validation-for="ClubName"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="ClubName"
+                       class="control-label">
+                    Name of Club (none = leave empty)
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-black bg-opacity-10">
+            <div class="col-md text-end">
+                Org Id Club
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgIdClub"
+                       class="form-control"
+                       placeholder="Org Id Club"
+                       style="width: 100%" />
+                <span asp-validation-for="OrgIdClub"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgIdClub"
+                       class="control-label">
+                    Organization Id of Club (none = leave empty)
+                </label>
+            </div>
+        </div>
+
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Ignore
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Ignore"
+                       class="form-check"/>
+                <span asp-validation-for="Ignore"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Ignore"
+                       class="control-label">
+                    Ignore this Competition Class
+                </label>
+            </div>
+        </div>
+
+        <div class="row d-flex justify-content-center py-1">
+            <div class="col">
+                <input type="submit" 
+                       value="@(isCreate ? "Create" : "Save")" 
+                       class="btn btn-primary px-lg-4" />
+                &nbsp;
+                <a asp-controller="@ParticipantController.RefName" 
+                   asp-action="@nameof(ParticipantController.Index)"
+                   asp-route-id="@Model.CompetitionId"
+                   class="btn btn-secondary px-lg-4">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

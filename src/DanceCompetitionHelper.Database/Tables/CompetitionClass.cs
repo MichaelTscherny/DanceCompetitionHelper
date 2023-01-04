@@ -43,8 +43,12 @@ namespace DanceCompetitionHelper.Database.Tables
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]
         public string? Class { get; set; }
 
+        [Range(0, int.MaxValue)]
         public int MinStartsForPromotion { get; set; }
+        [Range(0, int.MaxValue)]
         public int MinPointsForPromotion { get; set; }
+        [Range(0, int.MaxValue)]
+        public int PointsForWinning { get; set; }
 
         public bool Ignore { get; set; }
 
