@@ -10,7 +10,7 @@
     ViewData["Title"] = string.Format(
         "{0} Competition",
         isCreate
-        ? "Create new "
+        ? "Create new"
         : "Edit");
 
     var formAction = isCreate
@@ -140,7 +140,9 @@
         </div>
         <div class="row d-flex justify-content-center py-1">
             <div class="col">
-                <input type="submit" value="Save" class="btn btn-primary px-lg-4" />
+                <input type="submit" 
+                       value="@(isCreate ? "Create" : "Save")" 
+                       class="btn btn-primary px-lg-4" />
                 &nbsp;
                 <a asp-controller="@CompetitionController.RefName"
                    asp-action="@nameof(CompetitionController.Index)"

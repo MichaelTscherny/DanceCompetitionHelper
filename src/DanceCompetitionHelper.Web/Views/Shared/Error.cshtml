@@ -14,40 +14,42 @@
 }
 
 <h2 class ="text-danger">Model Errors</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>
-                Value
-            </th>
-            <th>
-                Errors
-            </th>
-            <th>
-                Raw value
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var curModelError in Model.ModelErrors)
-        {
+<div class="table-responsive-xxl">
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td>
-                    @curModelError.ValidationState
-                </td>
-                <td>
-                    @string.Join(
-                        "; ",
-                        curModelError.Errors
-                            .Select(x => x.ErrorMessage));
-                </td>
-                <td>
-                    @curModelError.RawValue
-                </td>
+                <th>
+                    Value
+                </th>
+                <th>
+                    Errors
+                </th>
+                <th>
+                    Raw value
+                </th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var curModelError in Model.ModelErrors)
+            {
+                <tr>
+                    <td>
+                        @curModelError.ValidationState
+                    </td>
+                    <td>
+                        @string.Join(
+                            "; ",
+                            curModelError.Errors
+                                .Select(x => x.ErrorMessage));
+                    </td>
+                    <td>
+                        @curModelError.RawValue
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <h3>Development Mode</h3>
 <p>

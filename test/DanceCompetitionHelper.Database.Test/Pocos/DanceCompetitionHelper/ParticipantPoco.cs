@@ -9,6 +9,7 @@
         public string? OrgIdPartA { get; set; }
         public string? NamePartB { get; set; }
         public string? OrgIdPartB { get; set; }
+        public string? ClubName { get; set; }
         public string? OrgIdClub { get; set; }
         public int OrgPointsPartA { get; set; }
         public int OrgStartsPartA { get; set; }

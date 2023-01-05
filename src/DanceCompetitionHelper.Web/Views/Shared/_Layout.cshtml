@@ -2,6 +2,7 @@
 
 @{
     var backToCompClass = ViewData["BackTo" + CompetitionClassController.RefName] as Guid?;
+    var showParticipants = ViewData["Show" + ParticipantController.RefName] as Guid?;
     var showMultipleStarters = ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] as Guid?;
 }
 
@@ -36,6 +37,16 @@
                             </li>
                         }
 
+                        @if (showParticipants != null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area=""
+                                   asp-controller="@ParticipantController.RefName"
+                                   asp-action="@nameof(ParticipantController.Index)"
+                                   asp-route-id="@showParticipants">Participants</a>
+                            </li>
+                        }
+
                         @if (showMultipleStarters != null)
                         {
                             <li class="nav-item">
@@ -46,18 +57,13 @@
                             </li>
                         }
 
-                        <!--
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Competition" asp-action="Privacy">Privacy</a>
-                        </li>
-                        -->
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container-fluid">
+        <main role="main" class="">
             @RenderBody()
         </main>
     </div>

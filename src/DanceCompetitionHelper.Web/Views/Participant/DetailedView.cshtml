@@ -1,0 +1,168 @@
+﻿@using DanceCompetitionHelper.Database.Extensions;
+@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Extensions;
+
+@model ParticipantOverviewViewModel
+
+@{
+    var compInfo = Model.Competition;
+    var compInfoStr = compInfo.GetCompetitionName();
+    var participantsCount = Model.Participtans?.Count() ?? 0;
+
+    ViewData["Title"] = string.Format(
+        "{0} Participants Details of {1}",
+        participantsCount,
+        compInfoStr);
+}
+
+<div class="text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+    
+    <div class="table-responsive-xxl w-auto">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Class (@participantsCount)
+                    </th>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        Ign.
+                    </th>
+                    <th>
+                        Name A (Org-ID-A)
+                    </th>
+                    <th>
+                        Starts/Points A
+                    </th>
+                    <th>
+                        Name B (Org-ID-B)
+                    </th>
+                    <th>
+                        Starts/Points B
+                    </th>
+                    <th>
+                        Club (Org-Club-ID)
+                    </th>
+                    <th>
+                        Possible Promotion
+                    </th>
+                    <th>
+                        Multiple Starts
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Participtans ?? Enumerable.Empty<Participant>())
+                {
+                    <tr>
+                        <td class="text-nowrap">
+                            @item.CompetitionClass.CompetitionClassName
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.StartNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Ignore)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.NamePartA)
+                            (@Html.DisplayFor(modelItem => item.OrgIdPartA))
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrgStartsPartA)
+                            /
+                            @Html.DisplayFor(modelItem => item.OrgPointsPartA)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.NamePartB)
+                            (@Html.DisplayFor(modelItem => item.OrgIdPartB))
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.OrgStartsPartB)
+                            /
+                            @Html.DisplayFor(modelItem => item.OrgPointsPartB)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClubName)
+                            (@Html.DisplayFor(modelItem => item.OrgIdClub))
+                        </td>
+                        <td>
+                            @(item.DisplayInfo?.PossiblePromotion ?? false)
+                        </td>
+                        <td>
+                            @(item.DisplayInfo?.MultipleStarts ?? false)
+                        </td>
+
+                        <td class="text-nowrap">
+                            <a asp-controller="@ParticipantController.RefName"
+                               asp-action="@nameof(ParticipantController.ShowEdit)"
+                               asp-route-id="@item.ParticipantId">Edit</a> |
+                            <a asp-controller="@ParticipantController.RefName"
+                               asp-action="@nameof(ParticipantController.Delete)"
+                               asp-route-id="@item.ParticipantId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>
+                        Class (@participantsCount)
+                    </th>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        Ign.
+                    </th>
+                    <th>
+                        Name A (Org-ID-A)
+                    </th>
+                    <th>
+                        Starts/Points A
+                    </th>
+                    <th>
+                        Name B (Org-ID-B)
+                    </th>
+                    <th>
+                        Starts/Points B
+                    </th>
+                    <th>
+                        Club (Org-Club-ID)
+                    </th>
+                    <th>
+                        Possible Promotion
+                    </th>
+                    <th>
+                        Multiple Starts
+                    </th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="row d-flex justify-content-center py-1">
+        <div class="col">
+            <a asp-controller="@ParticipantController.RefName"
+               asp-action="@nameof(ParticipantController.ShowCreateEdit)"
+               asp-route-id="@Model.Competition?.CompetitionId"
+               class="btn btn-primary px-lg-4">
+               Create new
+            </a>
+            &nbsp;
+            <a asp-controller="@CompetitionClassController.RefName"
+               asp-action="@nameof(CompetitionClassController.Index)"
+               asp-route-id="@Model.Competition?.CompetitionId"
+               class="btn btn-secondary px-lg-4">
+                Back
+            </a>
+        </div>
+    </div>
+</div>
+

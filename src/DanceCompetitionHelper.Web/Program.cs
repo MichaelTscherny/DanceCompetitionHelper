@@ -30,6 +30,16 @@ namespace DanceCompetitionHelper.Web
                     .AddSingleton<IDbConfig>(myCfg)
                     .AddControllersWithViews();
 
+
+                builder.Services
+                    .AddDistributedMemoryCache()
+                    .AddSession(options =>
+                    {
+                        options.IdleTimeout = TimeSpan.FromHours(10);
+                        options.Cookie.HttpOnly = true;
+                        options.Cookie.IsEssential = true;
+                    });
+
                 builder.Host.UseNLog();
 
                 var app = builder.Build();
@@ -52,6 +62,8 @@ namespace DanceCompetitionHelper.Web
                 app.UseRouting();
 
                 app.UseAuthorization();
+
+                app.UseSession();
 
                 app.MapControllerRoute(
                     name: "default",

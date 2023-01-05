@@ -305,6 +305,7 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                             OrgIdPartA = newPart.OrgIdPartA,
                             NamePartB = newPart.NamePartB,
                             OrgIdPartB = newPart.OrgIdPartB,
+                            ClubName = newPart.ClubName,
                             OrgIdClub = newPart.OrgIdClub,
                             OrgPointsPartA = newPart.OrgPointsPartA,
                             OrgStartsPartA = newPart.OrgStartsPartA,

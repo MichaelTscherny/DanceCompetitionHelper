@@ -8,6 +8,7 @@ namespace DanceCompetitionHelper.Web.Models
     {
         public string? Errors { get; set; }
 
+        [Required]
         [FromForm]
         [HiddenInput]
         public Guid CompetitionId { get; set; }
@@ -58,6 +59,10 @@ namespace DanceCompetitionHelper.Web.Models
         [FromForm]
         [Range(0, int.MaxValue)]
         public int MinPointsForPromotion { get; set; }
+
+        [FromForm]
+        [Range(0, int.MaxValue)]
+        public int PointsForWinning { get; set; }
 
         [FromForm]
         public bool Ignore { get; set; }

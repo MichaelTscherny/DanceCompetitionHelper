@@ -1,0 +1,101 @@
+﻿@using DanceCompetitionHelper.Database.DisplayInfo;
+@using DanceCompetitionHelper.Database.Extensions;
+@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Extensions;
+
+@model ShowMultipleStartersOverviewViewModel
+
+@{
+    var compInfo = Model.Competition;
+    var compInfoStr = compInfo.GetCompetitionName();
+    var multipleStartersCount = Model.MultipleStarters?.Count() ?? 0;
+
+    ViewData["Title"] = string.Format(
+        "{0} Multiple Starters of {1}",
+        multipleStartersCount,
+        compInfoStr);
+
+    var displayInfos = new List<(string ClassName, Guid ClassId)>(
+        Model.MultipleStarters
+            ?.SelectMany(
+                x => x.CompetitionClassNamesByName)
+            .Distinct()
+            .OrderBy(
+                x => x.Key)
+            .Select(
+                x => (x.Key, x.Value))
+            ?? Enumerable.Empty<(string, Guid)>());
+}
+
+<div class="text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    <div class="table-responsive-xxl">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Name (@multipleStartersCount) (P A/B; S A/B)
+                    </th>
+
+                    @foreach (var curDisplayInfo in displayInfos)
+                    {
+                        <th>
+                            @curDisplayInfo.ClassName
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.MultipleStarters ?? Enumerable.Empty<MultipleStarter>())
+                {
+                    <tr>
+                        <td class="text-nowrap">
+                            @item.Name
+                            (@item.PointsA / @item.PointsB; @item.StartsA / @item.StartsB)
+                        </td>
+
+                        @foreach (var curDisplayInfo in displayInfos)
+                        {
+                            <td>
+                                @if (item.CompetitionClassNamesByClassId.ContainsKey(curDisplayInfo.ClassId))
+                                {
+                                    <div>
+                                        # @item.StartnumberByClassId[curDisplayInfo.ClassId]
+                                    </div>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>
+                        Name (@multipleStartersCount) (P A/B; S A/B)
+                    </th>
+
+                    @foreach (var curDisplayInfo in displayInfos)
+                    {
+                        <th>
+                            @curDisplayInfo.ClassName
+                        </th>
+                    }
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+        
+    <div class="row d-flex justify-content-center py-1">
+        <div class="col">
+            <a asp-controller="@CompetitionClassController.RefName"
+               asp-action="@nameof(CompetitionClassController.Index)"
+               asp-route-id="@Model.Competition?.CompetitionId"
+               class="btn btn-primary px-lg-4">
+               Back
+            </a>
+        </div>
+    </div>
+</div>
+

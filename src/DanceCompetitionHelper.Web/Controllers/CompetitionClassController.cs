@@ -29,6 +29,29 @@ namespace DanceCompetitionHelper.Web.Controllers
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
 
+            ViewData["Show" + ParticipantController.RefName] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+
+            return View(
+                new CompetitionClassOverviewViewModel()
+                {
+                    Competition = _danceCompHelper.GetCompetition(
+                        foundCompId ?? Guid.Empty),
+                    CompetitionClasses = _danceCompHelper
+                        .GetCompetitionClasses(
+                            foundCompId,
+                            true)
+                        .ToList(),
+                });
+        }
+
+        public IActionResult DetailedView(
+            Guid id)
+        {
+            var foundCompId = _danceCompHelper.FindCompetition(
+                id);
+
+            ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
 
             return View(
@@ -55,7 +78,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return NotFound();
             }
 
-            ViewData["BackTo" + RefName] = foundCompId;
+            ViewData["Show" + ParticipantController.RefName] = foundCompId;
+            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
 
             return View(
                 new CompetitionClassViewModel()
@@ -90,6 +114,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     createCompetition.Class,
                     createCompetition.MinStartsForPromotion,
                     createCompetition.MinPointsForPromotion,
+                    createCompetition.PointsForWinning,
                     createCompetition.Ignore);
 
                 return RedirectToAction(
@@ -128,7 +153,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     });
             }
 
-            ViewData["BackTo" + RefName] = foundCompClass.CompetitionId;
+            ViewData["Show" + ParticipantController.RefName] = foundCompClass.CompetitionId;
+            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompClass.CompetitionId;
 
             return View(
                 nameof(ShowCreateEdit),
@@ -144,6 +170,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     Class = foundCompClass.Class,
                     MinStartsForPromotion = foundCompClass.MinStartsForPromotion,
                     MinPointsForPromotion = foundCompClass.MinPointsForPromotion,
+                    PointsForWinning = foundCompClass.PointsForWinning,
                     Ignore = foundCompClass.Ignore,
                 });
         }
@@ -174,6 +201,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     editCompetitionClass.Class,
                     editCompetitionClass.MinStartsForPromotion,
                     editCompetitionClass.MinPointsForPromotion,
+                    editCompetitionClass.PointsForWinning,
                     editCompetitionClass.Ignore);
 
                 return RedirectToAction(
@@ -213,10 +241,29 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult ShowMultipleStarters(
             Guid id)
         {
-            var helpCompClassId = _danceCompHelper.FindCompetition(
+            var foundCompId = _danceCompHelper.FindCompetition(
                     id);
 
-            return View();
+            if (foundCompId == null)
+            {
+                return NotFound();
+            }
+
+            var helpComp = _danceCompHelper.GetCompetition(
+                foundCompId.Value);
+
+            ViewData["Show" + ParticipantController.RefName] = foundCompId;
+            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
+
+            return View(
+                new ShowMultipleStartersOverviewViewModel()
+                {
+                    Competition = helpComp,
+                    MultipleStarters = _danceCompHelper
+                        .GetMultipleStarter(
+                            foundCompId.Value)
+                        .ToList()
+                });
         }
     }
 }

@@ -1,26 +1,30 @@
-﻿using DanceCompetitionHelper.Database.Enum;
+﻿using DanceCompetitionHelper.Database.DisplayInfo;
+using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 
 namespace DanceCompetitionHelper
 {
     public interface IDanceCompetitionHelper : IDisposable
     {
+        void AddTestData();
         void Migrate();
+
         IEnumerable<Competition> GetCompetitions(
             bool includeInfos = false);
         IEnumerable<CompetitionClass> GetCompetitionClasses(
             Guid? competitionId,
             bool includeInfos = false);
         IEnumerable<Participant> GetParticipants(
-            Guid? competitionId);
-        IEnumerable<Participant> GetParticipants(
             Guid? competitionId,
-            Guid? competitionClassId);
+            Guid? competitionClassId,
+            bool includeInfos = false);
 
         Competition? GetCompetition(
             Guid competitionId);
 
         Guid? FindCompetition(
+            Guid? byAnyId);
+        Guid? FindCompetitionClass(
             Guid? byAnyId);
         Guid? GetCompetition(
             string byName);
@@ -29,13 +33,10 @@ namespace DanceCompetitionHelper
         CompetitionClass? GetCompetitionClass(
             Guid competitionId);
 
-        /*
-        IEnumerable<CompetitionClassInfo> GetCompetitionClassInfos(
-            Guid competitionId,
-            IEnumerable<Guid>? competitionClassIds);
-        */
+        Participant? GetParticipant(
+            Guid participantId);
 
-        IEnumerable<(List<Participant> Participant, List<CompetitionClass> CompetitionClasses)> GetMultipleStarter(
+        IEnumerable<MultipleStarter> GetMultipleStarter(
             Guid competitionId);
 
         #region Competition Crud
@@ -72,6 +73,7 @@ namespace DanceCompetitionHelper
             string? className,
             int minStartsForPromotion,
             int minPointsForPromotion,
+            int pointsForWinning,
             bool ignore);
 
         void EditCompetitionClass(
@@ -84,10 +86,50 @@ namespace DanceCompetitionHelper
             string? className,
             int minStartsForPromotion,
             int minPointsForPromotion,
+            int pointsForWinning,
             bool ignore);
 
         void RemoveCompetitionClass(
             Guid competitionClassId);
+
+        #endregion //  CompetitionClass Crud 
+
+        #region Participant Crud
+
+        void CreateParticipant(
+            Guid competitionId,
+            Guid competitionClassId,
+            int startNumber,
+            string namePartA,
+            string? orgIdPartA,
+            string? namePartB,
+            string? orgIdPartB,
+            string? clubName,
+            string? orgIdClub,
+            int orgPointsPartA,
+            int orgStartsPartA,
+            int? orgPointsPartB,
+            int? orgStartsPartB,
+            bool ignore);
+
+        void EditParticipant(
+            Guid participantId,
+            Guid competitionClassId,
+            int startNumber,
+            string namePartA,
+            string? orgIdPartA,
+            string? namePartB,
+            string? orgIdPartB,
+            string? clubName,
+            string? orgIdClub,
+            int orgPointsPartA,
+            int orgStartsPartA,
+            int? orgPointsPartB,
+            int? orgStartsPartB,
+            bool ignore);
+
+        void RemoveParticipant(
+            Guid participantId);
 
         #endregion //  CompetitionClass Crud
 
