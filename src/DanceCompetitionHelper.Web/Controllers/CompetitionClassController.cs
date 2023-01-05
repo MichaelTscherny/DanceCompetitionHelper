@@ -45,6 +45,28 @@ namespace DanceCompetitionHelper.Web.Controllers
                 });
         }
 
+        public IActionResult DetailedView(
+            Guid id)
+        {
+            var foundCompId = _danceCompHelper.FindCompetition(
+                id);
+
+            ViewData["Show" + ParticipantController.RefName] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+
+            return View(
+                new CompetitionClassOverviewViewModel()
+                {
+                    Competition = _danceCompHelper.GetCompetition(
+                        foundCompId ?? Guid.Empty),
+                    CompetitionClasses = _danceCompHelper
+                        .GetCompetitionClasses(
+                            foundCompId,
+                            true)
+                        .ToList(),
+                });
+        }
+
         public IActionResult ShowCreateEdit(
             Guid id)
         {

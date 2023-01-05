@@ -315,6 +315,8 @@ namespace DanceCompetitionHelper
                 var qryParticipants = _danceCompHelperDb.Participants
                     .TagWith(
                         nameof(GetParticipants) + "(Guid?, Guid?, bool)[2]")
+                    .Include(
+                        x => x.CompetitionClass)
                     .Where(
                         x => x.CompetitionId == foundComp.CompetitionId
                         && x.Ignore == false);
@@ -377,14 +379,13 @@ namespace DanceCompetitionHelper
                 .Select(
                     x => x.Key);
 
-            var compClassById = GetCompetitionClassAsDictionaryById(
-                competitionId);
-
             foreach (var curMultiStart in multipleStarterGouping)
             {
                 var allPartInfo = _danceCompHelperDb.Participants
                     .TagWith(
                         nameof(GetMultipleStarterReuseTransacion) + "(Guid)[1]")
+                    .Include(
+                        x => x.CompetitionClass)
                     .Where(
                         x => x.NamePartA == curMultiStart.NamePartA
                         && x.OrgIdPartA == curMultiStart.OrgIdPartA
@@ -395,10 +396,7 @@ namespace DanceCompetitionHelper
                     .ToList();
 
                 yield return new MultipleStarter(
-                    SetCompetitionClasses(
-                        competitionId,
-                        allPartInfo,
-                        compClassById));
+                    allPartInfo);
             }
         }
 
@@ -465,46 +463,6 @@ namespace DanceCompetitionHelper
                             "{Method}: '{Organization}' not yet implemented!",
                             nameof(GetParticipantChecker),
                             competition.Organization));
-            }
-        }
-
-        private Dictionary<Guid, CompetitionClass> GetCompetitionClassAsDictionaryById(
-            Guid competitionId)
-        {
-            return _danceCompHelperDb.CompetitionClasses
-                .TagWith(
-                    nameof(GetCompetitionClassAsDictionaryById) + "(Guid)[0]")
-                .Where(
-                    x => x.CompetitionId == competitionId)
-                .ToDictionary(
-                    x => x.CompetitionClassId,
-                    x => x);
-        }
-
-        private IEnumerable<Participant> SetCompetitionClasses(
-            Guid competitionId,
-            IEnumerable<Participant> ofParticipants,
-            Dictionary<Guid, CompetitionClass>? reuseCompetitionClassById = null)
-        {
-            if (ofParticipants == null)
-            {
-                yield break;
-            }
-
-            var compClassesById = reuseCompetitionClassById
-                ?? GetCompetitionClassAsDictionaryById(
-                    competitionId);
-
-            foreach (var curPart in ofParticipants)
-            {
-                if (compClassesById.TryGetValue(
-                        curPart.CompetitionClassId,
-                        out var useCompClass))
-                {
-                    curPart.CompetitionClass = useCompClass;
-                }
-
-                yield return curPart;
             }
         }
 

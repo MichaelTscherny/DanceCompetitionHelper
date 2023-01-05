@@ -25,12 +25,5 @@ namespace DanceCompetitionHelper.Web.Extensions
 
             return retList;
         }
-
-        public static string GetCompetitionName(
-            this Competition? forCompetition) =>
-                string.Format(
-                    "{0} ({1})",
-                    forCompetition?.CompetitionName ?? "??",
-                    forCompetition?.OrgCompetitionId ?? "??");
     }
 }

@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database.Tables;
+﻿using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Tables;
 
 namespace DanceCompetitionHelper.Database.DisplayInfo
 {
@@ -12,13 +13,13 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
         public int PointsA { get; }
         public int StartsA { get; }
 
-        public int? PointsB { get; }
-        public int? StartsB { get; }
+        public int PointsB { get; }
+        public int StartsB { get; }
 
-        public Dictionary<Guid, int> StartnumberByClassId { get; }
-        public Dictionary<Guid, CompetitionClass> CompetitionClassByClassId { get; }
-        public Dictionary<Guid, string> CompetitionClassNamesByClassId { get; }
-        public Dictionary<string, Guid> CompetitionClassNamesByName { get; }
+        public Dictionary<Guid, int> StartnumberByClassId { get; } = new Dictionary<Guid, int>();
+        public Dictionary<Guid, CompetitionClass> CompetitionClassByClassId { get; } = new Dictionary<Guid, CompetitionClass>();
+        public Dictionary<Guid, string> CompetitionClassNamesByClassId { get; } = new Dictionary<Guid, string>();
+        public Dictionary<string, Guid> CompetitionClassNamesByName { get; } = new Dictionary<string, Guid>();
 
         public MultipleStarter(
             IEnumerable<Participant> participants)
@@ -26,49 +27,57 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
             Participants.AddRange(
                 participants ?? Enumerable.Empty<Participant>());
 
-            CompetitionClasses.AddRange(
-                Participants
-                    .Where(
-                        x => x.CompetitionClass != null)
-                    .Select(
-                        x => x.CompetitionClass)
-                    .Distinct());
+            var foundNames = new List<string>();
+            foreach (var curPart in Participants)
+            {
+                var useCompClass = curPart.CompetitionClass;
+                if (useCompClass != null
+                    && CompetitionClasses.Contains(curPart.CompetitionClass) == false)
+                {
+                    CompetitionClasses.Add(
+                        useCompClass);
+                }
+
+                foundNames.Add(
+                    string.Format(
+                        "{0} {1}",
+                        curPart.NamePartA,
+                        curPart.NamePartB));
+
+                PointsA = Math.Max(
+                    PointsA,
+                    curPart.OrgPointsPartA);
+                StartsA = Math.Max(
+                    PointsA,
+                    curPart.OrgStartsPartA);
+
+                PointsB = Math.Max(
+                    PointsB,
+                    curPart.OrgPointsPartB ?? 0);
+                StartsB = Math.Max(
+                    StartsB,
+                    curPart.OrgStartsPartB ?? 0);
+            }
 
             Name = string.Join(
                 "; ",
-                Participants
-                .Select(
-                    x => string.Format(
-                        "{0} {1}",
-                        x.NamePartA,
-                        x.NamePartB))
-                .Distinct());
-            PointsA = Participants.Max(
-                x => x.OrgPointsPartA);
-            StartsA = Participants.Max(
-                x => x.OrgStartsPartA);
-
-            PointsB = Participants.Max(
-                x => x.OrgPointsPartB);
-            StartsB = Participants.Max(
-                x => x.OrgStartsPartB);
+                foundNames
+                    .Distinct());
 
             StartnumberByClassId = Participants.
                 ToDictionary(
                     x => x.CompetitionClassId,
                     x => x.StartNumber);
-            CompetitionClassByClassId = CompetitionClasses
-                .ToDictionary(
-                    x => x.CompetitionClassId,
-                    x => x);
-            CompetitionClassNamesByClassId = CompetitionClasses
-                .ToDictionary(
-                    x => x.CompetitionClassId,
-                    x => x.CompetitionClassName);
-            CompetitionClassNamesByName = CompetitionClasses
-                .ToDictionary(
-                    x => x.CompetitionClassName,
-                    x => x.CompetitionClassId);
+
+            foreach (var curCompClass in CompetitionClasses)
+            {
+                var curCompClassId = curCompClass.CompetitionClassId;
+                var curCompClassName = curCompClass.GetCompetitionClassName();
+
+                CompetitionClassByClassId[curCompClassId] = curCompClass;
+                CompetitionClassNamesByClassId[curCompClassId] = curCompClassName;
+                CompetitionClassNamesByName[curCompClassName] = curCompClassId;
+            }
         }
     }
 }

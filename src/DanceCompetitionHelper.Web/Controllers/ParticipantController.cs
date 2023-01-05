@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Web.Extensions;
+﻿using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,6 +25,29 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         public IActionResult Index(
+            Guid id)
+        {
+            var foundCompId = _danceCompHelper.FindCompetition(
+                id);
+
+            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+
+            return View(
+                new ParticipantOverviewViewModel()
+                {
+                    Competition = _danceCompHelper.GetCompetition(
+                        foundCompId ?? Guid.Empty),
+                    Participtans = _danceCompHelper
+                        .GetParticipants(
+                            foundCompId,
+                            null,
+                            true)
+                        .ToList(),
+                });
+        }
+
+        public IActionResult DetailedView(
             Guid id)
         {
             var foundCompId = _danceCompHelper.FindCompetition(

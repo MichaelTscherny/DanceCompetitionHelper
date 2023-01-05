@@ -53,7 +53,7 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.Organization)
                         </td>
-                        <td>
+                        <td class ="text-nowrap">
                             <a asp-controller="@CompetitionClassController.RefName"
                                asp-action="@nameof(CompetitionClassController.Index)"
                                asp-route-id="@item.CompetitionId">
@@ -85,7 +85,7 @@
                                 @(item.DisplayInfo?.CountMultipleStarters ?? -1)
                             </a>
                         </td>
-                        <td>
+                        <td class="text-nowrap">
                             <a asp-controller="@CompetitionController.RefName"
                                asp-action="@nameof(CompetitionController.ShowEdit)" 
                                asp-route-id="@item.CompetitionId">Edit</a> |
