@@ -1,6 +1,9 @@
 using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Config;
 using DanceCompetitionHelper.Database.Diagnostic;
+using DanceCompetitionHelper.Web.Controllers;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using NLog.Web;
 using System.Diagnostics;
 
@@ -44,9 +47,17 @@ namespace DanceCompetitionHelper.Web
 
                 var app = builder.Build();
 
+                var logger = app.Services
+                    .GetRequiredService<ILogger<CompetitionController>>();
+
                 // for sql-tracing/loggings...
                 DiagnosticListener.AllListeners.Subscribe(
-                    app.Services.GetRequiredService<IObserver<DiagnosticListener>>());
+                    app.Services
+                        .GetRequiredService<IObserver<DiagnosticListener>>());
+
+                logger.LogInformation(
+                    "Working in '{EnvironmentName}'",
+                    app.Environment.EnvironmentName);
 
                 // Configure the HTTP request pipeline.
                 if (app.Environment.IsDevelopment() == false)
@@ -57,6 +68,7 @@ namespace DanceCompetitionHelper.Web
                         "Index",
                         "Competition");
                 }
+
                 app.UseStaticFiles();
 
                 app.UseRouting();
@@ -68,6 +80,64 @@ namespace DanceCompetitionHelper.Web
                 app.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Competition}/{action=Index}/{id?}");
+
+                app.Services
+                    .GetRequiredService<IHostApplicationLifetime>()
+                    .ApplicationStarted.Register(
+                        () =>
+                        {
+                            var addresses = app.Services.
+                                GetRequiredService<IServer>()
+                                ?.Features
+                                ?.Get<IServerAddressesFeature>()
+                                ?.Addresses ?? new List<string>();
+
+                            logger.LogInformation(
+                                "Reachable at: {addresses}",
+                                string.Join(
+                                    ", ",
+                                    addresses));
+
+                            // convenience: how to open a browser at win/linux?..
+                            return;
+
+                            if (app.Environment.IsDevelopment() == false
+                                || Debugger.IsAttached == false)
+                            {
+                                foreach (var curAddr in addresses)
+                                {
+                                    if (Uri.TryCreate(
+                                        curAddr,
+                                        UriKind.Absolute,
+                                        out _) == false)
+                                    {
+                                        continue;
+                                    }
+
+                                    try
+                                    {
+                                        Process.Start(
+                                            curAddr);
+                                    }
+                                    catch (System.ComponentModel.Win32Exception noBrowser)
+                                    {
+                                        if (noBrowser.ErrorCode == -2147467259)
+                                        {
+                                            logger.LogWarning(
+                                                noBrowser,
+                                                "No browser found!");
+                                        }
+                                    }
+                                    catch (Exception exc)
+                                    {
+                                        logger.LogError(
+                                            exc,
+                                            "Unable to start/open '{address}'",
+                                            curAddr);
+                                    }
+                                }
+                            }
+                        });
 
                 app.Run();
             }

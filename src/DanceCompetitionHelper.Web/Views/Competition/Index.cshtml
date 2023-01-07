@@ -57,7 +57,7 @@
                             <a asp-controller="@CompetitionClassController.RefName"
                                asp-action="@nameof(CompetitionClassController.Index)"
                                asp-route-id="@item.CompetitionId">
-                                @Html.DisplayFor(modelItem => item.CompetitionName)&nbsp;
+                                @Html.DisplayFor(modelItem => item.CompetitionName)
                                 (@Html.DisplayFor(modelItem => item.OrgCompetitionId))
                             </a>
                         </td>

@@ -68,10 +68,16 @@
                             @Html.DisplayFor(modelItem => item.ClubName)
                         </td>
                         <td>
-                            @(item.DisplayInfo?.PossiblePromotion ?? false)
+                            @{
+                                var useBool = item.DisplayInfo?.PossiblePromotion ?? false;
+                            }
+                            @Html.DisplayFor(modelItem => useBool)
                         </td>
                         <td>
-                            @(item.DisplayInfo?.MultipleStarts ?? false)
+                            @{
+                                useBool = item.DisplayInfo?.MultipleStarts ?? false;
+                            }
+                            @Html.DisplayFor(modelItem => useBool)
                         </td>
 
                         <td class ="text-nowrap">

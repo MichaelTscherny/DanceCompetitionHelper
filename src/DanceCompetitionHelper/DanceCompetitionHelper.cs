@@ -420,6 +420,7 @@ namespace DanceCompetitionHelper
             }
         }
 
+        [Obsolete("needed?..")]
         public ExtraParticipants GetExtraParticipants(
             CompetitionClass competitionClass,
             Dictionary<Guid, List<Participant>> participantsByCompClass)
@@ -434,6 +435,7 @@ namespace DanceCompetitionHelper
             return new ExtraParticipants();
         }
 
+        [Obsolete("needed?..")]
         public CompetitionClassSettings GetCompetitionClassSettings(
             CompetitionClass competitionClass)
         {
