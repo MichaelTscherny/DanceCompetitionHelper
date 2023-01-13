@@ -42,10 +42,10 @@
                         Ignore
                     </th>
                     <th>
-                        Participants
+                        Participants (Reg + Ex)
                     </th>
                     <th>
-                        Possible extras (W / P)
+                        Extras (W / P)
                     </th>
                     <th>
                         Multi Starter
@@ -54,7 +54,7 @@
                         Needed Rounds
                     </th>
                     <th>
-                        P for Win
+                        Points (F / L)
                     </th>
                     <th>
                         Prom. Min. (S / P)
@@ -114,7 +114,7 @@
                             @(item.DisplayInfo?.NeededRounds ?? -1)
                         </td>
                         <td>
-                            @(item.PointsForWinning)
+                            @(item.PointsForFirst) / @(item.PointsForLast)
                         </td>
                         <td class="text-nowrap">
                             @(item.MinStartsForPromotion) / @(item.MinPointsForPromotion) 
@@ -152,10 +152,10 @@
                         Ignore
                     </th>
                     <th>
-                        Participants
+                        Participants (Reg + Ex)
                     </th>
                     <th>
-                        Possible extras (W / P)
+                        Extras (W / P)
                     </th>
                     <th>
                         Multi Starter
@@ -164,7 +164,7 @@
                         Needed Rounds
                     </th>
                     <th>
-                        P for Win
+                        Points (F / L)
                     </th>
                     <th>
                         Prom. Min. (S / P)

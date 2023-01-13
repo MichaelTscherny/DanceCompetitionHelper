@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\MultipleStarts - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\Competition - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\CompetitionClass - Copy.feature.cs" />
   </ItemGroup>
@@ -53,6 +54,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Promotions PartA.feature.cs">
+      <DependentUpon>Promotions PartA.feature</DependentUpon>
+    </Compile>
     <Compile Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature.cs">
       <Visible>true</Visible>
       <DependentUpon>MultipleStarts.feature</DependentUpon>
@@ -68,6 +72,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Promotions PartA.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

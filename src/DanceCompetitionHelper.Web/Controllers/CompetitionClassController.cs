@@ -114,7 +114,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     createCompetition.Class,
                     createCompetition.MinStartsForPromotion,
                     createCompetition.MinPointsForPromotion,
-                    createCompetition.PointsForWinning,
+                    createCompetition.PointsForFirst,
+                    createCompetition.PointsForLast,
                     createCompetition.Ignore);
 
                 return RedirectToAction(
@@ -170,7 +171,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     Class = foundCompClass.Class,
                     MinStartsForPromotion = foundCompClass.MinStartsForPromotion,
                     MinPointsForPromotion = foundCompClass.MinPointsForPromotion,
-                    PointsForWinning = foundCompClass.PointsForWinning,
+                    PointsForFirst = foundCompClass.PointsForFirst,
+                    PointsForLast = foundCompClass.PointsForLast,
                     Ignore = foundCompClass.Ignore,
                 });
         }
@@ -201,7 +203,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     editCompetitionClass.Class,
                     editCompetitionClass.MinStartsForPromotion,
                     editCompetitionClass.MinPointsForPromotion,
-                    editCompetitionClass.PointsForWinning,
+                    editCompetitionClass.PointsForFirst,
+                    editCompetitionClass.PointsForLast,
                     editCompetitionClass.Ignore);
 
                 return RedirectToAction(

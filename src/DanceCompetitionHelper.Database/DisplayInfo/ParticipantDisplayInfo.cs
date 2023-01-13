@@ -3,6 +3,7 @@
     public class ParticipantDisplayInfo
     {
         public bool MultipleStarts { get; set; }
-        public bool PossiblePromotion { get; set; }
+        public bool PossiblePromotionA { get; set; }
+        public bool? PossiblePromotionB { get; set; }
     }
 }

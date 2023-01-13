@@ -141,7 +141,10 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("'Internal' Org-Id of class of CompetitionClass");
 
-                    b.Property<int>("PointsForWinning")
+                    b.Property<int>("PointsForFirst")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PointsForLast")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("CompetitionClassId");
@@ -223,7 +226,10 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("'Internal' Org-Id of class of CompetitionClass");
 
-                    b.Property<int>("PointsForWinning")
+                    b.Property<int>("PointsForFirst")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PointsForLast")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Version")

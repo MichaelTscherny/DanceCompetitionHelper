@@ -26,7 +26,9 @@ Scenario: None
         #
         | Test-Comp-01    | Sen 2 Sta C          | 7           | Dancer 06-A | 11         | Dancer 06-B | 12         | Test-Club-03 | 12        |
         | Test-Comp-01    | Sen 2 Sta C          | 8           | Dancer 07-A | 13         | Dancer 07-B | 14         | Test-Club-04 | 13        |
-    Then none multiple starts exists in Competition "Test-Comp-01" of DanceCompetitionHelper "DanceCompHelper"
+    Then none multiple starts exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName |
+        | Test-Comp-01    |
 
     
 Scenario: One in Sen Sta D
@@ -54,10 +56,10 @@ Scenario: One in Sen Sta D
         #
         | Test-Comp-01    | Sen 2 Sta C          | 7           | Dancer 06-A | 11         | Dancer 06-B | 12         | Test-Club-03 | 12        |
         | Test-Comp-01    | Sen 2 Sta C          | 8           | Dancer 07-A | 13         | Dancer 07-B | 14         | Test-Club-04 | 13        |
-    Then following multiple starts exists in Competition "Test-Comp-01" of DanceCompetitionHelper "DanceCompHelper"
-        | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub | CompetitionClassName | StartNumber |
-        | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 1 Sta D          | 1           |
-        | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 2 Sta D          | 3           |
+    Then following multiple starts exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub | CompetitionClassName | StartNumber |
+        | Test-Comp-01    | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 1 Sta D          | 1           |
+        | Test-Comp-01    | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 2 Sta D          | 3           |
 
 Scenario: One in Sen Sta D and C
     Given following DanceCompetitionHelper "DanceCompHelper"
@@ -86,11 +88,11 @@ Scenario: One in Sen Sta D and C
         | Test-Comp-01    | Sen 2 Sta C          | 7           | Dancer 06-A | 11         | Dancer 06-B | 12         | Test-Club-03 | 12        |
         | Test-Comp-01    | Sen 2 Sta C          | 8           | Dancer 07-A | 13         | Dancer 07-B | 14         | Test-Club-04 | 13        |
         | Test-Comp-01    | Sen 2 Sta C          | 9           | Dancer 08-A | 15         | Dancer 08-B | 16         | Test-Club-05 | 14        |
-    Then following multiple starts exists in Competition "Test-Comp-01" of DanceCompetitionHelper "DanceCompHelper"
-        | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub | CompetitionClassName | StartNumber |
+    Then following multiple starts exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub | CompetitionClassName | StartNumber |
         # Sen x Sta D
-        | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 1 Sta D          | 1           |
-        | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 2 Sta D          | 3           |
+        | Test-Comp-01    | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 1 Sta D          | 1           |
+        | Test-Comp-01    | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 2 Sta D          | 3           |
         # Sen x Sta C
-        | Dancer 08-A | 15         | Dancer 08-B | 16         | Test-Club-05 | 14        | Sen 1 Sta C          | 9           |
-        | Dancer 08-A | 15         | Dancer 08-B | 16         | Test-Club-05 | 14        | Sen 2 Sta C          | 9           |
+        | Test-Comp-01    | Dancer 08-A | 15         | Dancer 08-B | 16         | Test-Club-05 | 14        | Sen 1 Sta C          | 9           |
+        | Test-Comp-01    | Dancer 08-A | 15         | Dancer 08-B | 16         | Test-Club-05 | 14        | Sen 2 Sta C          | 9           |

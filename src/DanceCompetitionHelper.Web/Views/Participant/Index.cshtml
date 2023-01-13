@@ -39,7 +39,7 @@
                         Club
                     </th>
                     <th>
-                        Possible Promotion
+                        Possible Promotion (A / B)
                     </th>
                     <th>
                         Multiple Starts
@@ -69,9 +69,17 @@
                         </td>
                         <td>
                             @{
-                                var useBool = item.DisplayInfo?.PossiblePromotion ?? false;
+                                var useBool = item.DisplayInfo?.PossiblePromotionA ?? false;
                             }
                             @Html.DisplayFor(modelItem => useBool)
+
+                            @{
+                                var useBool02 = item.DisplayInfo?.PossiblePromotionB;
+                            }
+                            @if (useBool02.HasValue)
+                            {
+                                <div>/ @Html.DisplayFor(modelItem => useBool02)</div>
+                            }
                         </td>
                         <td>
                             @{
@@ -109,7 +117,7 @@
                         Club
                     </th>
                     <th>
-                        Possible Promotion
+                        Possible Promotion (A / B)
                     </th>
                     <th>
                         Multiple Starts

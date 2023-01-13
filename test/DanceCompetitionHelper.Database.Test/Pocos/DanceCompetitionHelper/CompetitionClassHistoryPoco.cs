@@ -12,7 +12,9 @@
         public string? Class { get; set; }
         public int MinStartsForPromotion { get; set; }
         public int MinPointsForPromotion { get; set; }
-        public int PointsForWinning { get; set; }
+
+        public int PointsForFirst { get; set; }
+        public int PointsForLast { get; set; }
 
         public bool Ignore { get; set; }
 

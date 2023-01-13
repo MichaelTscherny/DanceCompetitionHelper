@@ -73,7 +73,8 @@ namespace DanceCompetitionHelper
             string? className,
             int minStartsForPromotion,
             int minPointsForPromotion,
-            int pointsForWinning,
+            int pointsForFirts,
+            int pointsForLast,
             bool ignore);
 
         void EditCompetitionClass(
@@ -86,7 +87,8 @@ namespace DanceCompetitionHelper
             string? className,
             int minStartsForPromotion,
             int minPointsForPromotion,
-            int pointsForWinning,
+            int pointsForFirst,
+            int pointsForLast,
             bool ignore);
 
         void RemoveCompetitionClass(

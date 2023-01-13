@@ -18,6 +18,10 @@
         public int? OrgStartsPartB { get; set; }
         public bool Ignore { get; set; }
 
+        public bool MultipleStarts { get; set; }
+        public bool PossiblePromotionA { get; set; }
+        public bool? PossiblePromotionB { get; set; }
+
         public override string ToString()
         {
             return string.Format(
