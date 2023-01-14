@@ -848,40 +848,72 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                         "{0} not invalid - {1} missing",
                         partLogString,
                         nameof(Participant.DisplayInfo));
+                    Assert.That(
+                        foundPart?.DisplayInfo?.PromotionInfo,
+                        Is.Not.Null,
+                        "{0} not invalid - {1}.{2} missing",
+                        partLogString,
+                        nameof(Participant.DisplayInfo),
+                        nameof(ParticipantDisplayInfo.PromotionInfo));
+                    Assert.That(
+                        foundPart?.DisplayInfo?.MultipleStartInfo,
+                        Is.Not.Null,
+                        "{0} not invalid - {1}.{2} missing",
+                        partLogString,
+                        nameof(Participant.DisplayInfo),
+                        nameof(ParticipantDisplayInfo.MultipleStartInfo));
                 });
 
                 Assert.Multiple(() =>
                 {
                     if (foundPart == null
-                        || foundPart.DisplayInfo == null)
+                        || foundPart.DisplayInfo == null
+                        || foundPart.DisplayInfo.PromotionInfo == null
+                        || foundPart.DisplayInfo.MultipleStartInfo == null)
                     {
                         throw new ArgumentNullException();
                     }
 
                     Assert.That(
-                        foundPart.DisplayInfo.MultipleStarts,
+                        foundPart.DisplayInfo.MultipleStartInfo.MultipleStarts,
                         Is.EqualTo(
                             chkPart.MultipleStarts),
                         "{0}: {1}",
                         partLogString,
-                        nameof(ParticipantDisplayInfo.MultipleStarts));
+                        nameof(CheckMultipleStartInfo.MultipleStarts));
+
                     Assert.That(
-                        foundPart.DisplayInfo.PossiblePromotionA,
+                        foundPart.DisplayInfo.PromotionInfo.PossiblePromotionA,
                         Is.EqualTo(
                             chkPart.PossiblePromotionA),
                         "{0}: {1}",
                         partLogString,
-                        nameof(ParticipantDisplayInfo.PossiblePromotionA));
+                        nameof(CheckPromotionInfo.PossiblePromotionA));
                     Assert.That(
-                        foundPart.DisplayInfo.PossiblePromotionB,
+                        foundPart.DisplayInfo.PromotionInfo.PossiblePromotionAInfo,
+                        Is.EqualTo(
+                            chkPart.PossiblePromotionAInfo),
+                        "{0}: {1}",
+                        partLogString,
+                        nameof(CheckPromotionInfo.PossiblePromotionAInfo));
+
+                    Assert.That(
+                        foundPart.DisplayInfo.PromotionInfo.PossiblePromotionB,
                         Is.EqualTo(
                             chkPart.PossiblePromotionB),
                         "{0}: {1}",
                         partLogString,
-                        nameof(ParticipantDisplayInfo.PossiblePromotionB));
+                        nameof(CheckPromotionInfo.PossiblePromotionB));
+                    Assert.That(
+                        foundPart.DisplayInfo.PromotionInfo.PossiblePromotionBInfo,
+                        Is.EqualTo(
+                            chkPart.PossiblePromotionBInfo),
+                        "{0}: {1}",
+                        partLogString,
+                        nameof(CheckPromotionInfo.PossiblePromotionBInfo));
+
+
                 });
-
-
             }
         }
 

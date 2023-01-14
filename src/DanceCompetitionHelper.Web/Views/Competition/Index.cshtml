@@ -31,6 +31,9 @@
                         @Html.DisplayNameFor(model => model.CompetitionInfo)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.Comment)
+                    </th>
+                    <th>
                         Competition Classes
                     </th>
                     <th>
@@ -63,6 +66,9 @@
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.CompetitionInfo)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Comment)
                         </td>
                         <td>
                             <a asp-controller="@CompetitionClassController.RefName"
@@ -121,6 +127,9 @@
                     </th>
                     <th>
                         Multiple Starters
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Comment)
                     </th>
                     <th></th>
                 </tr>

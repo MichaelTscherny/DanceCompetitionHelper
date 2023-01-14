@@ -12,7 +12,8 @@
         public int MinStartsForPromotion { get; set; }
         public int MinPointsForPromotion { get; set; }
         public int PointsForFirst { get; set; }
-        public int PointsForLast { get; set; }
+        public int ExtraManualStarter { get; set; }
+        public string? Comment { get; set; }
 
         public bool Ignore { get; set; }
 

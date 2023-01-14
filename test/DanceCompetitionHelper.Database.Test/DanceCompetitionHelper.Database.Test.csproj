@@ -72,7 +72,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Promotions PartA.feature">
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>

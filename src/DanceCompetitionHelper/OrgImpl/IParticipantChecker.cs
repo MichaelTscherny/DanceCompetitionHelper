@@ -10,7 +10,7 @@ namespace DanceCompetitionHelper.OrgImpl
         void SetMultipleStarter(
             IEnumerable<MultipleStarter> multipleStarters);
 
-        (bool PromotionA, bool? PromotionB) CheckParticipantPromotion(
+        CheckPromotionInfo CheckParticipantPromotion(
             Participant participant);
     }
 }

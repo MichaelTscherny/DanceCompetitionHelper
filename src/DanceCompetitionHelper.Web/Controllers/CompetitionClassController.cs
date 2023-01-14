@@ -55,6 +55,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
 
             return View(
+                nameof(Index),
                 new CompetitionClassOverviewViewModel()
                 {
                     Competition = _danceCompHelper.GetCompetition(
@@ -64,6 +65,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                             foundCompId,
                             true)
                         .ToList(),
+                    DetailedView = true,
                 });
         }
 
@@ -115,7 +117,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     createCompetition.MinStartsForPromotion,
                     createCompetition.MinPointsForPromotion,
                     createCompetition.PointsForFirst,
-                    createCompetition.PointsForLast,
+                    createCompetition.ExtraManualStarter,
+                    createCompetition.Comment,
                     createCompetition.Ignore);
 
                 return RedirectToAction(
@@ -172,7 +175,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     MinStartsForPromotion = foundCompClass.MinStartsForPromotion,
                     MinPointsForPromotion = foundCompClass.MinPointsForPromotion,
                     PointsForFirst = foundCompClass.PointsForFirst,
-                    PointsForLast = foundCompClass.PointsForLast,
+                    ExtraManualStarter = foundCompClass.ExtraManualStarter,
+                    Comment = foundCompClass.Comment,
                     Ignore = foundCompClass.Ignore,
                 });
         }
@@ -204,7 +208,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     editCompetitionClass.MinStartsForPromotion,
                     editCompetitionClass.MinPointsForPromotion,
                     editCompetitionClass.PointsForFirst,
-                    editCompetitionClass.PointsForLast,
+                    editCompetitionClass.ExtraManualStarter,
+                    editCompetitionClass.Comment,
                     editCompetitionClass.Ignore);
 
                 return RedirectToAction(

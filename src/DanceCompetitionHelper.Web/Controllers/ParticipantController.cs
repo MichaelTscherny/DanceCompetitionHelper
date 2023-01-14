@@ -57,6 +57,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
 
             return View(
+                nameof(Index),
                 new ParticipantOverviewViewModel()
                 {
                     Competition = _danceCompHelper.GetCompetition(
@@ -67,6 +68,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                             null,
                             true)
                         .ToList(),
+                    DetailedView = true,
                 });
         }
 
@@ -142,6 +144,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                      createParticipant.OrgStartsPartA,
                      createParticipant.OrgPointsPartB,
                      createParticipant.OrgStartsPartB,
+                     createParticipant.Comment,
                      createParticipant.Ignore);
 
                 HttpContext.Session.SetString(
@@ -199,6 +202,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     OrgStartsPartA = foundParticipant.OrgStartsPartA,
                     OrgPointsPartB = foundParticipant.OrgPointsPartB,
                     OrgStartsPartB = foundParticipant.OrgStartsPartB,
+                    Comment = foundParticipant.Comment,
                     Ignore = foundParticipant.Ignore,
 
                     CompetitionClasses = _danceCompHelper
@@ -239,6 +243,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     editParticipant.OrgStartsPartA,
                     editParticipant.OrgPointsPartB,
                     editParticipant.OrgStartsPartB,
+                    editParticipant.Comment,
                     editParticipant.Ignore);
 
                 return RedirectToAction(

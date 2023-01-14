@@ -11,7 +11,9 @@
     var participantsCount = Model.Participtans?.Count() ?? 0;
 
     ViewData["Title"] = string.Format(
-        "{0} Participants of {1}",
+        Model.DetailedView
+            ? "{0} Participants Details of {1}"
+            : "{0} Participants of {1}",
         participantsCount,
         compInfoStr);
 }
@@ -27,22 +29,58 @@
                         Class (@participantsCount)
                     </th>
                     <th>
-                        Start Number
+                        #
                     </th>
                     <th>
                         Ignore
                     </th>
-                    <th>
-                        Name(s)
-                    </th>
-                    <th>
-                        Club
-                    </th>
+                    @if(Model.DetailedView)
+                    {
+                        <th>
+                            Name A (Org-ID-A)
+                        </th>
+                        <th>
+                            Points/Starts A
+                        </th>
+                        <th>
+                            Name B (Org-ID-B)
+                        </th>
+                        <th>
+                            Points/Starts B
+                        </th>
+                    }
+                    else 
+                    {
+                        <th>
+                            Name(s)
+                        </th>
+                    }
+                    @if(Model.DetailedView)
+                    {
+                        <th>
+                            Club (Org-Club-ID)
+                        </th>
+                    }
+                    else 
+                    {
+                        <th>
+                            Club
+                        </th>
+                    }
+                    @if (Model.DetailedView)
+                    {
+                        <th>
+                            Class: P-F / Prom S / P
+                        </th>
+                    }
                     <th>
                         Possible Promotion (A / B)
                     </th>
                     <th>
                         Multiple Starts
+                    </th>
+                    <th>
+                        Comment
                     </th>
                     <th></th>
                 </tr>
@@ -53,6 +91,7 @@
                     <tr>
                         <td class="text-nowrap">
                             @item.CompetitionClass.CompetitionClassName
+                            @(item.CompetitionClass.Comment)
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.StartNumber)
@@ -60,34 +99,91 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.Ignore)
                         </td>
-                        <td class="text-nowrap">
-                            @Html.DisplayFor(modelItem => item.NamePartA)
-                            @Html.DisplayFor(modelItem => item.NamePartB)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ClubName)
-                        </td>
+                        @if (Model.DetailedView)
+                        {
+                            <td class="text-nowrap">
+                                @Html.DisplayFor(modelItem => item.NamePartA)
+                                (@Html.DisplayFor(modelItem => item.OrgIdPartA))
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.OrgPointsPartA)
+                                / @Html.DisplayFor(modelItem => item.OrgStartsPartA)
+                            </td>
+                            <td class="text-nowrap">
+                                @Html.DisplayFor(modelItem => item.NamePartB)
+                                (@Html.DisplayFor(modelItem => item.OrgIdPartB))
+                            </td>
+                            <td class="text-nowrap">
+                                @Html.DisplayFor(modelItem => item.OrgPointsPartB)
+                                / @Html.DisplayFor(modelItem => item.OrgStartsPartB)
+                            </td>
+                        }
+                        else 
+                        {
+                            <td class="text-nowrap">
+                                @Html.DisplayFor(modelItem => item.NamePartA)
+                                @Html.DisplayFor(modelItem => item.NamePartB)
+                            </td>
+                        }
+                        @if (Model.DetailedView)
+                        {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ClubName)
+                                (@Html.DisplayFor(modelItem => item.OrgIdClub))
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ClubName)
+                            </td>
+                        }
+                        @if (Model.DetailedView)
+                        {
+                            <td class="text-nowrap">
+                                @(item.CompetitionClass.PointsForFirst) /
+                                @(item.CompetitionClass.MinPointsForPromotion) /
+                                @(item.CompetitionClass.MinStartsForPromotion)
+                            </td>
+                        }
                         <td>
                             @{
-                                var useBool = item.DisplayInfo?.PossiblePromotionA ?? false;
+                                var useBool = item.DisplayInfo?.PromotionInfo?.PossiblePromotionA ?? false;
                             }
-                            @Html.DisplayFor(modelItem => useBool)
+                            <div class="row row-cols justify-content-center">
+                                <div class="col-auto text-end"
+                                     data-bs-toggle="tooltip"
+                                     data-bs-custom-class="custom-tooltip"
+                                     data-bs-title="@(item.DisplayInfo?.PromotionInfo?.PossiblePromotionAInfo ?? string.Empty)">
+                                    @Html.DisplayFor(modelItem => useBool)
+                                </div>
 
                             @{
-                                var useBool02 = item.DisplayInfo?.PossiblePromotionB;
+                                var useBool02 = item.DisplayInfo?.PromotionInfo?.PossiblePromotionB;
                             }
                             @if (useBool02.HasValue)
                             {
-                                <div>/ @Html.DisplayFor(modelItem => useBool02)</div>
+                                <div class="col-auto">
+                                    /
+                                </div>
+                                <div class="col-auto"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-custom-class="custom-tooltip"
+                                        data-bs-title="@(item.DisplayInfo?.PromotionInfo?.PossiblePromotionBInfo ?? string.Empty)">
+                                    @Html.DisplayFor(modelItem => useBool02.Value)
+                                </div>                            
                             }
+                            </div>
                         </td>
                         <td>
                             @{
-                                useBool = item.DisplayInfo?.MultipleStarts ?? false;
+                                useBool = item.DisplayInfo?.MultipleStartInfo?.MultipleStarts ?? false;
                             }
                             @Html.DisplayFor(modelItem => useBool)
                         </td>
-
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Comment)
+                        </td>
                         <td class ="text-nowrap">
                             <a asp-controller="@ParticipantController.RefName"
                                asp-action="@nameof(ParticipantController.ShowEdit)"
@@ -105,22 +201,58 @@
                         Class (@participantsCount)
                     </th>
                     <th>
-                        Start Number
+                        #
                     </th>
                     <th>
                         Ignore
                     </th>
-                    <th>
-                        Name(s)
-                    </th>
-                    <th>
-                        Club
-                    </th>
+                    @if (Model.DetailedView)
+                    {
+                        <th>
+                            Name A (Org-ID-A)
+                        </th>
+                        <th>
+                            Points/Starts A
+                        </th>
+                        <th>
+                            Name B (Org-ID-B)
+                        </th>
+                        <th>
+                            Points/Starts B
+                        </th>
+                    }
+                    else
+                    {
+                        <th>
+                            Name(s)
+                        </th>
+                    }
+                    @if (Model.DetailedView)
+                    {
+                        <th>
+                            Club (Org-Club-ID)
+                        </th>
+                    }
+                    else
+                    {
+                        <th>
+                            Club
+                        </th>
+                    }
+                    @if (Model.DetailedView)
+                    {
+                        <th>
+                            Class: P-F / Prom S / P
+                        </th>
+                    }
                     <th>
                         Possible Promotion (A / B)
                     </th>
                     <th>
                         Multiple Starts
+                    </th>
+                    <th>
+                        Comment
                     </th>
                     <th></th>
                 </tr>
@@ -144,13 +276,24 @@
                 Back
             </a>
             |
-            <a asp-controller="@ParticipantController.RefName"
-               asp-action="@nameof(ParticipantController.DetailedView)"
+            @if(Model.DetailedView)
+            {
+                <a asp-controller="@ParticipantController.RefName"
+               asp-action="@nameof(ParticipantController.Index)"
                asp-route-id="@Model.Competition?.CompetitionId"
                class="btn btn-primary px-lg-4">
-                Detailed View
-            </a>
+                    Normal View
+                </a>
+            }
+            else 
+            {
+                <a asp-controller="@ParticipantController.RefName"
+                   asp-action="@nameof(ParticipantController.DetailedView)"
+                   asp-route-id="@Model.Competition?.CompetitionId"
+                   class="btn btn-primary px-lg-4">
+                    Detailed View
+                </a>
+            }
         </div>
     </div>
 </div>
-

@@ -138,6 +138,25 @@
                 </label>
             </div>
         </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Comment
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Comment"
+                       class="form-control"
+                       placeholder="Comment"
+                       style="width: 100%" />
+                <span asp-validation-for="Comment"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Comment"
+                       class="control-label">
+                    Comment for this Competition
+                </label>
+            </div>
+        </div>
         <div class="row d-flex justify-content-center py-1">
             <div class="col">
                 <input type="submit" 

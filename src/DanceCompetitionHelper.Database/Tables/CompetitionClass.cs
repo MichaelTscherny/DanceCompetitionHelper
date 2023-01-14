@@ -51,11 +51,11 @@ namespace DanceCompetitionHelper.Database.Tables
         [Range(0, int.MaxValue)]
         public int PointsForFirst { get; set; }
 
-        /// <summary>
-        /// TODO: is this realy needed?..
-        /// </summary>
         [Range(0, int.MaxValue)]
-        public int PointsForLast { get; set; }
+        public int ExtraManualStarter { get; set; }
+
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? Comment { get; set; }
 
         public bool Ignore { get; set; }
 

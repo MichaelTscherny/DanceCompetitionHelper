@@ -38,7 +38,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             }
         }
 
-        public (bool PromotionA, bool? PromotionB) CheckParticipantPromotion(Participant participant)
+        public CheckPromotionInfo CheckParticipantPromotion(Participant participant)
         {
             var allClasses = new List<CompetitionClass>();
             var usePartCompClass = participant.CompetitionClass;
@@ -57,7 +57,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             }
 
             var pointsForFirst = allClasses.Sum(x => x.PointsForFirst);
-            var pointsForLast = allClasses.Sum(x => x.PointsForLast);
             var countStarts = allClasses.Count;
 
             var newPartAPoints = (participant.OrgPointsPartA + pointsForFirst);
@@ -92,7 +91,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 "Participant '{NamePartA}'/'{NamePartB}' ({ParticipantId}): P/S " +
                 "[A] {CurrentOrgPointsPartA}/{CurrentOrgStartsPartA}; " +
                 "[B] {CurrentOrgPointsPartB}/{CurrentOrgStartsPartB} + " +
-                "F/L/S {pointsForFirst}/{pointsForLast}/{countStarts} = " +
+                "F/S {pointsForFirst}/{countStarts} = " +
                 "S/P [A] {newPartAPoints}/{newPartAStarts}; " +
                 "[B] {newPartBPoints}/{newPartBPoints} => " +
                 "Prom S/P [A] {promotionPartAPoints}/{promotionPartAStarts}; " +
@@ -107,7 +106,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 participant.OrgPointsPartB,
                 participant.OrgStartsPartB,
                 pointsForFirst,
-                pointsForLast,
                 countStarts,
                 newPartAPoints,
                 newPartAStarts,
@@ -123,7 +121,31 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 usePartCompClass.MinPointsForPromotion,
                 usePartCompClass.MinStartsForPromotion);
 
-            return (retPromotionA, retPromotionB);
+            return new CheckPromotionInfo()
+            {
+                PossiblePromotionA = retPromotionA,
+                PossiblePromotionAInfo = string.Format(
+                    "[A] {0}/{1} + {2}/{3} = {4}/{5} -> {6}",
+                    participant.OrgPointsPartA,
+                    participant.OrgStartsPartA,
+                    pointsForFirst,
+                    countStarts,
+                    newPartAPoints,
+                    newPartAStarts,
+                    retPromotionA),
+                PossiblePromotionB = retPromotionB,
+                PossiblePromotionBInfo = participant.OrgPointsPartB.HasValue
+                    ? string.Format(
+                        "[B] {0}/{1} + {2}/{3} = {4}/{5} -> {6}",
+                        participant.OrgPointsPartB,
+                        participant.OrgStartsPartB,
+                        pointsForFirst,
+                        countStarts,
+                        newPartBPoints,
+                        newPartBStarts,
+                        retPromotionB)
+                    : null,
+            };
         }
     }
 }

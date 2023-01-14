@@ -52,8 +52,12 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [Range(0, int.MaxValue)]
         public int PointsForFirst { get; set; }
+
         [Range(0, int.MaxValue)]
-        public int PointsForLast { get; set; }
+        public int ExtraManualStarter { get; set; }
+
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? Comment { get; set; }
 
         public bool Ignore { get; set; }
     }

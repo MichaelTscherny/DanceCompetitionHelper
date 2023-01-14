@@ -33,6 +33,9 @@ namespace DanceCompetitionHelper.Database.Tables
         [Required]
         public DateTime CompetitionDate { get; set; }
 
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? Comment { get; set; }
+
         [NotMapped]
         public CompetitionDisplayInfo? DisplayInfo { get; set; }
     }

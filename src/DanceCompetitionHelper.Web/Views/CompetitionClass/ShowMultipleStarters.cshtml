@@ -19,12 +19,13 @@
     var displayInfos = new List<(string ClassName, Guid ClassId)>(
         Model.MultipleStarters
             ?.SelectMany(
-                x => x.CompetitionClassNamesByName)
+                x => x.CompetitionClasses)
             .Distinct()
             .OrderBy(
-                x => x.Key)
+                x => x.OrgClassId)
             .Select(
-                x => (x.Key, x.Value))
+                x => (x.GetCompetitionClassName(), 
+                    x.CompetitionClassId))
             ?? Enumerable.Empty<(string, Guid)>());
 }
 

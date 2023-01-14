@@ -185,7 +185,8 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                             MinPointsForPromotion = newCompClass.MinPointsForPromotion,
 
                             PointsForFirst = newCompClass.PointsForFirst,
-                            PointsForLast = newCompClass.PointsForLast,
+                            ExtraManualStarter = newCompClass.ExtraManualStarter,
+                            Comment = newCompClass.Comment,
                         });
 
                     useDb.SaveChanges();
@@ -246,7 +247,8 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                             MinPointsForPromotion = newCompClassHist.MinPointsForPromotion,
 
                             PointsForFirst = newCompClassHist.PointsForFirst,
-                            PointsForLast = newCompClassHist.PointsForLast,
+                            ExtraManualStarter = newCompClassHist.ExtraManualStarter,
+                            Comment = newCompClassHist.Comment,
                         });
 
                     useDb.SaveChanges();

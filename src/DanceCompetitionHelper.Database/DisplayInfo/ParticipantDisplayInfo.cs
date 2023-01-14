@@ -2,8 +2,7 @@
 {
     public class ParticipantDisplayInfo
     {
-        public bool MultipleStarts { get; set; }
-        public bool PossiblePromotionA { get; set; }
-        public bool? PossiblePromotionB { get; set; }
+        public CheckMultipleStartInfo? MultipleStartInfo { get; set; }
+        public CheckPromotionInfo? PromotionInfo { get; set; }
     }
 }

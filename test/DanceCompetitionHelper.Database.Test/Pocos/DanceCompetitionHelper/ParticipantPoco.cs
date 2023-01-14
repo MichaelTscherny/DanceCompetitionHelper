@@ -20,7 +20,9 @@
 
         public bool MultipleStarts { get; set; }
         public bool PossiblePromotionA { get; set; }
+        public string? PossiblePromotionAInfo { get; set; }
         public bool? PossiblePromotionB { get; set; }
+        public string? PossiblePromotionBInfo { get; set; }
 
         public override string ToString()
         {
