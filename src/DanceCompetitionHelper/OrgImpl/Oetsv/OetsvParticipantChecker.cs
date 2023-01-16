@@ -11,10 +11,16 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         private readonly Dictionary<Guid, CompetitionClass> _compClassesById = new Dictionary<Guid, CompetitionClass>();
         private readonly Dictionary<Guid, List<CompetitionClass>> _multiStarterCompClassesByParticipantId = new Dictionary<Guid, List<CompetitionClass>>();
 
+        private readonly ICompetitonClassChecker _competitonClassChecker;
+
         public OetsvParticipantChecker(
             ILogger<OetsvParticipantChecker> logger)
         {
             _logger = logger;
+
+            var myCompClassChecker = new OetsvCompetitonClassChecker();
+
+            _competitonClassChecker = myCompClassChecker;
         }
 
         public void SetCompetitionClasses(
@@ -48,7 +54,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 out var foundAllStartingClasses))
             {
                 allClasses.AddRange(
-                    foundAllStartingClasses);
+                    _competitonClassChecker.GetRelatedCompetitionClassesForPoints(
+                        usePartCompClass,
+                        foundAllStartingClasses));
             }
             else
             {
