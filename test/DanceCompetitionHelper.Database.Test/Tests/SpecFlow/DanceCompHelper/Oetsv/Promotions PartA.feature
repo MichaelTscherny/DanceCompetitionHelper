@@ -27,15 +27,15 @@ Scenario: No Multiple Start - None
         | CompetitionName |
         | Test-Comp-01    |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo |
+        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo           |
         #                                                                                  
-        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | false              |                        |
+        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False |
         #                                                                               
-        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              |                        |
+        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False |
         #                                                        
-        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              |                        |
+        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False |
         #                                                        
-        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              |                        |
+        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False |
 
 Scenario: No Multiple Start - No Promotion - Too less starts - #10
     Given following DanceCompetitionHelper "DanceCompHelper"
@@ -62,15 +62,15 @@ Scenario: No Multiple Start - No Promotion - Too less starts - #10
         | CompetitionName |
         | Test-Comp-01    |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo |
+        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo              |
         #                                                                                  
-        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | false              |                        |
+        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | false              | [A] 910/8 + 100/1 = 1010/9 -> False |
         #                                                                               
-        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              |                        |
+        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False    |
         #                                                        
-        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              |                        |
+        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False    |
         #                                                        
-        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              |                        |
+        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False    |
 
 Scenario: No Multiple Start - No Promotion - Too less points - #10
     Given following DanceCompetitionHelper "DanceCompHelper"
@@ -97,15 +97,15 @@ Scenario: No Multiple Start - No Promotion - Too less points - #10
         | CompetitionName |
         | Test-Comp-01    |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo |
+        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo               |
         #                                                                                  
-        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | false              |                        |
+        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | false              | [A] 500/12 + 100/1 = 600/13 -> False |
         #                                                                               
-        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              |                        |
+        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False     |
         #                                                        
-        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              |                        |
+        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False     |
         #                                                        
-        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              |                        |
+        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False     |
 
 
 Scenario: No Multiple Start - Promotion - #10
@@ -133,13 +133,13 @@ Scenario: No Multiple Start - Promotion - #10
         | CompetitionName |
         | Test-Comp-01    |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo |
+        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo             |
         #                                                                                  
-        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | true               |                        |
+        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | true               | [A] 800/9 + 100/1 = 900/10 -> True |
         #                                                                               
-        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              |                        |
+        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False   |
         #                                                        
-        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              |                        |
+        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False   |
         #                                                        
-        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              |                        |
+        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False   |
 
