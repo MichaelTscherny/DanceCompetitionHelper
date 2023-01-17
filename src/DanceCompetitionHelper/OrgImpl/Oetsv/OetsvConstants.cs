@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-
-namespace DanceCompetitionHelper.OrgImpl.Oetsv
+﻿namespace DanceCompetitionHelper.OrgImpl.Oetsv
 {
     public static class OetsvConstants
     {
@@ -164,7 +162,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     case B:
                         return A;
 
-                    case S:
+                    case A:
                         return S;
                 }
 
@@ -174,42 +172,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         public static class Points
         {
-            public static readonly IReadOnlyList<IReadOnlySet<string>> SameAgeClassForPoints = new List<IReadOnlySet<string>>()
-                {
-                    new HashSet<string>()
-                    {
-                        AgeClasses.Pupil,
-                        AgeClasses.Junior,
-                        AgeClasses.Juvenile,
-                        AgeClasses.Adult,
-                    }.ToImmutableHashSet(),
-                    new HashSet<string>()
-                    {
-                        AgeClasses.Senior,
-                    }.ToImmutableHashSet(),
-                    new HashSet<string>()
-                    {
-                        AgeClasses.Formation,
-                    }.ToImmutableHashSet(),
-                }.AsReadOnly();
-
-            public static readonly IReadOnlyDictionary<string, IReadOnlySet<string>> SameAgeClassForPointsByAgeClass;
-
-            static Points()
-            {
-                var toSave = new Dictionary<string, IReadOnlySet<string>>();
-
-                foreach (var curSameAge in SameAgeClassForPoints)
-                {
-                    foreach (var curVal in curSameAge)
-                    {
-                        toSave[curVal] = curSameAge;
-                    }
-                }
-
-                SameAgeClassForPointsByAgeClass = toSave.ToImmutableDictionary();
-            }
-
             public static bool AgeClassForSamePoints(
                 string? ageClassBase,
                 string? ageClassCompare)
@@ -219,21 +181,40 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 var useAgeClassCompare = AgeClasses.ToAgeClasses(
                     ageClassCompare);
 
-                if (string.IsNullOrEmpty(useAgeClassBase)
-                    || string.IsNullOrEmpty(useAgeClassCompare))
+                switch (useAgeClassBase)
                 {
-                    return false;
+                    case AgeClasses.Pupil:
+                    case AgeClasses.Junior:
+                    case AgeClasses.Juvenile:
+                    case AgeClasses.Adult:
+                        switch (useAgeClassCompare)
+                        {
+                            case AgeClasses.Pupil:
+                            case AgeClasses.Junior:
+                            case AgeClasses.Juvenile:
+                            case AgeClasses.Adult:
+                                return true;
+                        }
+                        break;
+
+                    case AgeClasses.Senior:
+                        switch (useAgeClassCompare)
+                        {
+                            case AgeClasses.Senior:
+                                return true;
+                        }
+                        break;
+
+                    case AgeClasses.Formation:
+                        switch (useAgeClassCompare)
+                        {
+                            case AgeClasses.Formation:
+                                return true;
+                        }
+                        break;
                 }
 
-                if (SameAgeClassForPointsByAgeClass.TryGetValue(
-                    useAgeClassBase,
-                    out var chkClasses) == false)
-                {
-                    return false;
-                }
-
-                return chkClasses.Contains(
-                    useAgeClassCompare);
+                return false;
             }
         }
     }

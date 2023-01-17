@@ -1,4 +1,5 @@
 ﻿using DanceCompetitionHelper.Database.Tables;
+using static DanceCompetitionHelper.OrgImpl.Oetsv.OetsvConstants;
 
 namespace DanceCompetitionHelper.OrgImpl.Oetsv
 {
@@ -32,6 +33,34 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
                 yield return curChkClass;
             }
+        }
+
+        public CompetitionClass? GetHigherClassifications(
+            CompetitionClass forCompetitionClass,
+            IEnumerable<CompetitionClass> checkCompetitionClasses)
+        {
+            if (forCompetitionClass == null
+                || checkCompetitionClasses == null)
+            {
+                return null;
+            }
+
+            var higherCompClass = Classes.GetHigherClassifications(
+                forCompetitionClass.Class);
+
+            foreach (var curChkClass in checkCompetitionClasses)
+            {
+                if (curChkClass.CompetitionClassId == forCompetitionClass.CompetitionClassId
+                    && curChkClass.Discipline == forCompetitionClass.Discipline
+                    && curChkClass.AgeClass == forCompetitionClass.AgeClass
+                    && curChkClass.Class == higherCompClass)
+                {
+                    return curChkClass;
+                }
+            }
+
+            return null;
+
         }
     }
 }
