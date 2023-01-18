@@ -153,6 +153,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         newPartBStarts,
                         retPromotionB)
                     : null,
+                IncludedCompetitionClasses = allClasses,
             };
         }
     }

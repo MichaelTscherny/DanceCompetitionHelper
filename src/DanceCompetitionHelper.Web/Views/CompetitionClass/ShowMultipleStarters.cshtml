@@ -20,12 +20,12 @@
         Model.MultipleStarters
             ?.SelectMany(
                 x => x.CompetitionClasses)
-            .Distinct()
             .OrderBy(
                 x => x.OrgClassId)
             .Select(
                 x => (x.GetCompetitionClassName(), 
                     x.CompetitionClassId))
+            .Distinct()
             ?? Enumerable.Empty<(string, Guid)>());
 }
 

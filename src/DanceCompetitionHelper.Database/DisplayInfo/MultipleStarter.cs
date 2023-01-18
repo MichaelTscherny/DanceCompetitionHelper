@@ -62,6 +62,8 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
             Name = string.Join(
                 "; ",
                 foundNames
+                    .Select(
+                        x => x?.Trim() ?? "??")
                     .Distinct());
 
             StartnumberByClassId = Participants.

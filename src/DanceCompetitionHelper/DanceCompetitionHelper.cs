@@ -380,9 +380,12 @@ namespace DanceCompetitionHelper
                             curPart.ParticipantId,
                             out var curClassInfos))
                         {
-                            useDisplayInfo.MultipleStartInfo.MultipleStarts = true;
-                            useDisplayInfo.MultipleStartInfo.MultipleStartsInfo =
+                            var useMultiStartInfo = useDisplayInfo.MultipleStartInfo;
+                            useMultiStartInfo.MultipleStarts = true;
+                            useMultiStartInfo.MultipleStartsInfo =
                                 curClassInfos.GetCompetitionClasseNames();
+                            useMultiStartInfo.IncludedCompetitionClasses.AddRange(
+                                curClassInfos);
                         }
 
                         if (participantChecker != null)
