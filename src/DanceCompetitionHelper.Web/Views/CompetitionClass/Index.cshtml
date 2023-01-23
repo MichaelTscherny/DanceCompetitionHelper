@@ -106,9 +106,9 @@
                                asp-action="@nameof(ParticipantController.Index)"
                                asp-route-id="@item.CompetitionId">
                                 @(item.DisplayInfo?.CountParticipants ?? -1) 
-                                + @(item.ExtraManualStarter) 
-                                + @(item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1) 
-                                = @(item.DisplayInfo?.CountParticipants ?? -1 + item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1)
+                                + @(item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1)
+                                + @(item.ExtraManualStarter)
+                                = @((item.DisplayInfo?.CountParticipants ?? 0) + (item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? 0) + (item.ExtraManualStarter))
                             </a>
                         </td>
                         <td class="text-nowrap">

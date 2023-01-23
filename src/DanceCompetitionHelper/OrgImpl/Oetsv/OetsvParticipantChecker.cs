@@ -16,7 +16,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public OetsvParticipantChecker(
             ILogger<OetsvParticipantChecker> logger)
         {
-            _logger = logger;
+            _logger = logger
+                ?? throw new ArgumentNullException(
+                        nameof(logger));
 
             var myCompClassChecker = new OetsvCompetitonClassChecker();
 

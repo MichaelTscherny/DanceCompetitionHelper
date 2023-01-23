@@ -8,7 +8,7 @@ namespace DanceCompetitionHelper.OrgImpl
             CompetitionClass baseCompetitionClass,
             IEnumerable<CompetitionClass> checkCompetitionClasses);
 
-        public CompetitionClass? GetHigherClassifications(
+        public IEnumerable<CompetitionClass> GetHigherClassifications(
             CompetitionClass forCompetitionClass,
             IEnumerable<CompetitionClass> checkCompetitionClasses);
     }
