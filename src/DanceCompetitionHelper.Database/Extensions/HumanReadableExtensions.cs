@@ -18,5 +18,14 @@ namespace DanceCompetitionHelper.Database.Extensions
                     forCompetitionClass?.CompetitionClassName ?? "??",
                     forCompetitionClass?.OrgClassId ?? "??");
 
+        public static string GetCompetitionClasseNames(
+            this IEnumerable<CompetitionClass>? forCompetitionClasses) =>
+                string.Join(
+                    "; ",
+                    (forCompetitionClasses ?? Enumerable.Empty<CompetitionClass>())
+                        .OrderBy(
+                            x => x.OrgClassId)
+                        .Select(
+                            x => x.GetCompetitionClassName()));
     }
 }

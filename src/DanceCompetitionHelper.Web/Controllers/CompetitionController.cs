@@ -69,7 +69,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     createCompetition.Organization,
                     createCompetition.OrgCompetitionId,
                     createCompetition.CompetitionInfo,
-                    createCompetition.CompetitionDate ?? DateTime.Now);
+                    createCompetition.CompetitionDate ?? DateTime.Now,
+                    createCompetition.Comment);
 
                 return RedirectToAction(
                     nameof(Index));
@@ -106,6 +107,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     OrgCompetitionId = foundComp.OrgCompetitionId,
                     CompetitionInfo = foundComp.CompetitionInfo,
                     CompetitionDate = foundComp.CompetitionDate,
+                    Comment = foundComp.Comment,
                 });
         }
 
@@ -131,7 +133,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     editCompetition.Organization,
                     editCompetition.OrgCompetitionId,
                     editCompetition.CompetitionInfo,
-                    editCompetition.CompetitionDate ?? DateTime.Now);
+                    editCompetition.CompetitionDate ?? DateTime.Now,
+                    editCompetition.Comment);
 
                 return RedirectToAction(
                     nameof(Index));

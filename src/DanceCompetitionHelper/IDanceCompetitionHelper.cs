@@ -46,7 +46,8 @@ namespace DanceCompetitionHelper
             OrganizationEnum organization,
             string orgCompetitionId,
             string? competitionInfo,
-            DateTime competitionDate);
+            DateTime competitionDate,
+            string? comment);
 
         void EditCompetition(
             Guid competitionId,
@@ -54,7 +55,8 @@ namespace DanceCompetitionHelper
             OrganizationEnum organization,
             string orgCompetitionId,
             string? competitionInfo,
-            DateTime competitionDate);
+            DateTime competitionDate,
+            string? comment);
 
         void RemoveCompetition(
             Guid competitionId);
@@ -73,7 +75,9 @@ namespace DanceCompetitionHelper
             string? className,
             int minStartsForPromotion,
             int minPointsForPromotion,
-            int pointsForWinning,
+            int pointsForFirts,
+            int extraManualStarter,
+            string? comment,
             bool ignore);
 
         void EditCompetitionClass(
@@ -86,7 +90,9 @@ namespace DanceCompetitionHelper
             string? className,
             int minStartsForPromotion,
             int minPointsForPromotion,
-            int pointsForWinning,
+            int pointsForFirst,
+            int extraManualStarter,
+            string? comment,
             bool ignore);
 
         void RemoveCompetitionClass(
@@ -110,6 +116,7 @@ namespace DanceCompetitionHelper
             int orgStartsPartA,
             int? orgPointsPartB,
             int? orgStartsPartB,
+            string? comment,
             bool ignore);
 
         void EditParticipant(
@@ -126,6 +133,7 @@ namespace DanceCompetitionHelper
             int orgStartsPartA,
             int? orgPointsPartB,
             int? orgStartsPartB,
+            string? comment,
             bool ignore);
 
         void RemoveParticipant(

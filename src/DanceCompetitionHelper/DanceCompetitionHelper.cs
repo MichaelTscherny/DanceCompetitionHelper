@@ -1,10 +1,8 @@
-﻿using DanceCompetitionHelper.Config;
-using DanceCompetitionHelper.Database;
+﻿using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
-using DanceCompetitionHelper.Info;
 using DanceCompetitionHelper.OrgImpl;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +13,12 @@ namespace DanceCompetitionHelper
     public class DanceCompetitionHelper : IDanceCompetitionHelper
     {
         private readonly DanceCompetitionHelperDbContext _danceCompHelperDb;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger<DanceCompetitionHelperDbContext> _logger;
 
         public DanceCompetitionHelper(
             DanceCompetitionHelperDbContext danceCompHelperDb,
+            ILoggerFactory loggerFactory,
             ILogger<DanceCompetitionHelperDbContext> logger)
         {
             _danceCompHelperDb = danceCompHelperDb
@@ -28,6 +28,9 @@ namespace DanceCompetitionHelper
             _logger = logger
                 ?? throw new ArgumentNullException(
                     nameof(logger));
+            _loggerFactory = loggerFactory
+                ?? throw new ArgumentNullException(
+                    nameof(loggerFactory));
         }
 
         public void AddTestData()
@@ -300,16 +303,41 @@ namespace DanceCompetitionHelper
                     yield break;
                 }
 
-                var multiStarterByParticipantsId = new HashSet<Guid>();
+                var multiStarter = new List<MultipleStarter>();
+                var multiStarterByParticipantsId = new Dictionary<Guid, List<CompetitionClass>>();
+                var allCompClasses = new List<CompetitionClass>();
+                IParticipantChecker? participantChecker = null;
+
                 if (includeInfos)
                 {
-                    multiStarterByParticipantsId = new HashSet<Guid>(
+                    allCompClasses.AddRange(
+                        _danceCompHelperDb.CompetitionClasses
+                            .TagWith(
+                                nameof(GetParticipants) + "(Guid?, Guid?, bool)[1]")
+                            .Where(
+                                x => x.CompetitionId == competitionId));
+
+                    multiStarter.AddRange(
                         GetMultipleStarterReuseTransacion(
-                            foundComp.CompetitionId)
-                        .SelectMany(
-                            x => x.Participants)
-                        .Select(
-                            x => x.ParticipantId));
+                            foundComp.CompetitionId));
+
+                    multiStarterByParticipantsId =
+                        multiStarter.SelectMany(
+                            x => x.GetCompetitionClassesOfParticipants())
+                        .ToDictionary(
+                            x => x.ParticipantId,
+                            x => x.CompetitionClass);
+
+                    participantChecker = GetParticipantChecker(
+                        foundComp);
+
+                    if (participantChecker != null)
+                    {
+                        participantChecker.SetCompetitionClasses(
+                            allCompClasses);
+                        participantChecker.SetMultipleStarter(
+                            multiStarter);
+                    }
                 }
 
                 var qryParticipants = _danceCompHelperDb.Participants
@@ -343,8 +371,28 @@ namespace DanceCompetitionHelper
 
                         var useDisplayInfo = curPart.DisplayInfo;
 
-                        useDisplayInfo.MultipleStarts = multiStarterByParticipantsId.Contains(
-                            curPart.ParticipantId);
+                        if (useDisplayInfo.MultipleStartInfo == null)
+                        {
+                            useDisplayInfo.MultipleStartInfo = new CheckMultipleStartInfo();
+                        }
+
+                        if (multiStarterByParticipantsId.TryGetValue(
+                            curPart.ParticipantId,
+                            out var curClassInfos))
+                        {
+                            var useMultiStartInfo = useDisplayInfo.MultipleStartInfo;
+                            useMultiStartInfo.MultipleStarts = true;
+                            useMultiStartInfo.MultipleStartsInfo =
+                                curClassInfos.GetCompetitionClasseNames();
+                            useMultiStartInfo.IncludedCompetitionClasses.AddRange(
+                                curClassInfos);
+                        }
+
+                        if (participantChecker != null)
+                        {
+                            useDisplayInfo.PromotionInfo = participantChecker.CheckParticipantPromotion(
+                                curPart);
+                        }
                     }
 
                     yield return curPart;
@@ -420,50 +468,26 @@ namespace DanceCompetitionHelper
             }
         }
 
-        public ExtraParticipants GetExtraParticipants(
-            CompetitionClass competitionClass,
-            Dictionary<Guid, List<Participant>> participantsByCompClass)
-        {
-            var partChecker = GetParticipantChecker(
-                competitionClass.Competition);
-
-            _logger.LogTrace(
-                "{Method}() done",
-                nameof(GetExtraParticipants));
-
-            return new ExtraParticipants();
-        }
-
-        public CompetitionClassSettings GetCompetitionClassSettings(
-            CompetitionClass competitionClass)
-        {
-            var partChecker = GetParticipantChecker(
-                competitionClass.Competition);
-
-            _logger.LogTrace(
-                "{Method}() done",
-                nameof(GetCompetitionClassSettings));
-
-            return new CompetitionClassSettings();
-        }
-
         #region Get helper
 
-        public IParticipantChecker GetParticipantChecker(
+        public IParticipantChecker? GetParticipantChecker(
             Competition competition)
         {
             switch (competition.Organization)
             {
                 case OrganizationEnum.Oetsv:
-                    return new OetsvParticipantChecker();
+                    return new OetsvParticipantChecker(
+                        _loggerFactory.CreateLogger<OetsvParticipantChecker>());
 
                 default:
-                    throw new NotImplementedException(
-                        string.Format(
-                            "{Method}: '{Organization}' not yet implemented!",
+                    _logger.LogError(
+                        "{Method}: '{Organization}' not yet implemented!",
                             nameof(GetParticipantChecker),
-                            competition.Organization));
+                            competition.Organization);
+                    break;
             }
+
+            return null;
         }
 
         #endregion // Get helper
@@ -656,7 +680,8 @@ namespace DanceCompetitionHelper
             OrganizationEnum organization,
             string orgCompetitionId,
             string? competitionInfo,
-            DateTime competitionDate)
+            DateTime competitionDate,
+            string? comment)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
@@ -670,6 +695,7 @@ namespace DanceCompetitionHelper
                         OrgCompetitionId = orgCompetitionId,
                         CompetitionInfo = competitionInfo,
                         CompetitionDate = competitionDate,
+                        Comment = comment,
                     });
 
                 _danceCompHelperDb.SaveChanges();
@@ -701,7 +727,8 @@ namespace DanceCompetitionHelper
             OrganizationEnum organization,
             string orgCompetitionId,
             string? competitionInfo,
-            DateTime competitionDate)
+            DateTime competitionDate,
+            string? comment)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
@@ -727,6 +754,7 @@ namespace DanceCompetitionHelper
                 foundComp.OrgCompetitionId = orgCompetitionId;
                 foundComp.CompetitionInfo = competitionInfo;
                 foundComp.CompetitionDate = competitionDate;
+                foundComp.Comment = comment;
 
                 _danceCompHelperDb.SaveChanges();
                 dbTrans.Commit();
@@ -813,7 +841,9 @@ namespace DanceCompetitionHelper
             string? className,
             int minStartsForPromotion,
             int minPointsForPromotion,
-            int pointsForWinning,
+            int pointsForFirst,
+            int extraManualStarter,
+            string? comment,
             bool ignore)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
@@ -847,7 +877,9 @@ namespace DanceCompetitionHelper
                         Class = className,
                         MinStartsForPromotion = minStartsForPromotion,
                         MinPointsForPromotion = minPointsForPromotion,
-                        PointsForWinning = pointsForWinning,
+                        PointsForFirst = pointsForFirst,
+                        ExtraManualStarter = extraManualStarter,
+                        Comment = comment,
                         Ignore = ignore,
                     });
 
@@ -884,7 +916,9 @@ namespace DanceCompetitionHelper
             string? className,
             int minStartsForPromotion,
             int minPointsForPromotion,
-            int pointsForWinning,
+            int pointsForFirst,
+            int extraManualStarter,
+            string? comment,
             bool ignore)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
@@ -914,7 +948,9 @@ namespace DanceCompetitionHelper
                 foundCompClass.Class = className;
                 foundCompClass.MinStartsForPromotion = minStartsForPromotion;
                 foundCompClass.MinPointsForPromotion = minPointsForPromotion;
-                foundCompClass.PointsForWinning = pointsForWinning;
+                foundCompClass.PointsForFirst = pointsForFirst;
+                foundCompClass.ExtraManualStarter = extraManualStarter;
+                foundCompClass.Comment = comment;
                 foundCompClass.Ignore = ignore;
 
                 _danceCompHelperDb.SaveChanges();
@@ -1006,6 +1042,7 @@ namespace DanceCompetitionHelper
             int orgStartsPartA,
             int? orgPointsPartB,
             int? orgStartsPartB,
+            string? comment,
             bool ignore)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
@@ -1058,6 +1095,7 @@ namespace DanceCompetitionHelper
                         OrgStartsPartA = orgStartsPartA,
                         OrgPointsPartB = orgPointsPartB,
                         OrgStartsPartB = orgStartsPartB,
+                        Comment = comment,
                         Ignore = ignore,
                     });
 
@@ -1098,6 +1136,7 @@ namespace DanceCompetitionHelper
             int orgStartsPartA,
             int? orgPointsPartB,
             int? orgStartsPartB,
+            string? comment,
             bool ignore)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
@@ -1146,6 +1185,7 @@ namespace DanceCompetitionHelper
                 foundParticipant.OrgStartsPartA = orgStartsPartA;
                 foundParticipant.OrgPointsPartB = orgPointsPartB;
                 foundParticipant.OrgStartsPartB = orgStartsPartB;
+                foundParticipant.Comment = comment;
                 foundParticipant.Ignore = ignore;
 
                 _danceCompHelperDb.SaveChanges();

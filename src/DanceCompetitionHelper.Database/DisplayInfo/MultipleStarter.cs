@@ -48,7 +48,7 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
                     PointsA,
                     curPart.OrgPointsPartA);
                 StartsA = Math.Max(
-                    PointsA,
+                    StartsA,
                     curPart.OrgStartsPartA);
 
                 PointsB = Math.Max(
@@ -62,6 +62,8 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
             Name = string.Join(
                 "; ",
                 foundNames
+                    .Select(
+                        x => x?.Trim() ?? "??")
                     .Distinct());
 
             StartnumberByClassId = Participants.
@@ -77,6 +79,16 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
                 CompetitionClassByClassId[curCompClassId] = curCompClass;
                 CompetitionClassNamesByClassId[curCompClassId] = curCompClassName;
                 CompetitionClassNamesByName[curCompClassName] = curCompClassId;
+            }
+        }
+
+        public IEnumerable<(Guid ParticipantId, List<CompetitionClass> CompetitionClass)> GetCompetitionClassesOfParticipants()
+        {
+            foreach (var curPartId in Participants)
+            {
+                yield return (
+                    curPartId.ParticipantId,
+                    CompetitionClasses);
             }
         }
     }

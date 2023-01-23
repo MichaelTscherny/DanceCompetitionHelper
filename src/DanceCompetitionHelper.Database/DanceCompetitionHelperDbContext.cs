@@ -114,7 +114,6 @@ namespace DanceCompetitionHelper.Database
 
         #endregion Usefull methods
 
-
         #region Helpers
 
         private void OnSavingChanges(

@@ -39,5 +39,9 @@ namespace DanceCompetitionHelper.Web.Models
         [FromForm]
         [DataType(DataType.Date)]
         public DateTime? CompetitionDate { get; set; }
+
+        [FromForm]
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? Comment { get; set; }
     }
 }

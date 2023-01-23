@@ -1,7 +1,9 @@
-﻿@using DanceCompetitionHelper.Database.Extensions;
+﻿@using DanceCompetitionHelper.Database.DisplayInfo;
+@using DanceCompetitionHelper.Database.Extensions;
 @using DanceCompetitionHelper.Database.Tables;
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models;
 
 @model CompetitionClassOverviewViewModel
 
@@ -11,14 +13,16 @@
     var competitionClassesCount = Model.CompetitionClasses?.Count() ?? 0;
 
     ViewData["Title"] = string.Format(
-        "{0} Competition Classes of {1}",
+        Model.DetailedView
+            ? "{0} Competition Class Details of {1}"
+            : "{0} Competition Classes of {1}",
         competitionClassesCount,
         compInfoStr);
 }
 
 <div class="text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
-    
+
     <div class="table-responsive-xxl">
         <table class="table table-striped table-hover">
             <thead>
@@ -27,13 +31,31 @@
                         Competition Class (@competitionClassesCount)
                     </th>
                     <th>
+                        Comment
+                    </th>
+                    @if (Model.DetailedView)
+                    {
+                        <th>
+                            Discipline
+                        </th>
+                        <th>
+                            AgeClass
+                        </th>
+                        <th>
+                            AgeGroup
+                        </th>
+                        <th>
+                            Class
+                        </th>
+                    }
+                    <th>
                         Ignore
                     </th>
                     <th>
-                        Participants
+                        Part. (Reg + 'Extras' + Man)
                     </th>
                     <th>
-                        Possible extras (W / P)
+                        Extras (W / P)
                     </th>
                     <th>
                         Multi Starter
@@ -42,7 +64,7 @@
                         Needed Rounds
                     </th>
                     <th>
-                        P for Win
+                        Points (F)
                     </th>
                     <th>
                         Prom. Min. (S / P)
@@ -59,27 +81,46 @@
                             (@Html.DisplayFor(modelItem => item.OrgClassId))
                         </td>
                         <td>
+                            @Html.DisplayFor(modelItem => item.Comment)
+                        </td>
+                        @if (Model.DetailedView)
+                        {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Discipline)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AgeClass)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AgeGroup)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Class)
+                            </td>
+                        }
+                        <td>
                             @Html.DisplayFor(modelItem => item.Ignore)
                         </td>
                         <td class="text-nowrap">
                             <a asp-controller="@ParticipantController.RefName"
                                asp-action="@nameof(ParticipantController.Index)"
                                asp-route-id="@item.CompetitionId">
-                                @(item.DisplayInfo?.CountParticipants ?? -1) +
-                                @(item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1) = 
-                                @(item.DisplayInfo?.CountParticipants ?? -1 + item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1)
+                                @(item.DisplayInfo?.CountParticipants ?? -1) 
+                                + @(item.ExtraManualStarter) 
+                                + @(item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1) 
+                                = @(item.DisplayInfo?.CountParticipants ?? -1 + item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1)
                             </a>
                         </td>
                         <td class="text-nowrap">
                             <a asp-controller="@ParticipantController.RefName"
                                asp-action="@nameof(ParticipantController.Index)"
                                asp-route-id="@item.CompetitionId">
-                                @(item.DisplayInfo?.ExtraParticipants.ByWinning ?? -1) /
-                                @(item.DisplayInfo?.ExtraParticipants.ByPromotion ?? -1) =
-                                @(item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1)
+                                @(item.DisplayInfo?.ExtraParticipants.ByWinning ?? -1) 
+                                / @(item.DisplayInfo?.ExtraParticipants.ByPromotion ?? -1) 
+                                = @(item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1)
                             </a>
                         </td>
-                        <td>
+                        <td class="text-nowrap">
                             <a asp-controller="@CompetitionClassController.RefName"
                                asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
                                asp-route-id="@item.CompetitionId">
@@ -87,10 +128,10 @@
                             </a>
                         </td>
                         <td>
-                            @(item.DisplayInfo?.NeededRounds ?? -1)
+                            ~ @(item.DisplayInfo?.NeededRounds ?? -1)
                         </td>
                         <td>
-                            @(item.PointsForWinning)
+                            @(item.PointsForFirst)
                         </td>
                         <td class="text-nowrap">
                             @(item.MinStartsForPromotion) / @(item.MinPointsForPromotion) 
@@ -113,13 +154,31 @@
                         Competition Class (@competitionClassesCount)
                     </th>
                     <th>
+                        Comment
+                    </th>
+                    @if (Model.DetailedView)
+                    {
+                        <th>
+                            Discipline
+                        </th>
+                        <th>
+                            AgeClass
+                        </th>
+                        <th>
+                            AgeGroup
+                        </th>
+                        <th>
+                            Class
+                        </th>
+                    }
+                    <th>
                         Ignore
                     </th>
                     <th>
-                        Participants
+                        Part. (Reg + 'Extras' + Man)
                     </th>
                     <th>
-                        Possible extras (W / P)
+                        Extras (W / P)
                     </th>
                     <th>
                         Multi Starter
@@ -128,7 +187,7 @@
                         Needed Rounds
                     </th>
                     <th>
-                        P for Win
+                        Points (F / L)
                     </th>
                     <th>
                         Prom. Min. (S / P)
@@ -144,7 +203,7 @@
                asp-action="@nameof(CompetitionClassController.ShowCreateEdit)"
                asp-route-id="@Model.Competition?.CompetitionId"
                class="btn btn-primary px-lg-4">
-               Create new
+                Create new
             </a>
             &nbsp;
             <a asp-controller="@CompetitionController.RefName"
@@ -153,12 +212,24 @@
                 Back
             </a>
             |
-            <a asp-controller="@CompetitionClassController.RefName"
-               asp-action="@nameof(CompetitionClassController.DetailedView)"
-               asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-primary px-lg-4">
-                Detailed View
-            </a>
+            @if (Model.DetailedView)
+            {
+                <a asp-controller="@CompetitionClassController.RefName"
+                   asp-action="@nameof(CompetitionClassController.Index)"
+                   asp-route-id="@Model.Competition?.CompetitionId"
+                   class="btn btn-primary px-lg-4">
+                    Normal View
+                </a>
+            }
+            else
+            {
+                <a asp-controller="@CompetitionClassController.RefName"
+                   asp-action="@nameof(CompetitionClassController.DetailedView)"
+                   asp-route-id="@Model.Competition?.CompetitionId"
+                   class="btn btn-primary px-lg-4">
+                    Detailed View
+                </a>
+            }
         </div>
     </div>
 </div>

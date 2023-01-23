@@ -6,5 +6,6 @@ namespace DanceCompetitionHelper.Web.Models
     {
         public Competition? Competition { get; set; }
         public IEnumerable<Participant>? Participtans { get; set; }
+        public bool DetailedView { get; set; }
     }
 }

@@ -47,6 +47,7 @@ namespace DanceCompetitionHelper.Database.Extensions
                     OrgCompetitionId = "org-Id 01",
                     CompetitionDate = DateTime.Now.AddDays(2),
                     CompetitionInfo = "just an info",
+                    Comment = "yet another comp",
                 });
 
             var newCompClass0101 = dbCtx.CompetitionClasses.Add(
@@ -61,7 +62,9 @@ namespace DanceCompetitionHelper.Database.Extensions
                     Class = "D",
                     MinStartsForPromotion = 10,
                     MinPointsForPromotion = 900,
-                    PointsForWinning = 100,
+                    PointsForFirst = 100,
+                    ExtraManualStarter = 0,
+                    Comment = "a comment",
                 });
             // ----
             dbCtx.Participants.Add(
@@ -107,7 +110,9 @@ namespace DanceCompetitionHelper.Database.Extensions
                     Class = "C",
                     MinStartsForPromotion = 10,
                     MinPointsForPromotion = 1200,
-                    PointsForWinning = 100,
+                    PointsForFirst = 100,
+                    ExtraManualStarter = 0,
+                    Comment = "don't mind",
                 });
             // ----
             dbCtx.Participants.Add(
@@ -136,6 +141,7 @@ namespace DanceCompetitionHelper.Database.Extensions
                     OrgCompetitionId = "org-Id 02",
                     CompetitionDate = DateTime.Now.AddDays(4),
                     CompetitionInfo = "mixed info",
+                    Comment = "too much to do...",
                 });
 
             var newCompClass0201 = dbCtx.CompetitionClasses.Add(
@@ -150,7 +156,9 @@ namespace DanceCompetitionHelper.Database.Extensions
                     Class = "D",
                     MinStartsForPromotion = 10,
                     MinPointsForPromotion = 900,
-                    PointsForWinning = 150,
+                    PointsForFirst = 150,
+                    ExtraManualStarter = 0,
+                    Comment = "no comment",
                 });
             // ----
             dbCtx.Participants.Add(
@@ -188,7 +196,9 @@ namespace DanceCompetitionHelper.Database.Extensions
                     Class = "C",
                     MinStartsForPromotion = 10,
                     MinPointsForPromotion = 1200,
-                    PointsForWinning = 150,
+                    PointsForFirst = 150,
+                    ExtraManualStarter = 0,
+                    Comment = null,
                 });
             // ----
             dbCtx.Participants.Add(
@@ -224,7 +234,9 @@ namespace DanceCompetitionHelper.Database.Extensions
                     Class = "B",
                     MinStartsForPromotion = 10,
                     MinPointsForPromotion = 1200,
-                    PointsForWinning = 150,
+                    PointsForFirst = 150,
+                    ExtraManualStarter = 0,
+                    Comment = "what?",
                 });
             // ----
             dbCtx.Participants.Add(
@@ -273,7 +285,9 @@ namespace DanceCompetitionHelper.Database.Extensions
                     Class = "A",
                     MinStartsForPromotion = 10,
                     MinPointsForPromotion = 1800,
-                    PointsForWinning = 150,
+                    PointsForFirst = 150,
+                    ExtraManualStarter = 0,
+                    Comment = null,
                 });
             // ----
             dbCtx.Participants.Add(

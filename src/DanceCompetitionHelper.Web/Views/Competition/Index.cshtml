@@ -31,6 +31,9 @@
                         @Html.DisplayNameFor(model => model.CompetitionInfo)
                     </th>
                     <th>
+                        @Html.DisplayNameFor(model => model.Comment)
+                    </th>
+                    <th>
                         Competition Classes
                     </th>
                     <th>
@@ -57,12 +60,15 @@
                             <a asp-controller="@CompetitionClassController.RefName"
                                asp-action="@nameof(CompetitionClassController.Index)"
                                asp-route-id="@item.CompetitionId">
-                                @Html.DisplayFor(modelItem => item.CompetitionName)&nbsp;
+                                @Html.DisplayFor(modelItem => item.CompetitionName)
                                 (@Html.DisplayFor(modelItem => item.OrgCompetitionId))
                             </a>
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.CompetitionInfo)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Comment)
                         </td>
                         <td>
                             <a asp-controller="@CompetitionClassController.RefName"
@@ -121,6 +127,9 @@
                     </th>
                     <th>
                         Multiple Starters
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Comment)
                     </th>
                     <th></th>
                 </tr>

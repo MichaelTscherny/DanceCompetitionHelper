@@ -62,7 +62,15 @@ namespace DanceCompetitionHelper.Web.Models
 
         [FromForm]
         [Range(0, int.MaxValue)]
-        public int PointsForWinning { get; set; }
+        public int PointsForFirst { get; set; }
+
+        [FromForm]
+        [Range(0, int.MaxValue)]
+        public int ExtraManualStarter { get; set; }
+
+        [FromForm]
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? Comment { get; set; }
 
         [FromForm]
         public bool Ignore { get; set; }

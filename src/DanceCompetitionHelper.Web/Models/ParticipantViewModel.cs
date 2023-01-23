@@ -77,6 +77,10 @@ namespace DanceCompetitionHelper.Web.Models
         public int? OrgStartsPartB { get; set; }
 
         [FromForm]
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? Comment { get; set; }
+
+        [FromForm]
         public bool Ignore { get; set; }
     }
 }

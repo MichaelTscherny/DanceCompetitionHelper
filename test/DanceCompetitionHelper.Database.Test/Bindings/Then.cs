@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database.Tables;
+﻿using DanceCompetitionHelper.Database.DisplayInfo;
+using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
 using NUnit.Framework;
 using TechTalk.SpecFlow.Assist;
@@ -659,9 +660,8 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             }
         }
 
-        [Then(@"following multiple starts exists in Competition ""([^""]*)"" of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingMultipleStartsExistsInCompetitionDanceCompetitionHelper(
-            string competitionName,
+        [Then(@"following multiple starts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
+        public void ThenFollowingMultipleStartsExistsInCompetitionsDanceCompetitionHelper(
             string danceCompHelper,
             Table table)
         {
@@ -669,29 +669,39 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             var useDanceCompHelper = GetDanceCompetitionHelper(
                 danceCompHelper);
 
-            var useComp = useDanceCompHelper.GetCompetition(
-                competitionName);
-
-            Assert.That(
-                useComp,
-                Is.Not.Null,
-                "{0} '{1}' not found!",
-                nameof(Competition),
-                competitionName);
-            Assert.That(
-                useComp.HasValue,
-                Is.True,
-                "{0} '{1}' not found",
-                nameof(Competition),
-                competitionName);
-
-            var curMultiStarter = useDanceCompHelper.GetMultipleStarter(
-                useComp.Value)
-                .ToList();
+            var cachedMultipleStarters = new Dictionary<Guid, List<MultipleStarter>>();
 
             foreach (var chkMultiStart in multiStartParticipants)
             {
-                chkMultiStart.CompetitionName = competitionName;
+                var useComp = useDanceCompHelper.GetCompetition(
+                    chkMultiStart.CompetitionName);
+
+                Assert.That(
+                    useComp,
+                    Is.Not.Null,
+                    "{0} '{1}' not found!",
+                    nameof(Competition),
+                    chkMultiStart.CompetitionName);
+                Assert.That(
+                    useComp.HasValue,
+                    Is.True,
+                    "{0} '{1}' not found",
+                    nameof(Competition),
+                    chkMultiStart.CompetitionName);
+
+                if (cachedMultipleStarters.TryGetValue(
+                    useComp.Value,
+                    out var curMultiStarter) == false)
+                {
+                    curMultiStarter = useDanceCompHelper
+                        .GetMultipleStarter(
+                            useComp.Value)
+                        .ToList();
+
+                    cachedMultipleStarters[useComp.Value] = curMultiStarter;
+                }
+
+                chkMultiStart.CompetitionName = chkMultiStart.CompetitionName;
                 var foundStarter = false;
 
                 foreach (var curMuSt in curMultiStarter)
@@ -729,40 +739,184 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
             }
         }
 
-        [Then(@"none multiple starts exists in Competition ""([^""]*)"" of DanceCompetitionHelper ""([^""]*)""")]
+        [Then(@"none multiple starts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
         public void ThenNoneMultipleStartsExistsInCompetitionDanceCompetitionHelper(
-            string competitionName,
-            string danceCompHelper)
+            string danceCompHelper,
+            Table table)
         {
+            var multiStartParticipants = table.CreateSet<ParticipantPoco>();
+            var useDanceCompHelper = GetDanceCompetitionHelper(
+                    danceCompHelper);
+
+            foreach (var chkMultipleStart in multiStartParticipants)
+            {
+                var useComp = useDanceCompHelper.GetCompetition(
+                    chkMultipleStart.CompetitionName);
+
+                Assert.That(
+                    useComp,
+                    Is.Not.Null,
+                    "{0} '{1}' not found!",
+                    nameof(Competition),
+                    chkMultipleStart.CompetitionName);
+                Assert.That(
+                    useComp.HasValue,
+                    Is.True,
+                    "{0} '{1}' not found",
+                    nameof(Competition),
+                    chkMultipleStart.CompetitionName);
+
+                var curMultiStarter = useDanceCompHelper
+                    .GetMultipleStarter(
+                        useComp.Value)
+                    .ToList();
+
+                Assert.That(
+                    curMultiStarter.Count,
+                    Is.EqualTo(0),
+                    "Found '{0}' multiple starts in '{1}' instead of none!",
+                    curMultiStarter.Count,
+                    chkMultipleStart.CompetitionName);
+            }
+        }
+
+        [Then(@"following Participants exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
+        public void ThenFollowingParticipantsExistsInCompetitionOfDanceCompetitionHelper(string danceCompHelper, Table table)
+        {
+            var checkParticipants = table.CreateSet<ParticipantPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
                 danceCompHelper);
 
-            var useComp = useDanceCompHelper.GetCompetition(
-                competitionName);
+            var participtansByCompId = new Dictionary<Guid, List<Participant>>();
 
-            Assert.That(
-                useComp,
-                Is.Not.Null,
-                "{0} '{1}' not found!",
-                nameof(Competition),
-                competitionName);
-            Assert.That(
-                useComp.HasValue,
-                Is.True,
-                "{0} '{1}' not found",
-                nameof(Competition),
-                competitionName);
+            foreach (var chkPart in checkParticipants)
+            {
+                var useComp = useDanceCompHelper.GetCompetition(
+                    chkPart.CompetitionName);
 
-            var curMultiStarter = useDanceCompHelper.GetMultipleStarter(
-                useComp.Value)
-                .ToList();
+                Assert.That(
+                    useComp,
+                    Is.Not.Null,
+                    "{0} '{1}' not found!",
+                    nameof(Competition),
+                    chkPart.CompetitionName);
+                Assert.That(
+                    useComp.HasValue,
+                    Is.True,
+                    "{0} '{1}' not found",
+                    nameof(Competition),
+                    chkPart.CompetitionName);
 
-            Assert.That(
-                curMultiStarter.Count,
-                Is.EqualTo(0),
-                "Found '{0}' multiple starts instead of none!",
-                curMultiStarter.Count);
+                if (participtansByCompId.TryGetValue(
+                    useComp.Value,
+                    out var foundParticipants) == false)
+                {
+                    foundParticipants = useDanceCompHelper
+                        .GetParticipants(
+                            useComp.Value,
+                            null,
+                            true)
+                        .ToList();
+
+                    participtansByCompId[useComp.Value] = foundParticipants;
+                }
+
+                var foundPart = foundParticipants.FirstOrDefault(
+                    x => x.NamePartA == chkPart.NamePartA
+                    && x.NamePartB == chkPart.NamePartB
+                    && x.StartNumber == chkPart.StartNumber
+                    && x.CompetitionClass.CompetitionClassName == chkPart.CompetitionClassName);
+
+                var partLogString = string.Format(
+                    "{0} '{1}'/'{2}' #{3} ({4})",
+                    nameof(Participant),
+                    chkPart.NamePartA,
+                    chkPart.NamePartB,
+                    chkPart.StartNumber,
+                    chkPart.CompetitionClassName);
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(
+                        foundPart,
+                        Is.Not.Null,
+                        "{0} not found",
+                        partLogString);
+                    Assert.That(
+                        foundPart?.DisplayInfo,
+                        Is.Not.Null,
+                        "{0} not invalid - {1} missing",
+                        partLogString,
+                        nameof(Participant.DisplayInfo));
+                    Assert.That(
+                        foundPart?.DisplayInfo?.PromotionInfo,
+                        Is.Not.Null,
+                        "{0} not invalid - {1}.{2} missing",
+                        partLogString,
+                        nameof(Participant.DisplayInfo),
+                        nameof(ParticipantDisplayInfo.PromotionInfo));
+                    Assert.That(
+                        foundPart?.DisplayInfo?.MultipleStartInfo,
+                        Is.Not.Null,
+                        "{0} not invalid - {1}.{2} missing",
+                        partLogString,
+                        nameof(Participant.DisplayInfo),
+                        nameof(ParticipantDisplayInfo.MultipleStartInfo));
+                });
+
+                Assert.Multiple(() =>
+                {
+                    if (foundPart == null
+                        || foundPart.DisplayInfo == null
+                        || foundPart.DisplayInfo.PromotionInfo == null
+                        || foundPart.DisplayInfo.MultipleStartInfo == null)
+                    {
+                        throw new ArgumentNullException();
+                    }
+
+                    Assert.That(
+                        foundPart.DisplayInfo.MultipleStartInfo.MultipleStarts,
+                        Is.EqualTo(
+                            chkPart.MultipleStarts),
+                        "{0}: {1}",
+                        partLogString,
+                        nameof(CheckMultipleStartInfo.MultipleStarts));
+
+                    Assert.That(
+                        foundPart.DisplayInfo.PromotionInfo.PossiblePromotionA,
+                        Is.EqualTo(
+                            chkPart.PossiblePromotionA),
+                        "{0}: {1}",
+                        partLogString,
+                        nameof(CheckPromotionInfo.PossiblePromotionA));
+                    Assert.That(
+                        foundPart.DisplayInfo.PromotionInfo.PossiblePromotionAInfo,
+                        Is.EqualTo(
+                            chkPart.PossiblePromotionAInfo),
+                        "{0}: {1}",
+                        partLogString,
+                        nameof(CheckPromotionInfo.PossiblePromotionAInfo));
+
+                    Assert.That(
+                        foundPart.DisplayInfo.PromotionInfo.PossiblePromotionB,
+                        Is.EqualTo(
+                            chkPart.PossiblePromotionB),
+                        "{0}: {1}",
+                        partLogString,
+                        nameof(CheckPromotionInfo.PossiblePromotionB));
+                    Assert.That(
+                        foundPart.DisplayInfo.PromotionInfo.PossiblePromotionBInfo,
+                        Is.EqualTo(
+                            chkPart.PossiblePromotionBInfo),
+                        "{0}: {1}",
+                        partLogString,
+                        nameof(CheckPromotionInfo.PossiblePromotionBInfo));
+
+
+                });
+            }
         }
+
 
         #endregion Dance Competition Helper
 

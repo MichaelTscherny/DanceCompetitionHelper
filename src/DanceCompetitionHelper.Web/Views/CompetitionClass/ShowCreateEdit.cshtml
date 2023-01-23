@@ -74,7 +74,7 @@
                 </label>
             </div>
         </div>
-        <div class="row row-cols-3 py-1">
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-25">
             <div class="col-md text-end">
                 Discipline
             </div>
@@ -93,7 +93,7 @@
                 </label>
             </div>
         </div>
-        <div class="row row-cols-3 py-1">
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-10">
             <div class="col-md text-end">
                 Age Class
             </div>
@@ -112,7 +112,7 @@
                 </label>
             </div>
         </div>
-        <div class="row row-cols-3 py-1">
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-25">
             <div class="col-md text-end">
                 Age Group
             </div>
@@ -131,7 +131,7 @@
                 </label>
             </div>
         </div>
-        <div class="row row-cols-3 py-1">
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-10">
             <div class="col-md text-end">
                 Class
             </div>
@@ -151,7 +151,7 @@
                 </label>
             </div>
         </div>
-        <div class="row row-cols-3 py-1">
+        <div class="row row-cols-3 py-1 bg-warning bg-opacity-25">
             <div class="col-md text-end">
                 Min Starts
             </div>
@@ -171,7 +171,7 @@
                 </label>
             </div>
         </div>
-        <div class="row row-cols-3 py-1">
+        <div class="row row-cols-3 py-1 bg-warning bg-opacity-10">
             <div class="col-md text-end">
                 Min Points
             </div>
@@ -193,21 +193,80 @@
         </div>
         <div class="row row-cols-3 py-1">
             <div class="col-md text-end">
-                Win Points
+                Points for First
             </div>
             <div class="col-md-4">
-                <input asp-for="PointsForWinning"
+                <input asp-for="PointsForFirst"
                        class="form-control"
                        placeholder="Class" 
                        
                        style="width: 100%" />
-                <span asp-validation-for="PointsForWinning"
+                <span asp-validation-for="PointsForFirst"
                       class="text-danger"></span>
             </div>
             <div class="col-md text-start">
-                <label asp-for="PointsForWinning"
+                <label asp-for="PointsForFirst"
                        class="control-label">
-                    Point for Winner
+                    Point for first place (Winner)
+                </label>
+            </div>
+        </div>        
+        <div class="row row-cols-3 py-1 bg-black bg-opacity-25">
+            <div class="col-md text-end">
+                Extra Starter
+            </div>
+            <div class="col-md-4">
+                <input asp-for="ExtraManualStarter"
+                       class="form-control"
+                       placeholder="Class" 
+                       
+                       style="width: 100%" />
+                <span asp-validation-for="ExtraManualStarter"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="ExtraManualStarter"
+                       class="control-label">
+                    Manually added Starters
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-black bg-opacity-10">
+            <div class="col-md text-end">
+                Comment
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Comment"
+                       class="form-control"
+                       placeholder="Comment"                        
+                       style="width: 100%" />
+                <span asp-validation-for="Comment"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Comment"
+                       class="control-label">
+                    Comment for this Competition Class
+                </label>
+            </div>
+        </div>
+
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Comment
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Comment"
+                       class="form-control"
+                       placeholder="Comment"
+                       style="width: 100%" />
+                <span asp-validation-for="Comment"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Comment"
+                       class="control-label">
+                    Comment for this Competition Class
                 </label>
             </div>
         </div>

@@ -23,6 +23,10 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Comment")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CompetitionDate")
                         .HasColumnType("TEXT");
 
@@ -93,6 +97,10 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Comment")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CompetitionClassName")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -115,6 +123,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.Property<string>("Discipline")
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("ExtraManualStarter")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("Ignore")
                         .HasColumnType("INTEGER");
@@ -141,7 +152,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("'Internal' Org-Id of class of CompetitionClass");
 
-                    b.Property<int>("PointsForWinning")
+                    b.Property<int>("PointsForFirst")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("CompetitionClassId");
@@ -172,6 +183,10 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Comment")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("CompetitionClassId")
                         .HasColumnType("TEXT");
 
@@ -198,6 +213,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ExtraManualStarter")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("Ignore")
                         .HasColumnType("INTEGER");
 
@@ -223,7 +241,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("'Internal' Org-Id of class of CompetitionClass");
 
-                    b.Property<int>("PointsForWinning")
+                    b.Property<int>("PointsForFirst")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Version")
@@ -248,6 +266,10 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ClubName")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comment")
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
@@ -335,6 +357,10 @@ namespace DanceCompetitionHelper.Database.Migrations
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.ParticipantHistory", b =>
                 {
                     b.Property<string>("ClubName")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comment")
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 

@@ -67,6 +67,9 @@ namespace DanceCompetitionHelper.Database.Tables
         [Range(0, int.MaxValue)]
         public int? OrgStartsPartB { get; set; }
 
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? Comment { get; set; }
+
         public bool Ignore { get; set; }
 
         [NotMapped]

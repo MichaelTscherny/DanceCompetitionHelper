@@ -89,9 +89,9 @@ If you like to help on this project, please check
 
 following sources helped to get this project "on track":
 
-- [Österreichicher TanzSport Verband (ÖTSV)](https://www.tanzsportverband.at/)
-- [WDSF](https://www.worlddancesport.org/)
-- [USA Dance](https://usadance.org/)
+- [Österreichicher TanzSport Verband (ÖTSV)](https://www.tanzsportverband.at/): Docu, API
+- [WDSF](https://www.worlddancesport.org/): Docu
+- [USA Dance](https://usadance.org/): Docu
 
 ## License
 
