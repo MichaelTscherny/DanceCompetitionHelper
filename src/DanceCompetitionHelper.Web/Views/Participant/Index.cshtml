@@ -91,7 +91,7 @@
                     <tr>
                         <td class="text-nowrap">
                             @item.CompetitionClass.CompetitionClassName
-                            @(item.CompetitionClass.Comment)
+                            [@(item.CompetitionClass.Comment)]
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.StartNumber)
@@ -154,7 +154,7 @@
                                 <div class="col-auto text-end"
                                      data-bs-toggle="tooltip"
                                      data-bs-custom-class="custom-tooltip"
-                                     data-bs-title="@(item.DisplayInfo?.PromotionInfo?.PossiblePromotionAInfo ?? string.Empty)">
+                                     data-bs-title="@(item.DisplayInfo?.PromotionInfo?.PossiblePromotionAInfo ?? "-")">
                                     @Html.DisplayFor(modelItem => useBool)
                                 </div>
 
@@ -169,17 +169,24 @@
                                 <div class="col-auto"
                                         data-bs-toggle="tooltip"
                                         data-bs-custom-class="custom-tooltip"
-                                        data-bs-title="@(item.DisplayInfo?.PromotionInfo?.PossiblePromotionBInfo ?? string.Empty)">
+                                        data-bs-title="@(item.DisplayInfo?.PromotionInfo?.PossiblePromotionBInfo ?? "-")">
                                     @Html.DisplayFor(modelItem => useBool02.Value)
                                 </div>                            
                             }
                             </div>
                         </td>
                         <td>
-                            @{
-                                useBool = item.DisplayInfo?.MultipleStartInfo?.MultipleStarts ?? false;
-                            }
-                            @Html.DisplayFor(modelItem => useBool)
+                            <div class="row row-cols justify-content-center">
+                                @{
+                                    useBool = item.DisplayInfo?.MultipleStartInfo?.MultipleStarts ?? false;
+                                }
+                                <div class="col-auto text-end"
+                                     data-bs-toggle="tooltip"
+                                     data-bs-custom-class="custom-tooltip"
+                                     data-bs-title="@(item.DisplayInfo?.MultipleStartInfo?.MultipleStartsInfo ?? "-")">
+                                    @Html.DisplayFor(modelItem => useBool)
+                                </div>
+                            </div>
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Comment)

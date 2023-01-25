@@ -3,6 +3,7 @@ using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Extensions;
 using DanceCompetitionHelper.OrgImpl;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
 using Microsoft.EntityFrameworkCore;
@@ -181,7 +182,7 @@ namespace DanceCompetitionHelper
                 }
 
                 var partsByCompClass = new Dictionary<Guid, List<Participant>>();
-                var multiStartsByCompClass = new Dictionary<Guid, int>();
+                var multiStartsByCompClass = new Dictionary<Guid, List<Participant>>();
 
                 ICompetitonClassChecker? compClassChecker = GetCompetitonClassChecker(
                     foundComp);
@@ -215,14 +216,8 @@ namespace DanceCompetitionHelper
 
                     foreach (var curHighClass in higherClasses)
                     {
-                        if (possibleWinnerFromCompClass.TryGetValue(
+                        possibleWinnerFromCompClass.AddToBucket(
                             curHighClass.CompetitionClassId,
-                            out var useLowerClass) == false)
-                        {
-                            useLowerClass = new List<CompetitionClass>();
-                            possibleWinnerFromCompClass[curHighClass.CompetitionClassId] = useLowerClass;
-                        }
-                        useLowerClass.Add(
                             curCompClass);
                     }
                 }
@@ -238,16 +233,8 @@ namespace DanceCompetitionHelper
                             x => x.CompetitionId)
                         .ThenByDefault())
                     {
-                        if (partsByCompClass.TryGetValue(
+                        partsByCompClass.AddToBucket(
                             curPart.CompetitionClassId,
-                            out var curParticipants) == false)
-                        {
-                            curParticipants = new List<Participant>();
-                            partsByCompClass[curPart.CompetitionClassId]
-                                = curParticipants;
-                        }
-
-                        curParticipants.Add(
                             curPart);
 
                         var usePromotionInfo = curPart.DisplayInfo?.PromotionInfo;
@@ -262,16 +249,8 @@ namespace DanceCompetitionHelper
                                 {
                                     foreach (var curHighClass in foundHigherClasses)
                                     {
-                                        if (foundPromotionFromCompClass.TryGetValue(
+                                        foundPromotionFromCompClass.AddToBucket(
                                             curHighClass.CompetitionClassId,
-                                            out var toAddPart) == false)
-                                        {
-                                            toAddPart = new List<Participant>();
-                                            foundPromotionFromCompClass[curHighClass.CompetitionClassId]
-                                                = toAddPart;
-                                        }
-
-                                        toAddPart.Add(
                                             curPart);
                                     }
                                 }
@@ -283,18 +262,19 @@ namespace DanceCompetitionHelper
                         competitionId.Value)
                         .ToList();
 
-                    foreach (var curMultiStart in multipleStarters
-                        .SelectMany(x => x.CompetitionClasses))
+                    foreach (var curMultiStart in multipleStarters)
                     {
-                        var useCompClassid = curMultiStart.CompetitionClassId;
-                        if (multiStartsByCompClass.ContainsKey(
-                            useCompClassid) == false)
+                        foreach (var multiCompClasss in curMultiStart.CompetitionClasses)
                         {
-                            multiStartsByCompClass[useCompClassid] = 1;
-                        }
-                        else
-                        {
-                            multiStartsByCompClass[useCompClassid]++;
+                            foreach (var multiPart in curMultiStart.Participants
+                                .Where(
+                                    x => x.CompetitionClassId == multiCompClasss.CompetitionClassId))
+                            {
+                                multiStartsByCompClass.AddToBucket(
+                                    multiCompClasss.CompetitionClassId,
+                                    multiPart,
+                                    true);
+                            }
                         }
                     }
                 }
@@ -323,7 +303,19 @@ namespace DanceCompetitionHelper
                         multiStartsByCompClass.TryGetValue(
                             useCompClassId,
                             out var curCntMultiStarter);
-                        useDisplayInfo.CountMultipleStarters = curCntMultiStarter;
+                        useDisplayInfo.CountMultipleStarters = curCntMultiStarter?.Count ?? 0;
+                        useDisplayInfo.CountMultipleStartersInfo = string.Join(
+                            ", ",
+                            curCntMultiStarter
+                                ?.Select(
+                                    x => x.StartNumber)
+                                ?.OrderBy(
+                                    x => x)
+                                ?.Select(
+                                    x => string.Format(
+                                        "#{0}",
+                                        x))
+                                ?? Enumerable.Empty<string>());
 
                         if (possibleWinnerFromCompClass.TryGetValue(
                             useCompClassId,
@@ -338,10 +330,17 @@ namespace DanceCompetitionHelper
                             out var possiblePromotions))
                         {
                             useExtraPart.ByPromotion += possiblePromotions.Count;
-                            useExtraPart.ByWinningInfo += string.Join(
+                            useExtraPart.ByPromotionInfo += string.Join(
                                 ", ",
-                                possiblePromotions.Select(
-                                    x => x.StartNumber));
+                                possiblePromotions
+                                    .Select(
+                                        x => x.StartNumber)
+                                    .OrderBy(
+                                        x => x)
+                                    .Select(
+                                        x => string.Format(
+                                            "#{0}",
+                                            x)));
                         }
                     }
 

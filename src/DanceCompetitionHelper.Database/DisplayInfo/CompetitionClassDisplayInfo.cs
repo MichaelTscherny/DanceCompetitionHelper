@@ -15,5 +15,6 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
             / 7m /* (decimal)CompetitionClassSettings.MaxParticipantsAtOnce*/);
 
         public int CountMultipleStarters { get; set; }
+        public string? CountMultipleStartersInfo { get; set; }
     }
 }

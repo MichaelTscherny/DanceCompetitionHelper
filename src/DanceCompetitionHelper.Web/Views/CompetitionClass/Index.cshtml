@@ -52,10 +52,7 @@
                         Ignore
                     </th>
                     <th>
-                        Part. (Reg + 'Extras' + Man)
-                    </th>
-                    <th>
-                        Extras (W / P)
+                        Reg + 'Win' + 'Prom' + Man
                     </th>
                     <th>
                         Multi Starter
@@ -102,30 +99,60 @@
                             @Html.DisplayFor(modelItem => item.Ignore)
                         </td>
                         <td class="text-nowrap">
-                            <a asp-controller="@ParticipantController.RefName"
-                               asp-action="@nameof(ParticipantController.Index)"
-                               asp-route-id="@item.CompetitionId">
-                                @(item.DisplayInfo?.CountParticipants ?? -1) 
-                                + @(item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1)
-                                + @(item.ExtraManualStarter)
-                                = @((item.DisplayInfo?.CountParticipants ?? 0) + (item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? 0) + (item.ExtraManualStarter))
-                            </a>
+                            <div class="row row-cols justify-content-center">
+                                @{
+                                    var toolTipString = string.Empty;
+
+                                    toolTipString += item.DisplayInfo?.ExtraParticipants?.ByWinningInfo;
+                                    toolTipString += " / " + item.DisplayInfo?.ExtraParticipants?.ByPromotionInfo;
+                                    toolTipString = toolTipString.Trim();
+                                    toolTipString = toolTipString.Trim('/');
+
+                                    if(string.IsNullOrEmpty(toolTipString)
+                                        || toolTipString == "/")
+                                    {
+                                        toolTipString = "-";
+                                    }
+                                }
+                                <div class="col-auto text-end"
+                                     data-bs-toggle="tooltip"
+                                     data-bs-custom-class="custom-tooltip"
+                                     data-bs-title="@(toolTipString)">
+                                    <a asp-controller="@ParticipantController.RefName"
+                                       asp-action="@nameof(ParticipantController.Index)"
+                                       asp-route-id="@item.CompetitionId">
+                                        @(item.DisplayInfo?.CountParticipants ?? -1)
+                                        + @(item.DisplayInfo?.ExtraParticipants.ByWinning ?? -1)
+                                        + @(item.DisplayInfo?.ExtraParticipants.ByPromotion ?? -1)
+                                        + @(item.ExtraManualStarter)
+                                        = @((item.DisplayInfo?.CountParticipants ?? 0)
+                                          + (item.DisplayInfo?.ExtraParticipants.ByWinning ?? 0)
+                                          + (item.DisplayInfo?.ExtraParticipants.ByPromotion ?? 0)
+                                          + (item.ExtraManualStarter))
+                                    </a>
+                                </div>
+                            </div>
                         </td>
                         <td class="text-nowrap">
-                            <a asp-controller="@ParticipantController.RefName"
-                               asp-action="@nameof(ParticipantController.Index)"
-                               asp-route-id="@item.CompetitionId">
-                                @(item.DisplayInfo?.ExtraParticipants.ByWinning ?? -1) 
-                                / @(item.DisplayInfo?.ExtraParticipants.ByPromotion ?? -1) 
-                                = @(item.DisplayInfo?.ExtraParticipants.AllExtraParticipants ?? -1)
-                            </a>
-                        </td>
-                        <td class="text-nowrap">
-                            <a asp-controller="@CompetitionClassController.RefName"
-                               asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
-                               asp-route-id="@item.CompetitionId">
-                                @(item.DisplayInfo?.CountMultipleStarters)
-                            </a>
+                            <div class="row row-cols justify-content-center">
+                                @{
+                                    var multiStartInfo = item.DisplayInfo?.CountMultipleStartersInfo ?? "-";
+                                    if(string.IsNullOrEmpty(multiStartInfo))
+                                    {
+                                        multiStartInfo = "-";
+                                    }
+                                }
+                                <div class="col-auto text-end"
+                                     data-bs-toggle="tooltip"
+                                     data-bs-custom-class="custom-tooltip"
+                                 data-bs-title="@multiStartInfo">
+                                    <a asp-controller="@CompetitionClassController.RefName"
+                                       asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
+                                       asp-route-id="@item.CompetitionId">
+                                        @(item.DisplayInfo?.CountMultipleStarters ?? -1)
+                                    </a>
+                                </div>
+                            </div>
                         </td>
                         <td>
                             ~ @(item.DisplayInfo?.NeededRounds ?? -1)
@@ -175,10 +202,7 @@
                         Ignore
                     </th>
                     <th>
-                        Part. (Reg + 'Extras' + Man)
-                    </th>
-                    <th>
-                        Extras (W / P)
+                        Reg + 'Win' + 'Prom' + Man
                     </th>
                     <th>
                         Multi Starter

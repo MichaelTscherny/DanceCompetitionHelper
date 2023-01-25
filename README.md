@@ -11,7 +11,7 @@ During my work - over the last 10 years - I was facing
 some major "issues" where organizer and volunteers always struggle
 with: 
 
-* (class) winners [^1]</sup> and "promoted couples" [^2] dancing in a higher 
+* (class) winners [^1]</sup> and "promoted couples" [^2] dancing in a higher class
 * Time-Table of a competition
 
 This projects aim is to privide an *"easy" to use software* where
