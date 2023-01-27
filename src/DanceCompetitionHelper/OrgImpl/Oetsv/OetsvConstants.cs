@@ -30,6 +30,7 @@
                     case "Combination":
                     case "KOMBI":
                     case "Kombination":
+                    case "Combi":
                     case "combi":
                     case "COMBI":
                         return Combination;
@@ -64,11 +65,17 @@
                     case Pupil:
                     case "SCH":
                     case "Schüler":
+                    case "schüler":
+                    case "SCHÜLER":
                     case "Schueler":
+                    case "SCHUELER":
+                    case "schueler":
                         return Pupil;
 
                     case Junior:
                     case "Junior":
+                    case "JUNIOR":
+                    case "junior":
                     case "JUN":
                         return Junior;
 
@@ -80,9 +87,9 @@
                         return Juvenile;
 
                     case Adult:
+                    case "ALLG":
                     case "Adult":
-                    case "Adlt":
-                    case "ADLT":
+                    case "ADULT":
                     case "Adt":
                     case "ADT":
                         return Adult;
@@ -96,8 +103,10 @@
                     case Formation:
                     case "FOR":
                     case "FORM":
+                    case "form":
                     case "Form":
                     case "Formation":
+                    case "formation":
                     case "FORMATION":
                         return Formation;
                 }
@@ -108,12 +117,12 @@
 
         public static class Classes
         {
-            const string Amateur = "Bsp";
-            const string D = "D";
-            const string C = "C";
-            const string B = "B";
-            const string A = "A";
-            const string S = "S";
+            public const string Amateur = "Bsp";
+            public const string D = "D";
+            public const string C = "C";
+            public const string B = "B";
+            public const string A = "A";
+            public const string S = "S";
 
             public static string? ToClasses(
                 string? useString)
@@ -121,6 +130,7 @@
                 switch (useString)
                 {
                     case Amateur:
+                    case "bsp":
                     case "BSP":
                         return Amateur;
 

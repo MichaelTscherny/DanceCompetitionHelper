@@ -63,6 +63,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 if (curChkClass.CompetitionId == forCompetitionClass.CompetitionId
                     && curChkClass.Discipline == forCompetitionClass.Discipline
                     && curChkClass.AgeClass == forCompetitionClass.AgeClass
+                    && curChkClass.AgeGroup == forCompetitionClass.AgeGroup
                     && curChkClass.Class == higherCompClass)
                 {
                     yield return curChkClass;

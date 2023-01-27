@@ -1,4 +1,4 @@
-﻿namespace DanceCompetitionHelper.Database.Test.Bindings
+﻿namespace DanceCompetitionHelper.Test.Bindings
 {
     public static class SpecFlowConstants
     {

@@ -39,3 +39,9 @@ Scenario: Multiple Start - None
         | Test-Comp-01    | Allg La D            | 100         | Dancer 10-A | true           | false              | [A] 0/0 + 100/1 = 100/1 -> False |
         #                                                        
         | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False |
+    And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName | CompetitionClassName | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Allg Sta D           | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg Sta C           | 1                 | 1                  | Allg Sta D (Class-01)  | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg La D            | 2                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg La C            | 1                 | 1                  | Allg La D (Class-03)   | 0                    |                          | 0                  |

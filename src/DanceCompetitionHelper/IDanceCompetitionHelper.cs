@@ -114,8 +114,10 @@ namespace DanceCompetitionHelper
             string? orgIdClub,
             int orgPointsPartA,
             int orgStartsPartA,
+            int? minStartsForPromotionPartA,
             int? orgPointsPartB,
             int? orgStartsPartB,
+            int? minStartsForPromotionPartB,
             string? comment,
             bool ignore);
 
@@ -131,8 +133,10 @@ namespace DanceCompetitionHelper
             string? orgIdClub,
             int orgPointsPartA,
             int orgStartsPartA,
+            int? minStartsForPromotionPartA,
             int? orgPointsPartB,
             int? orgStartsPartB,
+            int? minStartsForPromotionPartB,
             string? comment,
             bool ignore);
 

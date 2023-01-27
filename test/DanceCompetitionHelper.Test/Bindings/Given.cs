@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database.Config;
+﻿using DanceCompetitionHelper.Database;
+using DanceCompetitionHelper.Database.Config;
 using DanceCompetitionHelper.Database.Diagnostic;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos;
@@ -6,12 +7,10 @@ using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NUnit.Framework;
 using System.Diagnostics;
-using TechTalk.SpecFlow.Assist;
 using TestHelper.Extensions;
 
-namespace DanceCompetitionHelper.Database.Test.Bindings
+namespace DanceCompetitionHelper.Test.Bindings
 {
     [Binding]
     public sealed class Given : BindingBase

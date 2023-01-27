@@ -48,6 +48,9 @@
                         <th>
                             Points/Starts B
                         </th>
+                        <th>
+                            Min Starts A/B
+                        </th>
                     }
                     else 
                     {
@@ -116,6 +119,10 @@
                             <td class="text-nowrap">
                                 @Html.DisplayFor(modelItem => item.OrgPointsPartB)
                                 / @Html.DisplayFor(modelItem => item.OrgStartsPartB)
+                            </td>
+                            <td class="text-nowrap">
+                                @Html.DisplayFor(modelItem => item.MinStartsForPromotionPartA)
+                                / @Html.DisplayFor(modelItem => item.MinStartsForPromotionPartB)
                             </td>
                         }
                         else 
@@ -226,6 +233,9 @@
                         </th>
                         <th>
                             Points/Starts B
+                        </th>
+                        <th>
+                            Min Starts A/B
                         </th>
                     }
                     else

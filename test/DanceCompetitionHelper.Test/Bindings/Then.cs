@@ -1,10 +1,9 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
-using NUnit.Framework;
-using TechTalk.SpecFlow.Assist;
+using DanceCompetitionHelper.Info;
 
-namespace DanceCompetitionHelper.Database.Test.Bindings
+namespace DanceCompetitionHelper.Test.Bindings
 {
     [Binding]
     public sealed class Then : BindingBase
@@ -432,6 +431,13 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                             "{0}: {1}",
                             curChk,
                             nameof(curChk.OrgStartsPartA));
+                        Assert.That(
+                            foundParticipant.MinStartsForPromotionPartA,
+                            Is.EqualTo(
+                                curChk.MinStartsForPromotionPartA),
+                            "{0}: {1}",
+                            curChk,
+                            nameof(curChk.MinStartsForPromotionPartA));
 
                         Assert.That(
                             foundParticipant.OrgPointsPartB,
@@ -447,6 +453,13 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                             "{0}: {1}",
                             curChk,
                             nameof(curChk.OrgStartsPartB));
+                        Assert.That(
+                            foundParticipant.MinStartsForPromotionPartB,
+                            Is.EqualTo(
+                                curChk.MinStartsForPromotionPartB),
+                            "{0}: {1}",
+                            curChk,
+                            nameof(curChk.MinStartsForPromotionPartB));
                     });
                 }
             }
@@ -614,8 +627,8 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
 
         #region Dance Competition Helper
 
-        [Then(@"following DanceCompetitionHelper ""([^""]*)"" counts exists")]
-        public void ThenFollowingDanceCompetitionHelperCountsExists(
+        [Then(@"following Counts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
+        public void ThenFollowingCountsExistsInDanceCompetitionsOfCompetitionHelper(
             string danceCompHelper,
             Table table)
         {
@@ -689,16 +702,17 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                     nameof(Competition),
                     chkMultiStart.CompetitionName);
 
+                var useCompId = useComp.Value;
                 if (cachedMultipleStarters.TryGetValue(
-                    useComp.Value,
+                    useCompId,
                     out var curMultiStarter) == false)
                 {
                     curMultiStarter = useDanceCompHelper
                         .GetMultipleStarter(
-                            useComp.Value)
+                            useCompId)
                         .ToList();
 
-                    cachedMultipleStarters[useComp.Value] = curMultiStarter;
+                    cachedMultipleStarters[useCompId] = curMultiStarter;
                 }
 
                 chkMultiStart.CompetitionName = chkMultiStart.CompetitionName;
@@ -766,9 +780,10 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                     nameof(Competition),
                     chkMultipleStart.CompetitionName);
 
+                var useCompId = useComp.Value;
                 var curMultiStarter = useDanceCompHelper
                     .GetMultipleStarter(
-                        useComp.Value)
+                        useCompId)
                     .ToList();
 
                 Assert.That(
@@ -781,7 +796,9 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
         }
 
         [Then(@"following Participants exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingParticipantsExistsInCompetitionOfDanceCompetitionHelper(string danceCompHelper, Table table)
+        public void ThenFollowingParticipantsExistsInCompetitionOfDanceCompetitionHelper(
+            string danceCompHelper,
+            Table table)
         {
             var checkParticipants = table.CreateSet<ParticipantPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -807,18 +824,19 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                     nameof(Competition),
                     chkPart.CompetitionName);
 
+                var useCompId = useComp.Value;
                 if (participtansByCompId.TryGetValue(
-                    useComp.Value,
+                    useCompId,
                     out var foundParticipants) == false)
                 {
                     foundParticipants = useDanceCompHelper
                         .GetParticipants(
-                            useComp.Value,
+                            useCompId,
                             null,
                             true)
                         .ToList();
 
-                    participtansByCompId[useComp.Value] = foundParticipants;
+                    participtansByCompId[useCompId] = foundParticipants;
                 }
 
                 var foundPart = foundParticipants.FirstOrDefault(
@@ -891,7 +909,7 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                         nameof(CheckPromotionInfo.PossiblePromotionA));
                     Assert.That(
                         foundPart.DisplayInfo.PromotionInfo.PossiblePromotionAInfo,
-                        Is.EqualTo(
+                        Is.Null.Or.Empty.Or.EqualTo(
                             chkPart.PossiblePromotionAInfo),
                         "{0}: {1}",
                         partLogString,
@@ -906,17 +924,136 @@ namespace DanceCompetitionHelper.Database.Test.Bindings
                         nameof(CheckPromotionInfo.PossiblePromotionB));
                     Assert.That(
                         foundPart.DisplayInfo.PromotionInfo.PossiblePromotionBInfo,
-                        Is.EqualTo(
+                        Is.Null.Or.Empty.Or.EqualTo(
                             chkPart.PossiblePromotionBInfo),
                         "{0}: {1}",
                         partLogString,
                         nameof(CheckPromotionInfo.PossiblePromotionBInfo));
-
-
                 });
             }
         }
 
+        [Then(@"following Classes exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
+        public void ThenFollowingClassesExistsInCompetitionsOfDanceCompetitionHelper(
+            string danceCompHelper,
+            Table table)
+        {
+            var checkCompClass = table.CreateSet<CompetitionClassPoco>();
+            var useDanceCompHelper = GetDanceCompetitionHelper(
+                danceCompHelper);
+
+            var compClassesByCompId = new Dictionary<Guid, List<CompetitionClass>>();
+
+            foreach (var chkCompClass in checkCompClass)
+            {
+                var useComp = useDanceCompHelper.GetCompetition(
+                    chkCompClass.CompetitionName);
+
+                Assert.That(
+                    useComp,
+                    Is.Not.Null,
+                    "{0} '{1}' not found!",
+                    nameof(Competition),
+                    chkCompClass.CompetitionName);
+                Assert.That(
+                    useComp.HasValue,
+                    Is.True,
+                    "{0} '{1}' not found",
+                    nameof(Competition),
+                    chkCompClass.CompetitionName);
+
+                var useCompId = useComp.Value;
+                if (compClassesByCompId.TryGetValue(
+                    useCompId,
+                    out var foundCompClasses) == false)
+                {
+                    foundCompClasses = useDanceCompHelper
+                        .GetCompetitionClasses(
+                            useCompId,
+                            true)
+                        .ToList();
+                    compClassesByCompId[useCompId] = foundCompClasses;
+                }
+
+                var foundCompClass = foundCompClasses.FirstOrDefault(
+                    x => x.CompetitionClassName == chkCompClass.CompetitionClassName);
+
+                var compClassLogString = string.Format(
+                    "{0} '{1}'",
+                    nameof(CompetitionClass),
+                    chkCompClass.CompetitionClassName);
+
+                Assert.Multiple(
+                    () =>
+                    {
+                        Assert.That(
+                            foundCompClass,
+                            Is.Not.Null,
+                            "{0} not found",
+                            compClassLogString);
+                        Assert.That(
+                            foundCompClass?.DisplayInfo,
+                            Is.Not.Null,
+                            "{0} not invalid - {1} missing",
+                            compClassLogString,
+                            nameof(CompetitionClass.DisplayInfo));
+                        Assert.That(
+                            foundCompClass?.DisplayInfo?.ExtraParticipants,
+                            Is.Not.Null,
+                            "{0} not invalid - {1} missing",
+                            compClassLogString,
+                            nameof(CompetitionClass.DisplayInfo.ExtraParticipants));
+                    });
+
+                Assert.Multiple(() =>
+                {
+                    if (foundCompClass == null
+                        || foundCompClass.DisplayInfo == null
+                        || foundCompClass.DisplayInfo.ExtraParticipants == null)
+                    {
+                        throw new ArgumentNullException();
+                    }
+
+                    Assert.That(
+                        foundCompClass.DisplayInfo.CountParticipants,
+                        Is.EqualTo(
+                            chkCompClass.CountParticipants),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(CompetitionClassDisplayInfo.CountParticipants));
+
+                    Assert.That(
+                        foundCompClass.DisplayInfo.ExtraParticipants.ByWinning,
+                        Is.EqualTo(
+                            chkCompClass.ExtraPartByWinning),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(ExtraParticipants.ByWinning));
+                    Assert.That(
+                        foundCompClass.DisplayInfo.ExtraParticipants.ByWinningInfo,
+                        Is.Null.Or.Empty.Or.EqualTo(
+                            chkCompClass.ExtraPartByWinningInfo),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(ExtraParticipants.ByWinningInfo));
+                    Assert.That(
+                        foundCompClass.DisplayInfo.ExtraParticipants.ByPromotion,
+                        Is.EqualTo(
+                            chkCompClass.ExtraPartByPromotion),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(ExtraParticipants.ByPromotion));
+                    Assert.That(
+                        foundCompClass.DisplayInfo.ExtraParticipants.ByPromotionInfo,
+                        Is.Null.Or.Empty.Or.EqualTo(
+                            chkCompClass.ExtraPartByPromotionInfo),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(ExtraParticipants.ByPromotionInfo));
+
+                });
+            }
+        }
 
         #endregion Dance Competition Helper
 

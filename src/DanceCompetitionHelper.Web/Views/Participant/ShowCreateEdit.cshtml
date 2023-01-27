@@ -152,6 +152,25 @@
                 </label>
             </div>
         </div>
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-25">
+            <div class="col-md text-end">
+                Min Starts Part-A
+            </div>
+            <div class="col-md-4">
+                <input asp-for="MinStartsForPromotionPartA"
+                       class="form-control"
+                       placeholder="Min Starts Part-A for Promotion"
+                       style="width: 100%" />
+                <span asp-validation-for="MinStartsForPromotionPartA"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="MinStartsForPromotionPartA"
+                       class="control-label">
+                    Overrides Competition Class MinStartsForPromotion
+                </label>
+            </div>
+        </div>
 
         <div class="row row-cols-3 py-1 bg-warning bg-opacity-25">
             <div class="col-md text-end">
@@ -226,6 +245,25 @@
                 <label asp-for="OrgStartsPartB"
                        class="control-label">
                     Current Starts of Part-B
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-warning bg-opacity-25">
+            <div class="col-md text-end">
+                Min Starts Part-B
+            </div>
+            <div class="col-md-4">
+                <input asp-for="MinStartsForPromotionPartB"
+                       class="form-control"
+                       placeholder="Min Starts Part-B for Promotion"
+                       style="width: 100%" />
+                <span asp-validation-for="MinStartsForPromotionPartB"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="MinStartsForPromotionPartB"
+                       class="control-label">
+                    Overrides Competition Class MinStartsForPromotion
                 </label>
             </div>
         </div>

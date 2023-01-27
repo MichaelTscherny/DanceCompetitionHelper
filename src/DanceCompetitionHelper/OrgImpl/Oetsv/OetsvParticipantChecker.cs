@@ -75,9 +75,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             bool? promotionPartBPoints = newPartBPoints >= usePartCompClass.MinPointsForPromotion;
 
             var newPartAStarts = (participant.OrgStartsPartA + countStarts);
-            var promotionPartAStarts = newPartAStarts >= usePartCompClass.MinStartsForPromotion;
+            var promotionPartAStarts = newPartAStarts >= (participant.MinStartsForPromotionPartA ?? usePartCompClass.MinStartsForPromotion);
             int? newPartBStarts = ((participant.OrgStartsPartB ?? 0) + countStarts);
-            bool? promotionPartBStarts = newPartBStarts >= usePartCompClass.MinStartsForPromotion;
+            bool? promotionPartBStarts = newPartBStarts >= (participant.MinStartsForPromotionPartB ?? usePartCompClass.MinStartsForPromotion);
 
             var retPromotionA = promotionPartAPoints
                 && promotionPartAStarts;
@@ -107,7 +107,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 "Prom S/P [A] {promotionPartAPoints}/{promotionPartAStarts}; " +
                 "[B] {promotionPartBPoints}/{promotionPartBStarts} -> " +
                 "[A/B] ({retPromotionA}/{retPromotionB}) " +
-                "('{CompetitionClassName}': Min S/P {MinPointsForPromotion}/{MinStartsForPromotion})",
+                "('{CompetitionClassName}': Min S/P {MinPointsForPromotion}/{MinStartsForPromotion} ([A/B] {MinStartsForPromotionPartA}/{MinStartsForPromotionPartB}))",
                 participant.NamePartA,
                 participant.NamePartB,
                 participant.ParticipantId,
@@ -129,7 +129,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 retPromotionB,
                 usePartCompClass.CompetitionClassName,
                 usePartCompClass.MinPointsForPromotion,
-                usePartCompClass.MinStartsForPromotion);
+                usePartCompClass.MinStartsForPromotion,
+                participant.MinStartsForPromotionPartA,
+                participant.MinStartsForPromotionPartB);
 
             return new CheckPromotionInfo()
             {

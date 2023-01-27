@@ -18,23 +18,21 @@
 
   <ItemGroup>
     <Compile Remove="Extensions\**" />
+    <Compile Remove="ValueRetriever\**" />
     <EmbeddedResource Remove="Extensions\**" />
+    <EmbeddedResource Remove="ValueRetriever\**" />
     <None Remove="Extensions\**" />
+    <None Remove="ValueRetriever\**" />
     <SpecFlowFeatureFiles Remove="Extensions\**" />
+    <SpecFlowFeatureFiles Remove="ValueRetriever\**" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Extensions\**" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="ValueRetriever\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\MultipleStarts - Copy.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA - Copy.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\Competition - Copy.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\CompetitionClass - Copy.feature.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="6.8.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.1" />
+    <PackageReference Include="FluentAssertions" Version="6.9.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
@@ -58,45 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ValueRetriever\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature.cs">
-      <Visible>true</Visible>
-      <DependentUpon>MultipleStarts.feature</DependentUpon>
-      <DesignTime>true</DesignTime>
-      <AutoGen>true</AutoGen>
-    </Compile>
-    <Compile Update="Tests\SpecFlow\Database\Participants.feature.cs">
-      <DependentUpon>Participants.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Tests\SpecFlow\Database\CompetitionClass.feature.cs">
-      <DependentUpon>CompetitionClass.feature</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\Database\Participants.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\Database\CompetitionClass.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
+    <Folder Include="Tests\SpecFlow\" />
   </ItemGroup>
 
 </Project>

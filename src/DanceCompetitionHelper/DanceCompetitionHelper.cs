@@ -304,18 +304,7 @@ namespace DanceCompetitionHelper
                             useCompClassId,
                             out var curCntMultiStarter);
                         useDisplayInfo.CountMultipleStarters = curCntMultiStarter?.Count ?? 0;
-                        useDisplayInfo.CountMultipleStartersInfo = string.Join(
-                            ", ",
-                            curCntMultiStarter
-                                ?.Select(
-                                    x => x.StartNumber)
-                                ?.OrderBy(
-                                    x => x)
-                                ?.Select(
-                                    x => string.Format(
-                                        "#{0}",
-                                        x))
-                                ?? Enumerable.Empty<string>());
+                        useDisplayInfo.CountMultipleStartersInfo = curCntMultiStarter.GetStartNumber();
 
                         if (possibleWinnerFromCompClass.TryGetValue(
                             useCompClassId,
@@ -330,17 +319,7 @@ namespace DanceCompetitionHelper
                             out var possiblePromotions))
                         {
                             useExtraPart.ByPromotion += possiblePromotions.Count;
-                            useExtraPart.ByPromotionInfo += string.Join(
-                                ", ",
-                                possiblePromotions
-                                    .Select(
-                                        x => x.StartNumber)
-                                    .OrderBy(
-                                        x => x)
-                                    .Select(
-                                        x => string.Format(
-                                            "#{0}",
-                                            x)));
+                            useExtraPart.ByPromotionInfo += possiblePromotions.GetStartNumber();
                         }
                     }
 
@@ -1157,8 +1136,10 @@ namespace DanceCompetitionHelper
             string? orgIdClub,
             int orgPointsPartA,
             int orgStartsPartA,
+            int? minStartsForPromotionPartA,
             int? orgPointsPartB,
             int? orgStartsPartB,
+            int? minStartsForPromotionPartB,
             string? comment,
             bool ignore)
         {
@@ -1210,8 +1191,10 @@ namespace DanceCompetitionHelper
                         OrgIdClub = orgIdClub,
                         OrgPointsPartA = orgPointsPartA,
                         OrgStartsPartA = orgStartsPartA,
+                        MinStartsForPromotionPartA = minStartsForPromotionPartA,
                         OrgPointsPartB = orgPointsPartB,
                         OrgStartsPartB = orgStartsPartB,
+                        MinStartsForPromotionPartB = minStartsForPromotionPartB,
                         Comment = comment,
                         Ignore = ignore,
                     });
@@ -1251,8 +1234,10 @@ namespace DanceCompetitionHelper
             string? orgIdClub,
             int orgPointsPartA,
             int orgStartsPartA,
+            int? minStartsForPromotionPartA,
             int? orgPointsPartB,
             int? orgStartsPartB,
+            int? minStartsForPromotionPartB,
             string? comment,
             bool ignore)
         {
@@ -1300,8 +1285,10 @@ namespace DanceCompetitionHelper
                 foundParticipant.OrgIdClub = orgIdClub;
                 foundParticipant.OrgPointsPartA = orgPointsPartA;
                 foundParticipant.OrgStartsPartA = orgStartsPartA;
+                foundParticipant.MinStartsForPromotionPartA = minStartsForPromotionPartA;
                 foundParticipant.OrgPointsPartB = orgPointsPartB;
                 foundParticipant.OrgStartsPartB = orgStartsPartB;
+                foundParticipant.MinStartsForPromotionPartB = minStartsForPromotionPartB;
                 foundParticipant.Comment = comment;
                 foundParticipant.Ignore = ignore;
 
