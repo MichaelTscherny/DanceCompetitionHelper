@@ -9,6 +9,8 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
         public bool? PossiblePromotionB { get; init; }
         public string? PossiblePromotionBInfo { get; init; }
 
+        public bool PossiblePromotion => PossiblePromotionA || (PossiblePromotionB ?? false);
+
         public List<CompetitionClass> IncludedCompetitionClasses { get; init; } = new List<CompetitionClass>();
     }
 }

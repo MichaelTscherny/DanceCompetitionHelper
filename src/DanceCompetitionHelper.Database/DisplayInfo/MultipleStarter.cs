@@ -39,10 +39,7 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
                 }
 
                 foundNames.Add(
-                    string.Format(
-                        "{0} {1}",
-                        curPart.NamePartA,
-                        curPart.NamePartB));
+                    curPart.GetNames());
 
                 PointsA = Math.Max(
                     PointsA,

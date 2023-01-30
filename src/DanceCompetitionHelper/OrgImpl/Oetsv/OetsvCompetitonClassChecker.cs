@@ -56,6 +56,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             }
 
             var higherCompClass = Classes.GetHigherClassifications(
+                forCompetitionClass.Discipline,
+                forCompetitionClass.AgeClass,
+                forCompetitionClass.AgeGroup,
                 forCompetitionClass.Class);
 
             foreach (var curChkClass in checkCompetitionClasses)

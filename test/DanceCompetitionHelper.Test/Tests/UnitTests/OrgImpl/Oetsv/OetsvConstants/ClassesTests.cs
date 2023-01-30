@@ -43,21 +43,38 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConstan
 
         [Test]
         // -------------
-        [TestCase(Classes.Amateur, null)]
-        [TestCase(Classes.D, Classes.C)]
-        [TestCase(Classes.C, Classes.B)]
-        [TestCase(Classes.B, Classes.A)]
+        [TestCase(Disciplines.Sta, AgeClasses.Adult, AgeGroups.GroupNone, Classes.Amateur, null)]
+        [TestCase(Disciplines.Sta, AgeClasses.Adult, AgeGroups.GroupNone, Classes.D, Classes.C)]
+        [TestCase(Disciplines.Sta, AgeClasses.Adult, AgeGroups.GroupNone, Classes.C, Classes.B)]
+        [TestCase(Disciplines.Sta, AgeClasses.Adult, AgeGroups.GroupNone, Classes.B, Classes.A)]
         // -------------
-        [TestCase(null, null)]
-        [TestCase("", null)]
-        [TestCase("dummy", null)]
+        [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group1, Classes.D, Classes.C)]
+        [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group1, Classes.C, Classes.B)]
+        [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group1, Classes.B, Classes.S)]
+        [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group1, Classes.A, null)]
+        // -------------
+        [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group4, Classes.D, null)]
+        [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group4, Classes.C, null)]
+        [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group4, Classes.B, null)]
+        [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group4, Classes.A, null)]
+        [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group4, Classes.S, null)]
+        // -------------
+        [TestCase(null, null, null, null, null)]
+        [TestCase("", "", "", "", null)]
+        [TestCase("dummy", "dummy", "dummy", "dummy", null)]
         public void GetHigherClassifications_Test(
-            string input,
+            string forDiscepline,
+            string forAgeClass,
+            string forAgeGroup,
+            string forClass,
             string expected)
         {
             Assert.That(
                 Classes.GetHigherClassifications(
-                    input),
+                    forDiscepline,
+                    forAgeClass,
+                    forAgeGroup,
+                    forClass),
                 Is.EqualTo(
                     expected));
 

@@ -40,6 +40,28 @@
         }
 
         public static void AddToBucket<TKey, TVal>(
+            this Dictionary<TKey, List<TVal>> useDict,
+            TKey byKey,
+            IEnumerable<TVal> addValues,
+            bool addOnce = false)
+            where TKey : notnull
+        {
+            if (useDict == null
+                || byKey == null)
+            {
+                return;
+            }
+
+            foreach (var curVal in addValues ?? Enumerable.Empty<TVal>())
+            {
+                useDict.AddToBucket(
+                    byKey,
+                    curVal,
+                    addOnce);
+            }
+        }
+
+        public static void AddToBucket<TKey, TVal>(
             this Dictionary<TKey, HashSet<TVal>> useDict,
             TKey byKey,
             TVal addValue)
@@ -64,6 +86,26 @@
             {
                 foundHashSet.Add(
                     addValue);
+            }
+        }
+
+        public static void AddToBucket<TKey, TVal>(
+            this Dictionary<TKey, HashSet<TVal>> useDict,
+            TKey byKey,
+            IEnumerable<TVal> addValues)
+            where TKey : notnull
+        {
+            if (useDict == null
+                || byKey == null)
+            {
+                return;
+            }
+
+            foreach (var curVal in addValues ?? Enumerable.Empty<TVal>())
+            {
+                useDict.AddToBucket(
+                    byKey,
+                    curVal);
             }
         }
     }

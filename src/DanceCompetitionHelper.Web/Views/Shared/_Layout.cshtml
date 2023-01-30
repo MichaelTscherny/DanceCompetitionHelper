@@ -4,6 +4,7 @@
     var backToCompClass = ViewData["BackTo" + CompetitionClassController.RefName] as Guid?;
     var showParticipants = ViewData["Show" + ParticipantController.RefName] as Guid?;
     var showMultipleStarters = ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] as Guid?;
+    var showPossiblePromotions = ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] as Guid?;
 }
 
 <!DOCTYPE html>
@@ -54,6 +55,16 @@
                                    asp-controller="@CompetitionClassController.RefName"
                                    asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
                                    asp-route-id="@showMultipleStarters">Multiple Starters</a>
+                            </li>
+                        }
+
+                        @if (showPossiblePromotions != null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area=""
+                                   asp-controller="@CompetitionClassController.RefName"
+                                   asp-action="@nameof(CompetitionClassController.ShowPossiblePromotions)"
+                                   asp-route-id="@showPossiblePromotions">Promotions</a>
                             </li>
                         }
 

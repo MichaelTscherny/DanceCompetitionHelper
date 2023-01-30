@@ -32,6 +32,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
 
             return View(
                 new ParticipantOverviewViewModel()
@@ -55,6 +56,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
 
             return View(
                 nameof(Index),
@@ -91,6 +93,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
 
             var helpCompName = string.Empty;
 
