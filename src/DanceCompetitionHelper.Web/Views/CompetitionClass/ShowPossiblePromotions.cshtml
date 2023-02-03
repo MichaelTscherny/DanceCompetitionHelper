@@ -10,8 +10,7 @@
 @{
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
-    var multipleStartersCount = Model.MultipleStarters?.Count() ?? 0;
-    var possiblePromotionsCount = Model.PossiblePromotions?.Count() ?? 0;
+    var possiblePromotionsCount = Model.ParticipantPromotionInfo.Count();
 
     ViewData["Title"] = string.Format(
         "{0} Possible Promotions of {1}",
@@ -19,7 +18,7 @@
         compInfoStr);
 
     var displayInfoCompClasses = new List<(string ClassName, Guid ClassId)>(
-        Model.MultipleStarters
+        Model.ParticipantPromotionInfo
             ?.SelectMany(
                 x => x.CompetitionClasses)
             .OrderBy(
@@ -29,49 +28,20 @@
                     x.CompetitionClassId))
             .Distinct()
             ?? Enumerable.Empty<(string, Guid)>());
-
-    var participantsClasses = new Dictionary<Guid, List<CompetitionClass>>();
-    var isSameParticipant = new Dictionary<Guid, Guid>();
-
-    foreach (var curPossPromotion in Model.PossiblePromotions ?? Enumerable.Empty<Participant>())
-    {
-        participantsClasses.AddToBucket(
-            curPossPromotion.ParticipantId,
-            curPossPromotion.CompetitionClass);
-    }
-
-    foreach (var curMultiStarter in Model.MultipleStarters ?? Enumerable.Empty<MultipleStarter>())
-    {
-        var firstPart = Guid.Empty;
-        foreach(var curPart in curMultiStarter.Participants)
-        {
-            if(firstPart == Guid.Empty)
-            {
-                firstPart = curPart.ParticipantId;
-            }
-
-            isSameParticipant[curPart.ParticipantId] = firstPart;
-        }
-
-        foreach(var curInfo in curMultiStarter.GetCompetitionClassesOfParticipants())
-        {
-            participantsClasses.AddToBucket(
-                firstPart,
-                curInfo.CompetitionClass,
-                true);
-        }
-    }
+    var displayInfoCompClassesIds = new List<Guid>(
+        displayInfoCompClasses.Select(
+            x => x.ClassId));    
 }
 
 <div class="text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
 
-    @foreach (var curPossPromotion in Model.PossiblePromotions ?? Enumerable.Empty<Participant>())
+    @foreach (var curPossPromotion in Model.ParticipantPromotionInfo ?? Enumerable.Empty<ParticipantPromotionInfo>())
     {
         <div class="table-responsive-xxl">
             @{
-                var curPartClasses = participantsClasses[curPossPromotion.ParticipantId];
+                // var curPartClasses = participantsClasses[curPossPromotion.ParticipantId];
             }
             <table class="table table-striped table-hover">
                 <thead>
@@ -80,7 +50,7 @@
                             Name
                         </th>
 
-                        @foreach (var curClass in curPartClasses)
+                        @foreach (var curClass in curPossPromotion.GetCompetitionClassOrderedBy(displayInfoCompClassesIds))
                         {
                             <th>
                                 @curClass.GetCompetitionClassName()
@@ -94,10 +64,10 @@
                             @(curPossPromotion.GetNames())
                         </td>
 
-                        @foreach (var curDisplayInfo in curPartClasses)
+                        @foreach (var curClass in curPossPromotion.GetCompetitionClassOrderedBy(displayInfoCompClassesIds))
                         {
                             <td>
-                                 @curDisplayInfo.OrgClassId
+                                @curClass.OrgClassId
                             </td>
                         }
                     </tr>
@@ -108,7 +78,7 @@
                             Name
                         </th>
 
-                        @foreach (var curClass in curPartClasses)
+                        @foreach (var curClass in curPossPromotion.GetCompetitionClassOrderedBy(displayInfoCompClassesIds))
                         {
                             <th>
                                 @curClass.GetCompetitionClassName()
