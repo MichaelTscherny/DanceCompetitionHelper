@@ -68,6 +68,9 @@ namespace DanceCompetitionHelper.Web.Models
         [FromForm]
         [Range(0, int.MaxValue)]
         public int OrgStartsPartA { get; set; }
+        [FromForm]
+        [Range(0, int.MaxValue)]
+        public int? MinStartsForPromotionPartA { get; set; }
 
         [FromForm]
         [Range(0, int.MaxValue)]
@@ -75,6 +78,9 @@ namespace DanceCompetitionHelper.Web.Models
         [FromForm]
         [Range(0, int.MaxValue)]
         public int? OrgStartsPartB { get; set; }
+        [FromForm]
+        [Range(0, int.MaxValue)]
+        public int? MinStartsForPromotionPartB { get; set; }
 
         [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]

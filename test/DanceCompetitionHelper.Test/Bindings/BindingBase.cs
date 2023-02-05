@@ -1,7 +1,8 @@
-﻿using DanceCompetitionHelper.Database.Test.Pocos;
+﻿using DanceCompetitionHelper.Database;
+using DanceCompetitionHelper.Database.Test.Pocos;
 using TestHelper.Extensions;
 
-namespace DanceCompetitionHelper.Database.Test.Bindings
+namespace DanceCompetitionHelper.Test.Bindings
 {
     public abstract class BindingBase
     {

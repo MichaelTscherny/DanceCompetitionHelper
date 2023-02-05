@@ -12,7 +12,15 @@
         public int MinStartsForPromotion { get; set; }
         public int MinPointsForPromotion { get; set; }
         public int PointsForFirst { get; set; }
+
+        public int CountParticipants { get; set; }
+        public int ExtraPartByWinning { get; set; }
+        public string? ExtraPartByWinningInfo { get; set; }
+        public int ExtraPartByPromotion { get; set; }
+        public string? ExtraPartByPromotionInfo { get; set; }
+
         public int ExtraManualStarter { get; set; }
+
         public string? Comment { get; set; }
 
         public bool Ignore { get; set; }

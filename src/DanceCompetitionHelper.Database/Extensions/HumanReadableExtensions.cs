@@ -27,5 +27,28 @@ namespace DanceCompetitionHelper.Database.Extensions
                             x => x.OrgClassId)
                         .Select(
                             x => x.GetCompetitionClassName()));
+
+        public static string GetStartNumber(
+            this IEnumerable<Participant>? forParticipants) =>
+                string.Join(
+                    ", ",
+                    forParticipants
+                        ?.Select(
+                            x => x.StartNumber)
+                        ?.OrderBy(
+                            x => x)
+                        ?.Select(
+                            x => string.Format(
+                                "#{0}",
+                                x))
+                        ?? Enumerable.Empty<string>());
+
+        public static string GetNames(
+            this Participant? forParticipant) =>
+                string.Format(
+                        "{0} {1}",
+                        forParticipant?.NamePartA ?? string.Empty,
+                        forParticipant?.NamePartB ?? string.Empty);
+
     }
 }

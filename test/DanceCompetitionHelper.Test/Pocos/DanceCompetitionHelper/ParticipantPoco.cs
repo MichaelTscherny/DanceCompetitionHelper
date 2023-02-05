@@ -13,9 +13,11 @@
         public string? OrgIdClub { get; set; }
         public int OrgPointsPartA { get; set; }
         public int OrgStartsPartA { get; set; }
+        public int? MinStartsForPromotionPartA { get; set; }
 
         public int? OrgPointsPartB { get; set; }
         public int? OrgStartsPartB { get; set; }
+        public int? MinStartsForPromotionPartB { get; set; }
         public bool Ignore { get; set; }
 
         public bool MultipleStarts { get; set; }

@@ -29,7 +29,12 @@ Scenario: None
     Then none multiple starts exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName |
         | Test-Comp-01    |
-
+    And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName | CompetitionClassName | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Sen 1 Sta D          | 2                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta D          | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 1 Sta C          | 2                 | 1                  | Sen 1 Sta D (Class-01) | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta C          | 2                 | 1                  | Sen 2 Sta D (Class-02) | 0                    |                          | 0                  |
     
 Scenario: One in Sen Sta D
     Given following DanceCompetitionHelper "DanceCompHelper"
@@ -60,6 +65,12 @@ Scenario: One in Sen Sta D
         | CompetitionName | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub | CompetitionClassName | StartNumber |
         | Test-Comp-01    | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 1 Sta D          | 1           |
         | Test-Comp-01    | Dancer 01-A | 1          | Dancer 01-B | 2          | Test-Club-01 | 10        | Sen 2 Sta D          | 3           |
+    And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName | CompetitionClassName | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Sen 1 Sta D          | 2                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta D          | 2                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 1 Sta C          | 2                 | 1                  | Sen 1 Sta D (Class-01) | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta C          | 2                 | 1                  | Sen 2 Sta D (Class-02) | 0                    |                          | 0                  |
 
 Scenario: One in Sen Sta D and C
     Given following DanceCompetitionHelper "DanceCompHelper"
@@ -96,3 +107,9 @@ Scenario: One in Sen Sta D and C
         # Sen x Sta C
         | Test-Comp-01    | Dancer 08-A | 15         | Dancer 08-B | 16         | Test-Club-05 | 14        | Sen 1 Sta C          | 9           |
         | Test-Comp-01    | Dancer 08-A | 15         | Dancer 08-B | 16         | Test-Club-05 | 14        | Sen 2 Sta C          | 9           |
+    And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName | CompetitionClassName | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Sen 1 Sta D          | 2                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta D          | 2                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 1 Sta C          | 3                 | 1                  | Sen 1 Sta D (Class-01) | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta C          | 3                 | 1                  | Sen 2 Sta D (Class-02) | 0                    |                          | 0                  |

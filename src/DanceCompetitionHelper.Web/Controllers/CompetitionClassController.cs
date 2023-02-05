@@ -31,6 +31,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
 
             return View(
                 new CompetitionClassOverviewViewModel()
@@ -53,6 +54,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
 
             return View(
                 nameof(Index),
@@ -262,6 +264,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
 
             return View(
                 new ShowMultipleStartersOverviewViewModel()
@@ -270,7 +273,50 @@ namespace DanceCompetitionHelper.Web.Controllers
                     MultipleStarters = _danceCompHelper
                         .GetMultipleStarter(
                             foundCompId.Value)
-                        .ToList()
+                        .ToList(),
+                });
+        }
+
+        public IActionResult ShowPossiblePromotions(
+            Guid id)
+        {
+            var foundCompId = _danceCompHelper.FindCompetition(
+                id);
+
+            if (foundCompId == null)
+            {
+                return NotFound();
+            }
+
+            var helpComp = _danceCompHelper.GetCompetition(
+                foundCompId.Value);
+
+            ViewData["Show" + ParticipantController.RefName] = foundCompId;
+            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+
+            return View(
+                new ShowPossiblePromotionsViewModel()
+                {
+                    Competition = helpComp,
+                    PossiblePromotions = _danceCompHelper
+                        .GetParticipants(
+                            foundCompId.Value,
+                            null,
+                            true)
+                        .Where(
+                            x => x.DisplayInfo != null
+                            && x.DisplayInfo.PromotionInfo != null
+                            && x.DisplayInfo.PromotionInfo.PossiblePromotion)
+                        .OrderBy(
+                            x => x.NamePartA)
+                        .ThenBy(
+                            x => x.NamePartB)
+                        .ToList(),
+                    MultipleStarters = _danceCompHelper
+                        .GetMultipleStarter(
+                            foundCompId.Value)
+                        .ToList(),
                 });
         }
     }

@@ -5,7 +5,17 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 {
     public class OetsvCompetitonClassChecker : ICompetitonClassChecker
     {
+        /*
+        private readonly ILogger<OetsvCompetitonClassChecker> _logger;
 
+        public OetsvCompetitonClassChecker(
+            ILogger<OetsvCompetitonClassChecker> logger)
+        {
+            _logger = logger
+                ?? throw new ArgumentNullException(
+                    nameof(logger));
+        }
+        */
 
         public IEnumerable<CompetitionClass> GetRelatedCompetitionClassesForPoints(
             CompetitionClass baseCompetitionClass,
@@ -35,32 +45,33 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             }
         }
 
-        public CompetitionClass? GetHigherClassifications(
+        public IEnumerable<CompetitionClass> GetHigherClassifications(
             CompetitionClass forCompetitionClass,
             IEnumerable<CompetitionClass> checkCompetitionClasses)
         {
             if (forCompetitionClass == null
                 || checkCompetitionClasses == null)
             {
-                return null;
+                yield break;
             }
 
             var higherCompClass = Classes.GetHigherClassifications(
+                forCompetitionClass.Discipline,
+                forCompetitionClass.AgeClass,
+                forCompetitionClass.AgeGroup,
                 forCompetitionClass.Class);
 
             foreach (var curChkClass in checkCompetitionClasses)
             {
-                if (curChkClass.CompetitionClassId == forCompetitionClass.CompetitionClassId
+                if (curChkClass.CompetitionId == forCompetitionClass.CompetitionId
                     && curChkClass.Discipline == forCompetitionClass.Discipline
                     && curChkClass.AgeClass == forCompetitionClass.AgeClass
+                    && curChkClass.AgeGroup == forCompetitionClass.AgeGroup
                     && curChkClass.Class == higherCompClass)
                 {
-                    return curChkClass;
+                    yield return curChkClass;
                 }
             }
-
-            return null;
-
         }
     }
 }

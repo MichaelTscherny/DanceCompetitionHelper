@@ -32,6 +32,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
 
             return View(
                 new ParticipantOverviewViewModel()
@@ -55,6 +56,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
 
             return View(
                 nameof(Index),
@@ -91,6 +93,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
 
             var helpCompName = string.Empty;
 
@@ -142,8 +145,10 @@ namespace DanceCompetitionHelper.Web.Controllers
                      createParticipant.OrgIdClub,
                      createParticipant.OrgPointsPartA,
                      createParticipant.OrgStartsPartA,
+                     createParticipant.MinStartsForPromotionPartA,
                      createParticipant.OrgPointsPartB,
                      createParticipant.OrgStartsPartB,
+                     createParticipant.MinStartsForPromotionPartB,
                      createParticipant.Comment,
                      createParticipant.Ignore);
 
@@ -200,8 +205,10 @@ namespace DanceCompetitionHelper.Web.Controllers
                     OrgIdClub = foundParticipant.OrgIdClub,
                     OrgPointsPartA = foundParticipant.OrgPointsPartA,
                     OrgStartsPartA = foundParticipant.OrgStartsPartA,
+                    MinStartsForPromotionPartA = foundParticipant.MinStartsForPromotionPartA,
                     OrgPointsPartB = foundParticipant.OrgPointsPartB,
                     OrgStartsPartB = foundParticipant.OrgStartsPartB,
+                    MinStartsForPromotionPartB = foundParticipant.MinStartsForPromotionPartB,
                     Comment = foundParticipant.Comment,
                     Ignore = foundParticipant.Ignore,
 
@@ -241,8 +248,10 @@ namespace DanceCompetitionHelper.Web.Controllers
                     editParticipant.OrgIdClub,
                     editParticipant.OrgPointsPartA,
                     editParticipant.OrgStartsPartA,
+                    editParticipant.MinStartsForPromotionPartA,
                     editParticipant.OrgPointsPartB,
                     editParticipant.OrgStartsPartB,
+                    editParticipant.MinStartsForPromotionPartB,
                     editParticipant.Comment,
                     editParticipant.Ignore);
 

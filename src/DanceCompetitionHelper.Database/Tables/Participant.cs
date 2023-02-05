@@ -58,11 +58,15 @@ namespace DanceCompetitionHelper.Database.Tables
         public int OrgPointsPartA { get; set; }
         [Range(0, int.MaxValue)]
         public int OrgStartsPartA { get; set; }
+        [Range(0, int.MaxValue)]
+        public int? MinStartsForPromotionPartA { get; set; }
 
         [Range(0, int.MaxValue)]
         public int? OrgPointsPartB { get; set; }
         [Range(0, int.MaxValue)]
         public int? OrgStartsPartB { get; set; }
+        [Range(0, int.MaxValue)]
+        public int? MinStartsForPromotionPartB { get; set; }
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }

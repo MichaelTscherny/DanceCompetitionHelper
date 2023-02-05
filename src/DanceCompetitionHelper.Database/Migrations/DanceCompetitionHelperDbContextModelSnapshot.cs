@@ -304,6 +304,12 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("Row last modified by");
 
+                    b.Property<int?>("MinStartsForPromotionPartA")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("MinStartsForPromotionPartB")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("NamePartA")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -394,6 +400,12 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("Row last modified by");
+
+                    b.Property<int?>("MinStartsForPromotionPartA")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("MinStartsForPromotionPartB")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("NamePartA")
                         .IsRequired()
