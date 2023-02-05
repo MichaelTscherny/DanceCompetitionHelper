@@ -17,16 +17,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Extensions\**" />
-    <Compile Remove="ValueRetriever\**" />
-    <EmbeddedResource Remove="Extensions\**" />
-    <EmbeddedResource Remove="ValueRetriever\**" />
-    <None Remove="Extensions\**" />
-    <None Remove="ValueRetriever\**" />
-    <SpecFlowFeatureFiles Remove="Extensions\**" />
-    <SpecFlowFeatureFiles Remove="ValueRetriever\**" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Extensions\**" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="ValueRetriever\**" />
+    <Compile Remove="Tests\SpecFlow\**" />
+    <EmbeddedResource Remove="Tests\SpecFlow\**" />
+    <None Remove="Tests\SpecFlow\**" />
+    <SpecFlowFeatureFiles Remove="Tests\SpecFlow\**" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,10 +48,6 @@
     <ProjectReference Include="..\..\src\DanceCompetitionHelper.Database\DanceCompetitionHelper.Database.csproj" />
     <ProjectReference Include="..\..\src\DanceCompetitionHelper\DanceCompetitionHelper.csproj" />
     <ProjectReference Include="..\TestHelper\TestHelper.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Tests\SpecFlow\" />
   </ItemGroup>
 
 </Project>

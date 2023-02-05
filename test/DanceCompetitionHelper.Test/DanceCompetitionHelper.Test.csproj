@@ -17,13 +17,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\DanceCompHelperBasics.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\Competition.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\CompetitionClass.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\Participants.feature.cs" />
   </ItemGroup>
 
   <ItemGroup>

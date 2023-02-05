@@ -48,8 +48,8 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         public CheckPromotionInfo CheckParticipantPromotion(Participant participant)
         {
-            var allClasses = new List<CompetitionClass>();
             var usePartCompClass = participant.CompetitionClass;
+            var allClasses = new List<CompetitionClass>();
 
             if (_multiStarterCompClassesByParticipantId.TryGetValue(
                 participant.ParticipantId,
@@ -60,7 +60,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         usePartCompClass,
                         foundAllStartingClasses));
             }
-            else
+
+            if (allClasses.Contains(
+                usePartCompClass) == false)
             {
                 allClasses.Add(
                     usePartCompClass);

@@ -296,16 +296,28 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
 
             return View(
-                new ShowPossiblePromotionsViewModel(
-                    helpComp,
-                    _danceCompHelper
+                new ShowPossiblePromotionsViewModel()
+                {
+                    Competition = helpComp,
+                    PossiblePromotions = _danceCompHelper
                         .GetParticipants(
                             foundCompId.Value,
                             null,
-                            true),
-                    _danceCompHelper
+                            true)
+                        .Where(
+                            x => x.DisplayInfo != null
+                            && x.DisplayInfo.PromotionInfo != null
+                            && x.DisplayInfo.PromotionInfo.PossiblePromotion)
+                        .OrderBy(
+                            x => x.NamePartA)
+                        .ThenBy(
+                            x => x.NamePartB)
+                        .ToList(),
+                    MultipleStarters = _danceCompHelper
                         .GetMultipleStarter(
-                            foundCompId.Value)));
+                            foundCompId.Value)
+                        .ToList(),
+                });
         }
     }
 }

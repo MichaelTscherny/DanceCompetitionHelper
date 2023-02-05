@@ -10,50 +10,118 @@
 @{
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
-    var possiblePromotionsCount = Model.ParticipantPromotionInfo.Count();
+    var possiblePromotionsCount = Model.PossiblePromotions?.Count() == 0;
 
     ViewData["Title"] = string.Format(
         "{0} Possible Promotions of {1}",
         possiblePromotionsCount,
         compInfoStr);
 
+    var helpIncludedClasses = new List<CompetitionClass>();
+    var maxDisplayClasses = 0;
+
+    foreach(var curPossibleProm in Model.PossiblePromotions
+        ?.Where(
+            x => x.DisplayInfo != null
+            && x.DisplayInfo.PromotionInfo != null))
+
+    {
+        var curClasses = curPossibleProm.DisplayInfo.PromotionInfo.IncludedCompetitionClasses;
+
+        maxDisplayClasses = Math.Max(
+            maxDisplayClasses,
+            curClasses.Count);
+
+        helpIncludedClasses.AddRange(
+            curClasses);
+    }
+
     var displayInfoCompClasses = new List<(string ClassName, Guid ClassId)>(
-        Model.ParticipantPromotionInfo
-            ?.SelectMany(
-                x => x.CompetitionClasses)
+        helpIncludedClasses
             .OrderBy(
                 x => x.OrgClassId)
             .Select(
-                x => (x.GetCompetitionClassName(), 
+                x => (x.GetCompetitionClassName(),
                     x.CompetitionClassId))
-            .Distinct()
-            ?? Enumerable.Empty<(string, Guid)>());
+            .Distinct());
     var displayInfoCompClassesIds = new List<Guid>(
         displayInfoCompClasses.Select(
-            x => x.ClassId));    
+            x => x.ClassId));
+
+    var emptyHelper = string.Join(
+        "&nbsp;",
+        Enumerable.Repeat(
+            string.Empty,
+            displayInfoCompClasses
+                .Select(
+                    x => x.ClassName.Length)
+                .Max()));
+
+    var columnWith = 100 / (maxDisplayClasses + 1);
+    var partInfoByCompetitionClass = new Dictionary<Guid, Dictionary<Guid, Participant>>();
+
+    // helper to get the correct start number for a competition class
+    foreach(var curMiltiStarter in Model.MultipleStarters ?? Enumerable.Empty<MultipleStarter>())
+    {
+        foreach (var curPart in curMiltiStarter.Participants)
+        {
+            var usePartId = curPart.ParticipantId;
+            if (partInfoByCompetitionClass.TryGetValue(
+                usePartId,
+                out var byClassId) == false)
+            {
+                byClassId = new Dictionary<Guid, Participant>();
+                partInfoByCompetitionClass[usePartId] = byClassId;
+            }
+
+            foreach (var curPartClassInfos in curMiltiStarter.Participants)
+            {
+                byClassId[curPartClassInfos.CompetitionClassId] = curPartClassInfos;
+            }
+        }
+    }
 }
 
 <div class="text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
 
-    @foreach (var curPossPromotion in Model.ParticipantPromotionInfo ?? Enumerable.Empty<ParticipantPromotionInfo>())
+    @foreach (var curPossPromotion in Model.PossiblePromotions ?? Enumerable.Empty<Participant>())
     {
         <div class="table-responsive-xxl">
             @{
-                // var curPartClasses = participantsClasses[curPossPromotion.ParticipantId];
+                var curClassesByClassId = curPossPromotion.DisplayInfo?.PromotionInfo?.IncludedCompetitionClasses
+                        .ToDictionary(
+                            x => x.CompetitionClassId) 
+                            ?? new Dictionary<Guid, CompetitionClass>();
             }
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
-                        <th>
+                        <th style="width: @columnWith%">
                             Name
                         </th>
 
-                        @foreach (var curClass in curPossPromotion.GetCompetitionClassOrderedBy(displayInfoCompClassesIds))
+                        @{
+                            var displayedColumns = 0;
+                        }
+                        @foreach (var curClassId in displayInfoCompClassesIds)
                         {
-                            <th>
-                                @curClass.GetCompetitionClassName()
+                            if (curClassesByClassId.TryGetValue(
+                                curClassId,
+                                out var curClass))
+                            {
+                                displayedColumns++;
+                                <th style="width: @columnWith%">
+                                    @curClass.GetCompetitionClassName()
+                                </th>
+                            }
+                        }
+                        
+                        @for (var leftColumns = displayedColumns; leftColumns < maxDisplayClasses; leftColumns++)
+                        {
+                            <th style="width: @columnWith%">
+                                @Html.Raw(emptyHelper)
                             </th>
                         }
                     </tr>
@@ -64,28 +132,111 @@
                             @(curPossPromotion.GetNames())
                         </td>
 
-                        @foreach (var curClass in curPossPromotion.GetCompetitionClassOrderedBy(displayInfoCompClassesIds))
+                        @{
+                            displayedColumns = 0;
+                        }
+                        @foreach (var curClassId in displayInfoCompClassesIds)
+                        {
+                            if (curClassesByClassId.TryGetValue(
+                                curClassId,
+                                out var curClass))
+                            {
+                                var useStartNumber = -1;
+
+                                if (partInfoByCompetitionClass.TryGetValue(
+                                    curPossPromotion.ParticipantId,
+                                    out var compClassesByPartId))
+                                {
+                                    if (compClassesByPartId.TryGetValue(
+                                        curClassId,
+                                        out var foundPart))
+                                    {
+                                        useStartNumber = foundPart.StartNumber;
+                                    }
+                                }
+
+                                displayedColumns++;
+
+                                <td>
+                                    #@useStartNumber
+                                    / @curClass.MinPointsForPromotion
+                                    / @curClass.MinStartsForPromotion
+                                </td>
+                            }
+                        }
+
+                        @for (var leftColumns = displayedColumns; leftColumns < maxDisplayClasses; leftColumns++)
                         {
                             <td>
-                                @curClass.OrgClassId
+                                @Html.Raw(emptyHelper)
                             </td>
                         }
                     </tr>
-                </tbody>
-                <tfoot>
                     <tr>
-                        <th>
-                            Name
-                        </th>
+                        <td class="text-nowrap">
+                            A: @curPossPromotion.OrgPointsPartA
+                            / @curPossPromotion.OrgStartsPartA
+                        </td>
 
-                        @foreach (var curClass in curPossPromotion.GetCompetitionClassOrderedBy(displayInfoCompClassesIds))
+                        @{
+                            displayedColumns = 0;
+                        }
+                        @foreach (var curClassId in displayInfoCompClassesIds)
                         {
-                            <th>
-                                @curClass.GetCompetitionClassName()
-                            </th>
+                            if (curClassesByClassId.TryGetValue(
+                                curClassId,
+                                out var curClass))
+                            {
+                                displayedColumns++;
+
+                                <td>
+                                    /
+                                </td>
+                            }
+                        }
+
+                        @for (var leftColumns = displayedColumns; leftColumns < maxDisplayClasses; leftColumns++)
+                        {
+                            <td>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </td>
                         }
                     </tr>
-                </tfoot>
+                    @if (curPossPromotion.OrgPointsPartB.HasValue)
+                    {
+                        <tr>
+                            <td class="text-nowrap">
+                                B: @curPossPromotion.OrgPointsPartB
+                                / @curPossPromotion.OrgStartsPartB
+                            </td>
+
+                            @{
+                                displayedColumns = 0;
+                            }
+                            @foreach (var curClassId in displayInfoCompClassesIds)
+                            {
+                                if (curClassesByClassId.TryGetValue(
+                                    curClassId,
+                                    out var curClass))
+                                {
+                                    displayedColumns++;
+
+                                    <td>
+                                        /
+                                    </td>
+                                }
+                            }
+    
+                            @for (var leftColumns = displayedColumns; leftColumns < maxDisplayClasses; leftColumns++)
+                            {
+                                <td>
+                                    @Html.Raw(emptyHelper)
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+                <!-- NO <tfoot> ON PURPOSE! -->
             </table>
         </div>
     }
@@ -101,4 +252,3 @@
         </div>
     </div>
 </div>
-
