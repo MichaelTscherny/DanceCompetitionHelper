@@ -161,6 +161,13 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public IActionResult ShowImport()
         {
+            return View(
+                new DoImportViewModel());
+        }
+
+        public IActionResult DoImport(
+            DoImportViewModel doImportView)
+        {
             return View();
         }
 

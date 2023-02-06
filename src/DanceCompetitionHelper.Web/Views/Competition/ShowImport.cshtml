@@ -1,32 +1,63 @@
 ﻿@using DanceCompetitionHelper.Database.Enum;
 @using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Enum;
+
+@model DoImportViewModel
 
 @{
     var isCreate = Model.CompetitionId.HasValue == false;
 
     ViewData["Title"] = "Import new Competition";
-
-    var formAction = "DoImport";
 }
 
 <div class="container text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
-    <form asp-action="@formAction" method="post"
+    @if (string.IsNullOrEmpty(Model.Errors) == false)
+    {
+        <div class="row py-2 text-danger">
+            <div class="col-md">
+                @Model.Errors
+            </div>
+        </div>
+    }
+
+    <form asp-action="@nameof(CompetitionController.DoImport)" method="post"
           class="form-horizontal needs-validation"
           enctype="multipart/form-data"
           role="form">
+
+        <input asp-for="CompetitionId" />
+        <input asp-for="ImportType" value="@nameof(ImportTypeEnum.Url)" />
+        <input asp-for="Organization" value="@nameof(OrganizationEnum.Oetsv)" />
         
-        <div class="row d-flex justify-content-center py-1">
-            <div class="col">
+        <div class="row row-cols-4 py-1">
+            <div class="col-md text-end">
+                ÖTSV ID
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgCompetitionId"
+                       class="form-control"
+                       placeholder="ÖTSV ID"
+                       style="width: 100%" />
+                <span asp-validation-for="OrgCompetitionId"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgCompetitionId"
+                       class="control-label">
+                    ÖTSV ID (e.g. 1234)
+                </label>
+            </div>
+            <div class="col-md text-start">
                 <button class="btn btn-primary px-lg-4" type="submit">
-                    Save
+                    Create
                 </button>
-                &nbsp;
-                <a asp-action="Index" class="btn btn-secondary px-lg-4">
-                    Cancel
-                </a>
             </div>
         </div>
+
+        <hr />
+        
     </form>
 </div>
