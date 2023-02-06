@@ -10,7 +10,7 @@
 @{
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
-    var possiblePromotionsCount = Model.PossiblePromotions?.Count() == 0;
+    var possiblePromotionsCount = Model.PossiblePromotions?.Count() ?? 0;
 
     ViewData["Title"] = string.Format(
         "{0} Possible Promotions of {1}",
@@ -23,10 +23,12 @@
     foreach(var curPossibleProm in Model.PossiblePromotions
         ?.Where(
             x => x.DisplayInfo != null
-            && x.DisplayInfo.PromotionInfo != null))
+            && x.DisplayInfo.PromotionInfo != null)
+        ?? Enumerable.Empty<Participant>())
 
     {
-        var curClasses = curPossibleProm.DisplayInfo.PromotionInfo.IncludedCompetitionClasses;
+        var curClasses = curPossibleProm?.DisplayInfo?.PromotionInfo?.IncludedCompetitionClasses 
+            ?? new List<CompetitionClass>();
 
         maxDisplayClasses = Math.Max(
             maxDisplayClasses,
@@ -48,15 +50,7 @@
         displayInfoCompClasses.Select(
             x => x.ClassId));
 
-    var emptyHelper = string.Join(
-        "&nbsp;",
-        Enumerable.Repeat(
-            string.Empty,
-            displayInfoCompClasses
-                .Select(
-                    x => x.ClassName.Length)
-                .Max()));
-
+    var emptyHelper = "&nbsp;";
     var columnWith = 100 / (maxDisplayClasses + 1);
     var partInfoByCompetitionClass = new Dictionary<Guid, Dictionary<Guid, Participant>>();
 
@@ -154,13 +148,21 @@
                                         useStartNumber = foundPart.StartNumber;
                                     }
                                 }
+                                else
+                                {
+                                    if(curClassId == curPossPromotion.CompetitionClassId)
+                                    {
+                                        useStartNumber = curPossPromotion.StartNumber;
+                                    }
+                                }
 
                                 displayedColumns++;
 
                                 <td>
+                                    @curClass.MinPointsForPromotion
+                                    / @curClass.MinStartsForPromotion<br>
                                     #@useStartNumber
-                                    / @curClass.MinPointsForPromotion
-                                    / @curClass.MinStartsForPromotion
+                                    : +@curClass.PointsForFirst / +1
                                 </td>
                             }
                         }
