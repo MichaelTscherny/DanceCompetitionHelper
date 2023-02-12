@@ -21,10 +21,17 @@ namespace DanceCompetitionHelper.Database.Tables
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Comment("Ref to " + nameof(Tables.Competition))]
-        public Guid CompetitionId { get; set; }
+        public Guid? CompetitionId { get; set; }
 
         [ForeignKey(nameof(CompetitionId))]
-        public Competition Competition { get; set; } = default!;
+        public Competition? Competition { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Comment("Ref to " + nameof(AdjudicatorPanel))]
+        public Guid? AdjudicatorPanelId { get; set; }
+
+        [ForeignKey(nameof(AdjudicatorPanelId))]
+        public AdjudicatorPanel? AdjudicatorPanel { get; set; }
 
         [Required]
         [Range(0, int.MaxValue)]

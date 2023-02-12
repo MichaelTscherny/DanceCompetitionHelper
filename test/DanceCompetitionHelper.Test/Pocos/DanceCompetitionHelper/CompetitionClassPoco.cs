@@ -5,6 +5,7 @@
         public string CompetitionName { get; set; } = default!;
         public string OrgClassId { get; set; } = default!;
         public string CompetitionClassName { get; set; } = default!;
+        public string AdjudicatorPanelName { get; set; } = default!;
         public string? Discipline { get; set; }
         public string? AgeClass { get; set; }
         public string? AgeGroup { get; set; }

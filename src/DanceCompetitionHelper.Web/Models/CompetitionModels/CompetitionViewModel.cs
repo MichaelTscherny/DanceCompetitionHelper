@@ -3,7 +3,7 @@ using DanceCompetitionHelper.Database.Enum;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
-namespace DanceCompetitionHelper.Web.Models
+namespace DanceCompetitionHelper.Web.Models.CompetitionModels
 {
     public class CompetitionViewModel
     {

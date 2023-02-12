@@ -28,6 +28,14 @@ namespace DanceCompetitionHelper.Database.Tables
         [ForeignKey(nameof(CompetitionId))]
         public Competition Competition { get; set; } = default!;
 
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Comment("Ref to " + nameof(AdjudicatorPanel))]
+        public Guid AdjudicatorPanelId { get; set; }
+
+        [ForeignKey(nameof(AdjudicatorPanelId))]
+        public AdjudicatorPanel AdjudicatorPanel { get; set; } = default!;
+
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]
         public string CompetitionClassName { get; set; } = default!;
 

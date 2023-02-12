@@ -2,6 +2,7 @@
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
 using DanceCompetitionHelper.Info;
+using DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper;
 
 namespace DanceCompetitionHelper.Test.Bindings
 {
@@ -182,6 +183,158 @@ namespace DanceCompetitionHelper.Test.Bindings
                             "{0}: {1}",
                             curChk,
                             nameof(curChk.MinPointsForPromotion));
+                    });
+                }
+            }
+            finally
+            {
+                dbTrans.Rollback();
+            }
+        }
+
+        [Then(@"following Adjudicator Panels exists in ""([^""]*)""")]
+        public void ThenFollowingAdjudicatorPanelsExistsIn(
+            string danceCompHelperDb,
+            Table table)
+        {
+            var checkAdjPanels = table.CreateSet<AdjudicatorPanelPoco>();
+            var useDb = GetDanceCompetitionHelperDbContext(
+                danceCompHelperDb);
+
+            using var dbTrans = useDb.BeginTransaction();
+            try
+            {
+                foreach (var curChk in checkAdjPanels)
+                {
+                    var foundComp = useDb.Competitions.FirstOrDefault(
+                        x => x.CompetitionName == curChk.CompetitionName);
+
+                    Assert.That(
+                        foundComp,
+                        Is.Not.Null,
+                        "{0} '{1}' not found!",
+                        nameof(Competition),
+                        curChk);
+
+                    var foundAdjPanel = useDb.AdjudicatorPanels.FirstOrDefault(
+                        x => x.Competition == foundComp
+                        && x.Name == curChk.Name);
+
+                    Assert.That(
+                        foundAdjPanel,
+                        Is.Not.Null,
+                        "{0} '{1}' not found!",
+                        nameof(AdjudicatorPanel),
+                        curChk);
+
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(
+                            foundAdjPanel.CompetitionId,
+                            Is.EqualTo(
+                                foundComp.CompetitionId),
+                            "{0}: {1}",
+                            curChk,
+                            nameof(foundComp.CompetitionId));
+                        Assert.That(
+                            foundAdjPanel.Name,
+                            Is.EqualTo(
+                                curChk.Name),
+                            "{0}: {1}",
+                            curChk,
+                            nameof(curChk.Name));
+                        Assert.That(
+                            foundAdjPanel.Comment,
+                            Is.Null.Or.Empty.Or.EqualTo(
+                                curChk.Comment),
+                            "{0}: {1}",
+                            curChk,
+                            nameof(curChk.Comment));
+                    });
+                }
+            }
+            finally
+            {
+                dbTrans.Rollback();
+            }
+        }
+
+        [Then(@"following Adjudicators exists in ""([^""]*)""")]
+        public void ThenFollowingAdjudicatorsExistsIn(
+            string danceCompHelperDb,
+            Table table)
+        {
+            var checkAdjs = table.CreateSet<AdjudicatorPoco>();
+            var useDb = GetDanceCompetitionHelperDbContext(
+                danceCompHelperDb);
+
+            using var dbTrans = useDb.BeginTransaction();
+            try
+            {
+                foreach (var curChk in checkAdjs)
+                {
+                    var foundComp = useDb.Competitions.FirstOrDefault(
+                        x => x.CompetitionName == curChk.CompetitionName);
+
+                    Assert.That(
+                        foundComp,
+                        Is.Not.Null,
+                        "{0} '{1}' not found!",
+                        nameof(Competition),
+                        curChk);
+
+                    var foundAdjPanel = useDb.AdjudicatorPanels.FirstOrDefault(
+                        x => x.Competition == foundComp
+                        && x.Name == curChk.AdjudicatorPanelName);
+
+                    Assert.That(
+                        foundAdjPanel,
+                        Is.Not.Null,
+                        "{0} '{1}' not found!",
+                        nameof(AdjudicatorPanel),
+                        curChk);
+
+                    var foundAdj = useDb.Adjudicators.FirstOrDefault(
+                        x => x.AdjudicatorPanelId == foundAdjPanel.AdjudicatorPanelId
+                        && x.Name == curChk.Name);
+
+                    Assert.That(
+                        foundAdj,
+                        Is.Not.Null,
+                        "{0} '{1}' not found!",
+                        nameof(Adjudicator),
+                        curChk);
+
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(
+                            foundAdj.AdjudicatorPanelId,
+                            Is.EqualTo(
+                                foundAdjPanel.AdjudicatorPanelId),
+                            "{0}: {1}",
+                            curChk,
+                            nameof(foundAdjPanel.AdjudicatorPanelId));
+                        Assert.That(
+                            foundAdj.Abbreviation,
+                            Is.EqualTo(
+                                curChk.Abbreviation),
+                            "{0}: {1}",
+                            curChk,
+                            nameof(curChk.Abbreviation));
+                        Assert.That(
+                            foundAdj.Name,
+                            Is.EqualTo(
+                                curChk.Name),
+                            "{0}: {1}",
+                            curChk,
+                            nameof(curChk.Name));
+                        Assert.That(
+                            foundAdj.Comment,
+                            Is.Null.Or.Empty.Or.EqualTo(
+                                curChk.Comment),
+                            "{0}: {1}",
+                            curChk,
+                            nameof(curChk.Comment));
                     });
                 }
             }

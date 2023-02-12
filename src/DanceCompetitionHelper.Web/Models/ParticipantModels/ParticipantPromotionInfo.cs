@@ -1,7 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 
-namespace DanceCompetitionHelper.Web.Models
+namespace DanceCompetitionHelper.Web.Models.ParticipantModels
 {
     public class ParticipantPromotionInfo
     {

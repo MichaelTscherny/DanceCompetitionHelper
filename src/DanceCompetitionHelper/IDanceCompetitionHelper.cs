@@ -18,9 +18,16 @@ namespace DanceCompetitionHelper
             Guid? competitionId,
             Guid? competitionClassId,
             bool includeInfos = false);
+        IEnumerable<AdjudicatorPanel> GetAdjudicatorPanels(
+            Guid? competitionId,
+            bool includeInfos = false);
+        IEnumerable<Adjudicator> GetAdjudicators(
+            Guid? competitionId,
+            Guid? adjudicatorPanelId,
+            bool includeInfos = false);
 
         Competition? GetCompetition(
-            Guid competitionId);
+            Guid? competitionId);
 
         Guid? FindCompetition(
             Guid? byAnyId);
@@ -35,6 +42,12 @@ namespace DanceCompetitionHelper
 
         Participant? GetParticipant(
             Guid participantId);
+
+        AdjudicatorPanel? GetAdjudicatorPanel(
+            Guid adjudicatorPanelId);
+
+        Adjudicator? GetAdjudicator(
+            Guid adjudicatorId);
 
         IEnumerable<MultipleStarter> GetMultipleStarter(
             Guid competitionId);
@@ -62,6 +75,44 @@ namespace DanceCompetitionHelper
             Guid competitionId);
 
         #endregion //  Competition Crud
+
+        #region AdjudicatorPanel Crud
+
+        void CreateAdjudicatorPanel(
+            Guid competitionId,
+            string name,
+            string? comment);
+
+        void EditAdjudicatorPanel(
+            Guid adjudicatorPanelId,
+            Guid competitionId,
+            string name,
+            string? comment);
+
+        void RemoveAdjudicatorPanel(
+            Guid adjudicatorPanelId);
+
+        #endregion //  AdjudicatorPanel Crud
+
+        #region Adjudicator Crud
+
+        void CreateAdjudicator(
+            Guid adjudicatorPanelId,
+            string abbreviation,
+            string name,
+            string? comment);
+
+        void EditAdjudicator(
+            Guid adjudicatorId,
+            Guid adjudicatorPanelId,
+            string abbreviation,
+            string name,
+            string? comment);
+
+        void RemoveAdjudicator(
+            Guid adjudicatorId);
+
+        #endregion //  Adjudicator Crud
 
         #region CompetitionClass Crud
 

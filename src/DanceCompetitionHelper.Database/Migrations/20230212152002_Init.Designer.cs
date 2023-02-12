@@ -11,14 +11,241 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DanceCompetitionHelper.Database.Migrations
 {
     [DbContext(typeof(DanceCompetitionHelperDbContext))]
-    [Migration("20230127203725_Init")]
+    [Migration("20230212152002_Init")]
     partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.1");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
+
+            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.Adjudicator", b =>
+                {
+                    b.Property<Guid>("AdjudicatorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Abbreviation")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AdjudicatorPanelId")
+                        .HasColumnType("TEXT")
+                        .HasComment("Ref to AdjudicatorPanel");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT")
+                        .HasComment("Row created at (UTC)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasComment("Row created by");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT")
+                        .HasComment("Row last modified at (UTC)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasComment("Row last modified by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("AdjudicatorId");
+
+                    b.HasIndex("AdjudicatorPanelId");
+
+                    b.HasIndex("AdjudicatorId", "AdjudicatorPanelId")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "AdjudicatorPanelId")
+                        .IsUnique();
+
+                    b.ToTable("Adjudicators", t =>
+                        {
+                            t.HasComment("An Adjudicatorof a CompetitionClass");
+                        });
+                });
+
+            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorHistory", b =>
+                {
+                    b.Property<Guid?>("AdjudicatorPanelId")
+                        .HasColumnType("TEXT")
+                        .HasComment("Ref to AdjudicatorPanel");
+
+                    b.Property<Guid>("AdjudicatorlId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT")
+                        .HasComment("Row created at (UTC)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasComment("Row created by");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT")
+                        .HasComment("Row last modified at (UTC)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasComment("Row last modified by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
+
+                    b.HasIndex("AdjudicatorPanelId");
+
+                    b.HasIndex("AdjudicatorlId", "AdjudicatorPanelId")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "AdjudicatorPanelId")
+                        .IsUnique();
+
+                    b.ToTable("AdjudicatorHistory", t =>
+                        {
+                            t.HasComment("Histroy of an Adjudicatorof a CompetitionClass");
+                        });
+                });
+
+            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorPanel", b =>
+                {
+                    b.Property<Guid>("AdjudicatorPanelId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CompetitionId")
+                        .HasColumnType("TEXT")
+                        .HasComment("Ref to Competition");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT")
+                        .HasComment("Row created at (UTC)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasComment("Row created by");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT")
+                        .HasComment("Row last modified at (UTC)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasComment("Row last modified by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("AdjudicatorPanelId");
+
+                    b.HasIndex("CompetitionId");
+
+                    b.HasIndex("AdjudicatorPanelId", "CompetitionId")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "CompetitionId")
+                        .IsUnique();
+
+                    b.ToTable("AdjudicatorPanels", t =>
+                        {
+                            t.HasComment("An AdjudicatorPanelof a CompetitionClass");
+                        });
+                });
+
+            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorPanelHistory", b =>
+                {
+                    b.Property<Guid>("AdjudicatorPanelId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CompetitionId")
+                        .HasColumnType("TEXT")
+                        .HasComment("Ref to Competition");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT")
+                        .HasComment("Row created at (UTC)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasComment("Row created by");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT")
+                        .HasComment("Row last modified at (UTC)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasComment("Row last modified by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
+
+                    b.HasIndex("CompetitionId");
+
+                    b.HasIndex("AdjudicatorPanelId", "CompetitionId")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "CompetitionId")
+                        .IsUnique();
+
+                    b.ToTable("AdjudicatorPanelHistroy", t =>
+                        {
+                            t.HasComment("History of an AdjudicatorPanelof a CompetitionClass");
+                        });
+                });
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.Competition", b =>
                 {
@@ -87,6 +314,10 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.Property<Guid>("CompetitionClassId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AdjudicatorPanelId")
+                        .HasColumnType("TEXT")
+                        .HasComment("Ref to AdjudicatorPanel");
 
                     b.Property<string>("AgeClass")
                         .HasMaxLength(32)
@@ -160,6 +391,8 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.HasKey("CompetitionClassId");
 
+                    b.HasIndex("AdjudicatorPanelId");
+
                     b.HasIndex("CompetitionId", "CompetitionClassName")
                         .IsUnique();
 
@@ -198,7 +431,8 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("CompetitionId")
+                    b.Property<Guid?>("CompetitionId")
+                        .IsRequired()
                         .HasColumnType("TEXT")
                         .HasComment("Ref to Competition");
 
@@ -508,13 +742,61 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.ToTable("TableVersionInfos");
                 });
 
-            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.CompetitionClass", b =>
+            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.Adjudicator", b =>
+                {
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.AdjudicatorPanel", "AdjudicatorPanel")
+                        .WithMany()
+                        .HasForeignKey("AdjudicatorPanelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdjudicatorPanel");
+                });
+
+            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorHistory", b =>
+                {
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.AdjudicatorPanel", "AdjudicatorPanel")
+                        .WithMany()
+                        .HasForeignKey("AdjudicatorPanelId");
+
+                    b.Navigation("AdjudicatorPanel");
+                });
+
+            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorPanel", b =>
                 {
                     b.HasOne("DanceCompetitionHelper.Database.Tables.Competition", "Competition")
                         .WithMany()
                         .HasForeignKey("CompetitionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Competition");
+                });
+
+            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorPanelHistory", b =>
+                {
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.Competition", "Competition")
+                        .WithMany()
+                        .HasForeignKey("CompetitionId");
+
+                    b.Navigation("Competition");
+                });
+
+            modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.CompetitionClass", b =>
+                {
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.AdjudicatorPanel", "AdjudicatorPanel")
+                        .WithMany()
+                        .HasForeignKey("AdjudicatorPanelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.Competition", "Competition")
+                        .WithMany()
+                        .HasForeignKey("CompetitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdjudicatorPanel");
 
                     b.Navigation("Competition");
                 });

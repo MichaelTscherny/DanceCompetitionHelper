@@ -53,8 +53,13 @@ namespace DanceCompetitionHelper
         }
 
         public Competition? GetCompetition(
-            Guid competitionId)
+            Guid? competitionId)
         {
+            if (competitionId == null)
+            {
+                return null;
+            }
+
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
             try
@@ -86,6 +91,8 @@ namespace DanceCompetitionHelper
                     countsOfCompClasses = _danceCompHelperDb.CompetitionClasses
                         .TagWith(
                             nameof(GetCompetitions) + "(bool?)[0]")
+                        .Include(
+                            x => x.AdjudicatorPanel)
                         .GroupBy(
                             x => x.CompetitionId,
                             (compId, items) => new
@@ -146,6 +153,11 @@ namespace DanceCompetitionHelper
                         useDisplayInfo.CountMultipleStarters = GetMultipleStarterReuseTransaction(
                             curComp.CompetitionId)
                             .Count();
+                        useDisplayInfo.CountAdjudicatorPanels = _danceCompHelperDb.AdjudicatorPanels
+                            .TagWith(
+                                nameof(GetCompetitions) + " " + nameof(Adjudicator) + ".Count")
+                            .Count(
+                                x => x.CompetitionId == curComp.CompetitionId);
                     }
 
                     yield return curComp;
@@ -194,6 +206,8 @@ namespace DanceCompetitionHelper
                 var allCompetitionClasses = _danceCompHelperDb.CompetitionClasses
                     .TagWith(
                         nameof(GetCompetitionClasses) + "(Guid?)[2]")
+                    .Include(
+                        x => x.AdjudicatorPanel)
                     .Where(
                         x => x.CompetitionId == foundComp.CompetitionId)
                     .OrderBy(
@@ -481,6 +495,145 @@ namespace DanceCompetitionHelper
             }
         }
 
+        public IEnumerable<AdjudicatorPanel> GetAdjudicatorPanels(
+            Guid? competitionId,
+            bool includeInfos = false)
+        {
+            if (competitionId == null)
+            {
+                return Enumerable.Empty<AdjudicatorPanel>();
+            }
+
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                return GetAdjudicatorPanelsReuseTransaction(
+                    competitionId,
+                    includeInfos);
+            }
+            finally
+            {
+                dbTrans.Rollback();
+            }
+        }
+
+        public IEnumerable<AdjudicatorPanel> GetAdjudicatorPanelsReuseTransaction(
+            Guid? competitionId,
+            bool includeInfos = false)
+        {
+            foreach (var curAdjPanel in _danceCompHelperDb.AdjudicatorPanels
+                .TagWith(
+                    nameof(GetAdjudicatorPanelsReuseTransaction) + "(Guid?, bool)[0]")
+                .Where(
+                    x => x.CompetitionId == competitionId))
+            {
+                if (includeInfos)
+                {
+                    curAdjPanel.DisplayInfo = new AdjudicatorPanelDisplayInfos();
+                    var useDisplayInfo = curAdjPanel.DisplayInfo;
+
+                    useDisplayInfo.CountAdjudicators = _danceCompHelperDb.Adjudicators
+                        .TagWith(
+                            nameof(GetAdjudicatorPanelsReuseTransaction) + "(Guid?, bool)[1]")
+                        .Count(
+                            x => x.AdjudicatorPanelId == curAdjPanel.AdjudicatorPanelId);
+                }
+
+                yield return curAdjPanel;
+            }
+        }
+
+        public IEnumerable<Adjudicator> GetAdjudicators(
+            Guid? competitionId,
+            Guid? adjudicatorPanelId,
+            bool includeInfos = false)
+        {
+            if (competitionId == null)
+            {
+                return Enumerable.Empty<Adjudicator>();
+            }
+
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                return GetAdjudicatorsReuseTransaction(
+                    competitionId,
+                    adjudicatorPanelId,
+                    includeInfos);
+            }
+            finally
+            {
+                dbTrans.Rollback();
+            }
+        }
+
+        public IEnumerable<Adjudicator> GetAdjudicatorsReuseTransaction(
+            Guid? competitionId,
+            Guid? adjudicatorPanelId,
+            bool includeInfos = false)
+        {
+            var foundComp = _danceCompHelperDb.Competitions
+                .TagWith(
+                    nameof(GetAdjudicatorsReuseTransaction) + "(Guid?, Guid?)[0]")
+                .FirstOrDefault(
+                    x => x.CompetitionId == competitionId);
+
+            if (foundComp == null)
+            {
+                yield break;
+            }
+
+            var useAdjPanels = new List<Guid>();
+
+            if (adjudicatorPanelId == null)
+            {
+                useAdjPanels.AddRange(
+                    _danceCompHelperDb.AdjudicatorPanels
+                        .TagWith(
+                            nameof(GetAdjudicatorsReuseTransaction) + "(Guid?, Guid?)[1]")
+                        .Where(
+                            x => x.CompetitionId == foundComp.CompetitionId)
+                        .OrderBy(
+                            x => x.Name)
+                        .Select(
+                            x => x.AdjudicatorPanelId));
+            }
+            else
+            {
+                var foundAdjPanel = _danceCompHelperDb.AdjudicatorPanels
+                    .TagWith(
+                        nameof(GetAdjudicatorsReuseTransaction) + "(Guid?, Guid?)[3]")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == foundComp.CompetitionId);
+
+                if (foundAdjPanel == null)
+                {
+                    yield break;
+                }
+
+                useAdjPanels.Add(
+                    foundAdjPanel.AdjudicatorPanelId);
+            }
+
+            foreach (var curAdjPanelId in useAdjPanels)
+            {
+                foreach (var curRetAdj in _danceCompHelperDb.Adjudicators
+                    .TagWith(
+                        nameof(GetAdjudicatorsReuseTransaction) + "(Guid?, Guid?)[4]")
+                    .Include(
+                        x => x.AdjudicatorPanel)
+                    .Where(
+                        x => x.AdjudicatorPanelId == curAdjPanelId)
+                    .OrderBy(
+                        x => x.Abbreviation))
+                {
+                    yield return curRetAdj;
+                }
+            }
+        }
+
         public IEnumerable<MultipleStarter> GetMultipleStarterReuseTransaction(
             Guid competitionId)
         {
@@ -625,7 +778,8 @@ namespace DanceCompetitionHelper
                         nameof(FindCompetition) + "(Guid)[0]")
                     .FirstOrDefault(
                         x => x.CompetitionId == byAnyId
-                        || x.CompetitionClassId == byAnyId)
+                        || x.CompetitionClassId == byAnyId
+                        || x.AdjudicatorPanelId == byAnyId)
                     ?.CompetitionId;
 
                 if (foundCompId == null)
@@ -645,6 +799,35 @@ namespace DanceCompetitionHelper
                             nameof(FindCompetition) + "(Guid)[2]")
                         .FirstOrDefault(
                             x => x.ParticipantId == byAnyId)
+                        ?.CompetitionId;
+                }
+
+                if (foundCompId == null)
+                {
+                    var foundAdj = _danceCompHelperDb.Adjudicators
+                        .TagWith(
+                            nameof(FindCompetition) + "(Guid)[4]")
+                        .FirstOrDefault(
+                            x => x.AdjudicatorId == byAnyId);
+
+                    if (foundAdj != null)
+                    {
+                        foundCompId = _danceCompHelperDb.AdjudicatorPanels
+                            .TagWith(
+                                nameof(FindCompetition) + "(Guid)[5]")
+                            .FirstOrDefault(
+                                x => x.AdjudicatorPanelId == foundAdj.AdjudicatorPanelId)
+                            ?.CompetitionId;
+                    }
+                }
+
+                if (foundCompId == null)
+                {
+                    foundCompId = _danceCompHelperDb.AdjudicatorPanels
+                        .TagWith(
+                            nameof(FindCompetition) + "(Guid)[6]")
+                        .FirstOrDefault(
+                            x => x.AdjudicatorPanelId == byAnyId)
                         ?.CompetitionId;
                 }
 
@@ -672,7 +855,8 @@ namespace DanceCompetitionHelper
                         nameof(FindCompetitionClass) + "(Guid)[0]")
                     .FirstOrDefault(
                         x => x.CompetitionId == byAnyId
-                        || x.CompetitionClassId == byAnyId)
+                        || x.CompetitionClassId == byAnyId
+                        || x.AdjudicatorPanelId == byAnyId)
                     ?.CompetitionClassId;
 
                 if (foundCompClassId == null)
@@ -762,6 +946,54 @@ namespace DanceCompetitionHelper
                 _logger.LogTrace(
                     "{Method}() done",
                     nameof(GetParticipant));
+
+                dbTrans.Rollback();
+            }
+        }
+
+        public AdjudicatorPanel? GetAdjudicatorPanel(
+            Guid adjudicatorPanelId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                return _danceCompHelperDb.AdjudicatorPanels
+                    .TagWith(
+                        nameof(GetAdjudicatorPanel) + "(Guid)[0]")
+                    .FirstOrDefault(
+                        x => x.AdjudicatorPanelId == adjudicatorPanelId);
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(GetAdjudicatorPanel));
+
+                dbTrans.Rollback();
+            }
+        }
+
+        public Adjudicator? GetAdjudicator(
+            Guid adjudicatorId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                return _danceCompHelperDb.Adjudicators
+                    .TagWith(
+                        nameof(GetAdjudicator) + "(Guid)[0]")
+                    .Include(
+                         x => x.AdjudicatorPanel)
+                    .FirstOrDefault(
+                        x => x.AdjudicatorId == adjudicatorId);
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(GetAdjudicator));
 
                 dbTrans.Rollback();
             }
@@ -924,6 +1156,313 @@ namespace DanceCompetitionHelper
         }
 
         #endregion //  Competition Crud
+
+        #region AdjudicatorPanel Crud
+
+        public void CreateAdjudicatorPanel(
+            Guid competitionId,
+            string name,
+            string? comment)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundComp = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(CreateAdjudicatorPanel) + "(Guid, string, string?)[0]")
+                    .FirstOrDefault(
+                        x => x.CompetitionId == competitionId);
+
+                if (foundComp == null)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            "{0} with id '{1}' not found!",
+                            nameof(Competition),
+                            competitionId));
+                }
+
+                _danceCompHelperDb.AdjudicatorPanels.Add(
+                    new AdjudicatorPanel()
+                    {
+                        Competition = foundComp,
+                        Name = name,
+                        Comment = comment,
+                    });
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(CreateAdjudicatorPanel),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(CreateAdjudicatorPanel));
+            }
+        }
+
+        public void EditAdjudicatorPanel(
+            Guid adjudicatorPanelId,
+            Guid competitionId,
+            string name,
+            string? comment)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundAdjPanel = _danceCompHelperDb.AdjudicatorPanels
+                    .TagWith(
+                        nameof(EditAdjudicatorPanel) + "(Guid, ...)[0]")
+                    .FirstOrDefault(
+                        x => x.AdjudicatorPanelId == adjudicatorPanelId);
+
+                if (foundAdjPanel == null)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            "{0} with id '{1}' not found!",
+                            nameof(AdjudicatorPanel),
+                            adjudicatorPanelId));
+                }
+
+                foundAdjPanel.CompetitionId = competitionId;
+                foundAdjPanel.Name = name;
+                foundAdjPanel.Comment = comment;
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(EditAdjudicatorPanel),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(EditAdjudicatorPanel));
+            }
+        }
+
+        public void RemoveAdjudicatorPanel(
+            Guid adjudicatorPanelId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundAdjPanel = _danceCompHelperDb.AdjudicatorPanels
+                    .TagWith(
+                        nameof(RemoveAdjudicatorPanel) + "(Guid)")
+                    .FirstOrDefault(
+                        x => x.AdjudicatorPanelId == adjudicatorPanelId);
+
+                if (foundAdjPanel == null)
+                {
+                    _logger.LogWarning(
+                        "{AdjudicatorPanel} with id '{AdjudicatorPanelId}' not found!",
+                        nameof(AdjudicatorPanel),
+                        adjudicatorPanelId);
+                    return;
+                }
+
+                _danceCompHelperDb.AdjudicatorPanels.Remove(
+                    foundAdjPanel);
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(RemoveAdjudicatorPanel),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(RemoveAdjudicatorPanel));
+            }
+        }
+
+        #endregion //  AdjudicatorPanel Crud
+
+        #region Adjudicator Crud
+
+        public void CreateAdjudicator(
+            Guid adjudicatorPanelId,
+            string abbreviation,
+            string name,
+            string? comment)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                _danceCompHelperDb.Adjudicators.Add(
+                    new Adjudicator()
+                    {
+                        AdjudicatorPanelId = adjudicatorPanelId,
+                        Abbreviation = abbreviation,
+                        Name = name,
+                        Comment = comment,
+                    });
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(CreateAdjudicator),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(CreateAdjudicator));
+            }
+        }
+
+        public void EditAdjudicator(
+            Guid adjudicatorId,
+            Guid adjudicatorPanelId,
+            string abbreviation,
+            string name,
+            string? comment)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundAdj = _danceCompHelperDb.Adjudicators
+                    .TagWith(
+                        nameof(EditAdjudicator) + "(Guid, ...)[0]")
+                    .FirstOrDefault(
+                        x => x.AdjudicatorId == adjudicatorId);
+
+                if (foundAdj == null)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            "{0} with id '{1}' not found!",
+                            nameof(Adjudicator),
+                            adjudicatorId));
+                }
+
+                foundAdj.AdjudicatorPanelId = adjudicatorPanelId;
+                foundAdj.Abbreviation = abbreviation;
+                foundAdj.Name = name;
+                foundAdj.Comment = comment;
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(EditAdjudicator),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(EditAdjudicator));
+            }
+        }
+
+        public void RemoveAdjudicator(
+            Guid adjudicatorId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction();
+
+            try
+            {
+                var foundAdj = _danceCompHelperDb.Adjudicators
+                    .TagWith(
+                        nameof(RemoveAdjudicator) + "(Guid)")
+                    .FirstOrDefault(
+                        x => x.AdjudicatorId == adjudicatorId);
+
+                if (foundAdj == null)
+                {
+                    _logger.LogWarning(
+                        "{Adjudicator} with id '{AdjudicatorId}' not found!",
+                        nameof(Adjudicator),
+                        adjudicatorId);
+                    return;
+                }
+
+                _danceCompHelperDb.Adjudicators.Remove(
+                    foundAdj);
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(RemoveAdjudicator),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(RemoveAdjudicator));
+            }
+        }
+
+        #endregion //  Adjudicator Crud
 
         #region CompetitionClass Crud
 

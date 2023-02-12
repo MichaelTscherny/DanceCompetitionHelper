@@ -4,6 +4,7 @@ using DanceCompetitionHelper.Database.Diagnostic;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
+using DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -143,6 +144,117 @@ namespace DanceCompetitionHelper.Test.Bindings
             dbTrans.Commit();
         }
 
+        [Given(@"following Adjudicator Panels in ""([^""]*)""")]
+        public void GivenFollowingAdjudicatorPanelsIn(
+            string danceCompHelperDb,
+            Table table)
+        {
+            var newAdjPanels = table.CreateSet<AdjudicatorPanelPoco>();
+            var useDb = GetDanceCompetitionHelperDbContext(
+                danceCompHelperDb);
+
+            using var dbTrans = useDb.BeginTransaction();
+
+            foreach (var newAdjPanel in newAdjPanels)
+            {
+                try
+                {
+                    var useComp = useDb.Competitions.FirstOrDefault(
+                        x => x.CompetitionName == newAdjPanel.CompetitionName);
+
+                    Assert.That(
+                        useComp,
+                        Is.Not.Null,
+                        "{0} '{1}' not found!",
+                        nameof(Competition),
+                        newAdjPanel.CompetitionName);
+
+
+                    useDb.AdjudicatorPanels.Add(
+                        new AdjudicatorPanel()
+                        {
+                            CompetitionId = useComp.CompetitionId,
+                            Name = newAdjPanel.Name,
+                            Comment = newAdjPanel.Comment,
+                        });
+
+                    useDb.SaveChanges();
+                }
+                catch (Exception exc)
+                {
+                    dbTrans.Rollback();
+
+                    Console.WriteLine(
+                        "Error during add of '{0}': {1}",
+                        newAdjPanel,
+                        exc);
+                    throw;
+                }
+            }
+
+            dbTrans.Commit();
+        }
+
+        [Given(@"following Adjudicators in ""([^""]*)""")]
+        public void GivenFollowingAdjudicatorsIn(
+            string danceCompHelperDb,
+            Table table)
+        {
+            var newAdjs = table.CreateSet<AdjudicatorPoco>();
+            var useDb = GetDanceCompetitionHelperDbContext(
+                danceCompHelperDb);
+
+            using var dbTrans = useDb.BeginTransaction();
+            var adjPanelsByName = new Dictionary<string, AdjudicatorPanel>();
+
+            foreach (var newAdj in newAdjs)
+            {
+                try
+                {
+                    var useAdjPanelName = newAdj.AdjudicatorPanelName;
+                    if (adjPanelsByName.TryGetValue(
+                        useAdjPanelName,
+                        out var useAdjPanel) == false)
+                    {
+                        useAdjPanel = useDb.AdjudicatorPanels.FirstOrDefault(
+                            x => x.Name == useAdjPanelName);
+
+                        Assert.That(
+                            useAdjPanel,
+                            Is.Not.Null,
+                            "{0} '{1}' not found!",
+                            nameof(AdjudicatorPanel),
+                            useAdjPanelName);
+
+                        adjPanelsByName[useAdjPanelName] = useAdjPanel;
+                    }
+
+                    useDb.Adjudicators.Add(
+                        new Adjudicator()
+                        {
+                            AdjudicatorPanelId = useAdjPanel.AdjudicatorPanelId,
+                            Abbreviation = newAdj.Abbreviation,
+                            Name = newAdj.Name,
+                            Comment = newAdj.Comment,
+                        });
+
+                    useDb.SaveChanges();
+                }
+                catch (Exception exc)
+                {
+                    dbTrans.Rollback();
+
+                    Console.WriteLine(
+                        "Error during add of '{0}': {1}",
+                        newAdj,
+                        exc);
+                    throw;
+                }
+            }
+
+            dbTrans.Commit();
+        }
+
         [Given(@"following Competition Classes in ""([^""]*)""")]
         public void GivenFollowingCompetitionClassesIn(
             string danceCompHelperDb,
@@ -167,6 +279,17 @@ namespace DanceCompetitionHelper.Test.Bindings
                     nameof(Competition),
                     newCompClass.CompetitionName);
 
+                var useAdjPanel = useDb.AdjudicatorPanels.FirstOrDefault(
+                    x => x.CompetitionId == useComp.CompetitionId
+                    && x.Name == newCompClass.AdjudicatorPanelName);
+
+                Assert.That(
+                    useAdjPanel,
+                    Is.Not.Null,
+                    "{0} '{1}' not found!",
+                    nameof(AdjudicatorPanel),
+                    newCompClass.AdjudicatorPanelName);
+
                 try
                 {
                     useDb.CompetitionClasses.Add(
@@ -175,6 +298,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Competition = useComp,
                             OrgClassId = newCompClass.OrgClassId,
                             CompetitionClassName = newCompClass.CompetitionClassName,
+                            AdjudicatorPanel = useAdjPanel,
                             Discipline = newCompClass.Discipline,
                             AgeClass = newCompClass.AgeClass,
                             AgeGroup = newCompClass.AgeGroup,

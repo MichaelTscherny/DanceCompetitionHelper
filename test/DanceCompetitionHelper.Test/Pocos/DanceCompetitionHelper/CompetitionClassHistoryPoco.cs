@@ -6,6 +6,7 @@
         public string OrgClassId { get; set; } = default!;
         public int Version { get; set; }
         public string CompetitionClassName { get; set; } = default!;
+        public string AdjudicatorPanelName { get; set; } = default!;
         public string? Discipline { get; set; }
         public string? AgeClass { get; set; }
         public string? AgeGroup { get; set; }

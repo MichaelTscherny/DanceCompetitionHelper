@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
-namespace DanceCompetitionHelper.Web.Models
+namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
 {
     public class CompetitionClassViewModel
     {

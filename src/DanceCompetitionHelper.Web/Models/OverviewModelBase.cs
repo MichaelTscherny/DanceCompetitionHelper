@@ -2,10 +2,11 @@
 
 namespace DanceCompetitionHelper.Web.Models
 {
-    public class ParticipantOverviewViewModel
+    public abstract class OverviewModelBase<T>
+        where T : class
     {
         public Competition? Competition { get; set; }
-        public IEnumerable<Participant>? Participtans { get; set; }
+        public IEnumerable<T>? OverviewItems { get; set; }
         public bool DetailedView { get; set; }
     }
 }

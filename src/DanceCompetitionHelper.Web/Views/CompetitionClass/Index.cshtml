@@ -4,13 +4,14 @@
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models;
+@using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 
 @model CompetitionClassOverviewViewModel
 
 @{
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
-    var competitionClassesCount = Model.CompetitionClasses?.Count() ?? 0;
+    var competitionClassesCount = Model.OverviewItems?.Count() ?? 0;
 
     ViewData["Title"] = string.Format(
         Model.DetailedView
@@ -33,6 +34,10 @@
                     <th>
                         Comment
                     </th>
+                    <th>
+                        Adj. Panel
+                    </th>
+
                     @if (Model.DetailedView)
                     {
                         <th>
@@ -48,6 +53,7 @@
                             Class
                         </th>
                     }
+
                     <th>
                         Ignore
                     </th>
@@ -70,7 +76,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.CompetitionClasses ?? Enumerable.Empty<CompetitionClass>())
+                @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<CompetitionClass>())
                 {
                     <tr>
                         <td class="text-nowrap">
@@ -80,6 +86,11 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.Comment)
                         </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AdjudicatorPanel.Name)
+                        </td>
+
                         @if (Model.DetailedView)
                         {
                             <td>
@@ -95,6 +106,7 @@
                                 @Html.DisplayFor(modelItem => item.Class)
                             </td>
                         }
+
                         <td>
                             @Html.DisplayFor(modelItem => item.Ignore)
                         </td>
@@ -183,6 +195,10 @@
                     <th>
                         Comment
                     </th>
+                    <th>
+                        Adj. Panel
+                    </th>
+
                     @if (Model.DetailedView)
                     {
                         <th>

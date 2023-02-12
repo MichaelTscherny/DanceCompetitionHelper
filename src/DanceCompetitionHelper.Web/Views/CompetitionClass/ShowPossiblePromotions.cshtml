@@ -4,13 +4,14 @@
 @using DanceCompetitionHelper.Extensions;
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 
 @model ShowPossiblePromotionsViewModel
 
 @{
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
-    var possiblePromotionsCount = Model.PossiblePromotions?.Count() ?? 0;
+    var possiblePromotionsCount = Model.OverviewItems?.Count() ?? 0;
 
     ViewData["Title"] = string.Format(
         "{0} Possible Promotions of {1}",
@@ -20,7 +21,7 @@
     var helpIncludedClasses = new List<CompetitionClass>();
     var maxDisplayClasses = 0;
 
-    foreach(var curPossibleProm in Model.PossiblePromotions
+    foreach (var curPossibleProm in Model.OverviewItems
         ?.Where(
             x => x.DisplayInfo != null
             && x.DisplayInfo.PromotionInfo != null)
@@ -80,7 +81,7 @@
     <h1 class="display-6">@ViewData["Title"]</h1>
 
 
-    @foreach (var curPossPromotion in Model.PossiblePromotions ?? Enumerable.Empty<Participant>())
+    @foreach (var curPossPromotion in Model.OverviewItems ?? Enumerable.Empty<Participant>())
     {
         <div class="table-responsive-xxl">
             @{

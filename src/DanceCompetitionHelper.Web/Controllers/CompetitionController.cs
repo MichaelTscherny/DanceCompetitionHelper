@@ -1,5 +1,6 @@
 ﻿using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models;
+using DanceCompetitionHelper.Web.Models.CompetitionModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 

@@ -2,13 +2,14 @@
 @using DanceCompetitionHelper.Database.Tables;
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models.ParticipantModels;
 
 @model ParticipantOverviewViewModel
 
 @{
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
-    var participantsCount = Model.Participtans?.Count() ?? 0;
+    var participantsCount = Model.OverviewItems?.Count() ?? 0;
 
     ViewData["Title"] = string.Format(
         Model.DetailedView
@@ -89,7 +90,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.Participtans ?? Enumerable.Empty<Participant>())
+                @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<Participant>())
                 {
                     <tr>
                         <td class="text-nowrap">

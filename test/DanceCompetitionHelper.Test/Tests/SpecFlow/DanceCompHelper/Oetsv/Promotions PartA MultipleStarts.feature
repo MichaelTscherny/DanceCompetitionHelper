@@ -7,12 +7,22 @@ Scenario: Multiple Start - None
     And following Competitions in "DanceCompHelper-db"
         | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
         | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+    And following Adjudicator Panels in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment        |
+        | Test-Comp-01    | Panel 01 | Just one Panel |
+    And following Adjudicators in "DanceCompHelper-db"
+        | CompetitionName | AdjudicatorPanelName | Abbreviation | Name              | Comment |
+        | Test-Comp-01    | Panel 01             | 01-01        | Adjudicator 01-01 | 01-01   |
+        | Test-Comp-01    | Panel 01             | 01-02        | Adjudicator 01-02 | 01-02   |
+        | Test-Comp-01    | Panel 01             | 01-03        | Adjudicator 01-03 | 01-03   |
+        | Test-Comp-01    | Panel 01             | 01-04        | Adjudicator 01-04 | 01-04   |
+        | Test-Comp-01    | Panel 01             | 01-05        | Adjudicator 01-05 | 01-05   |
     And following Competition Classes in "DanceCompHelper-db"
-        | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion | PointsForFirst | PointsForLast |
-        | Test-Comp-01    | 1       | Class-01   | Allg Sta D           | Sta        | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
-        | Test-Comp-01    | 1       | Class-02   | Allg Sta C           | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
-        | Test-Comp-01    | 1       | Class-03   | Allg La D            | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
-        | Test-Comp-01    | 1       | Class-04   | Allg La C            | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion | PointsForFirst | PointsForLast |
+        | Test-Comp-01    | Panel 01             | 1       | Class-01   | Allg Sta D           | Sta        | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
+        | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+        | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
+        | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   

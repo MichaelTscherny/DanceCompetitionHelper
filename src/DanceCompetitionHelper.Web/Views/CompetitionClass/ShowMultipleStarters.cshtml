@@ -3,13 +3,14 @@
 @using DanceCompetitionHelper.Database.Tables;
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 
 @model ShowMultipleStartersOverviewViewModel
 
 @{
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
-    var multipleStartersCount = Model.MultipleStarters?.Count() ?? 0;
+    var multipleStartersCount = Model.OverviewItems?.Count() ?? 0;
 
     ViewData["Title"] = string.Format(
         "{0} Multiple Starters of {1}",
@@ -17,7 +18,7 @@
         compInfoStr);
 
     var displayInfos = new List<(string ClassName, Guid ClassId)>(
-        Model.MultipleStarters
+        Model.OverviewItems
             ?.SelectMany(
                 x => x.CompetitionClasses)
             .OrderBy(
@@ -49,7 +50,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.MultipleStarters ?? Enumerable.Empty<MultipleStarter>())
+                @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<MultipleStarter>())
                 {
                     <tr>
                         <td class="text-nowrap">

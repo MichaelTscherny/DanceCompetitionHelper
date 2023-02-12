@@ -42,6 +42,9 @@
                     <th>
                         Multiple Starters
                     </th>
+                    <th>
+                        Adj. Panels
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -91,6 +94,13 @@
                                 @(item.DisplayInfo?.CountMultipleStarters ?? -1)
                             </a>
                         </td>
+                        <td>
+                            <a asp-controller="@AdjudicatorController.RefName"
+                               asp-action="@nameof(AdjudicatorController.Index)"
+                               asp-route-id="@item.CompetitionId">
+                                @(item.DisplayInfo?.CountAdjudicatorPanels ?? -1)
+                            </a>
+                        </td>
                         <td class="text-nowrap">
                             <a asp-controller="@CompetitionController.RefName"
                                asp-action="@nameof(CompetitionController.ShowEdit)" 
@@ -130,6 +140,9 @@
                     </th>
                     <th>
                         Multiple Starters
+                    </th>
+                    <th>
+                        Adj. Panels
                     </th>
                     <th></th>
                 </tr>

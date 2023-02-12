@@ -7,12 +7,22 @@ Scenario: None
     And following Competitions in "DanceCompHelper-db"
         | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
         | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+    And following Adjudicator Panels in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment        |
+        | Test-Comp-01    | Panel 01 | Just one Panel |
+    And following Adjudicators in "DanceCompHelper-db"
+        | CompetitionName | AdjudicatorPanelName | Abbreviation | Name              | Comment |
+        | Test-Comp-01    | Panel 01             | 01-01        | Adjudicator 01-01 | 01-01   |
+        | Test-Comp-01    | Panel 01             | 01-02        | Adjudicator 01-02 | 01-02   |
+        | Test-Comp-01    | Panel 01             | 01-03        | Adjudicator 01-03 | 01-03   |
+        | Test-Comp-01    | Panel 01             | 01-04        | Adjudicator 01-04 | 01-04   |
+        | Test-Comp-01    | Panel 01             | 01-05        | Adjudicator 01-05 | 01-05   |
     And following Competition Classes in "DanceCompHelper-db"
-        | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-01    | 1       | Class-01   | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
-        | Test-Comp-01    | 1       | Class-02   | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
-        | Test-Comp-01    | 1       | Class-03   | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
-        | Test-Comp-01    | 1       | Class-04   | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
+        | Test-Comp-01    | Panel 01             | 1       | Class-01   | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01             | 1       | Class-02   | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
+        | Test-Comp-01    | Panel 01             | 1       | Class-03   | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01             | 1       | Class-04   | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #                                                                                                              
@@ -41,12 +51,22 @@ Scenario: One in Sen Sta D
     And following Competitions in "DanceCompHelper-db"
         | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
         | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+    And following Adjudicator Panels in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment        |
+        | Test-Comp-01    | Panel 01 | Just one Panel |
+    And following Adjudicators in "DanceCompHelper-db"
+        | CompetitionName | AdjudicatorPanelName | Abbreviation | Name              | Comment |
+        | Test-Comp-01    | Panel 01             | 01-01        | Adjudicator 01-01 | 01-01   |
+        | Test-Comp-01    | Panel 01             | 01-02        | Adjudicator 01-02 | 01-02   |
+        | Test-Comp-01    | Panel 01             | 01-03        | Adjudicator 01-03 | 01-03   |
+        | Test-Comp-01    | Panel 01             | 01-04        | Adjudicator 01-04 | 01-04   |
+        | Test-Comp-01    | Panel 01             | 01-05        | Adjudicator 01-05 | 01-05   |
     And following Competition Classes in "DanceCompHelper-db"
-        | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-01    | 1       | Class-01   | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
-        | Test-Comp-01    | 1       | Class-02   | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
-        | Test-Comp-01    | 1       | Class-03   | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
-        | Test-Comp-01    | 1       | Class-04   | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
+        | Test-Comp-01    | Panel 01             | 1       | Class-01   | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01             | 1       | Class-02   | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
+        | Test-Comp-01    | Panel 01             | 1       | Class-03   | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01             | 1       | Class-04   | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #
@@ -77,12 +97,22 @@ Scenario: One in Sen Sta D and C
     And following Competitions in "DanceCompHelper-db"
         | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
         | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+    And following Adjudicator Panels in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment        |
+        | Test-Comp-01    | Panel 01 | Just one Panel |
+    And following Adjudicators in "DanceCompHelper-db"
+        | CompetitionName | AdjudicatorPanelName | Abbreviation | Name              | Comment |
+        | Test-Comp-01    | Panel 01             | 01-01        | Adjudicator 01-01 | 01-01   |
+        | Test-Comp-01    | Panel 01             | 01-02        | Adjudicator 01-02 | 01-02   |
+        | Test-Comp-01    | Panel 01             | 01-03        | Adjudicator 01-03 | 01-03   |
+        | Test-Comp-01    | Panel 01             | 01-04        | Adjudicator 01-04 | 01-04   |
+        | Test-Comp-01    | Panel 01             | 01-05        | Adjudicator 01-05 | 01-05   |
     And following Competition Classes in "DanceCompHelper-db"
-        | CompetitionName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-01    | 1       | Class-01   | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
-        | Test-Comp-01    | 1       | Class-02   | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
-        | Test-Comp-01    | 1       | Class-03   | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
-        | Test-Comp-01    | 1       | Class-04   | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
+        | Test-Comp-01    | Panel 01             | 1       | Class-01   | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01             | 1       | Class-02   | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
+        | Test-Comp-01    | Panel 01             | 1       | Class-03   | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01             | 1       | Class-04   | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #

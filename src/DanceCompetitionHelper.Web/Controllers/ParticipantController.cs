@@ -1,6 +1,6 @@
 ﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Web.Extensions;
-using DanceCompetitionHelper.Web.Models;
+using DanceCompetitionHelper.Web.Models.ParticipantModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
@@ -8,6 +8,7 @@ namespace DanceCompetitionHelper.Web.Controllers
     public class ParticipantController : Controller
     {
         public const string RefName = "Participant";
+        public const string ParticipantLastCreatedCompetitionClassId = nameof(ParticipantLastCreatedCompetitionClassId);
 
         private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<CompetitionController> _logger;
@@ -33,13 +34,14 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
+            ViewData[nameof(AdjudicatorController.RefName)] = foundCompId;
 
             return View(
                 new ParticipantOverviewViewModel()
                 {
                     Competition = _danceCompHelper.GetCompetition(
-                        foundCompId ?? Guid.Empty),
-                    Participtans = _danceCompHelper
+                        foundCompId),
+                    OverviewItems = _danceCompHelper
                         .GetParticipants(
                             foundCompId,
                             null,
@@ -57,14 +59,15 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
+            ViewData[nameof(AdjudicatorController.RefName)] = foundCompId;
 
             return View(
                 nameof(Index),
                 new ParticipantOverviewViewModel()
                 {
                     Competition = _danceCompHelper.GetCompetition(
-                        foundCompId ?? Guid.Empty),
-                    Participtans = _danceCompHelper
+                        foundCompId),
+                    OverviewItems = _danceCompHelper
                         .GetParticipants(
                             foundCompId,
                             null,
@@ -73,8 +76,6 @@ namespace DanceCompetitionHelper.Web.Controllers
                     DetailedView = true,
                 });
         }
-
-        public const string ParticipantLastCreatedCompetitionClassId = nameof(ParticipantLastCreatedCompetitionClassId);
 
         public IActionResult ShowCreateEdit(
             Guid id)
@@ -88,12 +89,13 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
 
             var foundComp = _danceCompHelper.GetCompetition(
-                foundCompId.Value);
+                foundCompId);
 
             ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
             ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
+            ViewData[nameof(AdjudicatorController.RefName)] = foundCompId;
 
             var helpCompName = string.Empty;
 
@@ -123,6 +125,12 @@ namespace DanceCompetitionHelper.Web.Controllers
             if (ModelState.IsValid == false)
             {
                 createParticipant.Errors = ModelState.GetErrorMessages();
+
+                createParticipant.CompetitionClasses = _danceCompHelper
+                    .GetCompetitionClasses(
+                        createParticipant.CompetitionId)
+                    .ToSelectListItem(
+                        createParticipant.CompetitionClassId);
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -166,6 +174,12 @@ namespace DanceCompetitionHelper.Web.Controllers
             catch (Exception exc)
             {
                 createParticipant.Errors = exc.InnerException?.Message ?? exc.Message;
+
+                createParticipant.CompetitionClasses = _danceCompHelper
+                    .GetCompetitionClasses(
+                        createParticipant.CompetitionId)
+                    .ToSelectListItem(
+                        createParticipant.CompetitionClassId);
 
                 return View(
                     nameof(ShowCreateEdit),
