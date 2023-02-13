@@ -4,6 +4,7 @@
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
 @using DanceCompetitionHelper.Web.Models.ParticipantModels;
+@using DanceCompetitionHelper.Web.Models.AdjudicatorPanelModels;
 
 @model AdjudicatorPanelOverviewViewModel
 
@@ -47,7 +48,11 @@
                             @Html.DisplayFor(modelItem => item.Name)
                         </td>
                         <td>
-                            @(item.DisplayInfo?.CountAdjudicators ?? -1)
+                            <a asp-controller="@AdjudicatorController.RefName"
+                               asp-action="@nameof(AdjudicatorController.Index)" 
+                               asp-route-id="@Model.Competition?.CompetitionId">
+                                @(item.DisplayInfo?.CountAdjudicators ?? -1)
+                            </a>
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Comment)

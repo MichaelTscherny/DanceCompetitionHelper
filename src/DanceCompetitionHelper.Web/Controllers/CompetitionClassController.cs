@@ -7,6 +7,7 @@ namespace DanceCompetitionHelper.Web.Controllers
     public class CompetitionClassController : Controller
     {
         public const string RefName = "CompetitionClass";
+        public const string CompetitionClassLastCreatedAdjudicatorPanelId = nameof(CompetitionClassLastCreatedAdjudicatorPanelId);
 
         private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<CompetitionController> _logger;
@@ -89,10 +90,20 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
 
+            Guid.TryParse(
+                HttpContext.Session.GetString(
+                    CompetitionClassLastCreatedAdjudicatorPanelId),
+                out var lastCreatedAdjudicatorPanelId);
+
             return View(
                 new CompetitionClassViewModel()
                 {
                     CompetitionId = foundCompId.Value,
+                    AdjudicatorPanels = _danceCompHelper
+                        .GetAdjudicatorPanels(
+                            foundCompId)
+                        .ToSelectListItem(
+                            lastCreatedAdjudicatorPanelId),
                 });
         }
 
@@ -105,6 +116,12 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 createCompetition.Errors = ModelState.GetErrorMessages();
 
+                createCompetition.AdjudicatorPanels = _danceCompHelper
+                    .GetAdjudicatorPanels(
+                        createCompetition.CompetitionId)
+                    .ToSelectListItem(
+                        createCompetition.AdjudicatorPanelId);
+
                 return View(
                     nameof(ShowCreateEdit),
                     createCompetition);
@@ -112,9 +129,12 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             try
             {
+                var useAdjudicatorPanelId = createCompetition.AdjudicatorPanelId;
+
                 _danceCompHelper.CreateCompetitionClass(
                     createCompetition.CompetitionId,
                     createCompetition.CompetitionClassName,
+                    useAdjudicatorPanelId,
                     createCompetition.OrgClassId,
                     createCompetition.Discipline,
                     createCompetition.AgeClass,
@@ -127,6 +147,10 @@ namespace DanceCompetitionHelper.Web.Controllers
                     createCompetition.Comment,
                     createCompetition.Ignore);
 
+                HttpContext.Session.SetString(
+                    CompetitionClassLastCreatedAdjudicatorPanelId,
+                    useAdjudicatorPanelId.ToString());
+
                 return RedirectToAction(
                     nameof(Index),
                     new
@@ -137,6 +161,12 @@ namespace DanceCompetitionHelper.Web.Controllers
             catch (Exception exc)
             {
                 createCompetition.Errors = exc.InnerException?.Message ?? exc.Message;
+
+                createCompetition.AdjudicatorPanels = _danceCompHelper
+                    .GetAdjudicatorPanels(
+                        createCompetition.CompetitionId)
+                    .ToSelectListItem(
+                        createCompetition.AdjudicatorPanelId);
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -173,6 +203,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                     CompetitionId = foundCompClass.CompetitionId,
                     CompetitionClassId = foundCompClass.CompetitionClassId,
                     CompetitionClassName = foundCompClass.CompetitionClassName,
+                    AdjudicatorPanelId = foundCompClass.AdjudicatorPanelId,
+                    AdjudicatorPanels = _danceCompHelper
+                        .GetAdjudicatorPanels(
+                            foundCompClass.CompetitionId)
+                        .ToSelectListItem(
+                            foundCompClass.AdjudicatorPanelId),
                     OrgClassId = foundCompClass.OrgClassId,
                     Discipline = foundCompClass.Discipline,
                     AgeClass = foundCompClass.AgeClass,
@@ -196,6 +232,12 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 editCompetitionClass.Errors = ModelState.GetErrorMessages();
 
+                editCompetitionClass.AdjudicatorPanels = _danceCompHelper
+                    .GetAdjudicatorPanels(
+                        editCompetitionClass.CompetitionId)
+                    .ToSelectListItem(
+                        editCompetitionClass.AdjudicatorPanelId);
+
                 return View(
                     nameof(ShowCreateEdit),
                     editCompetitionClass);
@@ -206,6 +248,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 _danceCompHelper.EditCompetitionClass(
                     editCompetitionClass.CompetitionClassId ?? Guid.Empty,
                     editCompetitionClass.CompetitionClassName,
+                    editCompetitionClass.AdjudicatorPanelId,
                     editCompetitionClass.OrgClassId,
                     editCompetitionClass.Discipline,
                     editCompetitionClass.AgeClass,
@@ -228,6 +271,12 @@ namespace DanceCompetitionHelper.Web.Controllers
             catch (Exception exc)
             {
                 editCompetitionClass.Errors = exc.InnerException?.Message ?? exc.Message;
+
+                editCompetitionClass.AdjudicatorPanels = _danceCompHelper
+                    .GetAdjudicatorPanels(
+                        editCompetitionClass.CompetitionId)
+                    .ToSelectListItem(
+                        editCompetitionClass.AdjudicatorPanelId);
 
                 return View(
                     nameof(ShowCreateEdit),

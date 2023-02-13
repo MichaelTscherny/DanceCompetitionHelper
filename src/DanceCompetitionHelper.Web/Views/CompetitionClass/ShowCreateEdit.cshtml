@@ -75,6 +75,26 @@
                 </label>
             </div>
         </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Adjudicator Panel
+            </div>
+            <div class="col-md-4">
+                <select asp-for="AdjudicatorPanelId"
+                        asp-items="Model.AdjudicatorPanels"
+                        class="form-select"
+                        style="width: 100%">
+                </select>
+                <span asp-validation-for="AdjudicatorPanelId"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="AdjudicatorPanelId"
+                       class="control-label">
+                    Panel for this Adjudicator
+                </label>
+            </div>
+        </div>
         <div class="row row-cols-3 py-1 bg-info bg-opacity-25">
             <div class="col-md text-end">
                 Discipline

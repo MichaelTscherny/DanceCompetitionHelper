@@ -119,6 +119,7 @@ namespace DanceCompetitionHelper
         void CreateCompetitionClass(
             Guid competitionId,
             string competitionClassName,
+            Guid adjudicatorPanelId,
             string orgClassId,
             string? discipline,
             string? ageClass,
@@ -134,6 +135,7 @@ namespace DanceCompetitionHelper
         void EditCompetitionClass(
             Guid competitionClassId,
             string competitionClassName,
+            Guid adjudicatorPanelId,
             string orgClassId,
             string? discipline,
             string? ageClass,

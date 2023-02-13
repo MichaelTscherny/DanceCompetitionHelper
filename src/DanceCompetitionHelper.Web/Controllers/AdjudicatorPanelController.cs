@@ -1,6 +1,6 @@
 ﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Web.Extensions;
-using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
+using DanceCompetitionHelper.Web.Models.AdjudicatorPanelModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers

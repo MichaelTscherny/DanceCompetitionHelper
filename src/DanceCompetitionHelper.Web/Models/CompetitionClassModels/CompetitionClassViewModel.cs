@@ -1,5 +1,6 @@
 ﻿using DanceCompetitionHelper.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
@@ -23,6 +24,12 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]
         [StringLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]
         public string CompetitionClassName { get; set; } = default!;
+
+        [FromForm]
+        [Required]
+        public Guid AdjudicatorPanelId { get; set; }
+
+        public List<SelectListItem> AdjudicatorPanels { get; set; } = new List<SelectListItem>();
 
         [Required]
         [FromForm]

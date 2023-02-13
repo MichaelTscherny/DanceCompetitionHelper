@@ -1469,6 +1469,7 @@ namespace DanceCompetitionHelper
         public void CreateCompetitionClass(
             Guid competitionId,
             string competitionClassName,
+            Guid adjudicatorPanelId,
             string orgClassId,
             string? discipline,
             string? ageClass,
@@ -1506,6 +1507,7 @@ namespace DanceCompetitionHelper
                         Competition = foundCompId,
                         OrgClassId = orgClassId,
                         CompetitionClassName = competitionClassName,
+                        AdjudicatorPanelId = adjudicatorPanelId,
                         Discipline = discipline,
                         AgeClass = ageClass,
                         AgeGroup = ageGroup,
@@ -1544,6 +1546,7 @@ namespace DanceCompetitionHelper
         public void EditCompetitionClass(
             Guid competitionClassId,
             string competitionClassName,
+            Guid adjudicatorPanelId,
             string orgClassId,
             string? discipline,
             string? ageClass,
@@ -1577,6 +1580,7 @@ namespace DanceCompetitionHelper
 
                 foundCompClass.OrgClassId = orgClassId;
                 foundCompClass.CompetitionClassName = competitionClassName;
+                foundCompClass.AdjudicatorPanelId = adjudicatorPanelId;
                 foundCompClass.Discipline = discipline;
                 foundCompClass.AgeClass = ageClass;
                 foundCompClass.AgeGroup = ageGroup;
