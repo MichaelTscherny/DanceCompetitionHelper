@@ -1,5 +1,7 @@
 ﻿using DanceCompetitionHelper.Database;
+using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos;
+using Microsoft.EntityFrameworkCore;
 using TestHelper.Extensions;
 
 namespace DanceCompetitionHelper.Test.Bindings
@@ -11,6 +13,10 @@ namespace DanceCompetitionHelper.Test.Bindings
         protected readonly ScenarioContext _scenarioContext;
 
         private readonly List<IDisposable> _toDispose = new List<IDisposable>();
+
+        private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<string, Competition?>> _competitionsByName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<string, Competition?>>();
+        private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<string, AdjudicatorPanel?>> _adjudicatorPanelsByName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<string, AdjudicatorPanel?>>();
+        private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionClass?>>> _competitionClassesByCompIdAndName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionClass?>>>();
 
         public BindingBase(
             ScenarioContext scenarioContext)
@@ -59,6 +65,122 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             return toRet;
         }
+
+        #region Data Caching Stuff
+
+        public Competition? GetCompetition(
+            DanceCompetitionHelperDbContext dbCtx,
+            string byCompetitionName)
+        {
+            if (dbCtx == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(dbCtx));
+            }
+
+            if (_competitionsByName.TryGetValue(
+                dbCtx,
+                out var byDbCtx) == false)
+            {
+                byDbCtx = new Dictionary<string, Competition?>();
+                _competitionsByName[dbCtx] = byDbCtx;
+            }
+
+            if (byDbCtx.TryGetValue(
+                byCompetitionName,
+                out var foundComp) == false)
+            {
+                foundComp = dbCtx.Competitions
+                    .TagWith(
+                        nameof(GetCompetition))
+                    .FirstOrDefault(
+                        x => x.CompetitionName == byCompetitionName);
+            }
+
+            byDbCtx[byCompetitionName] = foundComp;
+
+            return foundComp;
+        }
+
+        public AdjudicatorPanel? GetAdjudicatorPanel(
+            DanceCompetitionHelperDbContext dbCtx,
+            string byAdjudicatorPanelName)
+        {
+            if (dbCtx == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(dbCtx));
+            }
+
+            if (_adjudicatorPanelsByName.TryGetValue(
+                dbCtx,
+                out var byDbCtx) == false)
+            {
+                byDbCtx = new Dictionary<string, AdjudicatorPanel?>();
+                _adjudicatorPanelsByName[dbCtx] = byDbCtx;
+            }
+
+            if (byDbCtx.TryGetValue(
+                byAdjudicatorPanelName,
+                out var foundAdjPanel) == false)
+            {
+                foundAdjPanel = dbCtx.AdjudicatorPanels
+                    .TagWith(
+                        nameof(GetAdjudicatorPanel))
+                    .FirstOrDefault(
+                        x => x.Name == byAdjudicatorPanelName);
+            }
+
+            byDbCtx[byAdjudicatorPanelName] = foundAdjPanel;
+
+            return foundAdjPanel;
+        }
+
+        public CompetitionClass? GetCompetitionClass(
+            DanceCompetitionHelperDbContext dbCtx,
+            Guid byCompetitionId,
+            string byCompetitionClassName)
+        {
+            if (dbCtx == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(dbCtx));
+            }
+
+            if (_competitionClassesByCompIdAndName.TryGetValue(
+                dbCtx,
+                out var byDbCtx) == false)
+            {
+                byDbCtx = new Dictionary<Guid, Dictionary<string, CompetitionClass?>>();
+                _competitionClassesByCompIdAndName[dbCtx] = byDbCtx;
+            }
+
+            if (byDbCtx.TryGetValue(
+                byCompetitionId,
+                out var byDbCtxAndCompId) == false)
+            {
+                byDbCtxAndCompId = new Dictionary<string, CompetitionClass?>();
+                byDbCtx[byCompetitionId] = byDbCtxAndCompId;
+            }
+
+            if (byDbCtxAndCompId.TryGetValue(
+                byCompetitionClassName,
+                out var foundCompClass) == false)
+            {
+                foundCompClass = dbCtx.CompetitionClasses
+                    .TagWith(
+                        nameof(GetCompetitionClass))
+                    .FirstOrDefault(
+                        x => x.CompetitionClassName == byCompetitionClassName);
+            }
+
+            byDbCtxAndCompId[byCompetitionClassName] = foundCompClass;
+
+            return foundCompClass;
+        }
+
+
+        #endregion // Data Caching Stuff
 
         #region Dispose Stuff
 

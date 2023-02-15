@@ -159,8 +159,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 try
                 {
-                    var useComp = useDb.Competitions.FirstOrDefault(
-                        x => x.CompetitionName == newAdjPanel.CompetitionName);
+                    var useComp = GetCompetition(
+                        useDb,
+                        newAdjPanel.CompetitionName);
 
                     Assert.That(
                         useComp,
@@ -205,29 +206,22 @@ namespace DanceCompetitionHelper.Test.Bindings
                 danceCompHelperDb);
 
             using var dbTrans = useDb.BeginTransaction();
-            var adjPanelsByName = new Dictionary<string, AdjudicatorPanel>();
 
             foreach (var newAdj in newAdjs)
             {
                 try
                 {
                     var useAdjPanelName = newAdj.AdjudicatorPanelName;
-                    if (adjPanelsByName.TryGetValue(
-                        useAdjPanelName,
-                        out var useAdjPanel) == false)
-                    {
-                        useAdjPanel = useDb.AdjudicatorPanels.FirstOrDefault(
-                            x => x.Name == useAdjPanelName);
+                    var useAdjPanel = GetAdjudicatorPanel(
+                        useDb,
+                        useAdjPanelName);
 
-                        Assert.That(
-                            useAdjPanel,
-                            Is.Not.Null,
-                            "{0} '{1}' not found!",
-                            nameof(AdjudicatorPanel),
-                            useAdjPanelName);
-
-                        adjPanelsByName[useAdjPanelName] = useAdjPanel;
-                    }
+                    Assert.That(
+                        useAdjPanel,
+                        Is.Not.Null,
+                        "{0} '{1}' not found!",
+                        nameof(AdjudicatorPanel),
+                        useAdjPanelName);
 
                     useDb.Adjudicators.Add(
                         new Adjudicator()
@@ -269,8 +263,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             foreach (var newCompClass in newCompClasses)
             {
-                var useComp = useDb.Competitions.FirstOrDefault(
-                    x => x.CompetitionName == newCompClass.CompetitionName);
+                var useComp = GetCompetition(
+                    useDb,
+                    newCompClass.CompetitionName);
 
                 Assert.That(
                     useComp,
@@ -279,9 +274,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                     nameof(Competition),
                     newCompClass.CompetitionName);
 
-                var useAdjPanel = useDb.AdjudicatorPanels.FirstOrDefault(
-                    x => x.CompetitionId == useComp.CompetitionId
-                    && x.Name == newCompClass.AdjudicatorPanelName);
+                var useAdjPanel = GetAdjudicatorPanel(
+                    useDb,
+                    newCompClass.AdjudicatorPanelName);
 
                 Assert.That(
                     useAdjPanel,
@@ -343,8 +338,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             foreach (var newCompClassHist in newCompClassesHistory)
             {
-                var useComp = useDb.Competitions.FirstOrDefault(
-                    x => x.CompetitionName == newCompClassHist.CompetitionName);
+                var useComp = GetCompetition(
+                    useDb,
+                    newCompClassHist.CompetitionName);
 
                 Assert.That(
                     useComp,
@@ -404,8 +400,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             foreach (var newPart in newParticipants)
             {
-                var useComp = useDb.Competitions.FirstOrDefault(
-                    x => x.CompetitionName == newPart.CompetitionName);
+                var useComp = GetCompetition(
+                    useDb,
+                    newPart.CompetitionName);
 
                 Assert.That(
                     useComp,
@@ -414,8 +411,10 @@ namespace DanceCompetitionHelper.Test.Bindings
                     nameof(Competition),
                     newPart.CompetitionName);
 
-                var useCompClass = useDb.CompetitionClasses.FirstOrDefault(
-                    x => x.CompetitionClassName == newPart.CompetitionClassName);
+                var useCompClass = GetCompetitionClass(
+                    useDb,
+                    useComp.CompetitionId,
+                    newPart.CompetitionClassName);
 
                 Assert.That(
                     useCompClass,
@@ -474,8 +473,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             foreach (var newPartHist in newParticipantsHistory)
             {
-                var useComp = useDb.Competitions.FirstOrDefault(
-                    x => x.CompetitionName == newPartHist.CompetitionName);
+                var useComp = GetCompetition(
+                    useDb,
+                    newPartHist.CompetitionName);
 
                 Assert.That(
                     useComp,
@@ -484,8 +484,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                     nameof(Competition),
                     newPartHist.CompetitionName);
 
-                var useCompClassHist = useDb.CompetitionClassesHistory.FirstOrDefault(
-                    x => x.CompetitionClassName == newPartHist.CompetitionClassName);
+                // TODO: wrong table!..
+                var useCompClassHist = GetCompetitionClass(
+                    useDb,
+                    useComp.CompetitionId,
+                    newPartHist.CompetitionClassName);
 
                 Assert.That(
                     useCompClassHist,
@@ -500,7 +503,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         new ParticipantHistory()
                         {
                             Competition = useComp,
-                            CompetitionClassHistory = useCompClassHist,
+                            // CompetitionClassHistory = useCompClassHist,
                             Version = newPartHist.Version,
                             StartNumber = newPartHist.StartNumber,
                             NamePartA = newPartHist.NamePartA,

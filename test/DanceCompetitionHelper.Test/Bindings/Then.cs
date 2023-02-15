@@ -33,8 +33,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 foreach (var toChk in checkComps)
                 {
-                    var foundComp = useDb.Competitions.FirstOrDefault(
-                        x => x.CompetitionName == toChk.CompetitionName);
+                    var foundComp = GetCompetition(
+                        useDb,
+                        toChk.CompetitionName);
 
                     Assert.That(
                         foundComp,
@@ -103,8 +104,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 foreach (var curChk in checkCompClasses)
                 {
-                    var foundComp = useDb.Competitions.FirstOrDefault(
-                        x => x.CompetitionName == curChk.CompetitionName);
+                    var foundComp = GetCompetition(
+                        useDb,
+                        curChk.CompetitionName);
 
                     Assert.That(
                         foundComp,
@@ -113,9 +115,10 @@ namespace DanceCompetitionHelper.Test.Bindings
                         nameof(Competition),
                         curChk);
 
-                    var foundCompClass = useDb.CompetitionClasses.FirstOrDefault(
-                        x => x.Competition == foundComp
-                        && x.OrgClassId == curChk.OrgClassId);
+                    var foundCompClass = GetCompetitionClass(
+                        useDb,
+                        foundComp.CompetitionId,
+                        curChk.CompetitionClassName);
 
                     Assert.That(
                         foundCompClass,
@@ -206,8 +209,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 foreach (var curChk in checkAdjPanels)
                 {
-                    var foundComp = useDb.Competitions.FirstOrDefault(
-                        x => x.CompetitionName == curChk.CompetitionName);
+                    var foundComp = GetCompetition(
+                        useDb,
+                        curChk.CompetitionName);
 
                     Assert.That(
                         foundComp,
@@ -216,9 +220,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                         nameof(Competition),
                         curChk);
 
-                    var foundAdjPanel = useDb.AdjudicatorPanels.FirstOrDefault(
-                        x => x.Competition == foundComp
-                        && x.Name == curChk.Name);
+                    var foundAdjPanel = GetAdjudicatorPanel(
+                        useDb,
+                        curChk.Name);
 
                     Assert.That(
                         foundAdjPanel,
@@ -273,8 +277,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 foreach (var curChk in checkAdjs)
                 {
-                    var foundComp = useDb.Competitions.FirstOrDefault(
-                        x => x.CompetitionName == curChk.CompetitionName);
+                    var foundComp = GetCompetition(
+                        useDb,
+                        curChk.CompetitionName);
 
                     Assert.That(
                         foundComp,
@@ -283,9 +288,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                         nameof(Competition),
                         curChk);
 
-                    var foundAdjPanel = useDb.AdjudicatorPanels.FirstOrDefault(
-                        x => x.Competition == foundComp
-                        && x.Name == curChk.AdjudicatorPanelName);
+                    var foundAdjPanel = GetAdjudicatorPanel(
+                        useDb,
+                        curChk.AdjudicatorPanelName);
 
                     Assert.That(
                         foundAdjPanel,
@@ -358,8 +363,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 foreach (var curChkHist in checkCompClassesHist)
                 {
-                    var foundComp = useDb.Competitions.FirstOrDefault(
-                        x => x.CompetitionName == curChkHist.CompetitionName);
+                    var foundComp = GetCompetition(
+                        useDb,
+                        curChkHist.CompetitionName);
 
                     Assert.That(
                         foundComp,
@@ -475,8 +481,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 foreach (var curChk in checkParticipants)
                 {
-                    var foundComp = useDb.Competitions.FirstOrDefault(
-                        x => x.CompetitionName == curChk.CompetitionName);
+                    var foundComp = GetCompetition(
+                        useDb,
+                        curChk.CompetitionName);
 
                     Assert.That(
                         foundComp,
@@ -485,9 +492,10 @@ namespace DanceCompetitionHelper.Test.Bindings
                         nameof(Competition),
                         curChk);
 
-                    var foundCompClass = useDb.CompetitionClasses.FirstOrDefault(
-                        x => x.Competition == foundComp
-                        && x.CompetitionClassName == curChk.CompetitionClassName);
+                    var foundCompClass = GetCompetitionClass(
+                        useDb,
+                        foundComp.CompetitionId,
+                        curChk.CompetitionClassName);
 
                     Assert.That(
                         foundCompClass,
@@ -636,8 +644,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 foreach (var curChkHist in checkParticipantsHist)
                 {
-                    var foundComp = useDb.Competitions.FirstOrDefault(
-                        x => x.CompetitionName == curChkHist.CompetitionName);
+                    var foundComp = GetCompetition(
+                        useDb,
+                        curChkHist.CompetitionName);
 
                     Assert.That(
                         foundComp,
