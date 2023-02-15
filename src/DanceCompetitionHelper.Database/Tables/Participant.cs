@@ -6,10 +6,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("The Participants of a " + nameof(Competition))]
+    [Index(nameof(CompetitionId), nameof(ParticipantId), IsUnique = true)]
+    [PrimaryKey(nameof(ParticipantId))]
     public class Participant : TableBase
     {
         [Required]
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid ParticipantId { get; set; }
 

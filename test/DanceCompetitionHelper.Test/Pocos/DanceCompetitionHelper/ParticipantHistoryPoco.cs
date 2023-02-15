@@ -4,6 +4,7 @@
     {
         public string CompetitionName { get; set; } = default!;
         public string CompetitionClassName { get; set; } = default!;
+        public int CompetitionClassVersion { get; set; }
         public int Version { get; set; }
         public int StartNumber { get; set; }
         public string NamePartA { get; set; } = default!;

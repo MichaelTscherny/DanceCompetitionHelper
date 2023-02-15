@@ -6,5 +6,6 @@
         public int CountParticipants { get; set; }
         public int CountMultipleStarters { get; set; }
         public int CountAdjudicatorPanels { get; set; }
+        public int CountVersions { get; set; }
     }
 }

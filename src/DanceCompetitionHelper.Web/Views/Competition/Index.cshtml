@@ -45,6 +45,9 @@
                     <th>
                         Adj. Panels
                     </th>
+                    <th>
+                        Versions
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -101,6 +104,9 @@
                                 @(item.DisplayInfo?.CountAdjudicatorPanels ?? -1)
                             </a>
                         </td>
+                        <td>
+                            @(item.DisplayInfo?.CountVersions ?? -1)
+                        </td>
                         <td class="text-nowrap">
                             <a asp-controller="@CompetitionController.RefName"
                                asp-action="@nameof(CompetitionController.ShowEdit)" 
@@ -110,7 +116,10 @@
                                asp-route-id="@item.CompetitionId">Details</a> |
                             <a asp-controller="@CompetitionController.RefName"
                                asp-action="@nameof(CompetitionController.Delete)"
-                               asp-route-id="@item.CompetitionId">Delete</a>
+                               asp-route-id="@item.CompetitionId">Delete</a> |
+                            <a asp-controller="@CompetitionController.RefName"
+                               asp-action="@nameof(CompetitionController.CreateTableHistory)"
+                               asp-route-id="@item.CompetitionId">+ History</a>
                         </td>
                     </tr>
                 }
@@ -143,6 +152,9 @@
                     </th>
                     <th>
                         Adj. Panels
+                    </th>
+                    <th>
+                        Versions
                     </th>
                     <th></th>
                 </tr>

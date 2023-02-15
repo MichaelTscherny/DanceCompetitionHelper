@@ -7,10 +7,10 @@ namespace DanceCompetitionHelper.Database.Tables
     [Comment("An " + nameof(Tables.Adjudicator) + "of a " + nameof(CompetitionClass))]
     [Index(nameof(AdjudicatorId), nameof(AdjudicatorPanelId), IsUnique = true)]
     [Index(nameof(Name), nameof(AdjudicatorPanelId), IsUnique = true)]
+    [PrimaryKey(nameof(AdjudicatorId))]
     public class Adjudicator : TableBase
     {
         [Required]
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid AdjudicatorId { get; set; }
 

@@ -6,8 +6,13 @@ namespace DanceCompetitionHelper
 {
     public interface IDanceCompetitionHelper : IDisposable
     {
+        #region Administration stuff
         void AddTestData();
         void Migrate();
+        void CreateTableHistory(
+            Guid competitionId);
+
+        #endregion // Administration stuff
 
         IEnumerable<Competition> GetCompetitions(
             bool includeInfos = false);

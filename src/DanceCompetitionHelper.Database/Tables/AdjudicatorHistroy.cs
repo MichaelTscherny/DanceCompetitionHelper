@@ -5,25 +5,34 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("Histroy of an " + nameof(Tables.Adjudicator) + "of a " + nameof(CompetitionClass))]
-    [Index(nameof(AdjudicatorlId), nameof(AdjudicatorPanelId), IsUnique = true)]
-    [Index(nameof(Name), nameof(AdjudicatorPanelId), IsUnique = true)]
-    [Keyless]
+    [Index(nameof(AdjudicatorHistoryId), nameof(AdjudicatorPanelHistoryId), nameof(Version), IsUnique = true)]
+    [Index(nameof(Name), nameof(AdjudicatorPanelHistoryId), nameof(Version), IsUnique = true)]
+    [PrimaryKey(nameof(AdjudicatorHistoryId), nameof(Version))]
     public class AdjudicatorHistory : TableBase
     {
         [Required]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid AdjudicatorlId { get; set; }
-
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Comment("Ref to " + nameof(Tables.AdjudicatorPanel))]
-        public Guid? AdjudicatorPanelId { get; set; }
+        public Guid AdjudicatorHistoryId { get; set; }
 
-        [ForeignKey(nameof(AdjudicatorPanelId))]
-        public AdjudicatorPanel? AdjudicatorPanel { get; set; } = default!;
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Comment("Ref to " + nameof(Tables.AdjudicatorPanelHistory))]
+        public Guid AdjudicatorPanelHistoryId { get; set; }
+
+        [Required]
+        [Range(0, int.MaxValue)]
+        public int AdjudicatorPanelHistoryVersion { get; set; }
+
+        [ForeignKey(nameof(AdjudicatorPanelHistoryId) + "," + nameof(AdjudicatorPanelHistoryVersion))]
+        public AdjudicatorPanelHistory AdjudicatorPanelHistory { get; set; } = default!;
 
         [Required]
         [Range(0, int.MaxValue)]
         public int Version { get; set; }
+
+        [Required]
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
+        public string Abbreviation { get; set; } = default!;
 
         [Required]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsLarge)]

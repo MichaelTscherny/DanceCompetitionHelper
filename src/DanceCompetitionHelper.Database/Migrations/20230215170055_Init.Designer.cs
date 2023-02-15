@@ -11,14 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DanceCompetitionHelper.Database.Migrations
 {
     [DbContext(typeof(DanceCompetitionHelperDbContext))]
-    [Migration("20230212152002_Init")]
+    [Migration("20230215170055_Init")]
     partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.3");
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.Adjudicator", b =>
                 {
@@ -82,13 +82,23 @@ namespace DanceCompetitionHelper.Database.Migrations
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorHistory", b =>
                 {
-                    b.Property<Guid?>("AdjudicatorPanelId")
-                        .HasColumnType("TEXT")
-                        .HasComment("Ref to AdjudicatorPanel");
-
-                    b.Property<Guid>("AdjudicatorlId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("AdjudicatorHistoryId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Abbreviation")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AdjudicatorPanelHistoryId")
+                        .HasColumnType("TEXT")
+                        .HasComment("Ref to AdjudicatorPanelHistory");
+
+                    b.Property<int>("AdjudicatorPanelHistoryVersion")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Comment")
                         .HasMaxLength(512)
@@ -119,18 +129,17 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("INTEGER");
+                    b.HasKey("AdjudicatorHistoryId", "Version");
 
-                    b.HasIndex("AdjudicatorPanelId");
+                    b.HasIndex("AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion");
 
-                    b.HasIndex("AdjudicatorlId", "AdjudicatorPanelId")
+                    b.HasIndex("AdjudicatorHistoryId", "AdjudicatorPanelHistoryId", "Version")
                         .IsUnique();
 
-                    b.HasIndex("Name", "AdjudicatorPanelId")
+                    b.HasIndex("Name", "AdjudicatorPanelHistoryId", "Version")
                         .IsUnique();
 
-                    b.ToTable("AdjudicatorHistory", t =>
+                    b.ToTable("AdjudicatorsHistory", t =>
                         {
                             t.HasComment("Histroy of an Adjudicatorof a CompetitionClass");
                         });
@@ -193,15 +202,17 @@ namespace DanceCompetitionHelper.Database.Migrations
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorPanelHistory", b =>
                 {
-                    b.Property<Guid>("AdjudicatorPanelId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("AdjudicatorPanelHistoryId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Comment")
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("CompetitionId")
+                    b.Property<Guid>("CompetitionId")
                         .HasColumnType("TEXT")
                         .HasComment("Ref to Competition");
 
@@ -230,20 +241,19 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("INTEGER");
+                    b.HasKey("AdjudicatorPanelHistoryId", "Version");
 
                     b.HasIndex("CompetitionId");
 
-                    b.HasIndex("AdjudicatorPanelId", "CompetitionId")
+                    b.HasIndex("AdjudicatorPanelHistoryId", "CompetitionId", "Version")
                         .IsUnique();
 
-                    b.HasIndex("Name", "CompetitionId")
+                    b.HasIndex("Name", "CompetitionId", "Version")
                         .IsUnique();
 
-                    b.ToTable("AdjudicatorPanelHistroy", t =>
+                    b.ToTable("AdjudicatorPanelsHistroy", t =>
                         {
-                            t.HasComment("History of an AdjudicatorPanelof a CompetitionClass");
+                            t.HasComment("History of an AdjudicatorPanelof a Competition");
                         });
                 });
 
@@ -407,6 +417,19 @@ namespace DanceCompetitionHelper.Database.Migrations
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.CompetitionClassHistory", b =>
                 {
+                    b.Property<Guid>("CompetitionClassHistoryId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("AdjudicatorPanelHistoryId")
+                        .HasColumnType("TEXT")
+                        .HasComment("Ref to AdjudicatorPanelHistory");
+
+                    b.Property<int>("AdjudicatorPanelHistoryVersion")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("AgeClass")
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
@@ -423,16 +446,12 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("CompetitionClassId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("CompetitionClassName")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("CompetitionId")
-                        .IsRequired()
+                    b.Property<Guid>("CompetitionId")
                         .HasColumnType("TEXT")
                         .HasComment("Ref to Competition");
 
@@ -481,8 +500,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.Property<int>("PointsForFirst")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("INTEGER");
+                    b.HasKey("CompetitionClassHistoryId", "Version");
+
+                    b.HasIndex("AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion");
 
                     b.HasIndex("CompetitionId", "CompetitionClassName", "Version")
                         .IsUnique();
@@ -589,7 +609,8 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.HasIndex("CompetitionClassId");
 
-                    b.HasIndex("CompetitionId");
+                    b.HasIndex("CompetitionId", "ParticipantId")
+                        .IsUnique();
 
                     b.ToTable("Participants", t =>
                         {
@@ -599,6 +620,12 @@ namespace DanceCompetitionHelper.Database.Migrations
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.ParticipantHistory", b =>
                 {
+                    b.Property<Guid>("ParticipantHistoryId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ClubName")
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
@@ -607,9 +634,12 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("CompetitionClassId")
+                    b.Property<Guid>("CompetitionClassHistoryId")
                         .HasColumnType("TEXT")
-                        .HasComment("Ref to CompetitionClass");
+                        .HasComment("Ref to CompetitionClassHistory");
+
+                    b.Property<int>("CompetitionClassHistoryVersion")
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("CompetitionId")
                         .HasColumnType("TEXT")
@@ -679,18 +709,14 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.Property<int?>("OrgStartsPartB")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("ParticipantId")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("StartNumber")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("INTEGER");
+                    b.HasKey("ParticipantHistoryId", "Version");
 
-                    b.HasIndex("CompetitionClassId");
+                    b.HasIndex("CompetitionClassHistoryId", "CompetitionClassHistoryVersion");
 
-                    b.HasIndex("CompetitionId", "ParticipantId", "Version")
+                    b.HasIndex("CompetitionId", "ParticipantHistoryId", "Version")
                         .IsUnique();
 
                     b.ToTable("ParticipantsHistory", t =>
@@ -755,11 +781,13 @@ namespace DanceCompetitionHelper.Database.Migrations
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorHistory", b =>
                 {
-                    b.HasOne("DanceCompetitionHelper.Database.Tables.AdjudicatorPanel", "AdjudicatorPanel")
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.AdjudicatorPanelHistory", "AdjudicatorPanelHistory")
                         .WithMany()
-                        .HasForeignKey("AdjudicatorPanelId");
+                        .HasForeignKey("AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("AdjudicatorPanel");
+                    b.Navigation("AdjudicatorPanelHistory");
                 });
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.AdjudicatorPanel", b =>
@@ -777,7 +805,9 @@ namespace DanceCompetitionHelper.Database.Migrations
                 {
                     b.HasOne("DanceCompetitionHelper.Database.Tables.Competition", "Competition")
                         .WithMany()
-                        .HasForeignKey("CompetitionId");
+                        .HasForeignKey("CompetitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Competition");
                 });
@@ -809,6 +839,14 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.AdjudicatorPanelHistory", "AdjudicatorPanelHistory")
+                        .WithMany()
+                        .HasForeignKey("AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdjudicatorPanelHistory");
+
                     b.Navigation("Competition");
                 });
 
@@ -833,19 +871,21 @@ namespace DanceCompetitionHelper.Database.Migrations
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.ParticipantHistory", b =>
                 {
-                    b.HasOne("DanceCompetitionHelper.Database.Tables.CompetitionClass", "CompetitionClass")
-                        .WithMany()
-                        .HasForeignKey("CompetitionClassId");
-
                     b.HasOne("DanceCompetitionHelper.Database.Tables.Competition", "Competition")
                         .WithMany()
                         .HasForeignKey("CompetitionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.CompetitionClassHistory", "CompetitionClassHistory")
+                        .WithMany()
+                        .HasForeignKey("CompetitionClassHistoryId", "CompetitionClassHistoryVersion")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Competition");
 
-                    b.Navigation("CompetitionClass");
+                    b.Navigation("CompetitionClassHistory");
                 });
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.TableVersionInfo", b =>

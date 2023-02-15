@@ -19,12 +19,13 @@ namespace DanceCompetitionHelper.Database
         public virtual DbSet<CompetitionClassHistory> CompetitionClassesHistory { get; set; }
         public virtual DbSet<Participant> Participants { get; set; }
         public virtual DbSet<ParticipantHistory> ParticipantsHistory { get; set; }
-        public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; }
 
         public virtual DbSet<AdjudicatorPanel> AdjudicatorPanels { get; set; }
-        public virtual DbSet<AdjudicatorPanelHistory> AdjudicatorPanelHistroy { get; set; }
+        public virtual DbSet<AdjudicatorPanelHistory> AdjudicatorPanelsHistroy { get; set; }
         public virtual DbSet<Adjudicator> Adjudicators { get; set; }
-        public virtual DbSet<AdjudicatorHistory> AdjudicatorHistory { get; set; }
+        public virtual DbSet<AdjudicatorHistory> AdjudicatorsHistory { get; set; }
+
+        public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; }
 
         public DanceCompetitionHelperDbContext(
             IDbConfig sqLiteDbConfig,

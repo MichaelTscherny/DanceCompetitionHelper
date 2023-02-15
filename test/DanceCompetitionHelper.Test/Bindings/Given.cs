@@ -484,11 +484,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                     nameof(Competition),
                     newPartHist.CompetitionName);
 
-                var useCompClass = useDb.CompetitionClasses.FirstOrDefault(
+                var useCompClassHist = useDb.CompetitionClassesHistory.FirstOrDefault(
                     x => x.CompetitionClassName == newPartHist.CompetitionClassName);
 
                 Assert.That(
-                    useCompClass,
+                    useCompClassHist,
                     Is.Not.Null,
                     "{0} '{1}' not found!",
                     nameof(CompetitionClass),
@@ -500,7 +500,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         new ParticipantHistory()
                         {
                             Competition = useComp,
-                            CompetitionClass = useCompClass,
+                            CompetitionClassHistory = useCompClassHist,
                             Version = newPartHist.Version,
                             StartNumber = newPartHist.StartNumber,
                             NamePartA = newPartHist.NamePartA,

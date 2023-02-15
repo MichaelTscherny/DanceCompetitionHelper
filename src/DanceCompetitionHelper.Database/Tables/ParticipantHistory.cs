@@ -6,12 +6,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("History of Participants of a " + nameof(Competition))]
-    [Index(nameof(CompetitionId), nameof(ParticipantId), nameof(Version), IsUnique = true)]
-    [Keyless]
+    [Index(nameof(CompetitionId), nameof(ParticipantHistoryId), nameof(Version), IsUnique = true)]
+    [PrimaryKey(nameof(ParticipantHistoryId), nameof(Version))]
     public class ParticipantHistory : TableBase
     {
         [Required]
-        public Guid ParticipantId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public Guid ParticipantHistoryId { get; set; }
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -21,12 +22,17 @@ namespace DanceCompetitionHelper.Database.Tables
         [ForeignKey(nameof(CompetitionId))]
         public Competition Competition { get; set; } = default!;
 
+        [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Comment("Ref to " + nameof(CompetitionClass))]
-        public Guid? CompetitionClassId { get; set; }
+        [Comment("Ref to " + nameof(CompetitionClassHistory))]
+        public Guid CompetitionClassHistoryId { get; set; }
 
-        [ForeignKey(nameof(CompetitionClassId))]
-        public CompetitionClass? CompetitionClass { get; set; }
+        [Required]
+        [Range(0, int.MaxValue)]
+        public int CompetitionClassHistoryVersion { get; set; }
+
+        [ForeignKey(nameof(CompetitionClassHistoryId) + "," + nameof(CompetitionClassHistoryVersion))]
+        public CompetitionClassHistory CompetitionClassHistory { get; set; } = default!;
 
         [Required]
         [Range(0, int.MaxValue)]

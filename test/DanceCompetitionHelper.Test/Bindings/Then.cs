@@ -389,9 +389,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                             curChkHist,
                             nameof(foundComp.CompetitionId));
                         Assert.That(
-                            foundCompClassHist.CompetitionClassId,
+                            foundCompClassHist.CompetitionClassHistoryId,
                             Is.EqualTo(
-                                foundCompClassHist.CompetitionClassId),
+                                foundCompClassHist.CompetitionClassHistoryId),
                             "{0}: {1}",
                             curChkHist,
                             nameof(foundComp.CompetitionId));
@@ -646,12 +646,12 @@ namespace DanceCompetitionHelper.Test.Bindings
                         nameof(Competition),
                         curChkHist);
 
-                    var foundCompClass = useDb.CompetitionClasses.FirstOrDefault(
+                    var foundCompClassHist = useDb.CompetitionClassesHistory.FirstOrDefault(
                         x => x.Competition == foundComp
                         && x.CompetitionClassName == curChkHist.CompetitionClassName);
 
                     Assert.That(
-                        foundCompClass,
+                        foundCompClassHist,
                         Is.Not.Null,
                         "{0} '{1}' not found!",
                         nameof(CompetitionClass),
@@ -659,7 +659,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                     var foundParticipant = useDb.ParticipantsHistory.FirstOrDefault(
                         x => x.Competition == foundComp
-                        && x.CompetitionClass == foundCompClass
+                        && x.CompetitionClassHistory == foundCompClassHist
                         && x.NamePartA == curChkHist.NamePartA
                         && x.NamePartB == curChkHist.NamePartB);
 
@@ -680,12 +680,12 @@ namespace DanceCompetitionHelper.Test.Bindings
                             curChkHist,
                             nameof(foundComp.CompetitionId));
                         Assert.That(
-                            foundParticipant.CompetitionClassId,
+                            foundParticipant.CompetitionClassHistoryId,
                             Is.EqualTo(
-                                foundCompClass.CompetitionClassId),
+                                foundCompClassHist.CompetitionClassHistoryId),
                             "{0}: {1}",
                             curChkHist,
-                            nameof(foundCompClass.CompetitionClassId));
+                            nameof(foundCompClassHist.CompetitionClassHistoryId));
 
                         Assert.That(
                             foundParticipant.Version,

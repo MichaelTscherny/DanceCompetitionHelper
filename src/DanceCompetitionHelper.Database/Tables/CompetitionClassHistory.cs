@@ -7,11 +7,12 @@ namespace DanceCompetitionHelper.Database.Tables
     [Comment("History of Classes of a " + nameof(Competition))]
     [Index(nameof(CompetitionId), nameof(OrgClassId), nameof(Version), IsUnique = true)]
     [Index(nameof(CompetitionId), nameof(CompetitionClassName), nameof(Version), IsUnique = true)]
-    [Keyless]
+    [PrimaryKey(nameof(CompetitionClassHistoryId), nameof(Version))]
     public class CompetitionClassHistory : TableBase
     {
         [Required]
-        public Guid CompetitionClassId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public Guid CompetitionClassHistoryId { get; set; }
 
         [Required]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
@@ -21,17 +22,22 @@ namespace DanceCompetitionHelper.Database.Tables
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Comment("Ref to " + nameof(Tables.Competition))]
-        public Guid? CompetitionId { get; set; }
+        public Guid CompetitionId { get; set; }
 
         [ForeignKey(nameof(CompetitionId))]
-        public Competition? Competition { get; set; }
+        public Competition Competition { get; set; } = default!;
 
+        [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Comment("Ref to " + nameof(AdjudicatorPanel))]
-        public Guid? AdjudicatorPanelId { get; set; }
+        [Comment("Ref to " + nameof(AdjudicatorPanelHistory))]
+        public Guid AdjudicatorPanelHistoryId { get; set; }
 
-        [ForeignKey(nameof(AdjudicatorPanelId))]
-        public AdjudicatorPanel? AdjudicatorPanel { get; set; }
+        [Required]
+        [Range(0, int.MaxValue)]
+        public int AdjudicatorPanelHistoryVersion { get; set; }
+
+        [ForeignKey(nameof(AdjudicatorPanelHistoryId) + "," + nameof(AdjudicatorPanelHistoryVersion))]
+        public AdjudicatorPanelHistory AdjudicatorPanelHistory { get; set; } = default!;
 
         [Required]
         [Range(0, int.MaxValue)]

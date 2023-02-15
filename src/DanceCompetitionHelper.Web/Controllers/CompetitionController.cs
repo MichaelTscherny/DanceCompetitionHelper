@@ -160,6 +160,22 @@ namespace DanceCompetitionHelper.Web.Controllers
                 nameof(Index));
         }
 
+        public IActionResult CreateTableHistory(
+            Guid id)
+        {
+            var foundComp = _danceCompHelper.GetCompetition(
+                id);
+
+            if (foundComp != null)
+            {
+                _danceCompHelper.CreateTableHistory(
+                    foundComp.CompetitionId);
+            }
+
+            return RedirectToAction(
+                nameof(Index));
+        }
+
         public IActionResult ShowImport()
         {
             return View(
