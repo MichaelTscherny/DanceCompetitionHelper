@@ -1,6 +1,6 @@
 using static DanceCompetitionHelper.OrgImpl.Oetsv.OetsvConstants;
 
-namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConstants
+namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
 {
     [TestFixture]
     public class OetsvConstantsTests

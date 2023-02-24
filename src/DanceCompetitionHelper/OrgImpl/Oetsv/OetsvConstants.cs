@@ -2,6 +2,82 @@
 {
     public static class OetsvConstants
     {
+        public static class CompetitionType
+        {
+            public const string Bewertungsturnier = "Bewertungsturnier";
+            public const string Landesmeisterschaft = "Landesmeisterschaft";
+            public const string Staatsmeisterschaft = "Staatsmeisterschaft";
+            public const string OesterrMeisterschaft = "Österr. Meisterschaft";
+
+            public static string? ToCompetitionType(
+                string? useString)
+            {
+                switch (useString)
+                {
+                    case Bewertungsturnier:
+                    case "BEWERTUNGSTURNIER":
+                    case "bewertungsturnier":
+                    case "BW":
+                    case "Bw":
+                    case "bw":
+                        return Bewertungsturnier;
+
+                    case Landesmeisterschaft:
+                    case "LANDESMEISTERSCHAFT":
+                    case "landesmeisterschaft":
+                    case "LM":
+                    case "Lm":
+                    case "lm":
+                        return Bewertungsturnier;
+
+                    case Staatsmeisterschaft:
+                    case "STAATSMEISTERSCHAFT":
+                    case "staatsmeisterschaft":
+                    case "STAATS":
+                    case "Staats":
+                        return Staatsmeisterschaft;
+
+                    case OesterrMeisterschaft:
+                    case "ÖSTERR. MEISTERSCHAFT":
+                    case "OESTERR. MEISTERSCHAFT":
+                    case "österr. meisterschaft":
+                    case "oesterr. meisterschaft":
+                    case "ÖM":
+                    case "OEM":
+                    case "OeM":
+                    case "öm":
+                    case "oem":
+                        return OesterrMeisterschaft;
+                }
+
+                return useString;
+            }
+
+            /// <summary>
+            /// See "5otsvto2023.pdf" (ÖTSV TURNIERORDNUNG): 
+            /// * § 10 - STARTKLASSENÄNDERUNG, page 35
+            /// </summary>
+            /// <param name="useCompetitionType"></param>
+            /// <returns></returns>
+            public static int GetPointsForWinning(
+                string? useCompetitionType)
+            {
+                switch (CompetitionType.ToCompetitionType(
+                    useCompetitionType))
+                {
+                    case CompetitionType.Landesmeisterschaft:
+                        return 150;
+
+                    case CompetitionType.Staatsmeisterschaft:
+                    case CompetitionType.OesterrMeisterschaft:
+                        return 200;
+                }
+
+                return 100;
+            }
+        }
+
+
         public static class Disciplines
         {
             public const string Sta = "Sta";
@@ -177,6 +253,8 @@
             public const string A = "A";
             public const string S = "S";
 
+            public const int NoPromotionPossible = 999_999_999;
+
             public static string? ToClasses(
                 string? useString)
             {
@@ -329,6 +407,206 @@
                 }
 
                 return null;
+            }
+
+            /// <summary>
+            /// See "5otsvto2023.pdf" (ÖTSV TURNIERORDNUNG): 
+            /// * § 10 - STARTKLASSENÄNDERUNG, page 35
+            /// </summary>
+            /// <param name="forAgeClass"></param>
+            /// <param name="forClass"></param>
+            /// <returns></returns>
+            public static int GetMinStartsForPromotion(
+                string? forDiscepline,
+                string? forAgeClass,
+                string? forAgeGroup,
+                string? forClass)
+            {
+                return 10;
+            }
+
+            /// <summary>
+            /// See "5otsvto2023.pdf" (ÖTSV TURNIERORDNUNG): 
+            /// * § 9 - STARTKLASSEN, page 33
+            /// * § 10 - STARTKLASSENÄNDERUNG, page 35
+            /// </summary>
+            /// <param name="forAgeClass"></param>
+            /// <param name="forClass"></param>
+            /// <returns></returns>
+            public static int GetMinPointsForPromotion(
+                string? forDiscepline,
+                string? forAgeClass,
+                string? forAgeGroup,
+                string? forClass)
+            {
+                var useDiscepline = Disciplines.ToDisciplines(forDiscepline);
+                var useAgeClasses = AgeClasses.ToAgeClasses(forAgeClass);
+                var useAgeGroup = AgeGroups.ToAgeGroup(forAgeGroup);
+                var useClasses = ToClasses(forClass);
+
+
+                switch (useAgeClasses)
+                {
+                    case AgeClasses.Adult:
+                        switch (useClasses)
+                        {
+                            case Classes.D:
+                                return 900;
+
+                            case Classes.C:
+                                return 1_500;
+
+                            case Classes.B:
+                                return 1_300;
+
+                            case Classes.A:
+                                return 1_600;
+
+                            case Classes.S:
+                                return NoPromotionPossible;
+                        }
+                        break;
+
+                    case AgeClasses.Senior:
+                        switch (useAgeGroup)
+                        {
+                            case AgeGroups.Group1:
+                                switch (useDiscepline)
+                                {
+                                    case Disciplines.Sta:
+                                        switch (useClasses)
+                                        {
+                                            case Classes.D:
+                                                return 900;
+
+                                            case Classes.C:
+                                                return 1_500;
+
+                                            case Classes.B:
+                                                return 1_300;
+
+                                            case Classes.A:
+                                                return 1_600;
+
+                                            case Classes.S:
+                                                return NoPromotionPossible;
+                                        }
+                                        break;
+
+                                    case Disciplines.La:
+                                        switch (useClasses)
+                                        {
+                                            case Classes.D:
+                                                return 900;
+
+                                            case Classes.C:
+                                                return 1_500;
+
+                                            case Classes.B:
+                                                return 1_800;
+
+                                            case Classes.A:
+                                                return 0;
+
+                                            case Classes.S:
+                                                return NoPromotionPossible;
+                                        }
+                                        break;
+                                }
+                                break;
+
+                            case AgeGroups.Group2:
+                            case AgeGroups.Group3:
+                            case AgeGroups.Group4:
+                                switch (useDiscepline)
+                                {
+                                    case Disciplines.Sta:
+                                        switch (useClasses)
+                                        {
+                                            case Classes.D:
+                                                return 1_400;
+
+                                            case Classes.C:
+                                                return 2_400;
+
+                                            case Classes.B:
+                                                return 2_000;
+
+                                            case Classes.A:
+                                                return 2_600;
+
+                                            case Classes.S:
+                                                return NoPromotionPossible;
+                                        }
+                                        break;
+
+                                    case Disciplines.La:
+                                        switch (useClasses)
+                                        {
+                                            case Classes.D:
+                                                return 1_400;
+
+                                            case Classes.C:
+                                                return 2_400;
+
+                                            case Classes.B:
+                                                return 2_800;
+
+                                            case Classes.A:
+                                                return 0;
+
+                                            case Classes.S:
+                                                return NoPromotionPossible;
+                                        }
+                                        break;
+                                }
+                                break;
+                        }
+                        break;
+
+                    case AgeClasses.Juvenile:
+                    case AgeClasses.Junior:
+                        switch (useClasses)
+                        {
+                            case Classes.D:
+                                return 1_000;
+
+                            case Classes.C:
+                                return 1_900;
+
+                            case Classes.B:
+                                return NoPromotionPossible;
+
+                            case Classes.A:
+                                return NoPromotionPossible;
+
+                            case Classes.S:
+                                return NoPromotionPossible;
+                        }
+                        break;
+
+                    case AgeClasses.Youth:
+                        switch (useClasses)
+                        {
+                            case Classes.D:
+                                return 900;
+
+                            case Classes.C:
+                                return 1_500;
+
+                            case Classes.B:
+                                return 1_000;
+
+                            case Classes.A:
+                                return NoPromotionPossible;
+
+                            case Classes.S:
+                                return NoPromotionPossible;
+                        }
+                        break;
+                }
+
+                return NoPromotionPossible;
             }
         }
 
