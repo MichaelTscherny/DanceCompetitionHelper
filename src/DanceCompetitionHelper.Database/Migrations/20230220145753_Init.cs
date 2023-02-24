@@ -352,6 +352,11 @@ namespace DanceCompetitionHelper.Database.Migrations
                 column: "CompetitionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AdjudicatorPanels_Created",
+                table: "AdjudicatorPanels",
+                column: "Created");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AdjudicatorPanels_Name_CompetitionId",
                 table: "AdjudicatorPanels",
                 columns: new[] { "Name", "CompetitionId" },
@@ -367,6 +372,11 @@ namespace DanceCompetitionHelper.Database.Migrations
                 name: "IX_AdjudicatorPanelsHistroy_CompetitionId",
                 table: "AdjudicatorPanelsHistroy",
                 column: "CompetitionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdjudicatorPanelsHistroy_Created",
+                table: "AdjudicatorPanelsHistroy",
+                column: "Created");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AdjudicatorPanelsHistroy_Name_CompetitionId_Version",
@@ -386,15 +396,20 @@ namespace DanceCompetitionHelper.Database.Migrations
                 column: "AdjudicatorPanelId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Adjudicators_Created",
+                table: "Adjudicators",
+                column: "Created");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Adjudicators_Name_AdjudicatorPanelId",
                 table: "Adjudicators",
                 columns: new[] { "Name", "AdjudicatorPanelId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AdjudicatorsHistory_AdjudicatorHistoryId_AdjudicatorPanelHistoryId_Version",
+                name: "IX_AdjudicatorsHistory_AdjudicatorHistoryId_AdjudicatorPanelHistoryId_AdjudicatorPanelHistoryVersion",
                 table: "AdjudicatorsHistory",
-                columns: new[] { "AdjudicatorHistoryId", "AdjudicatorPanelHistoryId", "Version" },
+                columns: new[] { "AdjudicatorHistoryId", "AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -403,9 +418,14 @@ namespace DanceCompetitionHelper.Database.Migrations
                 columns: new[] { "AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AdjudicatorsHistory_Name_AdjudicatorPanelHistoryId_Version",
+                name: "IX_AdjudicatorsHistory_Created",
                 table: "AdjudicatorsHistory",
-                columns: new[] { "Name", "AdjudicatorPanelHistoryId", "Version" },
+                column: "Created");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdjudicatorsHistory_Name_AdjudicatorPanelHistoryId_AdjudicatorPanelHistoryVersion",
+                table: "AdjudicatorsHistory",
+                columns: new[] { "Name", "AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -426,6 +446,11 @@ namespace DanceCompetitionHelper.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_CompetitionClasses_Created",
+                table: "CompetitionClasses",
+                column: "Created");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CompetitionClassesHistory_AdjudicatorPanelHistoryId_AdjudicatorPanelHistoryVersion",
                 table: "CompetitionClassesHistory",
                 columns: new[] { "AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion" });
@@ -441,6 +466,16 @@ namespace DanceCompetitionHelper.Database.Migrations
                 table: "CompetitionClassesHistory",
                 columns: new[] { "CompetitionId", "OrgClassId", "Version" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompetitionClassesHistory_Created",
+                table: "CompetitionClassesHistory",
+                column: "Created");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Competitions_Created",
+                table: "Competitions",
+                column: "Created");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Competitions_Organization_OrgCompetitionId",
@@ -460,6 +495,11 @@ namespace DanceCompetitionHelper.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Participants_Created",
+                table: "Participants",
+                column: "Created");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ParticipantsHistory_CompetitionClassHistoryId_CompetitionClassHistoryVersion",
                 table: "ParticipantsHistory",
                 columns: new[] { "CompetitionClassHistoryId", "CompetitionClassHistoryVersion" });
@@ -469,6 +509,16 @@ namespace DanceCompetitionHelper.Database.Migrations
                 table: "ParticipantsHistory",
                 columns: new[] { "CompetitionId", "ParticipantHistoryId", "Version" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ParticipantsHistory_Created",
+                table: "ParticipantsHistory",
+                column: "Created");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TableVersionInfos_Created",
+                table: "TableVersionInfos",
+                column: "Created");
         }
 
         /// <inheritdoc />

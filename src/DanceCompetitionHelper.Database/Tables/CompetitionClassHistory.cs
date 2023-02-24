@@ -7,6 +7,7 @@ namespace DanceCompetitionHelper.Database.Tables
     [Comment("History of Classes of a " + nameof(Competition))]
     [Index(nameof(CompetitionId), nameof(OrgClassId), nameof(Version), IsUnique = true)]
     [Index(nameof(CompetitionId), nameof(CompetitionClassName), nameof(Version), IsUnique = true)]
+    [Index(nameof(AdjudicatorPanelHistoryId), nameof(AdjudicatorPanelHistoryVersion), IsUnique = false)]
     [PrimaryKey(nameof(CompetitionClassHistoryId), nameof(Version))]
     public class CompetitionClassHistory : TableBase
     {

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DanceCompetitionHelper.Database.Migrations
 {
     [DbContext(typeof(DanceCompetitionHelperDbContext))]
-    [Migration("20230215170055_Init")]
+    [Migration("20230220145753_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -67,6 +67,8 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasKey("AdjudicatorId");
 
                     b.HasIndex("AdjudicatorPanelId");
+
+                    b.HasIndex("Created");
 
                     b.HasIndex("AdjudicatorId", "AdjudicatorPanelId")
                         .IsUnique();
@@ -131,12 +133,14 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.HasKey("AdjudicatorHistoryId", "Version");
 
+                    b.HasIndex("Created");
+
                     b.HasIndex("AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion");
 
-                    b.HasIndex("AdjudicatorHistoryId", "AdjudicatorPanelHistoryId", "Version")
+                    b.HasIndex("AdjudicatorHistoryId", "AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion")
                         .IsUnique();
 
-                    b.HasIndex("Name", "AdjudicatorPanelHistoryId", "Version")
+                    b.HasIndex("Name", "AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion")
                         .IsUnique();
 
                     b.ToTable("AdjudicatorsHistory", t =>
@@ -187,6 +191,8 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasKey("AdjudicatorPanelId");
 
                     b.HasIndex("CompetitionId");
+
+                    b.HasIndex("Created");
 
                     b.HasIndex("AdjudicatorPanelId", "CompetitionId")
                         .IsUnique();
@@ -244,6 +250,8 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasKey("AdjudicatorPanelHistoryId", "Version");
 
                     b.HasIndex("CompetitionId");
+
+                    b.HasIndex("Created");
 
                     b.HasIndex("AdjudicatorPanelHistoryId", "CompetitionId", "Version")
                         .IsUnique();
@@ -309,6 +317,8 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("CompetitionId");
+
+                    b.HasIndex("Created");
 
                     b.HasIndex("Organization", "OrgCompetitionId")
                         .IsUnique();
@@ -402,6 +412,8 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasKey("CompetitionClassId");
 
                     b.HasIndex("AdjudicatorPanelId");
+
+                    b.HasIndex("Created");
 
                     b.HasIndex("CompetitionId", "CompetitionClassName")
                         .IsUnique();
@@ -501,6 +513,8 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("CompetitionClassHistoryId", "Version");
+
+                    b.HasIndex("Created");
 
                     b.HasIndex("AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion");
 
@@ -609,6 +623,8 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.HasIndex("CompetitionClassId");
 
+                    b.HasIndex("Created");
+
                     b.HasIndex("CompetitionId", "ParticipantId")
                         .IsUnique();
 
@@ -714,6 +730,8 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.HasKey("ParticipantHistoryId", "Version");
 
+                    b.HasIndex("Created");
+
                     b.HasIndex("CompetitionClassHistoryId", "CompetitionClassHistoryVersion");
 
                     b.HasIndex("CompetitionId", "ParticipantHistoryId", "Version")
@@ -764,6 +782,8 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasComment("Row last modified by");
 
                     b.HasKey("CompetitionId", "TableName", "CurrentVersion");
+
+                    b.HasIndex("Created");
 
                     b.ToTable("TableVersionInfos");
                 });

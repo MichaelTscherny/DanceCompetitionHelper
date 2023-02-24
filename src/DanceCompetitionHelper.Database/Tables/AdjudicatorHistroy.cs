@@ -5,8 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("Histroy of an " + nameof(Tables.Adjudicator) + "of a " + nameof(CompetitionClass))]
-    [Index(nameof(AdjudicatorHistoryId), nameof(AdjudicatorPanelHistoryId), nameof(Version), IsUnique = true)]
-    [Index(nameof(Name), nameof(AdjudicatorPanelHistoryId), nameof(Version), IsUnique = true)]
+    [Index(nameof(AdjudicatorHistoryId), nameof(AdjudicatorPanelHistoryId), nameof(AdjudicatorPanelHistoryVersion), IsUnique = true)]
+    [Index(nameof(Name), nameof(AdjudicatorPanelHistoryId), nameof(AdjudicatorPanelHistoryVersion), IsUnique = true)]
     [PrimaryKey(nameof(AdjudicatorHistoryId), nameof(Version))]
     public class AdjudicatorHistory : TableBase
     {

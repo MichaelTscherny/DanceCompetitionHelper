@@ -8,6 +8,7 @@ namespace DanceCompetitionHelper.Database.Tables
     [Comment("The classes of a " + nameof(Competition))]
     [Index(nameof(CompetitionId), nameof(OrgClassId), IsUnique = true)]
     [Index(nameof(CompetitionId), nameof(CompetitionClassName), IsUnique = true)]
+    [Index(nameof(AdjudicatorPanelId), IsUnique = false)]
     [PrimaryKey(nameof(CompetitionClassId))]
     public class CompetitionClass : TableBase
     {
