@@ -56,7 +56,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
                 if (lineItems.Length >= 2)
                 {
-                    switch (lineItems[0].ToUpper())
+                    switch (lineItems[0].ToUpperInvariant())
                     {
                         case "TSD":
                             ExtractCompetitionInfo(
@@ -94,7 +94,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 return;
             }
 
-            var orgInfoType = orgInfo[0].ToUpper();
+            var orgInfoType = orgInfo[0].ToUpperInvariant();
             var orgInfoValue = orgInfo[1];
 
             switch (orgInfoType)
@@ -139,17 +139,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     break;
 
             }
-
-
-            /*
-        public string  { get; private set; } = default!;
-        public string  { get; private set; } = default!;
-        public string  { get; private set; } = default!;
-        public string?  { get; private set; }
-        public DateTime  { get; private set; }
-        public string  { get; private set; } = default!;             
-             */
-
         }
 
         public void ExtractCompetitionClasses(
@@ -159,6 +148,20 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             {
                 return;
             }
+
+            if (string.IsNullOrEmpty(OrgCompetitionId))
+            {
+                OrgCompetitionId = competitionInfo[1];
+            }
+
+            CompetitionClasses.Add(
+                string.Join(
+                    ";",
+                    competitionInfo[3],
+                    competitionInfo[4],
+                    competitionInfo[5],
+                    competitionInfo[6],
+                    competitionInfo[7]));
         }
 
         public void ExtractOfficials(
@@ -167,6 +170,36 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             if (competitionInfo.Length < 3)
             {
                 return;
+            }
+
+            var officialsInfo = competitionInfo[1].Split(
+                new[] { "=" },
+                StringSplitOptions.TrimEntries);
+
+            if (officialsInfo.Length < 2)
+            {
+                return;
+            }
+
+            var offInfoType = officialsInfo[0].ToUpperInvariant();
+            var offInfoValue = officialsInfo[1];
+
+            switch (offInfoType)
+            {
+                case "TL":
+                    MastersOfCeremony.Add(
+                        offInfoValue);
+                    break;
+
+                case "BS":
+                    Assessors.Add(
+                        offInfoValue);
+                    break;
+
+                case "WR":
+                    Adjudicators.Add(
+                        offInfoValue);
+                    break;
             }
         }
 
