@@ -12,7 +12,7 @@
             public static string? ToCompetitionType(
                 string? useString)
             {
-                switch (useString)
+                switch (useString?.Trim())
                 {
                     case Bewertungsturnier:
                     case "BEWERTUNGSTURNIER":
@@ -88,7 +88,7 @@
             public static string? ToDisciplines(
                 string? useString)
             {
-                switch (useString)
+                switch (useString?.Trim())
                 {
                     case Sta:
                     case "sta":
@@ -139,7 +139,7 @@
             public static string? ToAgeClasses(
                 string? useString)
             {
-                switch (useString)
+                switch (useString?.Trim())
                 {
                     case Juvenile:
                     case "SCH":
@@ -173,6 +173,8 @@
 
                     case Adult:
                     case "ALLG":
+                    case "ALG":
+                    case "Alg":
                     case "Adult":
                     case "ADULT":
                     case "Adt":
@@ -215,26 +217,31 @@
                 {
                     case GroupNone:
                     case "0":
+                    case "00":
                     case "":
                     case "-":
                         return GroupNone;
 
                     case Group1:
+                    case "01":
                     case "I":
                     case "i":
                         return Group1;
 
                     case Group2:
+                    case "02":
                     case "II":
                     case "ii":
                         return Group2;
 
                     case Group3:
+                    case "03":
                     case "III":
                     case "iii":
                         return Group3;
 
                     case Group4:
+                    case "05":
                     case "IV":
                     case "iv":
                         return Group4;
@@ -258,7 +265,7 @@
             public static string? ToClasses(
                 string? useString)
             {
-                switch (useString)
+                switch (useString?.Trim())
                 {
                     case Amateur:
                     case "bsp":
@@ -443,7 +450,6 @@
                 var useAgeClasses = AgeClasses.ToAgeClasses(forAgeClass);
                 var useAgeGroup = AgeGroups.ToAgeGroup(forAgeGroup);
                 var useClasses = ToClasses(forClass);
-
 
                 switch (useAgeClasses)
                 {
