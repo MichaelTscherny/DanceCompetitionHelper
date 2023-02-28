@@ -70,5 +70,22 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [NotMapped]
         public CompetitionClassDisplayInfo? DisplayInfo { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0} ({1}/{2}/{3}/{4}/{5} - {6}/{7}/{8}/{9}/'{10}')",
+                CompetitionClassName,
+                OrgClassId,
+                AgeClass,
+                AgeGroup,
+                Discipline,
+                Class,
+                MinPointsForPromotion,
+                MinStartsForPromotion,
+                PointsForFirst,
+                ExtraManualStarter,
+                Comment);
+        }
     }
 }

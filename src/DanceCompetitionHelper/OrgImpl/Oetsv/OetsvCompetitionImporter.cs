@@ -86,7 +86,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             ExtractData(
                 fullPathCompetition,
                 fullPathParticipants);
-            ImportToDatabase(
+            ImportOrUpdateDatabase(
                 dbCtx);
         }
 
@@ -546,15 +546,15 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 addPartImport);
         }
 
-        public void ImportToDatabase(
+        public void ImportOrUpdateDatabase(
             DanceCompetitionHelperDbContext dbCtx)
         {
-            var useComp = dbCtx.Competitions.FirstOrDefault(
+            var foundComp = dbCtx.Competitions.FirstOrDefault(
                 x => x.OrgCompetitionId == OrgCompetitionId);
 
-            if (useComp == null)
+            if (foundComp == null)
             {
-                useComp = dbCtx.Competitions.Add(
+                foundComp = dbCtx.Competitions.Add(
                     new Competition()
                     {
                         Organization = OrganizationEnum.Oetsv,
@@ -568,6 +568,130 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         CompetitionDate = CompetitionDate,
                     })
                     .Entity;
+            }
+            else
+            {
+                _logger.LogInformation(
+                    "Update existing {CompName}: {foundComp}",
+                    nameof(Competition),
+                    foundComp);
+
+                foundComp.CompetitionName = string.Format(
+                    "{0} ({1})",
+                    CompetitionName,
+                    CompetitionType);
+                foundComp.CompetitionInfo = string.Format(
+                    "{0}, {1}",
+                    CompetitionAddress,
+                    CompetitionLocation);
+                foundComp.CompetitionDate = CompetitionDate;
+            }
+
+            var foundAdjPanel = dbCtx.AdjudicatorPanels.FirstOrDefault(
+                x => x.CompetitionId == foundComp.CompetitionId);
+
+            if (foundAdjPanel == null)
+            {
+                foundAdjPanel = dbCtx.AdjudicatorPanels.Add(
+                    new AdjudicatorPanel()
+                    {
+                        Competition = foundComp,
+                        Name = "Panel 1",
+                    }).Entity;
+
+                var adjAbbr = 'A';
+                foreach (var curAdj in Adjudicators)
+                {
+                    dbCtx.Adjudicators.Add(
+                        new Adjudicator()
+                        {
+                            AdjudicatorPanel = foundAdjPanel,
+                            Name = curAdj,
+                            Abbreviation = adjAbbr.ToString(),
+                        });
+
+                    adjAbbr++;
+                }
+            }
+            else
+            {
+                // TOOD: how to update those?.. -> add missing ones...
+            }
+
+            var allCompClasses = dbCtx.CompetitionClasses.Where(
+                x => x.CompetitionId == foundComp.CompetitionId)
+                .ToDictionary(
+                    x => x.OrgClassId);
+
+            foreach (var curImportCompClass in CompetitionClasses)
+            {
+                if (string.IsNullOrEmpty(
+                    curImportCompClass.OrgClassId))
+                {
+                    _logger.LogWarning(
+                        "{PropertyName} '{OrgClassId}' is invalid/missing! Ignore {ImportCompetitionClass}",
+                        nameof(curImportCompClass.OrgClassId),
+                        curImportCompClass.OrgClassId,
+                        curImportCompClass);
+
+                    continue;
+                }
+
+                if (allCompClasses.TryGetValue(
+                    curImportCompClass.OrgClassId,
+                    out var foundCompetitionClass))
+                {
+                    _logger.LogInformation(
+                        "Update existing {CompClassName}: {foundCompetitionClass}",
+                        nameof(CompetitionClass),
+                        foundCompetitionClass);
+
+                    foundCompetitionClass.CompetitionClassName = curImportCompClass.Name ?? foundCompetitionClass.CompetitionClassName;
+                    foundCompetitionClass.Discipline = curImportCompClass.Discipline ?? foundCompetitionClass.Discipline;
+                    foundCompetitionClass.AgeClass = curImportCompClass.AgeClass ?? foundCompetitionClass.AgeClass;
+                    foundCompetitionClass.AgeGroup = curImportCompClass.AgeGroup ?? foundCompetitionClass.AgeGroup;
+                    foundCompetitionClass.Class = curImportCompClass.Class ?? foundCompetitionClass.Class;
+                }
+                else
+                {
+                    var useClassName = string.IsNullOrEmpty(curImportCompClass.Name)
+                        ? string.Format(
+                            "{0} {1} {2} {3} {4}",
+                            curImportCompClass.AgeClass,
+                            curImportCompClass.AgeClass,
+                            curImportCompClass.AgeGroup,
+                            curImportCompClass.Discipline,
+                            curImportCompClass.Class)
+                        : curImportCompClass.Name;
+
+                    var newCompClass = dbCtx.CompetitionClasses.Add(
+                        new CompetitionClass()
+                        {
+                            Competition = foundComp,
+                            OrgClassId = curImportCompClass.OrgClassId,
+                            AdjudicatorPanel = foundAdjPanel,
+                            CompetitionClassName = useClassName,
+                            Discipline = curImportCompClass.Discipline,
+                            AgeClass = curImportCompClass.AgeClass,
+                            AgeGroup = curImportCompClass.AgeGroup,
+                            Class = curImportCompClass.Class,
+                            MinPointsForPromotion = OetsvConstants.Classes.GetMinPointsForPromotion(
+                                curImportCompClass.Discipline,
+                                curImportCompClass.AgeClass,
+                                curImportCompClass.AgeGroup,
+                                curImportCompClass.Class),
+                            MinStartsForPromotion = OetsvConstants.Classes.GetMinStartsForPromotion(
+                                curImportCompClass.Discipline,
+                                curImportCompClass.AgeClass,
+                                curImportCompClass.AgeGroup,
+                                curImportCompClass.Class),
+                            PointsForFirst = OetsvConstants.CompetitionType.GetPointsForWinning(
+                                CompetitionType),
+                        })
+                        .Entity;
+
+                    allCompClasses[newCompClass.OrgClassId] = newCompClass;
+                }
             }
         }
 
