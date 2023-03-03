@@ -61,11 +61,11 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [Range(0, int.MaxValue)]
         public int MinStartsForPromotion { get; set; }
-        [Range(0, int.MaxValue)]
-        public int MinPointsForPromotion { get; set; }
+        [Range(0, double.MaxValue)]
+        public double MinPointsForPromotion { get; set; }
 
-        [Range(0, int.MaxValue)]
-        public int PointsForFirst { get; set; }
+        [Range(0, double.MaxValue)]
+        public double PointsForFirst { get; set; }
 
         [Range(0, int.MaxValue)]
         public int ExtraManualStarter { get; set; }

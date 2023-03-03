@@ -587,6 +587,20 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("OrgAlreadyPromotedInfoPartA")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OrgAlreadyPromotedInfoPartB")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("OrgAlreadyPromotedPartA")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("OrgAlreadyPromotedPartB")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("OrgIdClub")
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
@@ -695,6 +709,20 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.Property<string>("NamePartB")
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("OrgAlreadyPromotedInfoPartA")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OrgAlreadyPromotedInfoPartB")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("OrgAlreadyPromotedPartA")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("OrgAlreadyPromotedPartB")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("OrgIdClub")
                         .HasMaxLength(32)

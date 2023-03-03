@@ -1540,8 +1540,8 @@ namespace DanceCompetitionHelper
             string? ageGroup,
             string? className,
             int minStartsForPromotion,
-            int minPointsForPromotion,
-            int pointsForFirst,
+            double minPointsForPromotion,
+            double pointsForFirst,
             int extraManualStarter,
             string? comment,
             bool ignore)
@@ -1617,8 +1617,8 @@ namespace DanceCompetitionHelper
             string? ageGroup,
             string? className,
             int minStartsForPromotion,
-            int minPointsForPromotion,
-            int pointsForFirst,
+            double minPointsForPromotion,
+            double pointsForFirst,
             int extraManualStarter,
             string? comment,
             bool ignore)
@@ -1735,18 +1735,26 @@ namespace DanceCompetitionHelper
             Guid competitionId,
             Guid competitionClassId,
             int startNumber,
+            // A
             string namePartA,
             string? orgIdPartA,
+            // B
             string? namePartB,
             string? orgIdPartB,
             string? clubName,
             string? orgIdClub,
-            int orgPointsPartA,
+            // A
+            double orgPointsPartA,
             int orgStartsPartA,
             int? minStartsForPromotionPartA,
-            int? orgPointsPartB,
+            bool? orgAlreadyPromotedPartA,
+            string? orgAlreadyPromotedInfoPartA,
+            // B
+            double? orgPointsPartB,
             int? orgStartsPartB,
             int? minStartsForPromotionPartB,
+            bool? orgAlreadyPromotedPartB,
+            string? orgAlreadyPromotedInfoPartB,
             string? comment,
             bool ignore)
         {
@@ -1796,12 +1804,18 @@ namespace DanceCompetitionHelper
                         OrgIdPartB = orgIdPartB,
                         ClubName = clubName,
                         OrgIdClub = orgIdClub,
+                        // A
                         OrgPointsPartA = orgPointsPartA,
                         OrgStartsPartA = orgStartsPartA,
                         MinStartsForPromotionPartA = minStartsForPromotionPartA,
+                        OrgAlreadyPromotedPartA = orgAlreadyPromotedPartA,
+                        OrgAlreadyPromotedInfoPartA = orgAlreadyPromotedInfoPartA,
+                        // B
                         OrgPointsPartB = orgPointsPartB,
                         OrgStartsPartB = orgStartsPartB,
                         MinStartsForPromotionPartB = minStartsForPromotionPartB,
+                        OrgAlreadyPromotedPartB = orgAlreadyPromotedPartB,
+                        OrgAlreadyPromotedInfoPartB = orgAlreadyPromotedInfoPartB,
                         Comment = comment,
                         Ignore = ignore,
                     });
@@ -1833,18 +1847,26 @@ namespace DanceCompetitionHelper
             Guid participantId,
             Guid competitionClassId,
             int startNumber,
+            // A
             string namePartA,
             string? orgIdPartA,
+            // A
             string? namePartB,
             string? orgIdPartB,
             string? clubName,
             string? orgIdClub,
-            int orgPointsPartA,
+            // A
+            double orgPointsPartA,
             int orgStartsPartA,
             int? minStartsForPromotionPartA,
-            int? orgPointsPartB,
+            bool? orgAlreadyPromotedPartA,
+            string? orgAlreadyPromotedInfoPartA,
+            // B
+            double? orgPointsPartB,
             int? orgStartsPartB,
             int? minStartsForPromotionPartB,
+            bool? orgAlreadyPromotedPartB,
+            string? orgAlreadyPromotedInfoPartB,
             string? comment,
             bool ignore)
         {
@@ -1890,12 +1912,18 @@ namespace DanceCompetitionHelper
                 foundParticipant.OrgIdPartB = orgIdPartB;
                 foundParticipant.ClubName = clubName;
                 foundParticipant.OrgIdClub = orgIdClub;
+                // A
                 foundParticipant.OrgPointsPartA = orgPointsPartA;
                 foundParticipant.OrgStartsPartA = orgStartsPartA;
                 foundParticipant.MinStartsForPromotionPartA = minStartsForPromotionPartA;
+                foundParticipant.OrgAlreadyPromotedPartA = orgAlreadyPromotedPartA;
+                foundParticipant.OrgAlreadyPromotedInfoPartA = orgAlreadyPromotedInfoPartA;
+                // B
                 foundParticipant.OrgPointsPartB = orgPointsPartB;
                 foundParticipant.OrgStartsPartB = orgStartsPartB;
                 foundParticipant.MinStartsForPromotionPartB = minStartsForPromotionPartB;
+                foundParticipant.OrgAlreadyPromotedPartB = orgAlreadyPromotedPartB;
+                foundParticipant.OrgAlreadyPromotedInfoPartB = orgAlreadyPromotedInfoPartB;
                 foundParticipant.Comment = comment;
                 foundParticipant.Ignore = ignore;
 
@@ -1991,5 +2019,24 @@ namespace DanceCompetitionHelper
         }
 
         #endregion // IDisposable
+
+
+        #region Importer
+
+        public List<string> ImportOrUpdateCompetition(
+            OrganizationEnum Organization,
+            string? OrgCompetitionId,
+            ImportTypeEnum ImportType,
+            IEnumerable<string>? filePaths)
+        {
+            // TODO: implement!
+            return new List<string>()
+            {
+                "NOT YET IMPLEMENTED!",
+            };
+        }
+
+        #endregion // Importer
+
     }
 }

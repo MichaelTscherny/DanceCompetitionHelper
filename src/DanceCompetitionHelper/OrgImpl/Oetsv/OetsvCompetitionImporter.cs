@@ -2,6 +2,7 @@
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.OrgImpl.Oetsv.WorkData;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text;
@@ -50,11 +51,13 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public const int PartExcelAgeGroup = 13;
         public const int PartExcelClass = 14;
 
+        public const int PartExcelClassOrgSta = 21;
         public const int PartExcelOrgPointsSta = 19;
         public const int PartExcelOrgStartsSta = 20;
         public const int PartExcelOrgMinPointsForPromotionSta = 22;
         public const int PartExcelOrgMinStartsForPromotionSta = 23;
 
+        public const int PartExcelClassOrgLa = 27;
         public const int PartExcelOrgPointsLa = 25;
         public const int PartExcelOrgStartsLa = 26;
         public const int PartExcelOrgMinPointsForPromotionLa = 28;
@@ -504,6 +507,10 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             switch (addPartImport.Discipline)
             {
                 case OetsvConstants.Disciplines.Sta:
+                    addPartImport.ClassOrgRaw = participantInfo[PartExcelClassOrgSta];
+                    addPartImport.ClassOrg = OetsvConstants.Classes.ToClasses(
+                        participantInfo[PartExcelClassOrgSta]);
+
                     addPartImport.OrgPointsRaw = participantInfo[PartExcelOrgPointsSta];
                     addPartImport.OrgPoints = int.Parse(
                         participantInfo[PartExcelOrgPointsSta]);
@@ -523,6 +530,10 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     break;
 
                 case OetsvConstants.Disciplines.La:
+                    addPartImport.ClassOrgRaw = participantInfo[PartExcelClassOrgLa];
+                    addPartImport.ClassOrg = OetsvConstants.Classes.ToClasses(
+                        participantInfo[PartExcelClassOrgLa]);
+
                     addPartImport.OrgPointsRaw = participantInfo[PartExcelOrgPointsLa];
                     addPartImport.OrgPoints = int.Parse(
                         participantInfo[PartExcelOrgPointsLa]);
@@ -549,8 +560,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public void ImportOrUpdateDatabase(
             DanceCompetitionHelperDbContext dbCtx)
         {
-            var foundComp = dbCtx.Competitions.FirstOrDefault(
-                x => x.OrgCompetitionId == OrgCompetitionId);
+            var foundComp = dbCtx.Competitions
+                .TagWith(
+                    nameof(ImportOrUpdateDatabase) + "-01")
+                .FirstOrDefault(
+                    x => x.OrgCompetitionId == OrgCompetitionId);
 
             if (foundComp == null)
             {
@@ -587,8 +601,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 foundComp.CompetitionDate = CompetitionDate;
             }
 
-            var foundAdjPanel = dbCtx.AdjudicatorPanels.FirstOrDefault(
-                x => x.CompetitionId == foundComp.CompetitionId);
+            var foundAdjPanel = dbCtx.AdjudicatorPanels
+                .TagWith(
+                    nameof(ImportOrUpdateDatabase) + "-02")
+                .FirstOrDefault(
+                    x => x.CompetitionId == foundComp.CompetitionId);
 
             if (foundAdjPanel == null)
             {
@@ -618,8 +635,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 // TOOD: how to update those?.. -> add missing ones...
             }
 
-            var allCompClasses = dbCtx.CompetitionClasses.Where(
-                x => x.CompetitionId == foundComp.CompetitionId)
+            var allCompClasses = dbCtx.CompetitionClasses
+                .TagWith(
+                    nameof(ImportOrUpdateDatabase) + "-03")
+                .Where(
+                    x => x.CompetitionId == foundComp.CompetitionId)
                 .ToDictionary(
                     x => x.OrgClassId);
 
@@ -654,7 +674,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 }
                 else
                 {
-                    var useClassName = string.IsNullOrEmpty(curImportCompClass.Name)
+                    var useClassName = (string.IsNullOrEmpty(curImportCompClass.Name)
                         ? string.Format(
                             "{0} {1} {2} {3} {4}",
                             curImportCompClass.AgeClass,
@@ -662,7 +682,10 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                             curImportCompClass.AgeGroup,
                             curImportCompClass.Discipline,
                             curImportCompClass.Class)
-                        : curImportCompClass.Name;
+                        : curImportCompClass.Name)
+                            .Replace(
+                                "  ",
+                                " ");
 
                     var newCompClass = dbCtx.CompetitionClasses.Add(
                         new CompetitionClass()
@@ -693,6 +716,56 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     allCompClasses[newCompClass.OrgClassId] = newCompClass;
                 }
             }
+
+            var allParticipantsByImpStr = dbCtx.Participants
+                .TagWith(
+                    nameof(ImportOrUpdateDatabase) + "-04")
+                .Include(
+                    x => x.CompetitionClass)
+                .Where(
+                    x => x.CompetitionId == foundComp.CompetitionId)
+                .ToDictionary(
+                    x => string.Format(
+                        "{0}/{1}",
+                        x.CompetitionClass.OrgClassId,
+                        GetParticipantImportString(
+                            x)));
+
+            foreach (var curImportPart in Participants)
+            {
+                var curPartImpString = string.Format(
+                    "{0}/{1}",
+                    curImportPart.OrgClassId,
+                    GetParticipantImportString(
+                        curImportPart));
+
+            }
+        }
+
+        private string GetParticipantImportString(
+            Participant participant)
+        {
+            return string.Join(
+                "/",
+                participant.NamePartA,
+                participant.OrgIdPartA,
+                participant.NamePartB,
+                participant.OrgIdPartB,
+                participant.ClubName,
+                participant.OrgIdClub);
+        }
+
+        private string GetParticipantImportString(
+            CompetitionParticipantImport participantImport)
+        {
+            return string.Join(
+                "/",
+                participantImport.Part01Name,
+                participantImport.Part01OrgId,
+                participantImport.Part02Name,
+                participantImport.Part02OrgId,
+                participantImport.ClubName,
+                participantImport.ClubOrgId);
         }
 
         public DateTime ParseDateStrings(

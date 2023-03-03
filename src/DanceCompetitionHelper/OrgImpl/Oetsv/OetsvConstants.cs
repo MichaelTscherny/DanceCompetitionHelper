@@ -59,7 +59,7 @@
             /// </summary>
             /// <param name="useCompetitionType"></param>
             /// <returns></returns>
-            public static int GetPointsForWinning(
+            public static double GetPointsForWinning(
                 string? useCompetitionType)
             {
                 switch (CompetitionType.ToCompetitionType(

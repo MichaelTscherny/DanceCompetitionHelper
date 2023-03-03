@@ -1,5 +1,4 @@
 ﻿using DanceCompetitionHelper.Database.Enum;
-using DanceCompetitionHelper.Web.Enum;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,9 +6,8 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionModels
 {
     public class DoImportViewModel
     {
-        public string? Errors { get; set; }
+        public List<string> Errors { get; set; } = new List<string>();
 
-        [Required]
         [FromForm]
         [HiddenInput]
         public Guid? CompetitionId { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace DanceCompetitionHelper.Web.Enum
+﻿namespace DanceCompetitionHelper.Database.Enum
 {
     public enum ImportTypeEnum
     {

@@ -64,23 +64,33 @@ namespace DanceCompetitionHelper.Web.Models.ParticipantModels
 
         [FromForm]
         [Range(0, int.MaxValue)]
-        public int OrgPointsPartA { get; set; }
+        public double OrgPointsPartA { get; set; }
         [FromForm]
         [Range(0, int.MaxValue)]
         public int OrgStartsPartA { get; set; }
         [FromForm]
         [Range(0, int.MaxValue)]
         public int? MinStartsForPromotionPartA { get; set; }
+        [FromForm]
+        public bool? OrgAlreadyPromotedPartA { get; set; }
+        [FromForm]
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? OrgAlreadyPromotedInfoPartA { get; set; }
 
         [FromForm]
         [Range(0, int.MaxValue)]
-        public int? OrgPointsPartB { get; set; }
+        public double? OrgPointsPartB { get; set; }
         [FromForm]
         [Range(0, int.MaxValue)]
         public int? OrgStartsPartB { get; set; }
         [FromForm]
         [Range(0, int.MaxValue)]
         public int? MinStartsForPromotionPartB { get; set; }
+        [FromForm]
+        public bool? OrgAlreadyPromotedPartB { get; set; }
+        [FromForm]
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? OrgAlreadyPromotedInfoPartB { get; set; }
 
         [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]

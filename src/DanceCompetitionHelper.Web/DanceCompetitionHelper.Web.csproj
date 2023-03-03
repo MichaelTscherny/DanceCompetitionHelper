@@ -34,4 +34,8 @@
     <ProjectReference Include="..\DanceCompetitionHelper\DanceCompetitionHelper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Enum\" />
+  </ItemGroup>
+
 </Project>

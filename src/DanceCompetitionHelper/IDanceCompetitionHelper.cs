@@ -131,8 +131,8 @@ namespace DanceCompetitionHelper
             string? ageGroup,
             string? className,
             int minStartsForPromotion,
-            int minPointsForPromotion,
-            int pointsForFirts,
+            double minPointsForPromotion,
+            double pointsForFirts,
             int extraManualStarter,
             string? comment,
             bool ignore);
@@ -147,8 +147,8 @@ namespace DanceCompetitionHelper
             string? ageGroup,
             string? className,
             int minStartsForPromotion,
-            int minPointsForPromotion,
-            int pointsForFirst,
+            double minPointsForPromotion,
+            double pointsForFirst,
             int extraManualStarter,
             string? comment,
             bool ignore);
@@ -170,12 +170,16 @@ namespace DanceCompetitionHelper
             string? orgIdPartB,
             string? clubName,
             string? orgIdClub,
-            int orgPointsPartA,
+            double orgPointsPartA,
             int orgStartsPartA,
             int? minStartsForPromotionPartA,
-            int? orgPointsPartB,
+            bool? orgAlreadyPromotedPartA,
+            string? OrgAlreadyPromotedInfoPartA,
+            double? orgPointsPartB,
             int? orgStartsPartB,
             int? minStartsForPromotionPartB,
+            bool? orgAlreadyPromotedPartB,
+            string? OrgAlreadyPromotedInfoPartB,
             string? comment,
             bool ignore);
 
@@ -189,12 +193,16 @@ namespace DanceCompetitionHelper
             string? orgIdPartB,
             string? clubName,
             string? orgIdClub,
-            int orgPointsPartA,
+            double orgPointsPartA,
             int orgStartsPartA,
             int? minStartsForPromotionPartA,
-            int? orgPointsPartB,
+            bool? orgAlreadyPromotedPartA,
+            string? OrgAlreadyPromotedInfoPartA,
+            double? orgPointsPartB,
             int? orgStartsPartB,
             int? minStartsForPromotionPartB,
+            bool? orgAlreadyPromotedPartB,
+            string? OrgAlreadyPromotedInfoPartB,
             string? comment,
             bool ignore);
 
@@ -202,6 +210,16 @@ namespace DanceCompetitionHelper
             Guid participantId);
 
         #endregion //  CompetitionClass Crud
+
+        #region Importer
+
+        List<string> ImportOrUpdateCompetition(
+            OrganizationEnum Organization,
+            string? OrgCompetitionId,
+            ImportTypeEnum ImportType,
+            IEnumerable<string>? filePaths);
+
+        #endregion // Importer
 
     }
 }

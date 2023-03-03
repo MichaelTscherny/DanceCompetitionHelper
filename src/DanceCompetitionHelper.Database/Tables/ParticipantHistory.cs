@@ -63,19 +63,27 @@ namespace DanceCompetitionHelper.Database.Tables
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? OrgIdClub { get; set; }
 
-        [Range(0, int.MaxValue)]
-        public int OrgPointsPartA { get; set; }
+        [Range(0, double.MaxValue)]
+        public double OrgPointsPartA { get; set; }
         [Range(0, int.MaxValue)]
         public int OrgStartsPartA { get; set; }
         [Range(0, int.MaxValue)]
         public int? MinStartsForPromotionPartA { get; set; }
+        public bool? OrgAlreadyPromotedPartA { get; set; }
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? OrgAlreadyPromotedInfoPartA { get; set; }
 
-        [Range(0, int.MaxValue)]
-        public int? OrgPointsPartB { get; set; }
+        [Range(0, double.MaxValue)]
+        public double? OrgPointsPartB { get; set; }
         [Range(0, int.MaxValue)]
         public int? OrgStartsPartB { get; set; }
         [Range(0, int.MaxValue)]
         public int? MinStartsForPromotionPartB { get; set; }
+        public bool? OrgAlreadyPromotedPartB { get; set; }
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? OrgAlreadyPromotedInfoPartB { get; set; }
+
+
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }

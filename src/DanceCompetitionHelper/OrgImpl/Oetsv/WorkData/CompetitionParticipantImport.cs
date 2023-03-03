@@ -40,6 +40,9 @@
         public string? ClassRaw { get; set; }
         public string? Class { get; set; }
 
+        public string? ClassOrgRaw { get; set; }
+        public string? ClassOrg { get; set; }
+
         public string? AgeClassRaw { get; set; }
         public string? AgeClass { get; set; }
 
@@ -102,6 +105,8 @@
                    Discipline == import.Discipline &&
                    ClassRaw == import.ClassRaw &&
                    Class == import.Class &&
+                   ClassOrgRaw == import.ClassOrgRaw &&
+                   ClassOrg == import.ClassOrg &&
                    AgeClassRaw == import.AgeClassRaw &&
                    AgeClass == import.AgeClass &&
                    AgeGroupRaw == import.AgeGroupRaw &&
@@ -147,6 +152,8 @@
             hash.Add(Discipline);
             hash.Add(ClassRaw);
             hash.Add(Class);
+            hash.Add(ClassOrgRaw);
+            hash.Add(ClassOrg);
             hash.Add(AgeClassRaw);
             hash.Add(AgeClass);
             hash.Add(AgeGroupRaw);

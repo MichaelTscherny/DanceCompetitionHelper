@@ -124,6 +124,8 @@ namespace DanceCompetitionHelper.Database.Extensions
                     OrgIdPartA = "100",
                     OrgPointsPartA = 100,
                     OrgStartsPartA = 1,
+                    OrgAlreadyPromotedPartA = true,
+                    OrgAlreadyPromotedInfoPartA = "just a test!",
                     NamePartB = "Dancer 01-B",
                     OrgIdPartB = "101",
                     ClubName = "Club-01",

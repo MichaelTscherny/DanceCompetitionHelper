@@ -179,13 +179,48 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult ShowImport()
         {
             return View(
-                new DoImportViewModel());
+                new DoImportViewModel()
+                {
+                    OrgCompetitionId = "1524",
+                });
         }
 
         public IActionResult DoImport(
             DoImportViewModel doImportView)
         {
-            return View();
+            if (ModelState.IsValid == false)
+            {
+                doImportView.Errors.AddRange(
+                    ModelState.GetErrorMessages()
+                    .Split(
+                        new[] { "\r\n" },
+                        StringSplitOptions.RemoveEmptyEntries));
+
+                return View(
+                    nameof(ShowImport),
+                    doImportView);
+            }
+
+            try
+            {
+                // TODO: implement more options/file-uploads/etc...
+                var executionErrors = _danceCompHelper.ImportOrUpdateCompetition(
+                    doImportView.Organization,
+                    doImportView.OrgCompetitionId,
+                    doImportView.ImportType,
+                    null);
+
+                doImportView.Errors.AddRange(
+                    executionErrors);
+            }
+            catch (Exception exc)
+            {
+                doImportView.Errors.Add(
+                    exc.Message);
+            }
+
+            return View(
+                doImportView);
         }
 
         public IActionResult Privacy()

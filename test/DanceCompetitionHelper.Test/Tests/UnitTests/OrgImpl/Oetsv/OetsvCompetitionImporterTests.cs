@@ -249,6 +249,9 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                             ClassRaw = "D",
                             Class = OetsvConstants.Classes.D,
 
+                            ClassOrgRaw = "D",
+                            ClassOrg = OetsvConstants.Classes.D,
+
                             Part01OrgIdRaw = "6887",
                             Part01OrgId = "6887",
 
@@ -306,6 +309,9 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
 
                             ClassRaw = "C",
                             Class = OetsvConstants.Classes.C,
+
+                            ClassOrgRaw = "C",
+                            ClassOrg = OetsvConstants.Classes.C,
 
                             Part01OrgIdRaw = "6889",
                             Part01OrgId = "6889",

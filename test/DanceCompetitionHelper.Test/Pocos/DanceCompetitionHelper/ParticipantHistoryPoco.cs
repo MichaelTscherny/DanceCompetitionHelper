@@ -14,10 +14,15 @@
         public string? OrgIdClub { get; set; }
         public int OrgPointsPartA { get; set; }
         public int OrgStartsPartA { get; set; }
+        public bool? OrgAlreadyPromotedPartA { get; set; }
+        public string? OrgAlreadyPromotedInfoPartA { get; set; }
 
         public int? OrgPointsPartB { get; set; }
         public int? OrgStartsPartB { get; set; }
+        public bool? OrgAlreadyPromotedPartB { get; set; }
+        public string? OrgAlreadyPromotedInfoPartB { get; set; }
 
+        public bool Ignore { get; set; }
         public override string ToString()
         {
             return string.Format(

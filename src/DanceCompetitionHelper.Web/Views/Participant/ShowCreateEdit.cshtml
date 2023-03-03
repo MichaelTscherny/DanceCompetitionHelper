@@ -172,6 +172,44 @@
                 </label>
             </div>
         </div>
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-10">
+            <div class="col-md text-end">
+                Already Promoted Part-A
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgAlreadyPromotedPartA"
+                       class="form-control"
+                       placeholder=""
+                       style="width: 100%" />
+                <span asp-validation-for="OrgAlreadyPromotedPartA"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgAlreadyPromotedPartA"
+                       class="control-label">
+                    Already Promoted Part-A
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-info bg-opacity-25">
+            <div class="col-md text-end">
+                Already Promoted Info Part-A
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgAlreadyPromotedInfoPartA"
+                       class="form-control"
+                       placeholder="Min Starts Part-A for Promotion"
+                       style="width: 100%" />
+                <span asp-validation-for="OrgAlreadyPromotedInfoPartA"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgAlreadyPromotedInfoPartA"
+                       class="control-label">
+                    Already Promoted Info Part-A
+                </label>
+            </div>
+        </div>
 
         <div class="row row-cols-3 py-1 bg-warning bg-opacity-25">
             <div class="col-md text-end">
@@ -264,7 +302,45 @@
             <div class="col-md text-start">
                 <label asp-for="MinStartsForPromotionPartB"
                        class="control-label">
-                    Overrides Competition Class MinStartsForPromotion
+                    Current Starts of Part-B
+                </label>
+            </div>
+        </div>        
+        <div class="row row-cols-3 py-1 bg-warning bg-opacity-10">
+            <div class="col-md text-end">
+                Starts Part-B
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgAlreadyPromotedPartB"
+                       class="form-control"
+                       placeholder="" 
+                       style="width: 100%" />
+                <span asp-validation-for="OrgAlreadyPromotedPartB"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgAlreadyPromotedPartB"
+                       class="control-label">
+                    Already Promoted Part-B
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-warning bg-opacity-25">
+            <div class="col-md text-end">
+                Already Promoted Info Part-B
+            </div>
+            <div class="col-md-4">
+                <input asp-for="OrgAlreadyPromotedInfoPartB"
+                       class="form-control"
+                       placeholder=""
+                       style="width: 100%" />
+                <span asp-validation-for="OrgAlreadyPromotedInfoPartB"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="OrgAlreadyPromotedInfoPartB"
+                       class="control-label">
+                    Already Promoted Info Part-B
                 </label>
             </div>
         </div>

@@ -73,23 +73,42 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             var newPartAPoints = (participant.OrgPointsPartA + pointsForFirst);
             var promotionPartAPoints = newPartAPoints >= usePartCompClass.MinPointsForPromotion;
-            int? newPartBPoints = ((participant.OrgPointsPartB ?? 0) + pointsForFirst);
+            double? newPartBPoints = ((participant.OrgPointsPartB ?? 0) + pointsForFirst);
             bool? promotionPartBPoints = newPartBPoints >= usePartCompClass.MinPointsForPromotion;
+            var (alreadyPromotedA, alreadyPromotedAInfo) = CheckAlreadyPromoted(
+                participant.OrgAlreadyPromotedPartA,
+                participant.OrgPointsPartA,
+                participant.OrgStartsPartA,
+                participant.CompetitionClass.MinPointsForPromotion,
+                participant.CompetitionClass.MinStartsForPromotion);
 
             var newPartAStarts = (participant.OrgStartsPartA + countStarts);
             var promotionPartAStarts = newPartAStarts >= (participant.MinStartsForPromotionPartA ?? usePartCompClass.MinStartsForPromotion);
             int? newPartBStarts = ((participant.OrgStartsPartB ?? 0) + countStarts);
             bool? promotionPartBStarts = newPartBStarts >= (participant.MinStartsForPromotionPartB ?? usePartCompClass.MinStartsForPromotion);
+            bool? alreadyPromotedB = null;
+            string? alreadyPromotedBInfo = null;
 
-            var retPromotionA = promotionPartAPoints
-                && promotionPartAStarts;
+            // AND NOW?..
+            var retPromotionA = (participant.OrgAlreadyPromotedPartA ?? false)
+                || (promotionPartAPoints
+                && promotionPartAStarts);
 
             bool? retPromotionB = null;
 
+            // check already promoted
             if (participant.OrgPointsPartB.HasValue)
             {
-                retPromotionB = promotionPartBPoints.Value
-                    && promotionPartBStarts.Value;
+                retPromotionB = (participant.OrgAlreadyPromotedPartB ?? false)
+                    || (promotionPartBPoints.Value
+                    && promotionPartBStarts.Value);
+
+                (alreadyPromotedB, alreadyPromotedBInfo) = CheckAlreadyPromoted(
+                    participant.OrgAlreadyPromotedPartB,
+                    participant.OrgPointsPartB,
+                    participant.OrgStartsPartB,
+                    participant.CompetitionClass.MinPointsForPromotion,
+                    participant.CompetitionClass.MinStartsForPromotion);
             }
             else
             {
@@ -137,6 +156,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             return new CheckPromotionInfo()
             {
+                // A
                 PossiblePromotionA = retPromotionA,
                 PossiblePromotionAInfo = string.Format(
                     "[A] {0}/{1} + {2}/{3} = {4}/{5} -> {6}",
@@ -147,6 +167,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     newPartAPoints,
                     newPartAStarts,
                     retPromotionA),
+                AlreadyPromotionA = alreadyPromotedA,
+                AlreadyPromotionAInfo = alreadyPromotedAInfo,
+                // B
                 PossiblePromotionB = retPromotionB,
                 PossiblePromotionBInfo = participant.OrgPointsPartB.HasValue
                     ? string.Format(
@@ -159,8 +182,43 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         newPartBStarts,
                         retPromotionB)
                     : null,
+                AlreadyPromotionB = alreadyPromotedB,
+                AlreadyPromotionBInfo = alreadyPromotedBInfo,
+
                 IncludedCompetitionClasses = allClasses,
             };
+        }
+
+        public (bool? AlreadyPromoted, string? AlreadyPromotedInfo) CheckAlreadyPromoted(
+            bool? orgAlreadyPromoted,
+            double? curOrgPoints,
+            int? curOrgStarts,
+            double minPointsForPromotion,
+            int minStartsForPromotion)
+        {
+            if (orgAlreadyPromoted ?? false)
+            {
+                return (
+                    true,
+                    "Already Promted by Org");
+            }
+
+            if (curOrgPoints >= minPointsForPromotion
+                && curOrgStarts >= minStartsForPromotion)
+            {
+                return (
+                    true,
+                    string.Format(
+                    "{0}/{1} >= {2}/{3}",
+                    curOrgPoints,
+                    curOrgStarts,
+                    minPointsForPromotion,
+                    minStartsForPromotion));
+            }
+
+            return (
+                null,
+                null);
         }
     }
 }

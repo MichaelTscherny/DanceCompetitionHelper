@@ -145,18 +145,26 @@ namespace DanceCompetitionHelper.Web.Controllers
                      createParticipant.CompetitionId,
                      useCompetitionClassId,
                      createParticipant.StartNumber,
+                     // A
                      createParticipant.NamePartA,
                      createParticipant.OrgIdPartA,
+                     // B
                      createParticipant.NamePartB,
                      createParticipant.OrgIdPartB,
                      createParticipant.ClubName,
                      createParticipant.OrgIdClub,
+                     // A
                      createParticipant.OrgPointsPartA,
                      createParticipant.OrgStartsPartA,
                      createParticipant.MinStartsForPromotionPartA,
+                     createParticipant.OrgAlreadyPromotedPartA,
+                     createParticipant.OrgAlreadyPromotedInfoPartA,
+                     // B
                      createParticipant.OrgPointsPartB,
                      createParticipant.OrgStartsPartB,
                      createParticipant.MinStartsForPromotionPartB,
+                     createParticipant.OrgAlreadyPromotedPartB,
+                     createParticipant.OrgAlreadyPromotedInfoPartB,
                      createParticipant.Comment,
                      createParticipant.Ignore);
 
@@ -211,18 +219,26 @@ namespace DanceCompetitionHelper.Web.Controllers
                     CompetitionClassId = foundParticipant.CompetitionClassId,
                     ParticipantId = foundParticipant.ParticipantId,
                     StartNumber = foundParticipant.StartNumber,
+                    // A
                     NamePartA = foundParticipant.NamePartA,
                     OrgIdPartA = foundParticipant.OrgIdPartA,
+                    // B
                     NamePartB = foundParticipant.NamePartB,
                     OrgIdPartB = foundParticipant.OrgIdPartB,
                     ClubName = foundParticipant.ClubName,
                     OrgIdClub = foundParticipant.OrgIdClub,
+                    // A
                     OrgPointsPartA = foundParticipant.OrgPointsPartA,
                     OrgStartsPartA = foundParticipant.OrgStartsPartA,
                     MinStartsForPromotionPartA = foundParticipant.MinStartsForPromotionPartA,
+                    OrgAlreadyPromotedPartA = foundParticipant.OrgAlreadyPromotedPartA,
+                    OrgAlreadyPromotedInfoPartA = foundParticipant.OrgAlreadyPromotedInfoPartA,
+                    // B
                     OrgPointsPartB = foundParticipant.OrgPointsPartB,
                     OrgStartsPartB = foundParticipant.OrgStartsPartB,
                     MinStartsForPromotionPartB = foundParticipant.MinStartsForPromotionPartB,
+                    OrgAlreadyPromotedPartB = foundParticipant.OrgAlreadyPromotedPartB,
+                    OrgAlreadyPromotedInfoPartB = foundParticipant.OrgAlreadyPromotedInfoPartB,
                     Comment = foundParticipant.Comment,
                     Ignore = foundParticipant.Ignore,
 
@@ -254,18 +270,26 @@ namespace DanceCompetitionHelper.Web.Controllers
                     editParticipant.ParticipantId ?? Guid.Empty,
                     editParticipant.CompetitionClassId ?? Guid.Empty,
                     editParticipant.StartNumber,
+                    // A
                     editParticipant.NamePartA,
                     editParticipant.OrgIdPartA,
+                    // B
                     editParticipant.NamePartB,
                     editParticipant.OrgIdPartB,
                     editParticipant.ClubName,
                     editParticipant.OrgIdClub,
+                    // A
                     editParticipant.OrgPointsPartA,
                     editParticipant.OrgStartsPartA,
                     editParticipant.MinStartsForPromotionPartA,
+                    editParticipant.OrgAlreadyPromotedPartA,
+                    editParticipant.OrgAlreadyPromotedInfoPartA,
+                    // B
                     editParticipant.OrgPointsPartB,
                     editParticipant.OrgStartsPartB,
                     editParticipant.MinStartsForPromotionPartB,
+                    editParticipant.OrgAlreadyPromotedPartB,
+                    editParticipant.OrgAlreadyPromotedInfoPartB,
                     editParticipant.Comment,
                     editParticipant.Ignore);
 
