@@ -1,6 +1,9 @@
+using DanceCompetitionHelper.Config;
 using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Config;
 using DanceCompetitionHelper.Database.Diagnostic;
+using DanceCompetitionHelper.Helper;
+using DanceCompetitionHelper.OrgImpl.Oetsv;
 using DanceCompetitionHelper.Web.Controllers;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -23,6 +26,11 @@ namespace DanceCompetitionHelper.Web
                     .GetRequiredSection(
                         SqLiteDbConfig.Name)
                     .Bind(myCfg);
+                ImporterSettings myImporterSettigns = new ImporterSettings();
+                builder.Configuration
+                    .GetSection(
+                        ImporterSettings.Name)
+                    ?.Bind(myImporterSettigns);
 
                 // Add services to the container.
                 builder.Services
@@ -30,9 +38,18 @@ namespace DanceCompetitionHelper.Web
                     .AddScoped<IDanceCompetitionHelper, DanceCompetitionHelper>()
                     .AddSingleton<IObserver<DiagnosticListener>, DbDiagnosticObserver>()
                     .AddSingleton<IObserver<KeyValuePair<string, object?>>, DbKeyValueObserver>()
+                    // general settings
                     .AddSingleton<IDbConfig>(myCfg)
+                    .AddSingleton(myImporterSettigns)
+                    // general classes
+                    .AddTransient<TableHistoryCreator>()
                     .AddControllersWithViews();
 
+                // Organization specific classes:
+                // Oetsv:
+                builder.Services
+                    .AddTransient<OetsvCompetitionImporter>()
+                    .AddTransient<OetsvParticipantChecker>();
 
                 builder.Services
                     .AddDistributedMemoryCache()

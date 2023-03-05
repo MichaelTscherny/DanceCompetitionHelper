@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database;
+﻿using DanceCompetitionHelper.Config;
+using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.OrgImpl.Oetsv.WorkData;
@@ -12,6 +13,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
     public class OetsvCompetitionImporter : ICompetitionImporter
     {
         private readonly ILogger<OetsvCompetitionImporter> _logger;
+        private readonly ImporterSettings _importerSettings;
 
         public string Oranizer { get; private set; } = default!;
         public string OrgCompetitionId { get; set; } = default!;
@@ -30,34 +32,34 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         #region Constants...
 
-        public Encoding HtmlEncodingCompetition { get; set; } = Encoding.UTF8;
+        public Encoding HtmlEncodingCompetition { get; set; } = Encoding.GetEncoding(1252); // Encoding.UTF8;
         public Encoding HtmlEncodingParticipants { get; set; } = Encoding.GetEncoding(1252);
 
-        public const int PartExcelOrgCompId = 0;
-        public const int PartExcelOrgCompClassId = 1;
-        public const int PartExcelStartNumber = 2;
-        public const int PartExcelPart01LastName = 3;
-        public const int PartExcelPart01FirstName = 4;
-        public const int PartExcelPart01OrgId = 16;
-        public const int PartExcelPart02LastName = 5;
-        public const int PartExcelPart02FirstName = 6;
-        public const int PartExcelPart02OrgId = 17;
-        public const int PartExcelClubName = 7;
-        public const int PartExcelClubOrgId = 18;
-        public const int PartExcelState = 8;
-        public const int PartExcelStateAbbr = 9;
-        public const int PartExcelDiscipline = 11;
-        public const int PartExcelAgeClass = 12;
-        public const int PartExcelAgeGroup = 13;
-        public const int PartExcelClass = 14;
+        public const int PartExcelRegOrgCompId = 0;
+        public const int PartExcelRegOrgCompClassId = 1;
+        public const int PartExcelRegStartNumber = 2;
+        public const int PartExcelRegPartALastName = 3;
+        public const int PartExcelRegPartAFirstName = 4;
+        public const int PartExcelRegPartAOrgId = 16;
+        public const int PartExcelRegPartBLastName = 5;
+        public const int PartExcelRegPartBFirstName = 6;
+        public const int PartExcelRegPartBOrgId = 17;
+        public const int PartExcelRegClubName = 7;
+        public const int PartExcelRegClubOrgId = 18;
+        public const int PartExcelRegState = 8;
+        public const int PartExcelRegStateAbbr = 9;
+        public const int PartExcelRegDiscipline = 11;
+        public const int PartExcelRegAgeClass = 12;
+        public const int PartExcelRegAgeGroup = 13;
+        public const int PartExcelRegClass = 14;
 
-        public const int PartExcelClassOrgSta = 21;
+        public const int PartExcelOrgCurrentClassSta = 21;
         public const int PartExcelOrgPointsSta = 19;
         public const int PartExcelOrgStartsSta = 20;
         public const int PartExcelOrgMinPointsForPromotionSta = 22;
         public const int PartExcelOrgMinStartsForPromotionSta = 23;
 
-        public const int PartExcelClassOrgLa = 27;
+        public const int PartExcelOrgCurrentClassLa = 27;
         public const int PartExcelOrgPointsLa = 25;
         public const int PartExcelOrgStartsLa = 26;
         public const int PartExcelOrgMinPointsForPromotionLa = 28;
@@ -74,68 +76,86 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         }
 
         public OetsvCompetitionImporter(
-            ILogger<OetsvCompetitionImporter> logger)
+            ILogger<OetsvCompetitionImporter> logger,
+            ImporterSettings importerSettings)
         {
             _logger = logger ?? throw new ArgumentNullException(
                 nameof(logger));
+            _importerSettings = importerSettings ?? throw new ArgumentNullException(
+                nameof(importerSettings));
         }
 
-        public void ImportOrUpdateByFile(
+        public List<string> ImportOrUpdateByFile(
             DanceCompetitionHelperDbContext dbCtx,
             string? fullPathCompetition,
             string? fullPathCompetitionClasses,
             string? fullPathParticipants)
         {
-            ExtractData(
-                fullPathCompetition,
-                fullPathParticipants);
-            ImportOrUpdateDatabase(
-                dbCtx);
+            var retErrors = new List<string>();
+
+            try
+            {
+                retErrors.AddRange(
+                    ExtractData(
+                        fullPathCompetition,
+                        fullPathParticipants));
+                retErrors.AddRange(
+                    ImportOrUpdateDatabase(
+                        dbCtx));
+            }
+            catch (Exception exc)
+            {
+                var errorStr = string.Format(
+                    "Error during '{0}': {1}",
+                    nameof(ImportOrUpdateByFile),
+                    exc.Message);
+
+                _logger.LogError(
+                    exc,
+                    errorStr);
+            }
+
+            return retErrors;
         }
 
-        public void ImportOrUpdateByUrl(
+        public List<string> ImportOrUpdateByUrl(
             DanceCompetitionHelperDbContext dbCtx,
             Uri? uriCompetition,
             Uri? uriCompetitionClasses,
             Uri? uriParticipants)
         {
-            // TODO: should we save at special folder for
-            // "possible checks"/debugging?..
-            var fullPathCompetitionCsv = DownloadFile(
-                uriCompetition,
-                HtmlEncodingCompetition);
-            var fullPathParticipantsCsv = DownloadFile(
-                uriParticipants,
-                HtmlEncodingParticipants);
-
+            var retErrors = new List<string>();
             try
             {
-                ImportOrUpdateByFile(
-                    dbCtx,
-                    fullPathCompetitionCsv,
-                    null,
-                    fullPathParticipantsCsv);
-            }
-            finally
-            {
-                if (string.IsNullOrEmpty(
-                    fullPathCompetitionCsv) == false
-                    && File.Exists(
-                        fullPathCompetitionCsv))
-                {
-                    File.Delete(
-                        fullPathCompetitionCsv);
-                }
+                var fullPathCompetitionCsv = DownloadFile(
+                    "comp",
+                    uriCompetition,
+                    HtmlEncodingCompetition);
+                var fullPathParticipantsCsv = DownloadFile(
+                    "part",
+                    uriParticipants,
+                    HtmlEncodingParticipants);
 
-                if (string.IsNullOrEmpty(
-                    fullPathParticipantsCsv) == false
-                    && File.Exists(
-                        fullPathParticipantsCsv))
-                {
-                    File.Delete(
-                        fullPathParticipantsCsv);
-                }
+                retErrors.AddRange(
+                    ImportOrUpdateByFile(
+                        dbCtx,
+                        fullPathCompetitionCsv,
+                        null,
+                        fullPathParticipantsCsv));
             }
+            catch (Exception exc)
+            {
+                var errorStr = string.Format(
+                    "Error during '{0}': {1}",
+                    nameof(ImportOrUpdateByUrl),
+                    exc.Message);
+
+                _logger.LogError(
+                    exc,
+                    errorStr);
+            }
+
+            return retErrors;
         }
 
         public Uri GetCompetitioUriForOrgId(
@@ -167,6 +187,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         }
 
         public string? DownloadFile(
+            string fileType,
             Uri? downloadUri,
             Encoding encoding)
         {
@@ -176,6 +197,22 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             }
 
             var retFilePath = Path.GetTempFileName();
+
+            if (string.IsNullOrEmpty(
+                _importerSettings.DownloadFolder) == false)
+            {
+                Directory.CreateDirectory(
+                    _importerSettings.DownloadFolder);
+
+                retFilePath = Path.Combine(
+                    _importerSettings.DownloadFolder,
+                    string.Format(
+                        "{0}_{1}_download.csv",
+                        DateTime.Now.ToString(
+                            "yyyyMMdd_HHmmss"),
+                        fileType));
+            }
+
             using var useFileStream = File.OpenWrite(
                 retFilePath);
 
@@ -239,17 +276,19 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             return null;
         }
 
-        public void ExtractData(
+        public List<string> ExtractData(
             string? fullPathCompetition,
             string? fullPathParticipants)
         {
+            var retErrors = new List<string>();
+
             // ----------------------------------------
             if (string.IsNullOrEmpty(
                 fullPathCompetition)
                 || File.Exists(
                     fullPathCompetition) == false)
             {
-                return;
+                return retErrors;
             }
 
             foreach (var curLine in File.ReadAllLines(
@@ -287,7 +326,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 || File.Exists(
                     fullPathParticipants) == false)
             {
-                return;
+                return retErrors;
             }
 
             foreach (var curLine in File.ReadAllLines(
@@ -298,6 +337,8 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         new[] { ";" },
                         StringSplitOptions.TrimEntries));
             }
+
+            return retErrors;
         }
 
         public void ExtractCompetitionInfo(
@@ -322,6 +363,10 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             switch (orgInfoType)
             {
+                case "TKNR":
+                    OrgCompetitionId = orgInfoValue;
+                    break;
+
                 case "ORGANISATOR":
                     Oranizer = orgInfoValue;
                     break;
@@ -346,7 +391,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 case "TURNIERART":
                     var useCompetitionType = orgInfoValue;
                     var firstBlank = useCompetitionType.IndexOf(' ');
-
 
                     if (firstBlank >= 1)
                     {
@@ -408,7 +452,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public void ExtractOfficials(
             string[] competitionInfo)
         {
-            if (competitionInfo.Length < 3)
+            if (competitionInfo.Length < 2)
             {
                 return;
             }
@@ -448,121 +492,134 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             string[] participantInfo)
         {
             if (participantInfo.Length < 32
-                || OrgCompetitionId != participantInfo[PartExcelOrgCompId])
+                || OrgCompetitionId != participantInfo[PartExcelRegOrgCompId])
             {
                 return;
             }
 
             var addPartImport = new CompetitionParticipantImport()
             {
-                OrgClassIdRaw = participantInfo[PartExcelOrgCompClassId],
-                OrgClassId = participantInfo[PartExcelOrgCompClassId].Trim(),
+                RegOrgClassIdRaw = participantInfo[PartExcelRegOrgCompClassId],
+                RegOrgClassId = participantInfo[PartExcelRegOrgCompClassId].Trim(),
 
-                StartNumberRaw = participantInfo[PartExcelStartNumber],
-                StartNumber = int.Parse(
-                    participantInfo[PartExcelStartNumber]),
+                RegStartNumberRaw = participantInfo[PartExcelRegStartNumber],
+                RegStartNumber = int.Parse(
+                    participantInfo[PartExcelRegStartNumber]),
 
-                Part01FirstNameRaw = participantInfo[PartExcelPart01FirstName],
-                Part01LastNameRaw = participantInfo[PartExcelPart01LastName].Trim(),
+                RegPartAFirstNameRaw = participantInfo[PartExcelRegPartAFirstName]?.Trim(),
+                RegPartALastNameRaw = participantInfo[PartExcelRegPartALastName]?.Trim(),
 
-                Part02FirstNameRaw = participantInfo[PartExcelPart02FirstName],
-                Part02LastNameRaw = participantInfo[PartExcelPart02LastName],
+                RegPartAOrgIdRaw = participantInfo[PartExcelRegPartAOrgId],
+                RegPartAOrgId = participantInfo[PartExcelRegPartAOrgId].Trim(),
 
-                ClubNameRaw = participantInfo[PartExcelClubName],
-                ClubName = participantInfo[PartExcelClubName].Trim(),
+                RegPartBFirstNameRaw = participantInfo[PartExcelRegPartBFirstName]?.Trim(),
+                RegPartBLastNameRaw = participantInfo[PartExcelRegPartBLastName]?.Trim(),
 
-                ClubOrgIdRaw = participantInfo[PartExcelClubOrgId],
-                ClubOrgId = participantInfo[PartExcelClubOrgId].Trim(),
+                RegPartBOrgIdRaw = participantInfo[PartExcelRegPartBOrgId],
+                RegPartBOrgId = participantInfo[PartExcelRegPartBOrgId].Trim(),
 
-                StateRaw = participantInfo[PartExcelState],
-                State = participantInfo[PartExcelState].Trim(),
+                RegClubNameRaw = participantInfo[PartExcelRegClubName],
+                RegClubName = participantInfo[PartExcelRegClubName].Trim(),
 
-                StateAbbrRaw = participantInfo[PartExcelStateAbbr],
-                StateAbbr = participantInfo[PartExcelStateAbbr].Trim(),
+                RegClubOrgIdRaw = participantInfo[PartExcelRegClubOrgId],
+                RegClubOrgId = participantInfo[PartExcelRegClubOrgId].Trim(),
 
-                DisciplineRaw = participantInfo[PartExcelDiscipline],
-                Discipline = OetsvConstants.Disciplines.ToDisciplines(
-                    participantInfo[PartExcelDiscipline]),
+                RegStateRaw = participantInfo[PartExcelRegState],
+                RegState = participantInfo[PartExcelRegState].Trim(),
 
-                ClassRaw = participantInfo[PartExcelClass],
-                Class = OetsvConstants.Classes.ToClasses(
-                    participantInfo[PartExcelClass]),
+                RegStateAbbrRaw = participantInfo[PartExcelRegStateAbbr],
+                RegStateAbbr = participantInfo[PartExcelRegStateAbbr].Trim(),
 
-                AgeClassRaw = participantInfo[PartExcelAgeClass],
-                AgeClass = OetsvConstants.AgeClasses.ToAgeClasses(
-                    participantInfo[PartExcelAgeClass]),
+                RegDisciplineRaw = participantInfo[PartExcelRegDiscipline],
+                RegDiscipline = OetsvConstants.Disciplines.ToDisciplines(
+                    participantInfo[PartExcelRegDiscipline]),
 
-                AgeGroupRaw = participantInfo[PartExcelAgeGroup],
-                AgeGroup = OetsvConstants.AgeGroups.ToAgeGroup(
-                    participantInfo[PartExcelAgeGroup]),
+                RegClassRaw = participantInfo[PartExcelRegClass],
+                RegClass = OetsvConstants.Classes.ToClasses(
+                    participantInfo[PartExcelRegClass]),
+
+                RegAgeClassRaw = participantInfo[PartExcelRegAgeClass],
+                RegAgeClass = OetsvConstants.AgeClasses.ToAgeClasses(
+                    participantInfo[PartExcelRegAgeClass]),
+
+                RegAgeGroupRaw = participantInfo[PartExcelRegAgeGroup],
+                RegAgeGroup = OetsvConstants.AgeGroups.ToAgeGroup(
+                    participantInfo[PartExcelRegAgeGroup]),
             };
 
-            addPartImport.Part01Name = CombineFirstLastName(
-                addPartImport.Part01FirstNameRaw,
-                addPartImport.Part01LastNameRaw);
-            addPartImport.Part02Name = CombineFirstLastName(
-                addPartImport.Part02FirstNameRaw,
-                addPartImport.Part02LastNameRaw);
+            addPartImport.RegPartAName = CombineFirstLastName(
+                addPartImport.RegPartAFirstNameRaw,
+                addPartImport.RegPartALastNameRaw);
+            addPartImport.RegPartBName = CombineFirstLastName(
+                addPartImport.RegPartBFirstNameRaw,
+                addPartImport.RegPartBLastNameRaw);
 
-            switch (addPartImport.Discipline)
+            switch (addPartImport.RegDiscipline)
             {
                 case OetsvConstants.Disciplines.Sta:
-                    addPartImport.ClassOrgRaw = participantInfo[PartExcelClassOrgSta];
-                    addPartImport.ClassOrg = OetsvConstants.Classes.ToClasses(
-                        participantInfo[PartExcelClassOrgSta]);
+                    addPartImport.OrgCurrentClassRaw = participantInfo[PartExcelOrgCurrentClassSta];
+                    addPartImport.OrgCurrentClass = OetsvConstants.Classes.ToClasses(
+                        participantInfo[PartExcelOrgCurrentClassSta]);
 
                     addPartImport.OrgPointsRaw = participantInfo[PartExcelOrgPointsSta];
-                    addPartImport.OrgPoints = int.Parse(
+                    addPartImport.OrgPoints = double.Parse(
                         participantInfo[PartExcelOrgPointsSta]);
 
                     addPartImport.OrgStartsRaw = participantInfo[PartExcelOrgStartsSta];
                     addPartImport.OrgStarts = int.Parse(
                         participantInfo[PartExcelOrgStartsSta]);
 
-                    addPartImport.MinPointsForPromotionRaw = participantInfo[PartExcelOrgMinPointsForPromotionSta];
-                    addPartImport.MinPointsForPromotion = int.Parse(
+                    addPartImport.OrgMinPointsForPromotionRaw = participantInfo[PartExcelOrgMinPointsForPromotionSta];
+                    addPartImport.OrgMinPointsForPromotion = double.Parse(
                         participantInfo[PartExcelOrgMinPointsForPromotionSta]);
 
-                    addPartImport.MinStartsForPromotionRaw = participantInfo[PartExcelOrgMinStartsForPromotionSta];
-                    addPartImport.MinStartsForPromotion = int.Parse(
+                    addPartImport.OrgMinStartsForPromotionRaw = participantInfo[PartExcelOrgMinStartsForPromotionSta];
+                    addPartImport.OrgMinStartsForPromotion = int.Parse(
                         participantInfo[PartExcelOrgMinStartsForPromotionSta]);
 
                     break;
 
                 case OetsvConstants.Disciplines.La:
-                    addPartImport.ClassOrgRaw = participantInfo[PartExcelClassOrgLa];
-                    addPartImport.ClassOrg = OetsvConstants.Classes.ToClasses(
-                        participantInfo[PartExcelClassOrgLa]);
+                    addPartImport.OrgCurrentClassRaw = participantInfo[PartExcelOrgCurrentClassLa];
+                    addPartImport.OrgCurrentClass = OetsvConstants.Classes.ToClasses(
+                        participantInfo[PartExcelOrgCurrentClassLa]);
 
                     addPartImport.OrgPointsRaw = participantInfo[PartExcelOrgPointsLa];
-                    addPartImport.OrgPoints = int.Parse(
+                    addPartImport.OrgPoints = double.Parse(
                         participantInfo[PartExcelOrgPointsLa]);
 
                     addPartImport.OrgStartsRaw = participantInfo[PartExcelOrgStartsLa];
                     addPartImport.OrgStarts = int.Parse(
                         participantInfo[PartExcelOrgStartsLa]);
 
-                    addPartImport.MinPointsForPromotionRaw = participantInfo[PartExcelOrgMinPointsForPromotionLa];
-                    addPartImport.MinPointsForPromotion = int.Parse(
+                    addPartImport.OrgMinPointsForPromotionRaw = participantInfo[PartExcelOrgMinPointsForPromotionLa];
+                    addPartImport.OrgMinPointsForPromotion = int.Parse(
                         participantInfo[PartExcelOrgMinPointsForPromotionLa]);
 
-                    addPartImport.MinStartsForPromotionRaw = participantInfo[PartExcelOrgMinStartsForPromotionLa];
-                    addPartImport.MinStartsForPromotion = int.Parse(
+                    addPartImport.OrgMinStartsForPromotionRaw = participantInfo[PartExcelOrgMinStartsForPromotionLa];
+                    addPartImport.OrgMinStartsForPromotion = int.Parse(
                         participantInfo[PartExcelOrgMinStartsForPromotionLa]);
 
                     break;
+            }
+
+            if (addPartImport.OrgCurrentClass != addPartImport.OrgCurrentClassRaw)
+            {
+                var gotIt = true;
             }
 
             Participants.Add(
                 addPartImport);
         }
 
-        public void ImportOrUpdateDatabase(
+        public List<string> ImportOrUpdateDatabase(
             DanceCompetitionHelperDbContext dbCtx)
         {
+            var retErrors = new List<string>();
+
             var foundComp = dbCtx.Competitions
                 .TagWith(
-                    nameof(ImportOrUpdateDatabase) + "-01")
+                    nameof(ImportOrUpdateDatabase) + "[01]")
                 .FirstOrDefault(
                     x => x.OrgCompetitionId == OrgCompetitionId);
 
@@ -603,7 +660,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             var foundAdjPanel = dbCtx.AdjudicatorPanels
                 .TagWith(
-                    nameof(ImportOrUpdateDatabase) + "-02")
+                    nameof(ImportOrUpdateDatabase) + "[02]")
                 .FirstOrDefault(
                     x => x.CompetitionId == foundComp.CompetitionId);
 
@@ -637,7 +694,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             var allCompClasses = dbCtx.CompetitionClasses
                 .TagWith(
-                    nameof(ImportOrUpdateDatabase) + "-03")
+                    nameof(ImportOrUpdateDatabase) + "[03]")
                 .Where(
                     x => x.CompetitionId == foundComp.CompetitionId)
                 .ToDictionary(
@@ -648,11 +705,17 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 if (string.IsNullOrEmpty(
                     curImportCompClass.OrgClassId))
                 {
-                    _logger.LogWarning(
-                        "{PropertyName} '{OrgClassId}' is invalid/missing! Ignore {ImportCompetitionClass}",
+                    var logString = string.Format(
+                        "{0} '{1}' is invalid/missing! Ignore {2}",
                         nameof(curImportCompClass.OrgClassId),
                         curImportCompClass.OrgClassId,
                         curImportCompClass);
+
+                    retErrors.Add(
+                        logString);
+
+                    _logger.LogWarning(
+                        logString);
 
                     continue;
                 }
@@ -719,7 +782,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             var allParticipantsByImpStr = dbCtx.Participants
                 .TagWith(
-                    nameof(ImportOrUpdateDatabase) + "-04")
+                    nameof(ImportOrUpdateDatabase) + "[04]")
                 .Include(
                     x => x.CompetitionClass)
                 .Where(
@@ -735,11 +798,88 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             {
                 var curPartImpString = string.Format(
                     "{0}/{1}",
-                    curImportPart.OrgClassId,
+                    curImportPart.RegOrgClassId,
                     GetParticipantImportString(
                         curImportPart));
 
+                if (allCompClasses.TryGetValue(
+                    curImportPart.RegOrgClassId ?? string.Empty,
+                    out var useCompClass) == false)
+                {
+                    var logString = string.Format(
+                        "Unable to find {0} '{1}' of Import-Participant {2}",
+                        nameof(CompetitionClass.OrgClassId),
+                        curImportPart.RegOrgClassId,
+                        curImportPart);
+
+                    retErrors.Add(
+                        logString);
+                    _logger.LogWarning(
+                        logString);
+
+                    continue;
+                }
+
+                if (allParticipantsByImpStr.TryGetValue(
+                    curPartImpString,
+                    out var existingParticipant))
+                {
+                    // TODO: update!
+                }
+                else
+                {
+                    var newParticipant = dbCtx.Participants.Add(
+                        new Participant()
+                        {
+                            Competition = foundComp,
+                            CompetitionClass = useCompClass,
+                            StartNumber = curImportPart.RegStartNumber ?? 0,
+                            NamePartA = curImportPart.RegPartAName ?? "??",
+                            OrgIdPartA = curImportPart.RegPartAOrgId,
+                            NamePartB = curImportPart.RegPartBName ?? "??",
+                            OrgIdPartB = curImportPart.RegPartBOrgId,
+
+                            ClubName = curImportPart.RegClubName,
+                            OrgIdClub = curImportPart.RegClubOrgId,
+
+                            OrgPointsPartA = curImportPart.OrgPoints ?? 0,
+                            OrgStartsPartA = curImportPart.OrgStarts ?? 0,
+                        })
+                        .Entity;
+
+                    if (newParticipant.OrgPointsPartA >= useCompClass.MinPointsForPromotion
+                        && newParticipant.OrgStartsPartA >= useCompClass.MinStartsForPromotion)
+                    {
+                        newParticipant.OrgAlreadyPromotedPartA = true;
+                        newParticipant.OrgAlreadyPromotedInfoPartA = string.Format(
+                            "Points and starts exeeds Promotion Limits");
+                    }
+
+                    var checkAlreadyPromoted = true;
+                    if (useCompClass.Class == OetsvConstants.Classes.Amateur
+                        && curImportPart.RegClass == OetsvConstants.Classes.GirlsOnly)
+                    {
+                        // girls only... ignore this...
+                        checkAlreadyPromoted = false;
+                    }
+
+                    if (checkAlreadyPromoted
+                        && (curImportPart.OrgCurrentClass != useCompClass.Class
+                        || curImportPart.OrgCurrentClass != curImportPart.RegClass))
+                    {
+                        newParticipant.OrgAlreadyPromotedPartA = true;
+                        newParticipant.OrgAlreadyPromotedInfoPartA = string.Format(
+                            "Registration Class '{0}' != Import/Org Class: '{1}' ({2})",
+                            curImportPart.RegClass,
+                            curImportPart.OrgCurrentClass,
+                            curImportPart.OrgCurrentClassRaw);
+                    }
+
+                    allParticipantsByImpStr[curPartImpString] = newParticipant;
+                }
             }
+
+            return retErrors;
         }
 
         private string GetParticipantImportString(
@@ -760,12 +900,12 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         {
             return string.Join(
                 "/",
-                participantImport.Part01Name,
-                participantImport.Part01OrgId,
-                participantImport.Part02Name,
-                participantImport.Part02OrgId,
-                participantImport.ClubName,
-                participantImport.ClubOrgId);
+                participantImport.RegPartAName,
+                participantImport.RegPartAOrgId,
+                participantImport.RegPartBName,
+                participantImport.RegPartBOrgId,
+                participantImport.RegClubName,
+                participantImport.RegClubOrgId);
         }
 
         public DateTime ParseDateStrings(

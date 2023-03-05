@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.OrgImpl.Oetsv;
+﻿using DanceCompetitionHelper.Config;
+using DanceCompetitionHelper.OrgImpl.Oetsv;
 using DanceCompetitionHelper.OrgImpl.Oetsv.WorkData;
 using Microsoft.Extensions.Logging;
 using TestHelper.Extensions;
@@ -13,7 +14,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
         {
             var fakeLogger = new Mock<ILogger<OetsvCompetitionImporter>>();
             var testImporter = new OetsvCompetitionImporter(
-                fakeLogger.Object);
+                fakeLogger.Object,
+                new ImporterSettings());
 
             var rootPath = AssemblyExtensions.GetAssemblyPath() ?? string.Empty;
 
@@ -214,52 +216,52 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                     {
                         new CompetitionParticipantImport()
                         {
-                            OrgClassIdRaw = "1",
-                            OrgClassId = "1",
+                            RegOrgClassIdRaw = "1",
+                            RegOrgClassId = "1",
 
-                            StartNumberRaw = "1",
-                            StartNumber = 1,
+                            RegStartNumberRaw = "1",
+                            RegStartNumber = 1,
 
-                            Part01LastNameRaw = "Doe",
-                            Part01FirstNameRaw = "John",
-                            Part01Name = "John Doe",
+                            RegPartALastNameRaw = "Doe",
+                            RegPartAFirstNameRaw = "John",
+                            RegPartAName = "John Doe",
 
-                            Part02LastNameRaw = "Doe",
-                            Part02FirstNameRaw = "Jane",
-                            Part02Name = "Jane Doe",
+                            RegPartBLastNameRaw = "Doe",
+                            RegPartBFirstNameRaw = "Jane",
+                            RegPartBName = "Jane Doe",
 
-                            ClubNameRaw = "Choice Styria",
-                            ClubName = "Choice Styria",
+                            RegClubNameRaw = "Choice Styria",
+                            RegClubName = "Choice Styria",
 
-                            StateRaw = "Steiermark",
-                            State = "Steiermark",
+                            RegStateRaw = "Steiermark",
+                            RegState = "Steiermark",
 
-                            StateAbbrRaw = "St",
-                            StateAbbr = "St",
+                            RegStateAbbrRaw = "St",
+                            RegStateAbbr = "St",
 
-                            DisciplineRaw = "LA",
-                            Discipline = OetsvConstants.Disciplines.La,
+                            RegDisciplineRaw = "LA",
+                            RegDiscipline = OetsvConstants.Disciplines.La,
 
-                            AgeClassRaw = "SCH",
-                            AgeClass = OetsvConstants.AgeClasses.Juvenile,
+                            RegAgeClassRaw = "SCH",
+                            RegAgeClass = OetsvConstants.AgeClasses.Juvenile,
 
-                            AgeGroupRaw = "00",
-                            AgeGroup = OetsvConstants.AgeGroups.GroupNone,
+                            RegAgeGroupRaw = "00",
+                            RegAgeGroup = OetsvConstants.AgeGroups.GroupNone,
 
-                            ClassRaw = "D",
-                            Class = OetsvConstants.Classes.D,
+                            RegClassRaw = "D",
+                            RegClass = OetsvConstants.Classes.D,
 
-                            ClassOrgRaw = "D",
-                            ClassOrg = OetsvConstants.Classes.D,
+                            OrgCurrentClassRaw = "D",
+                            OrgCurrentClass = OetsvConstants.Classes.D,
 
-                            Part01OrgIdRaw = "6887",
-                            Part01OrgId = "6887",
+                            RegPartAOrgIdRaw = "6887",
+                            RegPartAOrgId = "6887",
 
-                            Part02OrgIdRaw = "7283",
-                            Part02OrgId = "7283",
+                            RegPartBOrgIdRaw = "7283",
+                            RegPartBOrgId = "7283",
 
-                            ClubOrgIdRaw = "607",
-                            ClubOrgId = "607",
+                            RegClubOrgIdRaw = "607",
+                            RegClubOrgId = "607",
 
                             OrgPointsRaw = "594",
                             OrgPoints = 594,
@@ -267,60 +269,60 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                             OrgStartsRaw = "13",
                             OrgStarts = 13,
 
-                            MinPointsForPromotionRaw = "1000",
-                            MinPointsForPromotion = 1000,
+                            OrgMinPointsForPromotionRaw = "1000",
+                            OrgMinPointsForPromotion = 1000,
 
-                            MinStartsForPromotionRaw = "10",
-                            MinStartsForPromotion = 10,
+                            OrgMinStartsForPromotionRaw = "10",
+                            OrgMinStartsForPromotion = 10,
                         },
                         new CompetitionParticipantImport()
                         {
-                            OrgClassIdRaw = "2",
-                            OrgClassId = "2",
+                            RegOrgClassIdRaw = "2",
+                            RegOrgClassId = "2",
 
-                            StartNumberRaw = "2",
-                            StartNumber = 2,
+                            RegStartNumberRaw = "2",
+                            RegStartNumber = 2,
 
-                            Part01LastNameRaw = "Summer",
-                            Part01FirstNameRaw = "John",
-                            Part01Name = "John Summer",
+                            RegPartALastNameRaw = "Summer",
+                            RegPartAFirstNameRaw = "John",
+                            RegPartAName = "John Summer",
 
-                            Part02LastNameRaw = "Summer",
-                            Part02FirstNameRaw = "Jane",
-                            Part02Name = "Jane Summer",
+                            RegPartBLastNameRaw = "Summer",
+                            RegPartBFirstNameRaw = "Jane",
+                            RegPartBName = "Jane Summer",
 
-                            ClubNameRaw = "Unknown",
-                            ClubName = "Unknown",
+                            RegClubNameRaw = "Unknown",
+                            RegClubName = "Unknown",
 
-                            StateRaw = "Wien",
-                            State = "Wien",
+                            RegStateRaw = "Wien",
+                            RegState = "Wien",
 
-                            StateAbbrRaw = "W",
-                            StateAbbr = "W",
+                            RegStateAbbrRaw = "W",
+                            RegStateAbbr = "W",
 
-                            DisciplineRaw = "STA",
-                            Discipline = OetsvConstants.Disciplines.Sta,
+                            RegDisciplineRaw = "STA",
+                            RegDiscipline = OetsvConstants.Disciplines.Sta,
 
-                            AgeClassRaw = "SCH",
-                            AgeClass = OetsvConstants.AgeClasses.Juvenile,
+                            RegAgeClassRaw = "SCH",
+                            RegAgeClass = OetsvConstants.AgeClasses.Juvenile,
 
-                            AgeGroupRaw = "00",
-                            AgeGroup = OetsvConstants.AgeGroups.GroupNone,
+                            RegAgeGroupRaw = "00",
+                            RegAgeGroup = OetsvConstants.AgeGroups.GroupNone,
 
-                            ClassRaw = "C",
-                            Class = OetsvConstants.Classes.C,
+                            RegClassRaw = "C",
+                            RegClass = OetsvConstants.Classes.C,
 
-                            ClassOrgRaw = "C",
-                            ClassOrg = OetsvConstants.Classes.C,
+                            OrgCurrentClassRaw = "C",
+                            OrgCurrentClass = OetsvConstants.Classes.C,
 
-                            Part01OrgIdRaw = "6889",
-                            Part01OrgId = "6889",
+                            RegPartAOrgIdRaw = "6889",
+                            RegPartAOrgId = "6889",
 
-                            Part02OrgIdRaw = "7285",
-                            Part02OrgId = "7285",
+                            RegPartBOrgIdRaw = "7285",
+                            RegPartBOrgId = "7285",
 
-                            ClubOrgIdRaw = "666",
-                            ClubOrgId = "666",
+                            RegClubOrgIdRaw = "666",
+                            RegClubOrgId = "666",
 
                             OrgPointsRaw = "123",
                             OrgPoints = 123,
@@ -328,11 +330,11 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                             OrgStartsRaw = "4",
                             OrgStarts = 4,
 
-                            MinPointsForPromotionRaw = "2000",
-                            MinPointsForPromotion = 2000,
+                            OrgMinPointsForPromotionRaw = "2000",
+                            OrgMinPointsForPromotion = 2000,
 
-                            MinStartsForPromotionRaw = "10",
-                            MinStartsForPromotion = 10,
+                            OrgMinStartsForPromotionRaw = "10",
+                            OrgMinStartsForPromotion = 10,
                         },
                     }),
                 nameof(testImporter.Participants));
@@ -344,7 +346,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
         {
             var fakeLogger = new Mock<ILogger<OetsvCompetitionImporter>>();
             var testImporter = new OetsvCompetitionImporter(
-                fakeLogger.Object);
+                fakeLogger.Object,
+                new ImporterSettings());
 
             testImporter.ImportOrUpdateByUrl(
                 null,

@@ -137,8 +137,7 @@
                         else 
                         {
                             <td class="text-nowrap">
-                                @Html.DisplayFor(modelItem => item.NamePartA)
-                                @Html.DisplayFor(modelItem => item.NamePartB)
+                                @item.GetNames()
                             </td>
                         }
                         @if (Model.DetailedView)

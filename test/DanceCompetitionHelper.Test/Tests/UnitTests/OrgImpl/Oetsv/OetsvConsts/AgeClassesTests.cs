@@ -53,8 +53,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase("FORMATION", AgeClasses.Formation)]
         // -------------
         [TestCase(null, null)]
-        [TestCase("", "")]
-        [TestCase("dummy", "dummy")]
+        [TestCase("", null)]
+        [TestCase("dummy", null)]
         public void ToAgeClasses_Test(
             string input,
             string expected)

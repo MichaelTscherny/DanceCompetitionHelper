@@ -28,7 +28,7 @@
                     case "LM":
                     case "Lm":
                     case "lm":
-                        return Bewertungsturnier;
+                        return Landesmeisterschaft;
 
                     case Staatsmeisterschaft:
                     case "STAATSMEISTERSCHAFT":
@@ -50,7 +50,7 @@
                         return OesterrMeisterschaft;
                 }
 
-                return useString;
+                return null;
             }
 
             /// <summary>
@@ -120,7 +120,7 @@
                         return Freestyle;
                 }
 
-                return useString;
+                return null;
             }
         }
 
@@ -135,6 +135,7 @@
             public const string Adult = "Allg";
             public const string Senior = "Sen";
             public const string Formation = "For";
+            public const string Open = "Offen";
 
             public static string? ToAgeClasses(
                 string? useString)
@@ -196,9 +197,17 @@
                     case "formation":
                     case "FORMATION":
                         return Formation;
+
+                    case Open:
+                    case "offen":
+                    case "OFF":
+                    case "off":
+                    case "OF":
+                    case "of":
+                        return Open;
                 }
 
-                return useString;
+                return null;
             }
         }
 
@@ -259,6 +268,7 @@
             public const string B = "B";
             public const string A = "A";
             public const string S = "S";
+            public const string GirlsOnly = "G";
 
             public const int NoPromotionPossible = 999_999_999;
 
@@ -291,9 +301,15 @@
                     case S:
                     case "s":
                         return S;
+
+                    case GirlsOnly:
+                    case "g":
+                    case "Girls":
+                    case "girls":
+                        return GirlsOnly;
                 }
 
-                return useString;
+                return null;
             }
 
             /// <summary>

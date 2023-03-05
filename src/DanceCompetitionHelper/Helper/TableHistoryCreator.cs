@@ -9,30 +9,16 @@ namespace DanceCompetitionHelper.Helper
     {
         private readonly ILogger<TableHistoryCreator> _logger;
 
-        public DanceCompetitionHelperDbContext DbCtx { get; }
+        public DanceCompetitionHelperDbContext DbCtx { get; private set; }
         public Dictionary<string, TableVersionInfo> TableVersions { get; } = new Dictionary<string, TableVersionInfo>();
-        public Guid CompetitionId { get; }
-        public string Comment { get; }
+        public Guid CompetitionId { get; private set; }
+        public string Comment { get; private set; }
 
         public TableHistoryCreator(
-            ILogger<TableHistoryCreator> logger,
-            DanceCompetitionHelperDbContext dbCtx,
-            Guid competitionId,
-            string comment)
+            ILogger<TableHistoryCreator> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(
                 nameof(logger));
-            DbCtx = dbCtx ?? throw new ArgumentNullException(
-                nameof(dbCtx));
-            CompetitionId = competitionId;
-
-            Comment = comment;
-            if (string.IsNullOrEmpty(Comment)
-                || string.IsNullOrWhiteSpace(Comment))
-            {
-                throw new ArgumentNullException(
-                    nameof(comment));
-            }
         }
 
         private TableVersionInfo GetTableVersion(
@@ -80,8 +66,23 @@ namespace DanceCompetitionHelper.Helper
             return tableVersionInfo;
         }
 
-        public void CreateHistory()
+        public void CreateHistory(
+            DanceCompetitionHelperDbContext dbCtx,
+            Guid competitionId,
+            string comment)
         {
+            DbCtx = dbCtx ?? throw new ArgumentNullException(
+                nameof(dbCtx));
+            CompetitionId = competitionId;
+
+            Comment = comment;
+            if (string.IsNullOrEmpty(Comment)
+                || string.IsNullOrWhiteSpace(Comment))
+            {
+                throw new ArgumentNullException(
+                    nameof(comment));
+            }
+
             var foundComp = DbCtx.Competitions
                 .TagWith(
                     nameof(CreateHistory) + "[0]")

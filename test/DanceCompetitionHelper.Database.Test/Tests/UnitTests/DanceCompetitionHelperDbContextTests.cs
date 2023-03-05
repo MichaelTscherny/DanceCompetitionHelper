@@ -1,9 +1,10 @@
-﻿using DanceCompetitionHelper.Database.Config;
+﻿using DanceCompetitionHelper.Config;
+using DanceCompetitionHelper.Database.Config;
 using DanceCompetitionHelper.Database.Diagnostic;
+using DanceCompetitionHelper.OrgImpl.Oetsv;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NUnit.Framework;
 using System.Diagnostics;
 using TestHelper.Logging;
 
@@ -26,9 +27,18 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                             SqLiteDbFile = GetNewDbName(),
                             // LogAllSqls = true,
                         });
+                    config.AddTransient(
+                        (srvProv) => new ImporterSettings()
+                        {
+                            // LogAllSqls = true,
+                        });
                     config.AddSingleton<ILoggerProvider, NUnitLoggerProvider>();
                     config.AddTransient<IObserver<DiagnosticListener>, DbDiagnosticObserver>();
                     config.AddTransient<IObserver<KeyValuePair<string, object?>>, DbKeyValueObserver>();
+
+                    // OeTSV Stuff...
+                    config.AddTransient<OetsvCompetitionImporter>();
+                    config.AddTransient<OetsvParticipantChecker>();
                 })
                 .ConfigureLogging((_, config) =>
                 {

@@ -27,8 +27,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase("S", Classes.S)]
         // -------------
         [TestCase(null, null)]
-        [TestCase("", "")]
-        [TestCase("dummy", "dummy")]
+        [TestCase("", null)]
+        [TestCase("dummy", null)]
         public void ToClasses_Test(
             string input,
             string expected)

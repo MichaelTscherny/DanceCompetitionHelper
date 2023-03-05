@@ -11,10 +11,12 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<CompetitionController> _logger;
+        private readonly IServiceProvider _serviceProvider;
 
         public CompetitionClassController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<CompetitionController> logger)
+            ILogger<CompetitionController> logger,
+            IServiceProvider serviceProvider)
         {
             _danceCompHelper = danceCompHelper
                 ?? throw new ArgumentNullException(
@@ -22,6 +24,9 @@ namespace DanceCompetitionHelper.Web.Controllers
             _logger = logger
                 ?? throw new ArgumentNullException(
                     nameof(logger));
+            _serviceProvider = serviceProvider
+                ?? throw new ArgumentNullException(
+                    nameof(serviceProvider));
         }
 
         public IActionResult Index(
@@ -70,6 +75,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     OverviewItems = _danceCompHelper
                         .GetCompetitionClasses(
                             foundCompId,
+                            true,
                             true)
                         .ToList(),
                     DetailedView = true,

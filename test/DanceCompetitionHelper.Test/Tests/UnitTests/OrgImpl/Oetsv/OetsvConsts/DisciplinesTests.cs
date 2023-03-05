@@ -33,8 +33,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase("KUER", Disciplines.Freestyle)]
         // -------------
         [TestCase(null, null)]
-        [TestCase("", "")]
-        [TestCase("dummy", "dummy")]
+        [TestCase("", null)]
+        [TestCase("dummy", null)]
         public void ToDisciplines_Test(
             string input,
             string expected)

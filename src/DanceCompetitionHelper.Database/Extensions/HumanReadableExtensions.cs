@@ -44,11 +44,30 @@ namespace DanceCompetitionHelper.Database.Extensions
                         ?? Enumerable.Empty<string>());
 
         public static string GetNames(
-            this Participant? forParticipant) =>
-                string.Format(
-                        "{0} {1}",
-                        forParticipant?.NamePartA ?? string.Empty,
-                        forParticipant?.NamePartB ?? string.Empty);
+            this Participant? forParticipant)
+        {
+            return GetNames(
+                forParticipant?.NamePartA,
+                forParticipant?.NamePartB);
+        }
 
+        public static string GetNames(
+            string? nameA,
+            string? nameB)
+        {
+            var useNameA = nameA ?? string.Empty;
+            var useNameB = nameB ?? string.Empty;
+
+            if (string.IsNullOrEmpty(
+                useNameB))
+            {
+                return useNameA;
+            }
+
+            return string.Format(
+                "{0} / {1}",
+                useNameA,
+                useNameB);
+        }
     }
 }

@@ -11,10 +11,12 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<AdjudicatorPanelController> _logger;
+        private readonly IServiceProvider _serviceProvider;
 
         public AdjudicatorPanelController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<AdjudicatorPanelController> logger)
+            ILogger<AdjudicatorPanelController> logger,
+            IServiceProvider serviceProvider)
         {
             _danceCompHelper = danceCompHelper
                 ?? throw new ArgumentNullException(
@@ -22,6 +24,9 @@ namespace DanceCompetitionHelper.Web.Controllers
             _logger = logger
                 ?? throw new ArgumentNullException(
                     nameof(logger));
+            _serviceProvider = serviceProvider
+                ?? throw new ArgumentNullException(
+                    nameof(serviceProvider));
         }
 
         public IActionResult Index(

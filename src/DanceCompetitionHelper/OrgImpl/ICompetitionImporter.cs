@@ -4,13 +4,13 @@ namespace DanceCompetitionHelper.OrgImpl
 {
     public interface ICompetitionImporter
     {
-        void ImportOrUpdateByFile(
+        List<string> ImportOrUpdateByFile(
             DanceCompetitionHelperDbContext dbCtx,
             string? fullPathCompetition,
             string? fullPathCompetitionClasses,
             string? fullPathParticipants);
 
-        void ImportOrUpdateByUrl(
+        List<string> ImportOrUpdateByUrl(
             DanceCompetitionHelperDbContext dbCtx,
             Uri? uriCompetition,
             Uri? uriCompetitionClasses,

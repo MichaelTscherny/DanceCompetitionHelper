@@ -2,123 +2,127 @@
 {
     public class CompetitionParticipantImport : IEquatable<CompetitionParticipantImport>
     {
-        public string? OrgClassIdRaw { get; set; }
-        public string? OrgClassId { get; set; }
+        public string? RegOrgClassIdRaw { get; set; }
+        public string? RegOrgClassId { get; set; }
 
-        public string? StartNumberRaw { get; set; }
-        public int? StartNumber { get; set; }
+        public string? RegStartNumberRaw { get; set; }
+        public int? RegStartNumber { get; set; }
 
-        public string? Part01FirstNameRaw { get; set; }
-        public string? Part01LastNameRaw { get; set; }
-        public string? Part01Name { get; set; }
+        public string? RegPartAFirstNameRaw { get; set; }
+        public string? RegPartALastNameRaw { get; set; }
+        public string? RegPartAName { get; set; }
 
-        public string? Part01OrgIdRaw { get; set; }
-        public string? Part01OrgId { get; set; }
+        public string? RegPartAOrgIdRaw { get; set; }
+        public string? RegPartAOrgId { get; set; }
 
-        public string? Part02FirstNameRaw { get; set; }
-        public string? Part02LastNameRaw { get; set; }
-        public string? Part02Name { get; set; }
+        public string? RegPartBFirstNameRaw { get; set; }
+        public string? RegPartBLastNameRaw { get; set; }
+        public string? RegPartBName { get; set; }
 
-        public string? Part02OrgIdRaw { get; set; }
-        public string? Part02OrgId { get; set; }
+        public string? RegPartBOrgIdRaw { get; set; }
+        public string? RegPartBOrgId { get; set; }
 
-        public string? ClubNameRaw { get; set; }
-        public string? ClubName { get; set; }
+        public string? RegClubNameRaw { get; set; }
+        public string? RegClubName { get; set; }
 
-        public string? ClubOrgIdRaw { get; set; }
-        public string? ClubOrgId { get; set; }
+        public string? RegClubOrgIdRaw { get; set; }
+        public string? RegClubOrgId { get; set; }
 
-        public string? StateRaw { get; set; }
-        public string? State { get; set; }
+        public string? RegStateRaw { get; set; }
+        public string? RegState { get; set; }
 
-        public string? StateAbbrRaw { get; set; }
-        public string? StateAbbr { get; set; }
+        public string? RegStateAbbrRaw { get; set; }
+        public string? RegStateAbbr { get; set; }
 
-        public string? DisciplineRaw { get; set; }
-        public string? Discipline { get; set; }
+        public string? RegDisciplineRaw { get; set; }
+        public string? RegDiscipline { get; set; }
 
-        public string? ClassRaw { get; set; }
-        public string? Class { get; set; }
+        public string? RegClassRaw { get; set; }
+        public string? RegClass { get; set; }
 
-        public string? ClassOrgRaw { get; set; }
-        public string? ClassOrg { get; set; }
+        public string? OrgCurrentClassRaw { get; set; }
+        public string? OrgCurrentClass { get; set; }
 
-        public string? AgeClassRaw { get; set; }
-        public string? AgeClass { get; set; }
+        public string? RegAgeClassRaw { get; set; }
+        public string? RegAgeClass { get; set; }
 
-        public string? AgeGroupRaw { get; set; }
-        public string? AgeGroup { get; set; }
+        public string? RegAgeGroupRaw { get; set; }
+        public string? RegAgeGroup { get; set; }
 
         public string? OrgPointsRaw { get; set; }
-        public int? OrgPoints { get; set; }
+        public double? OrgPoints { get; set; }
 
         public string? OrgStartsRaw { get; set; }
         public int? OrgStarts { get; set; }
 
-        public string? MinPointsForPromotionRaw { get; set; }
-        public int? MinPointsForPromotion { get; set; }
+        public string? OrgMinPointsForPromotionRaw { get; set; }
+        public double? OrgMinPointsForPromotion { get; set; }
 
-        public string? MinStartsForPromotionRaw { get; set; }
-        public int? MinStartsForPromotion { get; set; }
+        public string? OrgMinStartsForPromotionRaw { get; set; }
+        public int? OrgMinStartsForPromotion { get; set; }
 
         public override string ToString()
         {
             return string.Format(
                 "{0}/{1} ({2}/{3}/{4}/{5}/{6} - {7}/{8} - {9}/{10} - Prom: {11}/{12})",
-                Part01Name,
-                Part02Name,
-                OrgClassId,
-                AgeClass,
-                AgeGroup,
-                Discipline,
-                Class,
-                ClubName,
-                State,
+                RegPartAName,
+                RegPartBName,
+                RegOrgClassId,
+                RegAgeClass,
+                RegAgeGroup,
+                RegDiscipline,
+                RegClass,
+                RegClubName,
+                RegState,
                 OrgPoints,
                 OrgStarts,
-                MinPointsForPromotion,
-                MinStartsForPromotion);
+                OrgMinPointsForPromotion,
+                OrgMinStartsForPromotion);
         }
 
         public override bool Equals(object? obj)
         {
             return obj is CompetitionParticipantImport import &&
-                   OrgClassIdRaw == import.OrgClassIdRaw &&
-                   OrgClassId == import.OrgClassId &&
-                   StartNumberRaw == import.StartNumberRaw &&
-                   StartNumber == import.StartNumber &&
-                   Part01FirstNameRaw == import.Part01FirstNameRaw &&
-                   Part01LastNameRaw == import.Part01LastNameRaw &&
-                   Part01Name == import.Part01Name &&
-                   Part02FirstNameRaw == import.Part02FirstNameRaw &&
-                   Part02LastNameRaw == import.Part02LastNameRaw &&
-                   Part02Name == import.Part02Name &&
-                   ClubNameRaw == import.ClubNameRaw &&
-                   ClubName == import.ClubName &&
-                   ClubOrgIdRaw == import.ClubOrgIdRaw &&
-                   ClubOrgId == import.ClubOrgId &&
-                   StateRaw == import.StateRaw &&
-                   State == import.State &&
-                   StateAbbrRaw == import.StateAbbrRaw &&
-                   StateAbbr == import.StateAbbr &&
-                   DisciplineRaw == import.DisciplineRaw &&
-                   Discipline == import.Discipline &&
-                   ClassRaw == import.ClassRaw &&
-                   Class == import.Class &&
-                   ClassOrgRaw == import.ClassOrgRaw &&
-                   ClassOrg == import.ClassOrg &&
-                   AgeClassRaw == import.AgeClassRaw &&
-                   AgeClass == import.AgeClass &&
-                   AgeGroupRaw == import.AgeGroupRaw &&
-                   AgeGroup == import.AgeGroup &&
+                   RegOrgClassIdRaw == import.RegOrgClassIdRaw &&
+                   RegOrgClassId == import.RegOrgClassId &&
+                   RegStartNumberRaw == import.RegStartNumberRaw &&
+                   RegStartNumber == import.RegStartNumber &&
+                   RegPartAFirstNameRaw == import.RegPartAFirstNameRaw &&
+                   RegPartALastNameRaw == import.RegPartALastNameRaw &&
+                   RegPartAName == import.RegPartAName &&
+                   RegPartAOrgIdRaw == import.RegPartAOrgIdRaw &&
+                   RegPartAOrgId == import.RegPartAOrgId &&
+                   RegPartBFirstNameRaw == import.RegPartBFirstNameRaw &&
+                   RegPartBLastNameRaw == import.RegPartBLastNameRaw &&
+                   RegPartBName == import.RegPartBName &&
+                   RegPartBOrgIdRaw == import.RegPartBOrgIdRaw &&
+                   RegPartBOrgId == import.RegPartBOrgId &&
+                   RegClubNameRaw == import.RegClubNameRaw &&
+                   RegClubName == import.RegClubName &&
+                   RegClubOrgIdRaw == import.RegClubOrgIdRaw &&
+                   RegClubOrgId == import.RegClubOrgId &&
+                   RegStateRaw == import.RegStateRaw &&
+                   RegState == import.RegState &&
+                   RegStateAbbrRaw == import.RegStateAbbrRaw &&
+                   RegStateAbbr == import.RegStateAbbr &&
+                   RegDisciplineRaw == import.RegDisciplineRaw &&
+                   RegDiscipline == import.RegDiscipline &&
+                   RegClassRaw == import.RegClassRaw &&
+                   RegClass == import.RegClass &&
+                   OrgCurrentClassRaw == import.OrgCurrentClassRaw &&
+                   OrgCurrentClass == import.OrgCurrentClass &&
+                   RegAgeClassRaw == import.RegAgeClassRaw &&
+                   RegAgeClass == import.RegAgeClass &&
+                   RegAgeGroupRaw == import.RegAgeGroupRaw &&
+                   RegAgeGroup == import.RegAgeGroup &&
                    OrgPointsRaw == import.OrgPointsRaw &&
                    OrgPoints == import.OrgPoints &&
                    OrgStartsRaw == import.OrgStartsRaw &&
                    OrgStarts == import.OrgStarts &&
-                   MinPointsForPromotionRaw == import.MinPointsForPromotionRaw &&
-                   MinPointsForPromotion == import.MinPointsForPromotion &&
-                   MinStartsForPromotionRaw == import.MinStartsForPromotionRaw &&
-                   MinStartsForPromotion == import.MinStartsForPromotion;
+                   OrgMinPointsForPromotionRaw == import.OrgMinPointsForPromotionRaw &&
+                   OrgMinPointsForPromotion == import.OrgMinPointsForPromotion &&
+                   OrgMinStartsForPromotionRaw == import.OrgMinStartsForPromotionRaw &&
+                   OrgMinStartsForPromotion == import.OrgMinStartsForPromotion;
         }
 
         public bool Equals(CompetitionParticipantImport? other)
@@ -130,42 +134,44 @@
         public override int GetHashCode()
         {
             HashCode hash = new HashCode();
-            hash.Add(OrgClassIdRaw);
-            hash.Add(OrgClassId);
-            hash.Add(StartNumberRaw);
-            hash.Add(StartNumber);
-            hash.Add(Part01FirstNameRaw);
-            hash.Add(Part01LastNameRaw);
-            hash.Add(Part01Name);
-            hash.Add(Part02FirstNameRaw);
-            hash.Add(Part02LastNameRaw);
-            hash.Add(Part02Name);
-            hash.Add(ClubNameRaw);
-            hash.Add(ClubName);
-            hash.Add(ClubOrgIdRaw);
-            hash.Add(ClubOrgId);
-            hash.Add(StateRaw);
-            hash.Add(State);
-            hash.Add(StateAbbrRaw);
-            hash.Add(StateAbbr);
-            hash.Add(DisciplineRaw);
-            hash.Add(Discipline);
-            hash.Add(ClassRaw);
-            hash.Add(Class);
-            hash.Add(ClassOrgRaw);
-            hash.Add(ClassOrg);
-            hash.Add(AgeClassRaw);
-            hash.Add(AgeClass);
-            hash.Add(AgeGroupRaw);
-            hash.Add(AgeGroup);
+            hash.Add(RegOrgClassIdRaw);
+            hash.Add(RegOrgClassId);
+            hash.Add(RegStartNumberRaw);
+            hash.Add(RegStartNumber);
+            hash.Add(RegPartAFirstNameRaw);
+            hash.Add(RegPartALastNameRaw);
+            hash.Add(RegPartAName);
+            hash.Add(RegPartAOrgIdRaw);
+            hash.Add(RegPartBFirstNameRaw);
+            hash.Add(RegPartBLastNameRaw);
+            hash.Add(RegPartBName);
+            hash.Add(RegPartBOrgIdRaw);
+            hash.Add(RegClubNameRaw);
+            hash.Add(RegClubName);
+            hash.Add(RegClubOrgIdRaw);
+            hash.Add(RegClubOrgId);
+            hash.Add(RegStateRaw);
+            hash.Add(RegState);
+            hash.Add(RegStateAbbrRaw);
+            hash.Add(RegStateAbbr);
+            hash.Add(RegDisciplineRaw);
+            hash.Add(RegDiscipline);
+            hash.Add(RegClassRaw);
+            hash.Add(RegClass);
+            hash.Add(OrgCurrentClassRaw);
+            hash.Add(OrgCurrentClass);
+            hash.Add(RegAgeClassRaw);
+            hash.Add(RegAgeClass);
+            hash.Add(RegAgeGroupRaw);
+            hash.Add(RegAgeGroup);
             hash.Add(OrgPointsRaw);
             hash.Add(OrgPoints);
             hash.Add(OrgStartsRaw);
             hash.Add(OrgStarts);
-            hash.Add(MinPointsForPromotionRaw);
-            hash.Add(MinPointsForPromotion);
-            hash.Add(MinStartsForPromotionRaw);
-            hash.Add(MinStartsForPromotion);
+            hash.Add(OrgMinPointsForPromotionRaw);
+            hash.Add(OrgMinPointsForPromotion);
+            hash.Add(OrgMinStartsForPromotionRaw);
+            hash.Add(OrgMinStartsForPromotion);
             return hash.ToHashCode();
         }
     }
