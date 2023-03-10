@@ -10,9 +10,9 @@
         public string? AgeClass { get; set; }
         public string? AgeGroup { get; set; }
         public string? Class { get; set; }
-        public int MinStartsForPromotion { get; set; }
-        public int MinPointsForPromotion { get; set; }
-        public int PointsForFirst { get; set; }
+        public int? MinStartsForPromotion { get; set; }
+        public int? MinPointsForPromotion { get; set; }
+        public int? PointsForFirst { get; set; }
 
         public int CountParticipants { get; set; }
         public int ExtraPartByWinning { get; set; }

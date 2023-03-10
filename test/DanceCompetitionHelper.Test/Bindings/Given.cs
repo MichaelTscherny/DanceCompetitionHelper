@@ -310,10 +310,10 @@ namespace DanceCompetitionHelper.Test.Bindings
                             AgeGroup = newCompClass.AgeGroup,
                             Class = newCompClass.Class,
 
-                            MinStartsForPromotion = newCompClass.MinStartsForPromotion,
-                            MinPointsForPromotion = newCompClass.MinPointsForPromotion,
+                            MinStartsForPromotion = newCompClass.MinStartsForPromotion ?? 0,
+                            MinPointsForPromotion = newCompClass.MinPointsForPromotion ?? 0,
 
-                            PointsForFirst = newCompClass.PointsForFirst,
+                            PointsForFirst = newCompClass.PointsForFirst ?? 0.0,
                             ExtraManualStarter = newCompClass.ExtraManualStarter,
                             Comment = newCompClass.Comment,
                         });
@@ -568,6 +568,34 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             AddToDispose(
                 newDanceCompHelper);
+        }
+
+        [Given(@"following data is imported by DanceCompetitionHelper ""([^""]*)""")]
+        public void GivenFollowingDataIsImportedByDanceCompetitionHelper(
+            string danceCompHelper,
+            Table table)
+        {
+            var compsToImport = table.CreateSet<CompetitionImportPoco>();
+            var useDanceCompHelper = GetDanceCompetitionHelper(
+                danceCompHelper);
+
+            var rootPath = AssemblyExtensions.GetAssemblyPath() ?? string.Empty;
+
+            foreach (var toImport in compsToImport)
+            {
+                useDanceCompHelper.ImportOrUpdateCompetition(
+                    toImport.Organization,
+                    toImport.OrgCompetitionId,
+                    Database.Enum.ImportTypeEnum.Excel,
+                    new[] {
+                        Path.Combine(
+                            rootPath,
+                            toImport.CompetitionFile ?? string.Empty),
+                        Path.Combine(
+                            rootPath,
+                            toImport.ParticipantsFile ?? string.Empty)
+                    });
+            }
         }
 
         #endregion Dance Competition Helper 

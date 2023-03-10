@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\AdjudicatorPanel - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\Database\Competition - Copy.feature.cs" />
   </ItemGroup>
@@ -57,6 +58,9 @@
     <Compile Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter.feature.cs">
+      <DependentUpon>CompetitionImporter.feature</DependentUpon>
+    </Compile>
     <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts.feature.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
@@ -86,6 +90,10 @@
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
@@ -120,7 +128,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="TestData\Importer\Oetsv\CompetitionImport02_Competition.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TestData\Importer\Oetsv\CompetitionImport01_Competition.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\CompetitionImport02_Participants.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="TestData\Importer\Oetsv\CompetitionImport01_Participants.csv">

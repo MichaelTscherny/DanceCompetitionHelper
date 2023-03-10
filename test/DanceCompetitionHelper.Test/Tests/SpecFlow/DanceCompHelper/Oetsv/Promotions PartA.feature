@@ -47,11 +47,11 @@ Scenario: No Multiple Start - None
         #                                                        
         | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
-        | Test-Comp-01    | Allg Sta D           | 1                 | 0                  |                        | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg Sta C           | 1                 | 1                  | Allg Sta D (Class-01)  | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg La D            | 1                 | 0                  |                        | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg La C            | 1                 | 1                  | Allg La D (Class-03)   | 0                    |                          | 0                  |
+        | CompetitionName | CompetitionClassName | OrgClassId | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Allg Sta D           | Class-01   | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg Sta C           | Class-02   | 1                 | 1                  | Allg Sta D (Class-01)  | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg La D            | Class-03   | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg La C            | Class-04   | 1                 | 1                  | Allg La D (Class-03)   | 0                    |                          | 0                  |
 
 
 Scenario: No Multiple Start - No Promotion - Too less starts - #10
@@ -99,11 +99,11 @@ Scenario: No Multiple Start - No Promotion - Too less starts - #10
         #                                                        
         | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False    |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
-        | Test-Comp-01    | Allg Sta D           | 1                 | 0                  |                        | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg Sta C           | 1                 | 1                  | Allg Sta D (Class-01)  | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg La D            | 1                 | 0                  |                        | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg La C            | 1                 | 1                  | Allg La D (Class-03)   | 0                    |                          | 0                  |
+        | CompetitionName | CompetitionClassName | OrgClassId | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Allg Sta D           | Class-01   | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg Sta C           | Class-02   | 1                 | 1                  | Allg Sta D (Class-01)  | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg La D            | Class-03   | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg La C            | Class-04   | 1                 | 1                  | Allg La D (Class-03)   | 0                    |                          | 0                  |
 
 Scenario: No Multiple Start - No Promotion - Too less points - #10
     Given following DanceCompetitionHelper "DanceCompHelper"
@@ -150,11 +150,11 @@ Scenario: No Multiple Start - No Promotion - Too less points - #10
         #                                                        
         | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False     |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
-        | Test-Comp-01    | Allg Sta D           | 1                 | 0                  |                        | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg Sta C           | 1                 | 1                  | Allg Sta D (Class-01)  | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg La D            | 1                 | 0                  |                        | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg La C            | 1                 | 1                  | Allg La D (Class-03)   | 0                    |                          | 0                  |
+        | CompetitionName | CompetitionClassName | OrgClassId | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Allg Sta D           | Class-01   | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg Sta C           | Class-02   | 1                 | 1                  | Allg Sta D (Class-01)  | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg La D            | Class-03   | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg La C            | Class-04   | 1                 | 1                  | Allg La D (Class-03)   | 0                    |                          | 0                  |
 
 Scenario: No Multiple Start - Promotion - #10
     Given following DanceCompetitionHelper "DanceCompHelper"
@@ -201,9 +201,9 @@ Scenario: No Multiple Start - Promotion - #10
         #                                                        
         | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False   |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
-        | Test-Comp-01    | Allg Sta D           | 1                 | 0                  |                        | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg Sta C           | 1                 | 1                  | Allg Sta D (Class-01)  | 1                    | #10                      | 0                  |
-        | Test-Comp-01    | Allg La D            | 1                 | 0                  |                        | 0                    |                          | 0                  |
-        | Test-Comp-01    | Allg La C            | 1                 | 1                  | Allg La D (Class-03)   | 0                    |                          | 0                  |
+        | CompetitionName | CompetitionClassName | OrgClassId | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Allg Sta D           | Class-01   | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg Sta C           | Class-02   | 1                 | 1                  | Allg Sta D (Class-01)  | 1                    | #10                      | 0                  |
+        | Test-Comp-01    | Allg La D            | Class-03   | 1                 | 0                  |                        | 0                    |                          | 0                  |
+        | Test-Comp-01    | Allg La C            | Class-04   | 1                 | 1                  | Allg La D (Class-03)   | 0                    |                          | 0                  |
 

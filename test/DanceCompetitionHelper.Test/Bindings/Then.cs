@@ -2,6 +2,7 @@
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
 using DanceCompetitionHelper.Info;
+using DanceCompetitionHelper.OrgImpl.Oetsv;
 using DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper;
 
 namespace DanceCompetitionHelper.Test.Bindings
@@ -789,6 +790,310 @@ namespace DanceCompetitionHelper.Test.Bindings
 
         #region Dance Competition Helper
 
+        [Then(@"following Competitions exists in DanceCompetitionHelper ""([^""]*)""")]
+        public void ThenFollowingCompetitionExistsInDanceCompetitionHelper(
+            string danceCompHelper,
+            Table table)
+        {
+            var checkComps = table.CreateSet<CompetitionPoco>();
+            var useDanceCompHelper = GetDanceCompetitionHelper(
+                danceCompHelper);
+
+            foreach (var chkCmp in checkComps)
+            {
+                var foundComp = useDanceCompHelper.GetCompetition(
+                    useDanceCompHelper.GetCompetition(
+                        chkCmp.CompetitionName));
+
+                Assert.That(
+                    foundComp,
+                    Is.Not.Null,
+                    "{0} '{1}' not found!",
+                    nameof(Competition),
+                    chkCmp.CompetitionName);
+
+                var compLogString = string.Format(
+                    "{0} '{1}'",
+                    nameof(Competition),
+                    foundComp.CompetitionName);
+
+                Assert.Multiple(() =>
+                {
+                    if (foundComp == null)
+                    {
+                        throw new ArgumentNullException();
+                    }
+
+                    Assert.That(
+                        foundComp.CompetitionName,
+                        Is.EqualTo(
+                            chkCmp.CompetitionName),
+                        "{0}: {1}",
+                        compLogString,
+                        nameof(Competition.CompetitionName));
+                    Assert.That(
+                        foundComp.Organization,
+                        Is.EqualTo(
+                            chkCmp.Organization),
+                        "{0}: {1}",
+                        compLogString,
+                        nameof(Competition.Organization));
+
+                    if (chkCmp.OrgCompetitionId != null)
+                    {
+                        Assert.That(
+                            foundComp.OrgCompetitionId,
+                            Is.EqualTo(
+                                chkCmp.OrgCompetitionId),
+                            "{0}: {1}",
+                            compLogString,
+                            nameof(Competition.OrgCompetitionId));
+                    }
+
+                    if (chkCmp.CompetitionInfo != null)
+                    {
+                        Assert.That(
+                            foundComp.CompetitionInfo,
+                            Is.EqualTo(
+                                chkCmp.CompetitionInfo),
+                            "{0}: {1}",
+                            compLogString,
+                            nameof(Competition.CompetitionInfo));
+                    }
+
+                    if (chkCmp.CompetitionDate.HasValue)
+                    {
+                        Assert.That(
+                            foundComp.CompetitionDate,
+                            Is.EqualTo(
+                                chkCmp.CompetitionDate),
+                            "{0}: {1}",
+                            compLogString,
+                            nameof(Competition.CompetitionDate));
+                    }
+                });
+            }
+        }
+
+        [Then(@"following Classes exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
+        public void ThenFollowingClassesExistsInCompetitionsOfDanceCompetitionHelper(
+            string danceCompHelper,
+            Table table)
+        {
+            var checkCompClass = table.CreateSet<CompetitionClassPoco>();
+            var useDanceCompHelper = GetDanceCompetitionHelper(
+                danceCompHelper);
+
+            var compClassesByCompId = new Dictionary<Guid, List<CompetitionClass>>();
+
+            foreach (var chkCompClass in checkCompClass)
+            {
+                var useComp = useDanceCompHelper.GetCompetition(
+                    chkCompClass.CompetitionName);
+
+                Assert.That(
+                    useComp,
+                    Is.Not.Null,
+                    "{0} '{1}' not found!",
+                    nameof(Competition),
+                    chkCompClass.CompetitionName);
+                Assert.That(
+                    useComp.HasValue,
+                    Is.True,
+                    "{0} '{1}' not found",
+                    nameof(Competition),
+                    chkCompClass.CompetitionName);
+
+                var useCompId = useComp.Value;
+                if (compClassesByCompId.TryGetValue(
+                    useCompId,
+                    out var foundCompClasses) == false)
+                {
+                    foundCompClasses = useDanceCompHelper
+                        .GetCompetitionClasses(
+                            useCompId,
+                            true)
+                        .ToList();
+                    compClassesByCompId[useCompId] = foundCompClasses;
+                }
+
+                var foundCompClass = foundCompClasses.FirstOrDefault(
+                    x => x.CompetitionClassName == chkCompClass.CompetitionClassName);
+
+                var compClassLogString = string.Format(
+                    "{0} '{1}'",
+                    nameof(CompetitionClass),
+                    chkCompClass.CompetitionClassName);
+
+                Assert.Multiple(
+                    () =>
+                    {
+                        Assert.That(
+                            foundCompClass,
+                            Is.Not.Null,
+                            "{0} not found",
+                            compClassLogString);
+                        Assert.That(
+                            foundCompClass?.DisplayInfo,
+                            Is.Not.Null,
+                            "{0} not invalid - {1} missing",
+                            compClassLogString,
+                            nameof(CompetitionClass.DisplayInfo));
+                        Assert.That(
+                            foundCompClass?.DisplayInfo?.ExtraParticipants,
+                            Is.Not.Null,
+                            "{0} not invalid - {1} missing",
+                            compClassLogString,
+                            nameof(CompetitionClass.DisplayInfo.ExtraParticipants));
+                    });
+
+                Assert.Multiple(() =>
+                {
+                    if (foundCompClass == null)
+                    {
+                        throw new ArgumentNullException();
+                    }
+
+                    Assert.That(
+                        foundCompClass.OrgClassId,
+                        Is.EqualTo(
+                            chkCompClass.OrgClassId),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(CompetitionClass.OrgClassId));
+
+                    if (chkCompClass.Discipline != null)
+                    {
+                        Assert.That(
+                            foundCompClass.Discipline,
+                            Is.EqualTo(
+                                OetsvConstants.Disciplines.ToDisciplines(
+                                    chkCompClass.Discipline)),
+                            "{0}: {1}",
+                            compClassLogString,
+                            nameof(CompetitionClass.Discipline));
+                    }
+
+                    if (chkCompClass.AgeClass != null)
+                    {
+                        Assert.That(
+                            foundCompClass.AgeClass,
+                            Is.EqualTo(
+                                OetsvConstants.AgeClasses.ToAgeClasses(
+                                    chkCompClass.AgeClass)),
+                            "{0}: {1}",
+                            compClassLogString,
+                            nameof(CompetitionClass.AgeClass));
+                    }
+
+                    if (chkCompClass.AgeGroup != null)
+                    {
+                        Assert.That(
+                            foundCompClass.AgeGroup,
+                            Is.EqualTo(
+                                OetsvConstants.AgeGroups.ToAgeGroup(
+                                    chkCompClass.AgeGroup)),
+                            "{0}: {1}",
+                            compClassLogString,
+                            nameof(CompetitionClass.AgeGroup));
+                    }
+
+                    if (chkCompClass.Class != null)
+                    {
+                        Assert.That(
+                            foundCompClass.Class,
+                            Is.EqualTo(
+                                OetsvConstants.Classes.ToClasses(
+                                    chkCompClass.Class)),
+                            "{0}: {1}",
+                            compClassLogString,
+                            nameof(CompetitionClass.Class));
+                    }
+
+                    if (chkCompClass.MinPointsForPromotion.HasValue)
+                    {
+                        Assert.That(
+                            foundCompClass.MinPointsForPromotion,
+                            Is.EqualTo(
+                                chkCompClass.MinPointsForPromotion),
+                            "{0}: {1}",
+                            compClassLogString,
+                            nameof(CompetitionClass.MinPointsForPromotion));
+                    }
+
+                    if (chkCompClass.MinStartsForPromotion.HasValue)
+                    {
+                        Assert.That(
+                            foundCompClass.MinStartsForPromotion,
+                            Is.EqualTo(
+                                chkCompClass.MinStartsForPromotion),
+                            "{0}: {1}",
+                            compClassLogString,
+                            nameof(CompetitionClass.MinStartsForPromotion));
+                    }
+
+                    if (chkCompClass.PointsForFirst.HasValue)
+                    {
+                        Assert.That(
+                            foundCompClass.PointsForFirst,
+                            Is.EqualTo(
+                                chkCompClass.PointsForFirst),
+                            "{0}: {1}",
+                            compClassLogString,
+                            nameof(CompetitionClass.PointsForFirst));
+                    }
+                });
+
+                Assert.Multiple(() =>
+                {
+                    if (foundCompClass == null
+                        || foundCompClass.DisplayInfo == null
+                        || foundCompClass.DisplayInfo.ExtraParticipants == null)
+                    {
+                        throw new ArgumentNullException();
+                    }
+
+                    Assert.That(
+                        foundCompClass.DisplayInfo.CountParticipants,
+                        Is.EqualTo(
+                            chkCompClass.CountParticipants),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(CompetitionClassDisplayInfo.CountParticipants));
+
+                    Assert.That(
+                        foundCompClass.DisplayInfo.ExtraParticipants.ByWinning,
+                        Is.EqualTo(
+                            chkCompClass.ExtraPartByWinning),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(ExtraParticipants.ByWinning));
+                    Assert.That(
+                        foundCompClass.DisplayInfo.ExtraParticipants.ByWinningInfo,
+                        Is.Null.Or.Empty.Or.EqualTo(
+                            chkCompClass.ExtraPartByWinningInfo),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(ExtraParticipants.ByWinningInfo));
+                    Assert.That(
+                        foundCompClass.DisplayInfo.ExtraParticipants.ByPromotion,
+                        Is.EqualTo(
+                            chkCompClass.ExtraPartByPromotion),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(ExtraParticipants.ByPromotion));
+                    Assert.That(
+                        foundCompClass.DisplayInfo.ExtraParticipants.ByPromotionInfo,
+                        Is.Null.Or.Empty.Or.EqualTo(
+                            chkCompClass.ExtraPartByPromotionInfo),
+                        "{0}: {1}",
+                        compClassLogString,
+                        nameof(ExtraParticipants.ByPromotionInfo));
+
+                });
+            }
+        }
+
         [Then(@"following Counts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
         public void ThenFollowingCountsExistsInDanceCompetitionsOfCompetitionHelper(
             string danceCompHelper,
@@ -1095,127 +1400,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
         }
 
-        [Then(@"following Classes exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingClassesExistsInCompetitionsOfDanceCompetitionHelper(
-            string danceCompHelper,
-            Table table)
-        {
-            var checkCompClass = table.CreateSet<CompetitionClassPoco>();
-            var useDanceCompHelper = GetDanceCompetitionHelper(
-                danceCompHelper);
 
-            var compClassesByCompId = new Dictionary<Guid, List<CompetitionClass>>();
-
-            foreach (var chkCompClass in checkCompClass)
-            {
-                var useComp = useDanceCompHelper.GetCompetition(
-                    chkCompClass.CompetitionName);
-
-                Assert.That(
-                    useComp,
-                    Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    chkCompClass.CompetitionName);
-                Assert.That(
-                    useComp.HasValue,
-                    Is.True,
-                    "{0} '{1}' not found",
-                    nameof(Competition),
-                    chkCompClass.CompetitionName);
-
-                var useCompId = useComp.Value;
-                if (compClassesByCompId.TryGetValue(
-                    useCompId,
-                    out var foundCompClasses) == false)
-                {
-                    foundCompClasses = useDanceCompHelper
-                        .GetCompetitionClasses(
-                            useCompId,
-                            true)
-                        .ToList();
-                    compClassesByCompId[useCompId] = foundCompClasses;
-                }
-
-                var foundCompClass = foundCompClasses.FirstOrDefault(
-                    x => x.CompetitionClassName == chkCompClass.CompetitionClassName);
-
-                var compClassLogString = string.Format(
-                    "{0} '{1}'",
-                    nameof(CompetitionClass),
-                    chkCompClass.CompetitionClassName);
-
-                Assert.Multiple(
-                    () =>
-                    {
-                        Assert.That(
-                            foundCompClass,
-                            Is.Not.Null,
-                            "{0} not found",
-                            compClassLogString);
-                        Assert.That(
-                            foundCompClass?.DisplayInfo,
-                            Is.Not.Null,
-                            "{0} not invalid - {1} missing",
-                            compClassLogString,
-                            nameof(CompetitionClass.DisplayInfo));
-                        Assert.That(
-                            foundCompClass?.DisplayInfo?.ExtraParticipants,
-                            Is.Not.Null,
-                            "{0} not invalid - {1} missing",
-                            compClassLogString,
-                            nameof(CompetitionClass.DisplayInfo.ExtraParticipants));
-                    });
-
-                Assert.Multiple(() =>
-                {
-                    if (foundCompClass == null
-                        || foundCompClass.DisplayInfo == null
-                        || foundCompClass.DisplayInfo.ExtraParticipants == null)
-                    {
-                        throw new ArgumentNullException();
-                    }
-
-                    Assert.That(
-                        foundCompClass.DisplayInfo.CountParticipants,
-                        Is.EqualTo(
-                            chkCompClass.CountParticipants),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(CompetitionClassDisplayInfo.CountParticipants));
-
-                    Assert.That(
-                        foundCompClass.DisplayInfo.ExtraParticipants.ByWinning,
-                        Is.EqualTo(
-                            chkCompClass.ExtraPartByWinning),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(ExtraParticipants.ByWinning));
-                    Assert.That(
-                        foundCompClass.DisplayInfo.ExtraParticipants.ByWinningInfo,
-                        Is.Null.Or.Empty.Or.EqualTo(
-                            chkCompClass.ExtraPartByWinningInfo),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(ExtraParticipants.ByWinningInfo));
-                    Assert.That(
-                        foundCompClass.DisplayInfo.ExtraParticipants.ByPromotion,
-                        Is.EqualTo(
-                            chkCompClass.ExtraPartByPromotion),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(ExtraParticipants.ByPromotion));
-                    Assert.That(
-                        foundCompClass.DisplayInfo.ExtraParticipants.ByPromotionInfo,
-                        Is.Null.Or.Empty.Or.EqualTo(
-                            chkCompClass.ExtraPartByPromotionInfo),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(ExtraParticipants.ByPromotionInfo));
-
-                });
-            }
-        }
 
         #endregion Dance Competition Helper
 

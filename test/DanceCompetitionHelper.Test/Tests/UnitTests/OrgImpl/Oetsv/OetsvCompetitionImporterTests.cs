@@ -39,7 +39,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                     nameof(testImporter.OrgCompetitionId));
                 Assert.That(
                     testImporter.CompetitionName,
-                    Is.EqualTo("Hans-Rueff-Gedächtnispokal + Sportunion-Bundesmeisterschaft"),
+                    Is.EqualTo("Hans-Rueff-Gedächtnispokal"),
                     nameof(testImporter.CompetitionName));
                 Assert.That(
                     testImporter.CompetitionLocation,
@@ -51,7 +51,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                     nameof(testImporter.CompetitionAddress));
                 Assert.That(
                     testImporter.CompetitionDate,
-                    Is.EqualTo(new DateTime(2013, 5, 12)),
+                    Is.EqualTo(new DateTime(2013, 5, 22)),
                     nameof(testImporter.CompetitionDate));
                 Assert.That(
                     testImporter.CompetitionType,

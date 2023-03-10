@@ -2080,51 +2080,87 @@ namespace DanceCompetitionHelper
 
                         var oetsvImporter = _serviceProvider.GetRequiredService<OetsvCompetitionImporter>();
 
+                        Action importAction;
+
                         switch (importType)
                         {
                             case ImportTypeEnum.Url:
-                                using (var dbTrans = _danceCompHelperDb.BeginTransaction())
+                                importAction = () =>
                                 {
-                                    try
-                                    {
-                                        var checkComp = _danceCompHelperDb.Competitions
-                                            .TagWith(
-                                                nameof(ImportOrUpdateCompetition) + "[01]")
-                                            .FirstOrDefault(
-                                                x => x.OrgCompetitionId == orgCompetitionId);
-
-                                        if (checkComp != null)
-                                        {
-                                            CreateTableHistoryReuseTransaction(
-                                                checkComp.CompetitionId);
-                                        }
-
-                                        oetsvImporter.ImportOrUpdateByUrl(
-                                            _danceCompHelperDb,
-                                            oetsvImporter.GetCompetitioUriForOrgId(
-                                                useCompetitionId),
-                                            null,
-                                            oetsvImporter.GetParticipantsUriForOrgId(
-                                                useCompetitionId));
-
-                                        _danceCompHelperDb.SaveChanges();
-                                        dbTrans.Commit();
-                                    }
-                                    catch (Exception exc)
-                                    {
-                                        _logger.LogError(
-                                            exc,
-                                            "Error during {Organization} import: {ErrorMessage}",
-                                            organization,
-                                            exc.Message);
-
-                                        retErrors.Add(
-                                            exc.Message);
-
-                                        dbTrans.Rollback();
-                                    }
-                                }
+                                    oetsvImporter.ImportOrUpdateByUrl(
+                                        _danceCompHelperDb,
+                                        oetsvImporter.GetCompetitioUriForOrgId(
+                                            useCompetitionId),
+                                        null,
+                                        oetsvImporter.GetParticipantsUriForOrgId(
+                                            useCompetitionId));
+                                };
                                 break;
+
+                            case ImportTypeEnum.Excel:
+                                var useFiles = filePaths?.ToList() ?? new List<string>();
+
+                                if (useFiles.Count < 2)
+                                {
+                                    throw new ArgumentNullException(
+                                        nameof(filePaths),
+                                        string.Format(
+                                            "'{0}' must contain at least 2 files!",
+                                            nameof(filePaths)));
+                                }
+
+                                importAction = () =>
+                                {
+                                    oetsvImporter.ImportOrUpdateByFile(
+                                        _danceCompHelperDb,
+                                        useFiles[0],
+                                        null,
+                                        useFiles[1]);
+                                };
+                                break;
+
+                            default:
+                                throw new NotImplementedException(
+                                    string.Format(
+                                        "{0} '{1}' not yet implemented!",
+                                        nameof(ImportTypeEnum),
+                                        importType));
+                        }
+
+                        using (var dbTrans = _danceCompHelperDb.BeginTransaction())
+                        {
+                            try
+                            {
+                                var checkComp = _danceCompHelperDb.Competitions
+                                    .TagWith(
+                                        nameof(ImportOrUpdateCompetition) + "[01]")
+                                    .FirstOrDefault(
+                                        x => x.OrgCompetitionId == orgCompetitionId);
+
+                                if (checkComp != null)
+                                {
+                                    CreateTableHistoryReuseTransaction(
+                                        checkComp.CompetitionId);
+                                }
+
+                                importAction();
+
+                                _danceCompHelperDb.SaveChanges();
+                                dbTrans.Commit();
+                            }
+                            catch (Exception exc)
+                            {
+                                _logger.LogError(
+                                    exc,
+                                    "Error during {Organization} import: {ErrorMessage}",
+                                    organization,
+                                    exc.Message);
+
+                                retErrors.Add(
+                                    exc.Message);
+
+                                dbTrans.Rollback();
+                            }
                         }
                         break;
                 }

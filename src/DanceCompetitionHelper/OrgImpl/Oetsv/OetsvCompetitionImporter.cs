@@ -283,59 +283,93 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             var retErrors = new List<string>();
 
             // ----------------------------------------
-            if (string.IsNullOrEmpty(
-                fullPathCompetition)
-                || File.Exists(
-                    fullPathCompetition) == false)
-            {
-                return retErrors;
-            }
-
-            foreach (var curLine in File.ReadAllLines(
+            if (File.Exists(
                 fullPathCompetition))
             {
-                var lineItems = curLine.Split(
-                    new[] { ";" },
-                    StringSplitOptions.TrimEntries);
-
-                if (lineItems.Length >= 2)
+                foreach (var curLine in File.ReadAllLines(
+                    fullPathCompetition))
                 {
-                    switch (lineItems[0].ToUpperInvariant())
+                    var methodName = string.Empty;
+
+                    try
                     {
-                        case "TSD":
-                            ExtractCompetitionInfo(
-                                lineItems);
-                            break;
 
-                        case "TKL":
-                            ExtractCompetitionClasses(
-                                lineItems);
-                            break;
+                        var lineItems = curLine.Split(
+                            new[] { ";" },
+                            StringSplitOptions.TrimEntries);
 
-                        case "FUNKT":
-                            ExtractOfficials(
-                                lineItems);
-                            break;
+                        if (lineItems.Length >= 2)
+                        {
+                            switch (lineItems[0].ToUpperInvariant())
+                            {
+                                case "TSD":
+                                    methodName = nameof(ExtractCompetitionInfo);
+                                    ExtractCompetitionInfo(
+                                        lineItems);
+                                    break;
+
+                                case "TKL":
+                                    methodName = nameof(ExtractCompetitionClasses);
+                                    ExtractCompetitionClasses(
+                                        lineItems);
+                                    break;
+
+                                case "FUNKT":
+                                    methodName = nameof(ExtractOfficials);
+                                    ExtractOfficials(
+                                        lineItems);
+                                    break;
+                            }
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        var logStr = string.Format(
+                            "Error during '{0}' for '{1}': {2}",
+                            methodName,
+                            curLine,
+                            exc.Message);
+
+                        _logger.LogError(
+                            exc,
+                            logStr);
+
+                        retErrors.Add(
+                            logStr);
                     }
                 }
             }
 
             // ----------------------------------------
-            if (string.IsNullOrEmpty(
-                fullPathParticipants)
-                || File.Exists(
-                    fullPathParticipants) == false)
-            {
-                return retErrors;
-            }
-
-            foreach (var curLine in File.ReadAllLines(
+            if (File.Exists(
                 fullPathParticipants))
             {
-                ExtractCompetitionParticipants(
-                    curLine.Split(
-                        new[] { ";" },
-                        StringSplitOptions.TrimEntries));
+                foreach (var curLine in File.ReadAllLines(
+                    fullPathParticipants))
+                {
+                    try
+                    {
+                        ExtractCompetitionParticipants(
+                            curLine.Split(
+                                new[] { ";" },
+                                StringSplitOptions.TrimEntries));
+                    }
+                    catch (Exception exc)
+                    {
+                        var logStr = string.Format(
+                            "Error during '{0}' for '{1}': {2}",
+                            nameof(ExtractCompetitionParticipants),
+                            curLine,
+                            exc.Message);
+
+                        _logger.LogError(
+                            exc,
+                            logStr);
+
+                        retErrors.Add(
+                            logStr);
+                    }
+                }
             }
 
             return retErrors;
@@ -491,6 +525,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public void ExtractCompetitionParticipants(
             string[] participantInfo)
         {
+            if (string.IsNullOrEmpty(OrgCompetitionId))
+            {
+                OrgCompetitionId = participantInfo[PartExcelRegOrgCompId].Trim();
+            }
+
             if (participantInfo.Length < 32
                 || OrgCompetitionId != participantInfo[PartExcelRegOrgCompId])
             {
@@ -601,11 +640,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         participantInfo[PartExcelOrgMinStartsForPromotionLa]);
 
                     break;
-            }
-
-            if (addPartImport.OrgCurrentClass != addPartImport.OrgCurrentClassRaw)
-            {
-                var gotIt = true;
             }
 
             Participants.Add(
@@ -820,15 +854,19 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     continue;
                 }
 
+
+                // TODO: check "missing"/"deleted" participants 
                 if (allParticipantsByImpStr.TryGetValue(
                     curPartImpString,
-                    out var existingParticipant))
+                    out var useParticipant))
                 {
-                    // TODO: update!
+                    useParticipant.StartNumber = curImportPart.RegStartNumber ?? 0;
+                    useParticipant.OrgPointsPartA = curImportPart.OrgPoints ?? 0;
+                    useParticipant.OrgStartsPartA = curImportPart.OrgStarts ?? 0;
                 }
                 else
                 {
-                    var newParticipant = dbCtx.Participants.Add(
+                    useParticipant = dbCtx.Participants.Add(
                         new Participant()
                         {
                             Competition = foundComp,
@@ -847,35 +885,35 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         })
                         .Entity;
 
-                    if (newParticipant.OrgPointsPartA >= useCompClass.MinPointsForPromotion
-                        && newParticipant.OrgStartsPartA >= useCompClass.MinStartsForPromotion)
-                    {
-                        newParticipant.OrgAlreadyPromotedPartA = true;
-                        newParticipant.OrgAlreadyPromotedInfoPartA = string.Format(
-                            "Points and starts exeeds Promotion Limits");
-                    }
+                    allParticipantsByImpStr[curPartImpString] = useParticipant;
+                }
 
-                    var checkAlreadyPromoted = true;
-                    if (useCompClass.Class == OetsvConstants.Classes.Amateur
-                        && curImportPart.RegClass == OetsvConstants.Classes.GirlsOnly)
-                    {
-                        // girls only... ignore this...
-                        checkAlreadyPromoted = false;
-                    }
+                if (useParticipant.OrgPointsPartA >= useCompClass.MinPointsForPromotion
+                    && useParticipant.OrgStartsPartA >= useCompClass.MinStartsForPromotion)
+                {
+                    useParticipant.OrgAlreadyPromotedPartA = true;
+                    useParticipant.OrgAlreadyPromotedInfoPartA = string.Format(
+                        "Points and starts exeeds Promotion Limits");
+                }
 
-                    if (checkAlreadyPromoted
-                        && (curImportPart.OrgCurrentClass != useCompClass.Class
-                        || curImportPart.OrgCurrentClass != curImportPart.RegClass))
-                    {
-                        newParticipant.OrgAlreadyPromotedPartA = true;
-                        newParticipant.OrgAlreadyPromotedInfoPartA = string.Format(
-                            "Registration Class '{0}' != Import/Org Class: '{1}' ({2})",
-                            curImportPart.RegClass,
-                            curImportPart.OrgCurrentClass,
-                            curImportPart.OrgCurrentClassRaw);
-                    }
+                var checkAlreadyPromoted = true;
+                if (useCompClass.Class == OetsvConstants.Classes.Amateur
+                    && curImportPart.RegClass == OetsvConstants.Classes.GirlsOnly)
+                {
+                    // girls only... ignore this...
+                    checkAlreadyPromoted = false;
+                }
 
-                    allParticipantsByImpStr[curPartImpString] = newParticipant;
+                if (checkAlreadyPromoted
+                    && (curImportPart.OrgCurrentClass != useCompClass.Class
+                    || curImportPart.OrgCurrentClass != curImportPart.RegClass))
+                {
+                    useParticipant.OrgAlreadyPromotedPartA = true;
+                    useParticipant.OrgAlreadyPromotedInfoPartA = string.Format(
+                        "Registration Class '{0}' != Import/Org Class: '{1}' ({2})",
+                        curImportPart.RegClass,
+                        curImportPart.OrgCurrentClass,
+                        curImportPart.OrgCurrentClassRaw);
                 }
             }
 

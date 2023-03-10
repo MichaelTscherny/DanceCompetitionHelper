@@ -27,9 +27,12 @@ Scenario: Simple Counts
     Then following Counts exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName | CountClasses | CountParticipants |
         | Test-Comp-01    | 1            | 2                 |
+    # TODO: go on here!..
+    And following Competitions exists in DanceCompetitionHelper "DanceCompHelper"
+        |  |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
-        | Test-Comp-01    | Allg. Sta D          | 2                 | 0                  |                        | 0                    |                          | 0                  |
+        | CompetitionName | CompetitionClassName | OrgClassId | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Allg. Sta D          | Clas-01    | 2                 | 0                  |                        | 0                    |                          | 0                  |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName | CompetitionClassName | StartNumber | MultipleStarts | NamePartA   | PossiblePromotionA | PossiblePromotionAInfo           | NamePartB   |
         | Test-Comp-01    | Allg. Sta D          | 1           | false          | Dancer 01-A | false              | [A] 0/0 + 100/1 = 100/1 -> False | Dancer 01-B |
