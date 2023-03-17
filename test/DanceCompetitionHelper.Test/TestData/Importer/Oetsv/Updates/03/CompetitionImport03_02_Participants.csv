@@ -1,0 +1,16 @@
+﻿TurnierNr;TurnierLfNr;Startnummer;HerrZuname;HerrVorname;DameZuname;DameVorname;Klub;Bundesland;BundeslandAbk;Art;Disziplin;Altersklasse;Altersgrupe;Klasse;Turnierdatum;HerrID;DameID;KlubID;AktPunkteSTA;AktPflichtstartsSTA;AktKlasseSTA;AufstiegPunkteSTA;AufstiegPflichtstartsSTA;AufstiegKlasseSTA;AktPunkteLA;AktPflichtstartsLA;AktKlasseLA;AufstiegPunkteLA;AufstiegPflichtstartsLA;AufstiegKlasseLA;NenngeldBezahlt
+
+2142;1;101;01;Dancer-A;01;Dancer-B;Club 01;Steiermark;St;EIN;LA;SCH;00;D;2022-12-17;10;11;12;0;0;;0;0;;300;5;D;900;10;C;0;
+2142;1;102;02;Dancer-A;02;Dancer-B;Club 02;Steiermark;St;EIN;LA;SCH;00;D;2022-12-17;20;21;22;0;0;;0;0;;600;12;D;900;10;C;0;
+
+2142;2;201;03;Dancer-A;03;Dancer-B;Club 03;Wien;W;EIN;LA;SCH;00;C;2022-12-17;30;31;12;0;0;;0;0;;444;4;C;1500;10;B;0;
+2142;2;202;04;Dancer-A;04;Dancer-B;Club 04;Wien;W;EIN;LA;SCH;00;C;2022-12-17;40;41;42;0;0;;0;0;;777;7;C;1500;10;B;0;
+
+2142;3;301;05;Dancer-A;05;Dancer-B;Club 05;Wien;W;EIN;LA;SCH;00;B;2022-12-17;50;51;52;0;0;;0;0;;456;4;B;1300;10;A;0;
+2142;3;302;06;Dancer-A;06;Dancer-B;Club 06;Wien;W;EIN;LA;SCH;00;B;2022-12-17;60;61;62;0;0;;0;0;;890;8;B;1300;10;A;0;
+
+2142;4;401;07;Dancer-A;07;Dancer-B;Club 07;Niederösterreich;NÖ;EIN;LA;SCH;00;A;2022-12-17;70;71;72;0;0;;0;0;;666;12;A;1600;10;S;0;
+2142;4;402;08;Dancer-A;08;Dancer-B;Club 08;Niederösterreich;NÖ;EIN;LA;SCH;00;A;2022-12-17;80;81;82;0;0;;0;0;;777;14;A;1600;10;S;0;
+
+2142;5;501;09;Dancer-A;09;Dancer-B;Club 09;Niederösterreich;NÖ;EIN;LA;SCH;00;S;2022-12-17;90;91;92;0;0;;0;0;;2379;37;S;9999;9999;S;0;
+2142;5;502;10;Dancer-A;10;Dancer-B;Club 10;Niederösterreich;NÖ;EIN;LA;SCH;00;S;2022-12-17;100;101;102;0;0;;0;0;;600;12;S;9999;9999;S;0;

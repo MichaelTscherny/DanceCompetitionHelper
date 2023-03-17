@@ -570,8 +570,8 @@ namespace DanceCompetitionHelper.Test.Bindings
                 newDanceCompHelper);
         }
 
-        [Given(@"following data is imported by DanceCompetitionHelper ""([^""]*)""")]
-        public void GivenFollowingDataIsImportedByDanceCompetitionHelper(
+        [Given(@"following data are imported by DanceCompetitionHelper ""([^""]*)""")]
+        public void GivenFollowingDataAreImportedByDanceCompetitionHelper(
             string danceCompHelper,
             Table table)
         {

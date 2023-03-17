@@ -194,10 +194,9 @@ namespace DanceCompetitionHelper
                 {
                     if (includeInfos)
                     {
-                        if (curComp.DisplayInfo == null)
-                        {
-                            curComp.DisplayInfo = new CompetitionDisplayInfo();
-                        }
+                        // CAUTION: EF is caching, if we dont want wrong values
+                        // we need to recreate this!..
+                        curComp.DisplayInfo = new CompetitionDisplayInfo();
 
                         var useDisplayInfo = curComp.DisplayInfo;
 
@@ -383,10 +382,9 @@ namespace DanceCompetitionHelper
                 {
                     if (includeInfos)
                     {
-                        if (curCompClass.DisplayInfo == null)
-                        {
-                            curCompClass.DisplayInfo = new CompetitionClassDisplayInfo();
-                        }
+                        // CAUTION: EF is caching, if we dont want wrong values
+                        // we need to recreate this!..
+                        curCompClass.DisplayInfo = new CompetitionClassDisplayInfo();
 
                         var useDisplayInfo = curCompClass.DisplayInfo;
                         var useExtraPart = useDisplayInfo.ExtraParticipants;
@@ -554,17 +552,12 @@ namespace DanceCompetitionHelper
             {
                 if (includeInfos)
                 {
-                    if (curPart.DisplayInfo == null)
-                    {
-                        curPart.DisplayInfo = new ParticipantDisplayInfo();
-                    }
+                    // CAUTION: EF is caching, if we dont want wrong values
+                    // we need to recreate this!..
+                    curPart.DisplayInfo = new ParticipantDisplayInfo();
 
                     var useDisplayInfo = curPart.DisplayInfo;
-
-                    if (useDisplayInfo.MultipleStartInfo == null)
-                    {
-                        useDisplayInfo.MultipleStartInfo = new CheckMultipleStartInfo();
-                    }
+                    useDisplayInfo.MultipleStartInfo = new CheckMultipleStartInfo();
 
                     if (multiStarterByParticipantsId.TryGetValue(
                         curPart.ParticipantId,

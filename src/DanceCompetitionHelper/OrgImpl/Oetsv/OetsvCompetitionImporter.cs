@@ -673,23 +673,31 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         CompetitionDate = CompetitionDate,
                     })
                     .Entity;
+
+                _logger.LogInformation(
+                    "Added {CompName}: {foundComp}",
+                    nameof(Competition),
+                    foundComp);
             }
             else
             {
                 _logger.LogInformation(
-                    "Update existing {CompName}: {foundComp}",
+                    "Update existing {CompName}:  {foundComp}",
                     nameof(Competition),
                     foundComp);
 
-                foundComp.CompetitionName = string.Format(
-                    "{0} ({1})",
-                    CompetitionName,
-                    CompetitionType);
+                foundComp.CompetitionName = CompetitionName;
                 foundComp.CompetitionInfo = string.Format(
-                    "{0}, {1}",
-                    CompetitionAddress,
-                    CompetitionLocation);
+                    "{0} {1} {2}",
+                    CompetitionType,
+                    CompetitionLocation,
+                    CompetitionAddress);
                 foundComp.CompetitionDate = CompetitionDate;
+
+                _logger.LogInformation(
+                    "Updated existing {CompName}: {foundComp}",
+                    nameof(Competition),
+                    foundComp);
             }
 
             var foundAdjPanel = dbCtx.AdjudicatorPanels
@@ -707,6 +715,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         Name = "Panel 1",
                     }).Entity;
 
+                _logger.LogInformation(
+                    "Added {AdjPanName}: {foundComp}",
+                    nameof(AdjudicatorPanel),
+                    foundAdjPanel);
+
                 var adjAbbr = 'A';
                 foreach (var curAdj in Adjudicators)
                 {
@@ -723,6 +736,16 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             }
             else
             {
+                _logger.LogInformation(
+                    "Update existing {AdjPanName}:  {foundComp}",
+                    nameof(AdjudicatorPanel),
+                    foundAdjPanel);
+
+                _logger.LogInformation(
+                    "Updated existing {AdjPanName}: {foundComp}",
+                    nameof(AdjudicatorPanel),
+                    foundAdjPanel);
+
                 // TOOD: how to update those?.. -> add missing ones...
             }
 
@@ -734,6 +757,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 .ToDictionary(
                     x => x.OrgClassId);
 
+            // TODO: check "missing"/"deleted" participants 
             foreach (var curImportCompClass in CompetitionClasses)
             {
                 if (string.IsNullOrEmpty(
@@ -759,7 +783,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     out var foundCompetitionClass))
                 {
                     _logger.LogInformation(
-                        "Update existing {CompClassName}: {foundCompetitionClass}",
+                        "Update existing {CompClassName}:  {foundCompetitionClass}",
                         nameof(CompetitionClass),
                         foundCompetitionClass);
 
@@ -768,6 +792,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     foundCompetitionClass.AgeClass = curImportCompClass.AgeClass ?? foundCompetitionClass.AgeClass;
                     foundCompetitionClass.AgeGroup = curImportCompClass.AgeGroup ?? foundCompetitionClass.AgeGroup;
                     foundCompetitionClass.Class = curImportCompClass.Class ?? foundCompetitionClass.Class;
+
+                    _logger.LogInformation(
+                        "Updated existing {CompClassName}: {foundCompetitionClass}",
+                        nameof(CompetitionClass),
+                        foundCompetitionClass);
                 }
                 else
                 {
@@ -784,7 +813,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                                 "  ",
                                 " ");
 
-                    var newCompClass = dbCtx.CompetitionClasses.Add(
+                    foundCompetitionClass = dbCtx.CompetitionClasses.Add(
                         new CompetitionClass()
                         {
                             Competition = foundComp,
@@ -810,7 +839,12 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         })
                         .Entity;
 
-                    allCompClasses[newCompClass.OrgClassId] = newCompClass;
+                    allCompClasses[foundCompetitionClass.OrgClassId] = foundCompetitionClass;
+
+                    _logger.LogInformation(
+                        "Added {CompClassName}: {foundCompetitionClass}",
+                        nameof(CompetitionClass),
+                        foundCompetitionClass);
                 }
             }
 
@@ -856,13 +890,21 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
 
                 // TODO: check "missing"/"deleted" participants 
+                var isUpdate = false;
                 if (allParticipantsByImpStr.TryGetValue(
                     curPartImpString,
                     out var useParticipant))
                 {
+                    _logger.LogInformation(
+                        "Update existing {PartName}:  {useParticipant}",
+                        nameof(Participant),
+                        useParticipant);
+
                     useParticipant.StartNumber = curImportPart.RegStartNumber ?? 0;
                     useParticipant.OrgPointsPartA = curImportPart.OrgPoints ?? 0;
                     useParticipant.OrgStartsPartA = curImportPart.OrgStarts ?? 0;
+
+                    isUpdate = true;
                 }
                 else
                 {
@@ -914,6 +956,21 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         curImportPart.RegClass,
                         curImportPart.OrgCurrentClass,
                         curImportPart.OrgCurrentClassRaw);
+                }
+
+                if (isUpdate)
+                {
+                    _logger.LogInformation(
+                        "Updated existing {PartName}: {useParticipant}",
+                        nameof(Participant),
+                        useParticipant);
+                }
+                else
+                {
+                    _logger.LogInformation(
+                        "Added {PartName}: {useParticipant}",
+                        nameof(Participant),
+                        useParticipant);
                 }
             }
 
