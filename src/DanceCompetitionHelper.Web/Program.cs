@@ -115,9 +115,6 @@ namespace DanceCompetitionHelper.Web
                                     ", ",
                                     addresses));
 
-                            // convenience: how to open a browser at win/linux?..
-                            return;
-
                             if (app.Environment.IsDevelopment() == false
                                 || Debugger.IsAttached == false)
                             {
@@ -134,7 +131,14 @@ namespace DanceCompetitionHelper.Web
                                     try
                                     {
                                         Process.Start(
-                                            curAddr);
+                                            new ProcessStartInfo()
+                                            {
+                                                FileName = curAddr,
+                                                UseShellExecute = true,
+
+                                            });
+
+                                        return;
                                     }
                                     catch (System.ComponentModel.Win32Exception noBrowser)
                                     {

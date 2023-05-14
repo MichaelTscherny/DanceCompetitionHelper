@@ -2053,7 +2053,7 @@ namespace DanceCompetitionHelper
             ImportTypeEnum importType,
             IEnumerable<string>? filePaths)
         {
-            var retErrors = new List<string>();
+            var retWorkInfo = new List<string>();
 
             try
             {
@@ -2073,14 +2073,14 @@ namespace DanceCompetitionHelper
 
                         var oetsvImporter = _serviceProvider.GetRequiredService<OetsvCompetitionImporter>();
 
-                        Action importAction;
+                        Func<List<string>> importFunc;
 
                         switch (importType)
                         {
                             case ImportTypeEnum.Url:
-                                importAction = () =>
+                                importFunc = () =>
                                 {
-                                    oetsvImporter.ImportOrUpdateByUrl(
+                                    return oetsvImporter.ImportOrUpdateByUrl(
                                         _danceCompHelperDb,
                                         oetsvImporter.GetCompetitioUriForOrgId(
                                             useCompetitionId),
@@ -2092,7 +2092,6 @@ namespace DanceCompetitionHelper
 
                             case ImportTypeEnum.Excel:
                                 var useFiles = filePaths?.ToList() ?? new List<string>();
-
                                 if (useFiles.Count < 2)
                                 {
                                     throw new ArgumentNullException(
@@ -2102,9 +2101,9 @@ namespace DanceCompetitionHelper
                                             nameof(filePaths)));
                                 }
 
-                                importAction = () =>
+                                importFunc = () =>
                                 {
-                                    oetsvImporter.ImportOrUpdateByFile(
+                                    return oetsvImporter.ImportOrUpdateByFile(
                                         _danceCompHelperDb,
                                         useFiles[0],
                                         null,
@@ -2136,7 +2135,8 @@ namespace DanceCompetitionHelper
                                         checkComp.CompetitionId);
                                 }
 
-                                importAction();
+                                retWorkInfo.AddRange(
+                                    importFunc());
 
                                 _danceCompHelperDb.SaveChanges();
                                 dbTrans.Commit();
@@ -2149,7 +2149,7 @@ namespace DanceCompetitionHelper
                                     organization,
                                     exc.Message);
 
-                                retErrors.Add(
+                                retWorkInfo.Add(
                                     exc.Message);
 
                                 dbTrans.Rollback();
@@ -2166,12 +2166,11 @@ namespace DanceCompetitionHelper
                     nameof(ImportOrUpdateCompetition),
                     exc.Message);
 
-                retErrors.Add(
+                retWorkInfo.Add(
                     exc.Message);
             }
 
-            // TODO: implement!
-            return retErrors;
+            return retWorkInfo;
         }
 
         #endregion // Importer

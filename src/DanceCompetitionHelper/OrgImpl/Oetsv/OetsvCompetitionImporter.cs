@@ -91,15 +91,15 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             string? fullPathCompetitionClasses,
             string? fullPathParticipants)
         {
-            var retErrors = new List<string>();
+            var retWorkInfo = new List<string>();
 
             try
             {
-                retErrors.AddRange(
+                retWorkInfo.AddRange(
                     ExtractData(
                         fullPathCompetition,
                         fullPathParticipants));
-                retErrors.AddRange(
+                retWorkInfo.AddRange(
                     ImportOrUpdateDatabase(
                         dbCtx));
             }
@@ -110,12 +110,14 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     nameof(ImportOrUpdateByFile),
                     exc.Message);
 
+                retWorkInfo.Add(
+                    errorStr);
                 _logger.LogError(
                     exc,
                     errorStr);
             }
 
-            return retErrors;
+            return retWorkInfo;
         }
 
         public List<string> ImportOrUpdateByUrl(
@@ -124,7 +126,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             Uri? uriCompetitionClasses,
             Uri? uriParticipants)
         {
-            var retErrors = new List<string>();
+            var retWorkInfo = new List<string>();
             try
             {
                 var fullPathCompetitionCsv = DownloadFile(
@@ -136,7 +138,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     uriParticipants,
                     HtmlEncodingParticipants);
 
-                retErrors.AddRange(
+                retWorkInfo.AddRange(
                     ImportOrUpdateByFile(
                         dbCtx,
                         fullPathCompetitionCsv,
@@ -150,12 +152,14 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     nameof(ImportOrUpdateByUrl),
                     exc.Message);
 
+                retWorkInfo.Add(
+                    errorStr);
                 _logger.LogError(
                     exc,
                     errorStr);
             }
 
-            return retErrors;
+            return retWorkInfo;
         }
 
         public Uri GetCompetitioUriForOrgId(
@@ -280,7 +284,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             string? fullPathCompetition,
             string? fullPathParticipants)
         {
-            var retErrors = new List<string>();
+            var retWorkInfo = new List<string>();
 
             // ----------------------------------------
             if (File.Exists(
@@ -334,7 +338,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                             exc,
                             logStr);
 
-                        retErrors.Add(
+                        retWorkInfo.Add(
                             logStr);
                     }
                 }
@@ -366,13 +370,13 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                             exc,
                             logStr);
 
-                        retErrors.Add(
+                        retWorkInfo.Add(
                             logStr);
                     }
                 }
             }
 
-            return retErrors;
+            return retWorkInfo;
         }
 
         public void ExtractCompetitionInfo(
@@ -649,7 +653,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public List<string> ImportOrUpdateDatabase(
             DanceCompetitionHelperDbContext dbCtx)
         {
-            var retErrors = new List<string>();
+            var retWorkInfo = new List<string>();
 
             var foundComp = dbCtx.Competitions
                 .TagWith(
@@ -678,6 +682,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     "Added {CompName}: {foundComp}",
                     nameof(Competition),
                     foundComp);
+                retWorkInfo.Add(
+                    string.Format(
+                        "Added {0}: {1}",
+                        nameof(Competition),
+                        foundComp));
             }
             else
             {
@@ -685,6 +694,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     "Update existing {CompName}:  {foundComp}",
                     nameof(Competition),
                     foundComp);
+                retWorkInfo.Add(
+                    string.Format(
+                        "Update existing {0}:  {1}",
+                        nameof(Competition),
+                        foundComp));
 
                 foundComp.CompetitionName = CompetitionName;
                 foundComp.CompetitionInfo = string.Format(
@@ -693,11 +707,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     CompetitionLocation,
                     CompetitionAddress);
                 foundComp.CompetitionDate = CompetitionDate;
-
-                _logger.LogInformation(
-                    "Updated existing {CompName}: {foundComp}",
-                    nameof(Competition),
-                    foundComp);
             }
 
             var foundAdjPanel = dbCtx.AdjudicatorPanels
@@ -719,6 +728,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     "Added {AdjPanName}: {foundComp}",
                     nameof(AdjudicatorPanel),
                     foundAdjPanel);
+                retWorkInfo.Add(
+                    string.Format(
+                        "Added {0}: {1}",
+                        nameof(AdjudicatorPanel),
+                        foundAdjPanel));
 
                 var adjAbbr = 'A';
                 foreach (var curAdj in Adjudicators)
@@ -740,11 +754,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     "Update existing {AdjPanName}:  {foundComp}",
                     nameof(AdjudicatorPanel),
                     foundAdjPanel);
-
-                _logger.LogInformation(
-                    "Updated existing {AdjPanName}: {foundComp}",
-                    nameof(AdjudicatorPanel),
-                    foundAdjPanel);
+                retWorkInfo.Add(
+                    string.Format(
+                        "Updated existing {0}: {1}",
+                        nameof(AdjudicatorPanel),
+                        foundAdjPanel));
 
                 // TOOD: how to update those?.. -> add missing ones...
             }
@@ -763,17 +777,17 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 if (string.IsNullOrEmpty(
                     curImportCompClass.OrgClassId))
                 {
-                    var logString = string.Format(
-                        "{0} '{1}' is invalid/missing! Ignore {2}",
+                    _logger.LogWarning(
+                        "{OrgClassIdName} '{OrgClassId}' is invalid/missing! Ignore {curImportCompClass}",
                         nameof(curImportCompClass.OrgClassId),
                         curImportCompClass.OrgClassId,
                         curImportCompClass);
-
-                    retErrors.Add(
-                        logString);
-
-                    _logger.LogWarning(
-                        logString);
+                    retWorkInfo.Add(
+                        string.Format(
+                            "{0} '{1}' is invalid/missing! Ignore {2}",
+                            nameof(curImportCompClass.OrgClassId),
+                            curImportCompClass.OrgClassId,
+                        curImportCompClass));
 
                     continue;
                 }
@@ -786,6 +800,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         "Update existing {CompClassName}:  {foundCompetitionClass}",
                         nameof(CompetitionClass),
                         foundCompetitionClass);
+                    retWorkInfo.Add(
+                        string.Format(
+                            "Update existing {0}:  {1}",
+                            nameof(CompetitionClass),
+                            foundCompetitionClass));
 
                     foundCompetitionClass.CompetitionClassName = curImportCompClass.Name ?? foundCompetitionClass.CompetitionClassName;
                     foundCompetitionClass.Discipline = curImportCompClass.Discipline ?? foundCompetitionClass.Discipline;
@@ -845,6 +864,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         "Added {CompClassName}: {foundCompetitionClass}",
                         nameof(CompetitionClass),
                         foundCompetitionClass);
+                    retWorkInfo.Add(
+                        string.Format(
+                            "Added {0}: {1}",
+                            nameof(CompetitionClass),
+                            foundCompetitionClass));
                 }
             }
 
@@ -874,16 +898,17 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     curImportPart.RegOrgClassId ?? string.Empty,
                     out var useCompClass) == false)
                 {
-                    var logString = string.Format(
-                        "Unable to find {0} '{1}' of Import-Participant {2}",
+                    _logger.LogWarning(
+                        "Unable to find {OrgClassId} '{RegOrgClassId}' of Import-Participant {curImportPart}",
                         nameof(CompetitionClass.OrgClassId),
                         curImportPart.RegOrgClassId,
                         curImportPart);
-
-                    retErrors.Add(
-                        logString);
-                    _logger.LogWarning(
-                        logString);
+                    retWorkInfo.Add(
+                        string.Format(
+                            "Unable to find {0} '{1}' of Import-Participant {2}",
+                            nameof(CompetitionClass.OrgClassId),
+                            curImportPart.RegOrgClassId,
+                            curImportPart));
 
                     continue;
                 }
@@ -899,6 +924,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         "Update existing {PartName}:  {useParticipant}",
                         nameof(Participant),
                         useParticipant);
+                    retWorkInfo.Add(
+                        string.Format(
+                            "Update existing {0}:  {1}",
+                            nameof(Participant),
+                            useParticipant));
 
                     useParticipant.StartNumber = curImportPart.RegStartNumber ?? 0;
                     useParticipant.OrgPointsPartA = curImportPart.OrgPoints ?? 0;
@@ -964,6 +994,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         "Updated existing {PartName}: {useParticipant}",
                         nameof(Participant),
                         useParticipant);
+                    retWorkInfo.Add(
+                        string.Format(
+                            "Updated existing {0}: {1}",
+                            nameof(Participant),
+                            useParticipant));
                 }
                 else
                 {
@@ -971,10 +1006,15 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         "Added {PartName}: {useParticipant}",
                         nameof(Participant),
                         useParticipant);
+                    retWorkInfo.Add(
+                        string.Format(
+                            "Added {0}: {1}",
+                            nameof(Participant),
+                            useParticipant));
                 }
             }
 
-            return retErrors;
+            return retWorkInfo;
         }
 
         private string GetParticipantImportString(

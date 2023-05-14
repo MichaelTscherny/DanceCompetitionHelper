@@ -21,18 +21,23 @@
 
     @if ((Model.Errors?.Count ?? 0) >= 1)
     {
-        <div class="row py-2 text-danger">
+        <div>
             @foreach (var curError in Model.Errors ?? Enumerable.Empty<string>())
             {
-                <div class="col-md">
+                <div class="row py-2 text-danger">
                     @curError
                 </div>
             }
         </div>
     }
 
-    <div class="row d-flex justify-content-center py-1">
-        bla bla bla...
+    <div>
+        @foreach (var curInfo in Model.WorkInfo ?? Enumerable.Empty<string>())
+        {
+            <div class="row d-flex justify-content-left py-1">
+            @curInfo
+            </div>
+        }
     </div>
     
     <div class="row d-flex justify-content-center py-1">
