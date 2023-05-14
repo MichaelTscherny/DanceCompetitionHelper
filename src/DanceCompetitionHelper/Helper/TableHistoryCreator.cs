@@ -9,10 +9,10 @@ namespace DanceCompetitionHelper.Helper
     {
         private readonly ILogger<TableHistoryCreator> _logger;
 
-        public DanceCompetitionHelperDbContext DbCtx { get; private set; }
+        public DanceCompetitionHelperDbContext? DbCtx { get; private set; }
         public Dictionary<string, TableVersionInfo> TableVersions { get; } = new Dictionary<string, TableVersionInfo>();
         public Guid CompetitionId { get; private set; }
-        public string Comment { get; private set; }
+        public string? Comment { get; private set; }
 
         public TableHistoryCreator(
             ILogger<TableHistoryCreator> logger)
@@ -24,6 +24,12 @@ namespace DanceCompetitionHelper.Helper
         private TableVersionInfo GetTableVersion(
             string tableName)
         {
+            if (DbCtx == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(DbCtx));
+            }
+
             if (TableVersions.TryGetValue(
                 tableName,
                 out var tableVersionInfo) == false)
@@ -45,7 +51,7 @@ namespace DanceCompetitionHelper.Helper
                             CompetitionId = CompetitionId,
                             TableName = tableName,
                             CurrentVersion = 1,
-                            Comment = this.Comment,
+                            Comment = this.Comment ?? string.Empty,
                         }).Entity;
                 }
                 else
@@ -56,7 +62,7 @@ namespace DanceCompetitionHelper.Helper
                             CompetitionId = CompetitionId,
                             TableName = tableName,
                             CurrentVersion = tableVersionInfo.CurrentVersion + 1,
-                            Comment = this.Comment,
+                            Comment = this.Comment ?? string.Empty,
                         }).Entity;
                 }
 
