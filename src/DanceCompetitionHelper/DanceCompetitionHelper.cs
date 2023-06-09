@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database;
+﻿using DanceCompetitionHelper.Data;
+using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Extensions;
@@ -378,6 +379,7 @@ namespace DanceCompetitionHelper
                     }
                 }
 
+                // fill "displayInfo"...
                 foreach (var curCompClass in allCompetitionClasses)
                 {
                     if (includeInfos)
@@ -403,13 +405,37 @@ namespace DanceCompetitionHelper
                             out var curCntMultiStarter);
                         useDisplayInfo.CountMultipleStarters = curCntMultiStarter?.Count ?? 0;
                         useDisplayInfo.CountMultipleStartersInfo = curCntMultiStarter.GetStartNumber();
+                    }
+                }
+
+                // fill "Extra Part"...
+                foreach (var curCompClass in allCompetitionClasses)
+                {
+                    var useDisplayInfo = curCompClass.DisplayInfo;
+
+                    if (useDisplayInfo != null
+                        && includeInfos)
+                    {
+                        var useExtraPart = useDisplayInfo.ExtraParticipants;
+                        var useCompClassId = curCompClass.CompetitionClassId;
+                        var validClasses = new List<CompetitionClass>();
 
                         if (possibleWinnerFromCompClass.TryGetValue(
                             useCompClassId,
                             out var possibleWinners))
                         {
-                            useExtraPart.ByWinning += possibleWinners.Count;
-                            useExtraPart.ByWinningInfo += possibleWinners.GetCompetitionClasseNames();
+                            foreach (var curWin in possibleWinners)
+                            {
+                                // ?? only if we got a "running comp"...
+                                if (curWin.DisplayInfo?.Participants.Count >= 1)
+                                {
+                                    validClasses.Add(
+                                        curWin);
+                                }
+                            }
+
+                            useExtraPart.ByWinning += validClasses.Count;
+                            useExtraPart.ByWinningInfo += validClasses.GetCompetitionClasseNames();
                         }
 
                         if (foundPromotionFromCompClass.TryGetValue(
@@ -2047,13 +2073,13 @@ namespace DanceCompetitionHelper
 
         #region Importer
 
-        public List<string> ImportOrUpdateCompetition(
+        public ImportOrUpdateCompetitionStatus ImportOrUpdateCompetition(
             OrganizationEnum organization,
             string? orgCompetitionId,
             ImportTypeEnum importType,
             IEnumerable<string>? filePaths)
         {
-            var retWorkInfo = new List<string>();
+            var retWorkStatus = new ImportOrUpdateCompetitionStatus();
 
             try
             {
@@ -2082,6 +2108,7 @@ namespace DanceCompetitionHelper
                                 {
                                     return oetsvImporter.ImportOrUpdateByUrl(
                                         _danceCompHelperDb,
+                                        orgCompetitionId,
                                         oetsvImporter.GetCompetitioUriForOrgId(
                                             useCompetitionId),
                                         null,
@@ -2105,6 +2132,7 @@ namespace DanceCompetitionHelper
                                 {
                                     return oetsvImporter.ImportOrUpdateByFile(
                                         _danceCompHelperDb,
+                                        orgCompetitionId,
                                         useFiles[0],
                                         null,
                                         useFiles[1]);
@@ -2135,11 +2163,24 @@ namespace DanceCompetitionHelper
                                         checkComp.CompetitionId);
                                 }
 
-                                retWorkInfo.AddRange(
+                                retWorkStatus.WorkInfo.AddRange(
                                     importFunc());
 
                                 _danceCompHelperDb.SaveChanges();
                                 dbTrans.Commit();
+
+                                // read back infos
+                                checkComp = _danceCompHelperDb.Competitions
+                                    .TagWith(
+                                        nameof(ImportOrUpdateCompetition) + "[02]")
+                                    .FirstOrDefault(
+                                        x => x.OrgCompetitionId == orgCompetitionId);
+
+                                if (checkComp != null)
+                                {
+                                    retWorkStatus.OrgCompetitionId = checkComp.OrgCompetitionId;
+                                    retWorkStatus.CompetitionId = checkComp.CompetitionId;
+                                }
                             }
                             catch (Exception exc)
                             {
@@ -2149,7 +2190,9 @@ namespace DanceCompetitionHelper
                                     organization,
                                     exc.Message);
 
-                                retWorkInfo.Add(
+                                retWorkStatus.Errors.Add(
+                                    exc.Message);
+                                retWorkStatus.WorkInfo.Add(
                                     exc.Message);
 
                                 dbTrans.Rollback();
@@ -2166,11 +2209,13 @@ namespace DanceCompetitionHelper
                     nameof(ImportOrUpdateCompetition),
                     exc.Message);
 
-                retWorkInfo.Add(
+                retWorkStatus.Errors.Add(
+                    exc.Message);
+                retWorkStatus.WorkInfo.Add(
                     exc.Message);
             }
 
-            return retWorkInfo;
+            return retWorkStatus;
         }
 
         #endregion // Importer

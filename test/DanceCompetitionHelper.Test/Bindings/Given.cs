@@ -62,13 +62,18 @@ namespace DanceCompetitionHelper.Test.Bindings
 
         private static long _databaseId = 0;
 
-        public string GetNewDbName()
+        public string GetNewDbName(
+            bool incrementDatabaseId = true)
         {
+            var dbId = incrementDatabaseId
+                ? Interlocked.Increment(ref _databaseId)
+                : (Interlocked.Read(ref _databaseId) + 1);
+
             return string.Format(
                 "{0}_{1}_{2}.sqlite",
                 UseNow.ToString("yyyyMMdd_HHmmss"),
                 nextDanceCompHelperDb,
-                Interlocked.Increment(ref _databaseId));
+                dbId);
         }
 
         [Given(@"following DanceComp-DB ""([^""]*)""")]
@@ -76,7 +81,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             string danceCompHelperDb)
         {
             nextDanceCompHelperDb = danceCompHelperDb;
-            var newDbFile = GetNewDbName();
+            var newDbFile = GetNewDbName(
+                false);
 
             Console.WriteLine(
                 "Create Test-DB '{0}' -> {1}",

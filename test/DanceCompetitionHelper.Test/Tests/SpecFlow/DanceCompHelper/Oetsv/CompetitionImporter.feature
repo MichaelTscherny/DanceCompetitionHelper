@@ -16,7 +16,7 @@ Scenario: Import 01
         | Hans-Rueff-Gedächtnispokal | Allg.Kl. Sta C       | 2          | Sta        | Allg     | 0        | C     | 1500                  | 10                    | 100            | 1                 | 1                  | Allg.Kl. Sta D (1)     |
         | Hans-Rueff-Gedächtnispokal | Allg.Kl. La B        | 3          | La         | Allg     | 0        | B     | 1300                  | 10                    | 100            | 0                 | 0                  |                        |
         | Hans-Rueff-Gedächtnispokal | Allg.Kl. Sta B       | 4          | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 100            | 0                 | 1                  | Allg.Kl. Sta C (2)     |
-        | Hans-Rueff-Gedächtnispokal | Allg.Kl. La A        | 5          | La         | Allg     | 0        | A     | 1600                  | 10                    | 100            | 0                 | 1                  | Allg.Kl. La B (3)      |
+        | Hans-Rueff-Gedächtnispokal | Allg.Kl. La A        | 5          | La         | Allg     | 0        | A     | 1600                  | 10                    | 100            | 0                 | 0                  |                        |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName            | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionAInfo               |
         #                                                                                  
@@ -62,4 +62,3 @@ Scenario: Import 02
     And none multiple starts exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  |
         | Small Tournament |
-

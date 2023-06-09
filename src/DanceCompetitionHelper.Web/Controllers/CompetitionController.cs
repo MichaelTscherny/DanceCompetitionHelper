@@ -209,14 +209,18 @@ namespace DanceCompetitionHelper.Web.Controllers
             try
             {
                 // TODO: implement more options/file-uploads/etc...
-                var workInfo = _danceCompHelper.ImportOrUpdateCompetition(
+                var workStatus = _danceCompHelper.ImportOrUpdateCompetition(
                     doImportView.Organization,
                     doImportView.OrgCompetitionId,
                     doImportView.ImportType,
                     null);
 
+                doImportView.OrgCompetitionId = workStatus.OrgCompetitionId;
+                doImportView.CompetitionId = workStatus.CompetitionId;
+                doImportView.Errors.AddRange(
+                    workStatus.Errors);
                 doImportView.WorkInfo.AddRange(
-                    workInfo);
+                    workStatus.WorkInfo);
             }
             catch (Exception exc)
             {

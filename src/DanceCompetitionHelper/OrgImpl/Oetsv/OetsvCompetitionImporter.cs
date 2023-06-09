@@ -87,6 +87,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         public List<string> ImportOrUpdateByFile(
             DanceCompetitionHelperDbContext dbCtx,
+            string orgCompetitionId,
             string? fullPathCompetition,
             string? fullPathCompetitionClasses,
             string? fullPathParticipants)
@@ -122,6 +123,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         public List<string> ImportOrUpdateByUrl(
             DanceCompetitionHelperDbContext dbCtx,
+            string orgCompetitionId,
             Uri? uriCompetition,
             Uri? uriCompetitionClasses,
             Uri? uriParticipants)
@@ -131,16 +133,19 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             {
                 var fullPathCompetitionCsv = DownloadFile(
                     "comp",
+                    orgCompetitionId,
                     uriCompetition,
                     HtmlEncodingCompetition);
                 var fullPathParticipantsCsv = DownloadFile(
                     "part",
+                    orgCompetitionId,
                     uriParticipants,
                     HtmlEncodingParticipants);
 
                 retWorkInfo.AddRange(
                     ImportOrUpdateByFile(
                         dbCtx,
+                        orgCompetitionId,
                         fullPathCompetitionCsv,
                         null,
                         fullPathParticipantsCsv));
@@ -192,6 +197,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         public string? DownloadFile(
             string fileType,
+            string orgCompId,
             Uri? downloadUri,
             Encoding encoding)
         {
@@ -211,9 +217,10 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 retFilePath = Path.Combine(
                     _importerSettings.DownloadFolder,
                     string.Format(
-                        "{0}_{1}_download.csv",
+                        "{0}_{1}_{2}_download.csv",
                         DateTime.Now.ToString(
                             "yyyyMMdd_HHmmss"),
+                        orgCompId,
                         fileType));
             }
 
@@ -484,6 +491,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         .Trim(
                             '*')
                         .Trim(),
+
+                    DancesRaw = competitionInfo[8] ?? string.Empty,
+                    Dances = competitionInfo[8]
+                        ?.Trim()
+                         ?? string.Empty,
                 });
         }
 
@@ -707,62 +719,144 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     CompetitionLocation,
                     CompetitionAddress);
                 foundComp.CompetitionDate = CompetitionDate;
+
+                _logger.LogInformation(
+                    "Updated existing {CompName}: {foundComp}",
+                    nameof(Competition),
+                    foundComp);
             }
 
-            var foundAdjPanel = dbCtx.AdjudicatorPanels
+            var foundAdjPanels = dbCtx.AdjudicatorPanels
                 .TagWith(
                     nameof(ImportOrUpdateDatabase) + "[02]")
-                .FirstOrDefault(
-                    x => x.CompetitionId == foundComp.CompetitionId);
+                .Where(
+                    x => x.CompetitionId == foundComp.CompetitionId)
+                .ToList();
 
-            if (foundAdjPanel == null)
+            if (foundAdjPanels.Count <= 0)
             {
-                foundAdjPanel = dbCtx.AdjudicatorPanels.Add(
+                var newAdjPanel = dbCtx.AdjudicatorPanels.Add(
                     new AdjudicatorPanel()
                     {
                         Competition = foundComp,
                         Name = "Panel 1",
                     }).Entity;
+                foundAdjPanels.Add(
+                    newAdjPanel);
 
                 _logger.LogInformation(
-                    "Added {AdjPanName}: {foundComp}",
+                    "Added {AdjPanName}: {newAdjPanel}",
                     nameof(AdjudicatorPanel),
-                    foundAdjPanel);
+                    newAdjPanel);
                 retWorkInfo.Add(
                     string.Format(
                         "Added {0}: {1}",
                         nameof(AdjudicatorPanel),
-                        foundAdjPanel));
+                        newAdjPanel));
 
                 var adjAbbr = 'A';
                 foreach (var curAdj in Adjudicators)
                 {
-                    dbCtx.Adjudicators.Add(
+                    var newAdj = dbCtx.Adjudicators.Add(
                         new Adjudicator()
                         {
-                            AdjudicatorPanel = foundAdjPanel,
+                            AdjudicatorPanel = newAdjPanel,
                             Name = curAdj,
                             Abbreviation = adjAbbr.ToString(),
-                        });
+                        }).Entity;
+
+                    _logger.LogInformation(
+                        "Added {AdjudicatorName}: {newAdj}",
+                        nameof(Adjudicator),
+                        newAdj);
+                    retWorkInfo.Add(
+                        string.Format(
+                            "Added {0}: {1}",
+                            nameof(Adjudicator),
+                            newAdj));
 
                     adjAbbr++;
                 }
             }
             else
             {
-                _logger.LogInformation(
-                    "Update existing {AdjPanName}:  {foundComp}",
-                    nameof(AdjudicatorPanel),
-                    foundAdjPanel);
-                retWorkInfo.Add(
-                    string.Format(
-                        "Updated existing {0}: {1}",
-                        nameof(AdjudicatorPanel),
-                        foundAdjPanel));
+                if (foundAdjPanels.Count > 1)
+                {
+                    _logger.LogWarning(
+                        "Unable to Update multiple {AdjPanName}s",
+                        nameof(AdjudicatorPanel));
+                    retWorkInfo.Add(
+                        string.Format(
+                            "!! Unable to Update multiple {0}s",
+                            nameof(AdjudicatorPanel)));
+                }
+                else
+                {
+                    var curAdjPanel = foundAdjPanels[0];
 
-                // TOOD: how to update those?.. -> add missing ones...
+                    _logger.LogInformation(
+                        "Update existing {AdjPanName}:  {foundComp}",
+                        nameof(AdjudicatorPanel),
+                        curAdjPanel);
+                    retWorkInfo.Add(
+                        string.Format(
+                            "Update existing {0}: {1}",
+                            nameof(AdjudicatorPanel),
+                            curAdjPanel));
+
+                    var useUpdateDate = DateTime.Now.ToString(
+                        "yyyy.MM.dd HH:mm:ss");
+                    var adjAbbr = 'A';
+                    foreach (var curAdj in Adjudicators)
+                    {
+                        var logString01 = "Update ";
+                        var logString02 = "Updated ";
+                        var curAdjudicator = dbCtx.Adjudicators.FirstOrDefault(
+                            x => x.AdjudicatorPanelId == curAdjPanel.AdjudicatorPanelId
+                            && x.Abbreviation == adjAbbr.ToString());
+
+                        if (curAdjudicator == null)
+                        {
+                            logString01 = "Add ";
+                            logString02 = "Added ";
+                            curAdjudicator = dbCtx.Adjudicators.Add(
+                                new Adjudicator()
+                                {
+                                    AdjudicatorPanel = curAdjPanel,
+                                    Name = curAdj,
+                                    Abbreviation = adjAbbr.ToString(),
+                                }).Entity;
+                        }
+
+                        _logger.LogInformation(
+                            "{op} {AdjPanName}:  {foundComp}",
+                            logString01,
+                            nameof(Adjudicator),
+                            curAdjPanel);
+                        retWorkInfo.Add(
+                            string.Format(
+                                "{0} {1}: {2}",
+                                logString01,
+                                nameof(Adjudicator),
+                                curAdjPanel));
+
+                        curAdjudicator.Name = curAdj;
+                        curAdjudicator.Comment += string.Format(
+                            "Updated at {0}",
+                            useUpdateDate);
+
+                        adjAbbr++;
+
+                        _logger.LogInformation(
+                            "{op} {AdjPanName}: {foundComp}",
+                            logString02,
+                            nameof(Adjudicator),
+                            curAdjPanel);
+                    }
+                }
             }
 
+            var createdDatabaseNames = new HashSet<string>();
             var allCompClasses = dbCtx.CompetitionClasses
                 .TagWith(
                     nameof(ImportOrUpdateDatabase) + "[03]")
@@ -806,7 +900,19 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                             nameof(CompetitionClass),
                             foundCompetitionClass));
 
-                    foundCompetitionClass.CompetitionClassName = curImportCompClass.Name ?? foundCompetitionClass.CompetitionClassName;
+                    var useClassName = curImportCompClass.GetClassName() ?? foundCompetitionClass.CompetitionClassName;
+
+                    // we need a "unique" name...
+                    while (createdDatabaseNames.Contains(
+                        useClassName))
+                    {
+                        useClassName += " " + curImportCompClass.OrgClassId;
+                    }
+
+                    createdDatabaseNames.Add(
+                        useClassName);
+
+                    foundCompetitionClass.CompetitionClassName = useClassName;
                     foundCompetitionClass.Discipline = curImportCompClass.Discipline ?? foundCompetitionClass.Discipline;
                     foundCompetitionClass.AgeClass = curImportCompClass.AgeClass ?? foundCompetitionClass.AgeClass;
                     foundCompetitionClass.AgeGroup = curImportCompClass.AgeGroup ?? foundCompetitionClass.AgeGroup;
@@ -819,25 +925,25 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 }
                 else
                 {
-                    var useClassName = (string.IsNullOrEmpty(curImportCompClass.Name)
-                        ? string.Format(
-                            "{0} {1} {2} {3} {4}",
-                            curImportCompClass.AgeClass,
-                            curImportCompClass.AgeClass,
-                            curImportCompClass.AgeGroup,
-                            curImportCompClass.Discipline,
-                            curImportCompClass.Class)
-                        : curImportCompClass.Name)
-                            .Replace(
-                                "  ",
-                                " ");
+                    var useClassName = curImportCompClass.GetClassName();
 
+                    // we need a "unique" name...
+                    while (createdDatabaseNames.Contains(
+                        useClassName))
+                    {
+                        useClassName += " " + curImportCompClass.OrgClassId;
+                    }
+
+                    createdDatabaseNames.Add(
+                        useClassName);
+
+                    // let's add it...
                     foundCompetitionClass = dbCtx.CompetitionClasses.Add(
                         new CompetitionClass()
                         {
                             Competition = foundComp,
                             OrgClassId = curImportCompClass.OrgClassId,
-                            AdjudicatorPanel = foundAdjPanel,
+                            AdjudicatorPanel = foundAdjPanels.First(),
                             CompetitionClassName = useClassName,
                             Discipline = curImportCompClass.Discipline,
                             AgeClass = curImportCompClass.AgeClass,

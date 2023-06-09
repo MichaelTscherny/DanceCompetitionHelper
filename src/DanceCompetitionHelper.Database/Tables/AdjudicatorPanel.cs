@@ -32,5 +32,14 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [NotMapped]
         public AdjudicatorPanelDisplayInfos? DisplayInfo { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0} ('{1}' [{2}])",
+                Name,
+                Comment,
+                Competition?.CompetitionName);
+        }
     }
 }

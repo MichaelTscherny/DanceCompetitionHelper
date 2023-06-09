@@ -87,22 +87,27 @@ namespace DanceCompetitionHelper.Database.Tables
         public override string ToString()
         {
             return string.Format(
-                "{0} {1}/{2} ({3}/{4}) - {5} ({6}) - P {7}/{8} - S {9}/{10} - Pro {11}/{12} ({13}/{14})",
+                "{0} {1}/{2} ({3}/{4}) - {5} ({6}) - P {7}/{8} - S {9}/{10} - Prom {11}/{12} ({13}/{14})",
                 StartNumber,
+                // 1
                 NamePartA,
                 NamePartB,
                 OrgIdPartA,
                 OrgIdPartB,
+                // 5
                 ClubName,
                 OrgIdClub,
+                // 6
                 OrgPointsPartA,
                 OrgPointsPartB,
+                // 9
                 OrgStartsPartA,
                 OrgStartsPartB,
-                OrgAlreadyPromotedPartA,
-                OrgAlreadyPromotedPartB,
-                OrgAlreadyPromotedInfoPartA,
-                OrgAlreadyPromotedInfoPartB);
+                // 11
+                OrgAlreadyPromotedPartA ?? false,
+                OrgAlreadyPromotedPartB ?? false,
+                OrgAlreadyPromotedInfoPartA ?? "-",
+                OrgAlreadyPromotedInfoPartB ?? "-");
         }
     }
 }

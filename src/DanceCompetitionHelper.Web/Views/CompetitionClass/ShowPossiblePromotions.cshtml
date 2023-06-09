@@ -86,11 +86,11 @@
         <div class="table-responsive-xxl">
             @{
                 var curClassesByClassId = curPossPromotion.DisplayInfo?.PromotionInfo?.IncludedCompetitionClasses
-                        .ToDictionary(
-                            x => x.CompetitionClassId) 
-                            ?? new Dictionary<Guid, CompetitionClass>();
+                .ToDictionary(
+                    x => x.CompetitionClassId) 
+                    ?? new Dictionary<Guid, CompetitionClass>();
             }
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover table-striped-columns">
                 <thead>
                     <tr>
                         <th style="width: @columnWith%">

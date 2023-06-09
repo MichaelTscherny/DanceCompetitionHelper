@@ -83,6 +83,9 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
 
                                  NameRaw = "*Allg.Kl. Sta D",
                                  Name = "Allg.Kl. Sta D",
+
+                                 DancesRaw = string.Empty,
+                                 Dances = string.Empty,
                              },
                              // "2;ALG;00;C;STA;*Allg.Kl. Sta C"
                              new CompetitionClassImport()
@@ -104,6 +107,9 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
 
                                  NameRaw = "*Allg.Kl. Sta C",
                                  Name = "Allg.Kl. Sta C",
+
+                                 DancesRaw = string.Empty,
+                                 Dances = string.Empty,
                              },
                              // "3;ALG;00;B;LA;*Allg.Kl. La B"
                              new CompetitionClassImport()
@@ -125,6 +131,9 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
 
                                  NameRaw = "*Allg.Kl. La B",
                                  Name = "Allg.Kl. La B",
+
+                                 DancesRaw = string.Empty,
+                                 Dances = string.Empty,
                              },
                              // "4;ALG;00;B;STA;*Allg.Kl. Sta B"
                              new CompetitionClassImport()
@@ -146,6 +155,9 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
 
                                  NameRaw = "*Allg.Kl. Sta B",
                                  Name = "Allg.Kl. Sta B",
+
+                                 DancesRaw = string.Empty,
+                                 Dances = string.Empty,
                              },
                              // "5;ALG;00;A;LA;*Allg.Kl. La A"
                              new CompetitionClassImport()
@@ -167,6 +179,9 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
 
                                  NameRaw = "*Allg.Kl. La A",
                                  Name = "Allg.Kl. La A",
+
+                                 DancesRaw = string.Empty,
+                                 Dances = string.Empty,
                              },
                          }),
                     nameof(testImporter.CompetitionClasses));
@@ -351,6 +366,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
 
             testImporter.ImportOrUpdateByUrl(
                 null,
+                "1508",
                 testImporter.GetCompetitioUriForOrgId(
                     1508),
                 null,

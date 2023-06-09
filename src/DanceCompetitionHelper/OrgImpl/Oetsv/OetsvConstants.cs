@@ -109,6 +109,12 @@
                     case "Combi":
                     case "combi":
                     case "COMBI":
+                    case "CO":
+                    case "Co":
+                    case "co":
+                    case "KO":
+                    case "Ko":
+                    case "ko":
                         return Combination;
 
                     case Freestyle:
@@ -594,7 +600,7 @@
                                 return 1_000;
 
                             case Classes.C:
-                                return 1_900;
+                                return 1_800;
 
                             case Classes.B:
                                 return NoPromotionPossible;

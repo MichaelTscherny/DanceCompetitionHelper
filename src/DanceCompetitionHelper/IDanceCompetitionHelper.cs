@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database.DisplayInfo;
+﻿using DanceCompetitionHelper.Data;
+using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 
@@ -216,7 +217,7 @@ namespace DanceCompetitionHelper
 
         #region Importer
 
-        List<string> ImportOrUpdateCompetition(
+        ImportOrUpdateCompetitionStatus ImportOrUpdateCompetition(
             OrganizationEnum Organization,
             string? OrgCompetitionId,
             ImportTypeEnum ImportType,

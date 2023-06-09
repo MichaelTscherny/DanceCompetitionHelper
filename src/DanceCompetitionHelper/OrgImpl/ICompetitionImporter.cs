@@ -6,12 +6,14 @@ namespace DanceCompetitionHelper.OrgImpl
     {
         List<string> ImportOrUpdateByFile(
             DanceCompetitionHelperDbContext dbCtx,
+            string orgCompetitionId,
             string? fullPathCompetition,
             string? fullPathCompetitionClasses,
             string? fullPathParticipants);
 
         List<string> ImportOrUpdateByUrl(
             DanceCompetitionHelperDbContext dbCtx,
+            string orgCompetitionId,
             Uri? uriCompetition,
             Uri? uriCompetitionClasses,
             Uri? uriParticipants);

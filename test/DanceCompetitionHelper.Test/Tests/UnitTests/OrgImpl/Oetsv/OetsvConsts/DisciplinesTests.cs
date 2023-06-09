@@ -24,6 +24,12 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase("combi", Disciplines.Combination)]
         [TestCase("Combi", Disciplines.Combination)]
         [TestCase("COMBI", Disciplines.Combination)]
+        [TestCase("CO", Disciplines.Combination)]
+        [TestCase("Co", Disciplines.Combination)]
+        [TestCase("co", Disciplines.Combination)]
+        [TestCase("KO", Disciplines.Combination)]
+        [TestCase("Ko", Disciplines.Combination)]
+        [TestCase("ko", Disciplines.Combination)]
         // -------------
         [TestCase(Disciplines.Freestyle, Disciplines.Freestyle)]
         [TestCase("Freestyle", Disciplines.Freestyle)]

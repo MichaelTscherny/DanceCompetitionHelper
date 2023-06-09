@@ -32,5 +32,15 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsLarge)]
         public string? Comment { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0} ({1}/'{2}' [{3}])",
+                Name,
+                Abbreviation,
+                Comment,
+                AdjudicatorPanel);
+        }
     }
 }
