@@ -35,6 +35,14 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public Encoding HtmlEncodingCompetition { get; set; } = Encoding.GetEncoding(1252); // Encoding.UTF8;
         public Encoding HtmlEncodingParticipants { get; set; } = Encoding.GetEncoding(1252);
 
+        public const int CompExcelOrgClassId = 2;
+        public const int CompExcelAgeClass = 3;
+        public const int CompExcelAgeGroup = 4;
+        public const int CompExcelClass = 5;
+        public const int CompExcelDiscipline = 6;
+        public const int CompExcelName = 7;
+        public const int CompExcelDances = 8;
+
         public const int PartExcelRegOrgCompId = 0;
         public const int PartExcelRegOrgCompClassId = 1;
         public const int PartExcelRegStartNumber = 2;
@@ -467,33 +475,34 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             CompetitionClasses.Add(
                 new CompetitionClassImport()
                 {
-                    OrgClassIdRaw = competitionInfo[2],
-                    OrgClassId = competitionInfo[2].Trim(),
+                    OrgClassIdRaw = competitionInfo[CompExcelOrgClassId],
+                    // for sorting
+                    OrgClassId = competitionInfo[CompExcelOrgClassId].Trim().PadLeft(3, '0'),
 
-                    AgeClassRaw = competitionInfo[3],
+                    AgeClassRaw = competitionInfo[CompExcelAgeClass],
                     AgeClass = OetsvConstants.AgeClasses.ToAgeClasses(
-                        competitionInfo[3]),
+                        competitionInfo[CompExcelAgeClass]),
 
-                    AgeGroupRaw = competitionInfo[4],
+                    AgeGroupRaw = competitionInfo[CompExcelAgeGroup],
                     AgeGroup = OetsvConstants.AgeGroups.ToAgeGroup(
-                        competitionInfo[4]),
+                        competitionInfo[CompExcelAgeGroup]),
 
-                    ClassRaw = competitionInfo[5],
+                    ClassRaw = competitionInfo[CompExcelClass],
                     Class = OetsvConstants.Classes.ToClasses(
-                        competitionInfo[5]),
+                        competitionInfo[CompExcelClass]),
 
-                    DisciplineRaw = competitionInfo[6],
+                    DisciplineRaw = competitionInfo[CompExcelDiscipline],
                     Discipline = OetsvConstants.Disciplines.ToDisciplines(
-                        competitionInfo[6]),
+                        competitionInfo[CompExcelDiscipline]),
 
-                    NameRaw = competitionInfo[7],
-                    Name = competitionInfo[7]
+                    NameRaw = competitionInfo[CompExcelName],
+                    Name = competitionInfo[CompExcelName]
                         .Trim(
                             '*')
                         .Trim(),
 
-                    DancesRaw = competitionInfo[8] ?? string.Empty,
-                    Dances = competitionInfo[8]
+                    DancesRaw = competitionInfo[CompExcelDances] ?? string.Empty,
+                    Dances = competitionInfo[CompExcelDances]
                         ?.Trim()
                          ?? string.Empty,
                 });
@@ -555,7 +564,8 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             var addPartImport = new CompetitionParticipantImport()
             {
                 RegOrgClassIdRaw = participantInfo[PartExcelRegOrgCompClassId],
-                RegOrgClassId = participantInfo[PartExcelRegOrgCompClassId].Trim(),
+                // for sorting
+                RegOrgClassId = participantInfo[PartExcelRegOrgCompClassId].Trim().PadLeft(3, '0'),
 
                 RegStartNumberRaw = participantInfo[PartExcelRegStartNumber],
                 RegStartNumber = int.Parse(

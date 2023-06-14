@@ -8,7 +8,7 @@
         public const int MaxLengthStringsShort = 128;
         public const int MaxLengthStringsLarge = 512;
 
-        public const int MaxLengthCompetitionClassString = 32;
-        public const int MaxLengthOrgId = 32;
+        public const int MaxLengthCompetitionClassString = 128;
+        public const int MaxLengthOrgId = 64;
     }
 }

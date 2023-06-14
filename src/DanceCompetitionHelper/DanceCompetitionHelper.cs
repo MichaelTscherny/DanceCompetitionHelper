@@ -779,7 +779,8 @@ namespace DanceCompetitionHelper
                     .Include(
                         x => x.CompetitionClass)
                     .Where(
-                        x => x.NamePartA == curMultiStart.NamePartA
+                        x => x.CompetitionId == competitionId
+                        && x.NamePartA == curMultiStart.NamePartA
                         && x.OrgIdPartA == curMultiStart.OrgIdPartA
                         && x.NamePartB == curMultiStart.NamePartB
                         && x.OrgIdPartB == curMultiStart.OrgIdPartB
