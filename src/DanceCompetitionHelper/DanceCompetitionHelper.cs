@@ -290,10 +290,8 @@ namespace DanceCompetitionHelper
                         x => x.AdjudicatorPanel)
                     .Where(
                         x => x.CompetitionId == foundComp.CompetitionId)
-                    // TODO: do I like this?..
-                    .AsEnumerable()
-                    .OrderByOrganization(
-                        foundComp.Organization)
+                    .OrderBy(
+                        x => x.OrgClassId)
                     .ThenBy(
                         x => x.CompetitionClassName);
 
@@ -572,10 +570,8 @@ namespace DanceCompetitionHelper
             }
 
             foreach (var curPart in qryParticipants
-                // TODO: do I like this?..
-                .AsEnumerable()
-                .OrderByOrganization(
-                    foundComp.Organization)
+                .OrderBy(
+                    x => x.CompetitionClass.OrgClassId)
                 .ThenBy(
                     x => x.CompetitionClass.CompetitionClassName)
                 .ThenByDefault())
