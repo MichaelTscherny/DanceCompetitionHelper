@@ -685,5 +685,10 @@
                 return false;
             }
         }
+
+        public static class Participants
+        {
+            public const string NoneOetsvOrgId = "-99999";
+        }
     }
 }

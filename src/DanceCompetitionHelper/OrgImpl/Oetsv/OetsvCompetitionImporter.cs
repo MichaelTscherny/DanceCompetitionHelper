@@ -1092,6 +1092,13 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     checkAlreadyPromoted = false;
                 }
 
+                // None OeTSV members
+                if (OetsvConstants.Participants.NoneOetsvOrgId == curImportPart.RegPartAOrgId
+                    || OetsvConstants.Participants.NoneOetsvOrgId == curImportPart.RegPartBOrgId)
+                {
+                    checkAlreadyPromoted = false;
+                }
+
                 if (checkAlreadyPromoted
                     && (curImportPart.OrgCurrentClass != useCompClass.Class
                     || curImportPart.OrgCurrentClass != curImportPart.RegClass))
