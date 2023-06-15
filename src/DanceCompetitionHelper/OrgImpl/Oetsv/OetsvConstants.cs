@@ -689,6 +689,28 @@
         public static class Participants
         {
             public const string NoneOetsvOrgId = "-99999";
+
+            public static bool CheckValidOetsvParticipantOrgId(
+                string? participantOrgId)
+            {
+                switch (participantOrgId)
+                {
+                    case null:
+                    case NoneOetsvOrgId:
+                        return false;
+
+                    default:
+                        if (int.TryParse(
+                            participantOrgId,
+                            out var parsedId) == false
+                            || parsedId <= 0)
+                        {
+                            return false;
+                        }
+
+                        return true;
+                }
+            }
         }
     }
 }

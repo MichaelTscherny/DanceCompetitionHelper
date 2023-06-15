@@ -1093,8 +1093,10 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 }
 
                 // None OeTSV members
-                if (OetsvConstants.Participants.NoneOetsvOrgId == curImportPart.RegPartAOrgId
-                    || OetsvConstants.Participants.NoneOetsvOrgId == curImportPart.RegPartBOrgId)
+                if (OetsvConstants.Participants.CheckValidOetsvParticipantOrgId(
+                    curImportPart.RegPartAOrgId) == false
+                    || OetsvConstants.Participants.CheckValidOetsvParticipantOrgId(
+                        curImportPart.RegPartBOrgId) == false)
                 {
                     checkAlreadyPromoted = false;
                 }

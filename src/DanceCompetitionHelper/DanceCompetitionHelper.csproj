@@ -28,4 +28,8 @@
     <ProjectReference Include="..\DanceCompetitionHelper.Database\DanceCompetitionHelper.Database.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
 </Project>
