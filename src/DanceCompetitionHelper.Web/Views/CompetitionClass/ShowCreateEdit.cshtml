@@ -272,6 +272,28 @@
                 </label>
             </div>
         </div>
+        
+        <div class="row row-cols-3 py-1 bg-black bg-opacity-25">
+            <div class="col-md text-end">
+                Color
+            </div>
+            <div class="col-md-4">
+                <select asp-for="CompetitionColor"
+                        asp-items="Model.CompetitionColors"
+                        class="form-select"
+                        style="width: 100%">
+                </select>
+                <span asp-validation-for="CompetitionColor"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="CompetitionColor"
+                       class="control-label">
+                    Color of Competition Class for Timeschedule
+                </label>
+            </div>
+        </div>             
+        
         <div class="row row-cols-3 py-1">
             <div class="col-md text-end">
                 Ignore

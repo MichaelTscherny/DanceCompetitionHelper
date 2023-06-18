@@ -77,7 +77,14 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
 
         [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        [StringLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }
+
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthCreatedBy)]
+        [StringLength(DanceCompetitionHelperConstants.MaxLengthCreatedBy)]
+        public string? CompetitionColor { get; set; }
+
+        public List<SelectListItem> CompetitionColors { get; set; } = new List<SelectListItem>();
 
         [FromForm]
         public bool Ignore { get; set; }

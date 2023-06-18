@@ -28,6 +28,13 @@ namespace DanceCompetitionHelper.Database.Tables
         [ForeignKey(nameof(CompetitionId))]
         public Competition Competition { get; set; } = default!;
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Comment("Ref to follow up " + nameof(Tables.CompetitionClassHistory))]
+        public Guid? FollowUpCompetitionClassHistoryId { get; set; }
+
+        [ForeignKey(nameof(FollowUpCompetitionClassHistoryId) + "," + nameof(Version))]
+        public CompetitionClassHistory? FollowUpCompetitionClassHistory { get; set; }
+
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Comment("Ref to " + nameof(AdjudicatorPanelHistory))]
@@ -72,6 +79,9 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }
+
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthCreatedBy)]
+        public string? CompetitionColor { get; set; }
 
         public bool Ignore { get; set; }
     }

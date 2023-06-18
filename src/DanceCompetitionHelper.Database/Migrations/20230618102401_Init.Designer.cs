@@ -11,14 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DanceCompetitionHelper.Database.Migrations
 {
     [DbContext(typeof(DanceCompetitionHelperDbContext))]
-    [Migration("20230303141945_Init")]
+    [Migration("20230618102401_Init")]
     partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.Adjudicator", b =>
                 {
@@ -28,7 +28,7 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("Abbreviation")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("AdjudicatorPanelId")
@@ -36,7 +36,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasComment("Ref to AdjudicatorPanel");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -61,7 +61,7 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.HasKey("AdjudicatorId");
@@ -92,7 +92,7 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("Abbreviation")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("AdjudicatorPanelHistoryId")
@@ -103,7 +103,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -128,7 +128,7 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.HasKey("AdjudicatorHistoryId", "Version");
@@ -156,7 +156,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CompetitionId")
@@ -185,7 +185,7 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.HasKey("AdjudicatorPanelId");
@@ -215,7 +215,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CompetitionId")
@@ -244,7 +244,7 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.HasKey("AdjudicatorPanelHistoryId", "Version");
@@ -272,19 +272,19 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CompetitionDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CompetitionInfo")
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CompetitionName")
                         .IsRequired()
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -309,7 +309,7 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("OrgCompetitionId")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("'Internal' Org-Id of Competition");
 
@@ -340,24 +340,28 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasComment("Ref to AdjudicatorPanel");
 
                     b.Property<string>("AgeClass")
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("AgeGroup")
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Class")
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CompetitionClassName")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CompetitionColor")
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CompetitionId")
@@ -375,11 +379,15 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasComment("Row created by");
 
                     b.Property<string>("Discipline")
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ExtraManualStarter")
                         .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("FollowUpCompetitionClassId")
+                        .HasColumnType("TEXT")
+                        .HasComment("Ref to follow up CompetitionClass");
 
                     b.Property<bool>("Ignore")
                         .HasColumnType("INTEGER");
@@ -394,26 +402,28 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("Row last modified by");
 
-                    b.Property<int>("MinPointsForPromotion")
-                        .HasColumnType("INTEGER");
+                    b.Property<double>("MinPointsForPromotion")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("MinStartsForPromotion")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("OrgClassId")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("'Internal' Org-Id of class of CompetitionClass");
 
-                    b.Property<int>("PointsForFirst")
-                        .HasColumnType("INTEGER");
+                    b.Property<double>("PointsForFirst")
+                        .HasColumnType("REAL");
 
                     b.HasKey("CompetitionClassId");
 
                     b.HasIndex("AdjudicatorPanelId");
 
                     b.HasIndex("Created");
+
+                    b.HasIndex("FollowUpCompetitionClassId");
 
                     b.HasIndex("CompetitionId", "CompetitionClassName")
                         .IsUnique();
@@ -443,24 +453,28 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("AgeClass")
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("AgeGroup")
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Class")
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CompetitionClassName")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CompetitionColor")
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CompetitionId")
@@ -478,11 +492,15 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasComment("Row created by");
 
                     b.Property<string>("Discipline")
-                        .HasMaxLength(32)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ExtraManualStarter")
                         .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("FollowUpCompetitionClassHistoryId")
+                        .HasColumnType("TEXT")
+                        .HasComment("Ref to follow up CompetitionClassHistory");
 
                     b.Property<bool>("Ignore")
                         .HasColumnType("INTEGER");
@@ -497,26 +515,28 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("Row last modified by");
 
-                    b.Property<int>("MinPointsForPromotion")
-                        .HasColumnType("INTEGER");
+                    b.Property<double>("MinPointsForPromotion")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("MinStartsForPromotion")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("OrgClassId")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("'Internal' Org-Id of class of CompetitionClass");
 
-                    b.Property<int>("PointsForFirst")
-                        .HasColumnType("INTEGER");
+                    b.Property<double>("PointsForFirst")
+                        .HasColumnType("REAL");
 
                     b.HasKey("CompetitionClassHistoryId", "Version");
 
                     b.HasIndex("Created");
 
                     b.HasIndex("AdjudicatorPanelHistoryId", "AdjudicatorPanelHistoryVersion");
+
+                    b.HasIndex("FollowUpCompetitionClassHistoryId", "Version");
 
                     b.HasIndex("CompetitionId", "CompetitionClassName", "Version")
                         .IsUnique();
@@ -537,11 +557,11 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ClubName")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CompetitionClassId")
@@ -583,19 +603,19 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("NamePartA")
                         .IsRequired()
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NamePartB")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrgAlreadyPromotedInfoPartA")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrgAlreadyPromotedInfoPartB")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("OrgAlreadyPromotedPartA")
@@ -605,24 +625,24 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("OrgIdClub")
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrgIdPartA")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("'Internal' Org-Id of PartA");
 
                     b.Property<string>("OrgIdPartB")
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("OrgPointsPartA")
-                        .HasColumnType("INTEGER");
+                    b.Property<double>("OrgPointsPartA")
+                        .HasColumnType("REAL");
 
-                    b.Property<int?>("OrgPointsPartB")
-                        .HasColumnType("INTEGER");
+                    b.Property<double?>("OrgPointsPartB")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("OrgStartsPartA")
                         .HasColumnType("INTEGER");
@@ -657,11 +677,11 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ClubName")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CompetitionClassHistoryId")
@@ -706,19 +726,19 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("NamePartA")
                         .IsRequired()
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NamePartB")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrgAlreadyPromotedInfoPartA")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrgAlreadyPromotedInfoPartB")
-                        .HasMaxLength(128)
+                        .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("OrgAlreadyPromotedPartA")
@@ -728,24 +748,24 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("OrgIdClub")
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrgIdPartA")
                         .IsRequired()
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT")
                         .HasComment("'Internal' Org-Id of PartA");
 
                     b.Property<string>("OrgIdPartB")
-                        .HasMaxLength(32)
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("OrgPointsPartA")
-                        .HasColumnType("INTEGER");
+                    b.Property<double>("OrgPointsPartA")
+                        .HasColumnType("REAL");
 
-                    b.Property<int?>("OrgPointsPartB")
-                        .HasColumnType("INTEGER");
+                    b.Property<double?>("OrgPointsPartB")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("OrgStartsPartA")
                         .HasColumnType("INTEGER");
@@ -778,7 +798,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .HasComment("Ref to Competition");
 
                     b.Property<string>("TableName")
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("CurrentVersion")
@@ -786,7 +806,7 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.Property<string>("Comment")
                         .IsRequired()
-                        .HasMaxLength(512)
+                        .HasMaxLength(1024)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -874,9 +894,15 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.CompetitionClass", "FollowUpCompetitionClass")
+                        .WithMany()
+                        .HasForeignKey("FollowUpCompetitionClassId");
+
                     b.Navigation("AdjudicatorPanel");
 
                     b.Navigation("Competition");
+
+                    b.Navigation("FollowUpCompetitionClass");
                 });
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.CompetitionClassHistory", b =>
@@ -893,9 +919,15 @@ namespace DanceCompetitionHelper.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DanceCompetitionHelper.Database.Tables.CompetitionClassHistory", "FollowUpCompetitionClassHistory")
+                        .WithMany()
+                        .HasForeignKey("FollowUpCompetitionClassHistoryId", "Version");
+
                     b.Navigation("AdjudicatorPanelHistory");
 
                     b.Navigation("Competition");
+
+                    b.Navigation("FollowUpCompetitionClassHistory");
                 });
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.Participant", b =>

@@ -1,6 +1,7 @@
 ﻿using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
@@ -226,6 +227,16 @@ namespace DanceCompetitionHelper.Web.Controllers
                     ExtraManualStarter = foundCompClass.ExtraManualStarter,
                     Comment = foundCompClass.Comment,
                     Ignore = foundCompClass.Ignore,
+                    CompetitionColor = foundCompClass.CompetitionColor,
+                    CompetitionColors = new List<SelectListItem>()
+                    {
+                        // TODO: 
+                        new SelectListItem()
+                        {
+                            Text = "None",
+                            Value = ""
+                        },
+                    }
                 });
         }
 
