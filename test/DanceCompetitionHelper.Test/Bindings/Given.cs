@@ -228,9 +228,21 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 try
                 {
+                    var useComp = GetCompetition(
+                    useDb,
+                    newAdj.CompetitionName);
+
+                    Assert.That(
+                        useComp,
+                        Is.Not.Null,
+                        "{0} '{1}' not found!",
+                        nameof(Competition),
+                        newAdj.CompetitionName);
+
                     var useAdjPanelName = newAdj.AdjudicatorPanelName;
                     var useAdjPanel = GetAdjudicatorPanel(
                         useDb,
+                        useComp.CompetitionId,
                         useAdjPanelName);
 
                     Assert.That(
@@ -293,6 +305,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                 var useAdjPanel = GetAdjudicatorPanel(
                     useDb,
+                    useComp.CompetitionId,
                     newCompClass.AdjudicatorPanelName);
 
                 Assert.That(

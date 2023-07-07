@@ -223,6 +223,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                     var foundAdjPanel = GetAdjudicatorPanel(
                         useDb,
+                        foundComp.CompetitionId,
                         curChk.Name);
 
                     Assert.That(
@@ -291,6 +292,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                     var foundAdjPanel = GetAdjudicatorPanel(
                         useDb,
+                        foundComp.CompetitionId,
                         curChk.AdjudicatorPanelName);
 
                     Assert.That(

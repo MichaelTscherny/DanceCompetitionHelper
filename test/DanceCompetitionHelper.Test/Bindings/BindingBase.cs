@@ -15,7 +15,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         private readonly List<IDisposable> _toDispose = new List<IDisposable>();
 
         private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<string, Competition?>> _competitionsByName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<string, Competition?>>();
-        private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<string, AdjudicatorPanel?>> _adjudicatorPanelsByName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<string, AdjudicatorPanel?>>();
+        private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, AdjudicatorPanel?>>> _adjudicatorPanelsByCompIdAndName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, AdjudicatorPanel?>>>();
         private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionClass?>>> _competitionClassesByCompIdAndName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionClass?>>>();
 
         public BindingBase(
@@ -95,15 +95,16 @@ namespace DanceCompetitionHelper.Test.Bindings
                         nameof(GetCompetition))
                     .FirstOrDefault(
                         x => x.CompetitionName == byCompetitionName);
-            }
 
-            byDbCtx[byCompetitionName] = foundComp;
+                byDbCtx[byCompetitionName] = foundComp;
+            }
 
             return foundComp;
         }
 
         public AdjudicatorPanel? GetAdjudicatorPanel(
             DanceCompetitionHelperDbContext dbCtx,
+            Guid byCompetitionId,
             string byAdjudicatorPanelName)
         {
             if (dbCtx == null)
@@ -112,15 +113,24 @@ namespace DanceCompetitionHelper.Test.Bindings
                     nameof(dbCtx));
             }
 
-            if (_adjudicatorPanelsByName.TryGetValue(
+            if (_adjudicatorPanelsByCompIdAndName.TryGetValue(
                 dbCtx,
                 out var byDbCtx) == false)
             {
-                byDbCtx = new Dictionary<string, AdjudicatorPanel?>();
-                _adjudicatorPanelsByName[dbCtx] = byDbCtx;
+                byDbCtx = new Dictionary<Guid, Dictionary<string, AdjudicatorPanel?>>();
+                _adjudicatorPanelsByCompIdAndName[dbCtx] = byDbCtx;
             }
 
             if (byDbCtx.TryGetValue(
+                byCompetitionId,
+                out var byDbCtxAndCompId) == false)
+            {
+                byDbCtxAndCompId = new Dictionary<string, AdjudicatorPanel?>();
+                byDbCtx[byCompetitionId] = byDbCtxAndCompId;
+            }
+
+
+            if (byDbCtxAndCompId.TryGetValue(
                 byAdjudicatorPanelName,
                 out var foundAdjPanel) == false)
             {
@@ -128,10 +138,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                     .TagWith(
                         nameof(GetAdjudicatorPanel))
                     .FirstOrDefault(
-                        x => x.Name == byAdjudicatorPanelName);
-            }
+                        x => x.CompetitionId == byCompetitionId
+                        && x.Name == byAdjudicatorPanelName);
 
-            byDbCtx[byAdjudicatorPanelName] = foundAdjPanel;
+                byDbCtxAndCompId[byAdjudicatorPanelName] = foundAdjPanel;
+            }
 
             return foundAdjPanel;
         }
@@ -171,10 +182,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                     .TagWith(
                         nameof(GetCompetitionClass))
                     .FirstOrDefault(
-                        x => x.CompetitionClassName == byCompetitionClassName);
-            }
+                        x => x.CompetitionId == byCompetitionId
+                        && x.CompetitionClassName == byCompetitionClassName);
 
-            byDbCtxAndCompId[byCompetitionClassName] = foundCompClass;
+                byDbCtxAndCompId[byCompetitionClassName] = foundCompClass;
+            }
 
             return foundCompClass;
         }
