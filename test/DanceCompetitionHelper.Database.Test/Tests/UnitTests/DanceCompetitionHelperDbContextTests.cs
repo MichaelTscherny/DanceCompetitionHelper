@@ -115,6 +115,12 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             return dbCtx;
         }
 
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            _useHost?.Dispose();
+        }
+
         [Test]
         public void SimpleCreate()
         {

@@ -41,9 +41,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundComp,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Competition),
-                        toChk);
+                        $"{nameof(Competition)} '{toChk}' not found!");
 
                     Assert.Multiple(() =>
                     {
@@ -51,37 +49,27 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundComp.CompetitionName,
                             Is.EqualTo(
                                 toChk.CompetitionName),
-                            "{0}: {1}",
-                            toChk,
-                            nameof(foundComp.CompetitionName));
+                            $"{toChk}: {nameof(foundComp.CompetitionName)}");
                         Assert.That(
                             foundComp.Organization,
                             Is.EqualTo(
                                 toChk.Organization),
-                            "{0}: {1}",
-                            toChk,
-                            nameof(foundComp.Organization));
+                            $"{toChk}: {nameof(foundComp.Organization)}");
                         Assert.That(
                             foundComp.OrgCompetitionId,
                             Is.EqualTo(
                                 toChk.OrgCompetitionId),
-                            "{0}: {1}",
-                            toChk,
-                            nameof(foundComp.OrgCompetitionId));
+                            $"{toChk}: {nameof(foundComp.OrgCompetitionId)}");
                         Assert.That(
                             foundComp.CompetitionInfo,
                             Is.EqualTo(
                                 toChk.CompetitionInfo),
-                            "{0}: {1}",
-                            toChk,
-                            nameof(foundComp.CompetitionInfo));
+                            $"{toChk}: {nameof(foundComp.CompetitionInfo)}");
                         Assert.That(
                             foundComp.CompetitionDate,
                             Is.EqualTo(
                                 toChk.CompetitionDate ?? UseNow),
-                            "{0}: {1}",
-                            toChk,
-                            nameof(foundComp.CompetitionDate));
+                            $"{toChk}: {nameof(foundComp.CompetitionDate)}");
                     });
                 }
             }
@@ -112,9 +100,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundComp,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Competition),
-                        curChk);
+                        $"{nameof(Competition)} '{curChk}' not found!");
 
                     var foundCompClass = GetCompetitionClass(
                         useDb,
@@ -124,9 +110,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundCompClass,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(CompetitionClass),
-                        curChk);
+                        $"{nameof(CompetitionClass)} '{curChk}' not found!");
 
                     Assert.Multiple(() =>
                     {
@@ -134,59 +118,43 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClass.CompetitionId,
                             Is.EqualTo(
                                 foundComp.CompetitionId),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(foundComp.CompetitionId));
+                            "{curChk}: {nameof(foundComp.CompetitionId)}");
                         Assert.That(
                             foundCompClass.OrgClassId,
                             Is.EqualTo(
                                 curChk.OrgClassId),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.OrgClassId));
+                            $"{curChk}: {nameof(curChk.OrgClassId)}");
                         Assert.That(
                             foundCompClass.Discipline,
                             Is.EqualTo(
                                 curChk.Discipline),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.Discipline));
+                            $"{curChk}: {nameof(curChk.Discipline)}");
                         Assert.That(
                             foundCompClass.AgeClass,
                             Is.EqualTo(
                                 curChk.AgeClass),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.AgeClass));
+                            $"{curChk}: {nameof(curChk.AgeClass)}");
                         Assert.That(
                             foundCompClass.AgeGroup,
                             Is.EqualTo(
                                 curChk.AgeGroup),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.AgeGroup));
+                            $"{curChk}: {nameof(curChk.AgeGroup)}");
                         Assert.That(
                             foundCompClass.Class,
                             Is.EqualTo(
                                 curChk.Class),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.Class));
+                            $"{curChk}: {nameof(curChk.Class)}");
 
                         Assert.That(
                             foundCompClass.MinStartsForPromotion,
                             Is.EqualTo(
                                 curChk.MinStartsForPromotion),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.MinStartsForPromotion));
+                            $"{curChk}: {nameof(curChk.MinStartsForPromotion)}");
                         Assert.That(
                             foundCompClass.MinPointsForPromotion,
                             Is.EqualTo(
                                 curChk.MinPointsForPromotion),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.MinPointsForPromotion));
+                            $"{curChk}: {nameof(curChk.MinPointsForPromotion)}");
                     });
                 }
             }
@@ -217,9 +185,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundComp,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Competition),
-                        curChk);
+                        $"{nameof(Competition)} '{curChk}' not found!");
 
                     var foundAdjPanel = GetAdjudicatorPanel(
                         useDb,
@@ -229,9 +195,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundAdjPanel,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(AdjudicatorPanel),
-                        curChk);
+                        $"{nameof(AdjudicatorPanel)} '{curChk}' not found!");
 
                     Assert.Multiple(() =>
                     {
@@ -239,23 +203,17 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundAdjPanel.CompetitionId,
                             Is.EqualTo(
                                 foundComp.CompetitionId),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(foundComp.CompetitionId));
+                            $"{curChk}: {nameof(foundComp.CompetitionId)}");
                         Assert.That(
                             foundAdjPanel.Name,
                             Is.EqualTo(
                                 curChk.Name),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.Name));
+                            $"{curChk}: {nameof(foundAdjPanel.Name)}");
                         Assert.That(
                             foundAdjPanel.Comment,
                             Is.Null.Or.Empty.Or.EqualTo(
                                 curChk.Comment),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.Comment));
+                            $"{curChk}: {nameof(foundComp.Comment)}");
                     });
                 }
             }
@@ -286,9 +244,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundComp,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Competition),
-                        curChk);
+                        $"{nameof(Competition)} '{curChk}' not found!");
 
                     var foundAdjPanel = GetAdjudicatorPanel(
                         useDb,
@@ -298,9 +254,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundAdjPanel,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(AdjudicatorPanel),
-                        curChk);
+                        $"{nameof(AdjudicatorPanel)} '{curChk}' not found!");
 
                     var foundAdj = useDb.Adjudicators.FirstOrDefault(
                         x => x.AdjudicatorPanelId == foundAdjPanel.AdjudicatorPanelId
@@ -309,9 +263,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundAdj,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Adjudicator),
-                        curChk);
+                        $"{nameof(Adjudicator)} '{curChk}' not found!");
 
                     Assert.Multiple(() =>
                     {
@@ -319,30 +271,22 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundAdj.AdjudicatorPanelId,
                             Is.EqualTo(
                                 foundAdjPanel.AdjudicatorPanelId),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(foundAdjPanel.AdjudicatorPanelId));
+                            $"{curChk}: {nameof(foundAdj.AdjudicatorPanelId)}");
                         Assert.That(
                             foundAdj.Abbreviation,
                             Is.EqualTo(
                                 curChk.Abbreviation),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.Abbreviation));
+                            $"{curChk}: {nameof(curChk.Abbreviation)}");
                         Assert.That(
                             foundAdj.Name,
                             Is.EqualTo(
                                 curChk.Name),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.Name));
+                            $"{curChk}: {nameof(curChk.Name)}");
                         Assert.That(
                             foundAdj.Comment,
                             Is.Null.Or.Empty.Or.EqualTo(
                                 curChk.Comment),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.Comment));
+                            $"{curChk}: {nameof(curChk.Comment)}");
                     });
                 }
             }
@@ -373,9 +317,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundComp,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Competition),
-                        curChkHist);
+                        $"{nameof(Competition)} '{curChkHist}' not found!");
 
                     var foundCompClassHist = useDb.CompetitionClassesHistory.FirstOrDefault(
                         x => x.Competition == foundComp
@@ -384,9 +326,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundCompClassHist,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(CompetitionClass),
-                        curChkHist);
+                        $"{nameof(CompetitionClass)} '{curChkHist}' not found!");
 
                     Assert.Multiple(() =>
                     {
@@ -394,73 +334,53 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClassHist.CompetitionId,
                             Is.EqualTo(
                                 foundComp.CompetitionId),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(foundComp.CompetitionId));
+                            $"{curChkHist}: {nameof(foundComp.CompetitionId)}");
                         Assert.That(
                             foundCompClassHist.CompetitionClassHistoryId,
                             Is.EqualTo(
                                 foundCompClassHist.CompetitionClassHistoryId),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(foundComp.CompetitionId));
+                            $"{curChkHist}: {nameof(foundComp.CompetitionId)}");
                         Assert.That(
                             foundCompClassHist.Version,
                             Is.EqualTo(
                                 curChkHist.Version),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.Version));
+                            $"{curChkHist}: {nameof(curChkHist.Version)}");
                         Assert.That(
                             foundCompClassHist.OrgClassId,
                             Is.EqualTo(
                                 curChkHist.OrgClassId),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.OrgClassId));
+                            $"{curChkHist}: {nameof(curChkHist.OrgClassId)}");
                         Assert.That(
                             foundCompClassHist.Discipline,
                             Is.EqualTo(
                                 curChkHist.Discipline),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.Discipline));
+                            $"{curChkHist}: {nameof(curChkHist.Discipline)}");
                         Assert.That(
                             foundCompClassHist.AgeClass,
                             Is.EqualTo(
                                 curChkHist.AgeClass),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.AgeClass));
+                            $"{curChkHist}: {nameof(curChkHist.AgeClass)}");
                         Assert.That(
                             foundCompClassHist.AgeGroup,
                             Is.EqualTo(
                                 curChkHist.AgeGroup),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.AgeGroup));
+                            $"{curChkHist}: {nameof(curChkHist.AgeGroup)}");
                         Assert.That(
                             foundCompClassHist.Class,
                             Is.EqualTo(
                                 curChkHist.Class),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.Class));
+                            $"{curChkHist}: {nameof(curChkHist.Class)}");
 
                         Assert.That(
                             foundCompClassHist.MinStartsForPromotion,
                             Is.EqualTo(
                                 curChkHist.MinStartsForPromotion),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.MinStartsForPromotion));
+                            $"{curChkHist}: {nameof(curChkHist.MinStartsForPromotion)}");
                         Assert.That(
                             foundCompClassHist.MinPointsForPromotion,
                             Is.EqualTo(
                                 curChkHist.MinPointsForPromotion),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.MinPointsForPromotion));
+                            $"{curChkHist}: {nameof(curChkHist.MinPointsForPromotion)}");
                     });
                 }
             }
@@ -491,9 +411,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundComp,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Competition),
-                        curChk);
+                        $"{nameof(Competition)} '{curChk}' not found!");
 
                     var foundCompClass = GetCompetitionClass(
                         useDb,
@@ -503,9 +421,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundCompClass,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(CompetitionClass),
-                        curChk);
+                        $"{nameof(CompetitionClass)} '{curChk}' not found!");
 
                     var foundParticipant = useDb.Participants.FirstOrDefault(
                         x => x.Competition == foundComp
@@ -516,9 +432,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundParticipant,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Participant),
-                        curChk);
+                        $"{nameof(Participant)} '{curChk}' not found!");
 
                     Assert.Multiple(() =>
                     {
@@ -526,104 +440,76 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundParticipant.CompetitionId,
                             Is.EqualTo(
                                 foundComp.CompetitionId),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(foundComp.CompetitionId));
+                            $"{curChk}: {nameof(foundComp.CompetitionId)}");
                         Assert.That(
                             foundParticipant.CompetitionClassId,
                             Is.EqualTo(
                                 foundCompClass.CompetitionClassId),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(foundCompClass.CompetitionClassId));
+                            $"{curChk}: {nameof(foundCompClass.CompetitionClassId)}");
 
                         Assert.That(
                             foundParticipant.StartNumber,
                             Is.EqualTo(
                                 curChk.StartNumber),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.StartNumber));
+                            $"{curChk}: {nameof(curChk.StartNumber)}");
                         Assert.That(
                             foundParticipant.NamePartA,
                             Is.EqualTo(
                                 curChk.NamePartA),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.NamePartA));
+                            $"{curChk}: {nameof(curChk.NamePartA)}");
                         Assert.That(
                             foundParticipant.OrgIdPartA,
                             Is.EqualTo(
                                 curChk.OrgIdPartA),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.OrgIdPartA));
+                            $"{curChk}: {nameof(curChk.OrgIdPartA)}");
                         Assert.That(
                             foundParticipant.NamePartB,
                             Is.EqualTo(
                                 curChk.NamePartB),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.NamePartB));
+                            $"{curChk}: {nameof(curChk.NamePartB)}");
                         Assert.That(
                             foundParticipant.OrgIdPartB,
                             Is.EqualTo(
                                 curChk.OrgIdPartB),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.OrgIdPartB));
+                            $"{curChk}: {nameof(curChk.OrgIdPartB)}");
 
                         Assert.That(
                             foundParticipant.OrgIdClub,
                             Is.EqualTo(
                                 curChk.OrgIdClub),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.OrgIdClub));
+                            $"{curChk}: {nameof(curChk.OrgIdClub)}");
 
                         Assert.That(
                             foundParticipant.OrgPointsPartA,
                             Is.EqualTo(
                                 curChk.OrgPointsPartA),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.OrgPointsPartA));
+                            $"{curChk}: {nameof(curChk.OrgPointsPartA)}");
                         Assert.That(
                             foundParticipant.OrgStartsPartA,
                             Is.EqualTo(
                                 curChk.OrgStartsPartA),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.OrgStartsPartA));
+                            $"{curChk}: {nameof(curChk.OrgStartsPartA)}");
                         Assert.That(
                             foundParticipant.MinStartsForPromotionPartA,
                             Is.EqualTo(
                                 curChk.MinStartsForPromotionPartA),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.MinStartsForPromotionPartA));
+                            $"{curChk}: {nameof(curChk.MinStartsForPromotionPartA)}");
 
                         Assert.That(
                             foundParticipant.OrgPointsPartB,
                             Is.EqualTo(
                                 curChk.OrgPointsPartB),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.OrgPointsPartB));
+                            $"{curChk}: {nameof(curChk.OrgPointsPartB)}");
                         Assert.That(
                             foundParticipant.OrgStartsPartB,
                             Is.EqualTo(
                                 curChk.OrgStartsPartB),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.OrgStartsPartB));
+                            $"{curChk}: {nameof(curChk.OrgStartsPartB)}");
                         Assert.That(
                             foundParticipant.MinStartsForPromotionPartB,
                             Is.EqualTo(
                                 curChk.MinStartsForPromotionPartB),
-                            "{0}: {1}",
-                            curChk,
-                            nameof(curChk.MinStartsForPromotionPartB));
+                            $"{curChk}: {nameof(curChk.MinStartsForPromotionPartB)}");
                     });
                 }
             }
@@ -654,9 +540,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundComp,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Competition),
-                        curChkHist);
+                        $"{nameof(Competition)} '{curChkHist}' not found!");
 
                     var foundCompClassHist = useDb.CompetitionClassesHistory.FirstOrDefault(
                         x => x.Competition == foundComp
@@ -665,9 +549,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundCompClassHist,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(CompetitionClass),
-                        curChkHist);
+                        $"{nameof(CompetitionClass)} '{curChkHist}' not found!");
 
                     var foundParticipant = useDb.ParticipantsHistory.FirstOrDefault(
                         x => x.Competition == foundComp
@@ -678,9 +560,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundParticipant,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Participant),
-                        curChkHist);
+                        $"{nameof(Participant)} '{curChkHist}' not found!");
 
                     Assert.Multiple(() =>
                     {
@@ -688,97 +568,71 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundParticipant.CompetitionId,
                             Is.EqualTo(
                                 foundComp.CompetitionId),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(foundComp.CompetitionId));
+                            $"{curChkHist}: {nameof(foundComp.CompetitionId)}");
                         Assert.That(
                             foundParticipant.CompetitionClassHistoryId,
                             Is.EqualTo(
                                 foundCompClassHist.CompetitionClassHistoryId),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(foundCompClassHist.CompetitionClassHistoryId));
+                            $"{curChkHist}: {nameof(foundCompClassHist.CompetitionClassHistoryId)}");
 
                         Assert.That(
                             foundParticipant.Version,
                             Is.EqualTo(
                                 curChkHist.Version),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.Version));
+                            $"{curChkHist}: {nameof(curChkHist.Version)}");
                         Assert.That(
                             foundParticipant.StartNumber,
                             Is.EqualTo(
                                 curChkHist.StartNumber),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.StartNumber));
+                            $"{curChkHist}: {nameof(curChkHist.StartNumber)}");
                         Assert.That(
                             foundParticipant.NamePartA,
                             Is.EqualTo(
                                 curChkHist.NamePartA),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.NamePartA));
+                            $"{curChkHist}: {nameof(curChkHist.NamePartA)}");
                         Assert.That(
                             foundParticipant.OrgIdPartA,
                             Is.EqualTo(
                                 curChkHist.OrgIdPartA),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.OrgIdPartA));
+                            $"{curChkHist}: {nameof(curChkHist.OrgIdPartA)}");
                         Assert.That(
                             foundParticipant.NamePartB,
                             Is.EqualTo(
                                 curChkHist.NamePartB),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.NamePartB));
+                            $"{curChkHist}: {nameof(curChkHist.NamePartB)}");
                         Assert.That(
                             foundParticipant.OrgIdPartB,
                             Is.EqualTo(
                                 curChkHist.OrgIdPartB),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.OrgIdPartB));
+                            $"{curChkHist}: {nameof(curChkHist.OrgIdPartB)}");
 
                         Assert.That(
                             foundParticipant.OrgIdClub,
                             Is.EqualTo(
                                 curChkHist.OrgIdClub),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.OrgIdClub));
+                            $"{curChkHist}: {nameof(curChkHist.OrgIdClub)}");
 
                         Assert.That(
                             foundParticipant.OrgPointsPartA,
                             Is.EqualTo(
                                 curChkHist.OrgPointsPartA),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.OrgPointsPartA));
+                            $"{curChkHist}: {nameof(curChkHist.OrgPointsPartA)}");
                         Assert.That(
                             foundParticipant.OrgStartsPartA,
                             Is.EqualTo(
                                 curChkHist.OrgStartsPartA),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.OrgStartsPartA));
+                            $"{curChkHist}: {nameof(curChkHist.OrgStartsPartA)}");
 
                         Assert.That(
                             foundParticipant.OrgPointsPartB,
                             Is.EqualTo(
                                 curChkHist.OrgPointsPartB),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.OrgPointsPartB));
+                            $"{curChkHist}: {nameof(curChkHist.OrgPointsPartB)}");
                         Assert.That(
                             foundParticipant.OrgStartsPartB,
                             Is.EqualTo(
                                 curChkHist.OrgStartsPartB),
-                            "{0}: {1}",
-                            curChkHist,
-                            nameof(curChkHist.OrgStartsPartB));
+                            $"{curChkHist}: {nameof(curChkHist.OrgStartsPartB)}");
                     });
                 }
             }
@@ -810,9 +664,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     foundComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    chkCmp.CompetitionName);
+                    $"{nameof(Competition)} '{chkCmp.CompetitionName}' not found!");
 
                 var compLogString = string.Format(
                     "{0} '{1}'",
@@ -830,16 +682,12 @@ namespace DanceCompetitionHelper.Test.Bindings
                         foundComp.CompetitionName,
                         Is.EqualTo(
                             chkCmp.CompetitionName),
-                        "{0}: {1}",
-                        compLogString,
-                        nameof(Competition.CompetitionName));
+                        $"{compLogString}: {nameof(Competition.CompetitionName)}");
                     Assert.That(
                         foundComp.Organization,
                         Is.EqualTo(
                             chkCmp.Organization),
-                        "{0}: {1}",
-                        compLogString,
-                        nameof(Competition.Organization));
+                        $"{compLogString}: {nameof(Competition.Organization)}");
 
                     if (chkCmp.OrgCompetitionId != null)
                     {
@@ -847,9 +695,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundComp.OrgCompetitionId,
                             Is.EqualTo(
                                 chkCmp.OrgCompetitionId),
-                            "{0}: {1}",
-                            compLogString,
-                            nameof(Competition.OrgCompetitionId));
+                            $"{compLogString}: {nameof(Competition.OrgCompetitionId)}");
                     }
 
                     if (chkCmp.CompetitionInfo != null)
@@ -858,9 +704,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundComp.CompetitionInfo,
                             Is.EqualTo(
                                 chkCmp.CompetitionInfo),
-                            "{0}: {1}",
-                            compLogString,
-                            nameof(Competition.CompetitionInfo));
+                            $"{compLogString}: {nameof(Competition.CompetitionInfo)}");
                     }
 
                     if (chkCmp.CompetitionDate.HasValue)
@@ -869,9 +713,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundComp.CompetitionDate,
                             Is.EqualTo(
                                 chkCmp.CompetitionDate),
-                            "{0}: {1}",
-                            compLogString,
-                            nameof(Competition.CompetitionDate));
+                            $"{compLogString}: {nameof(Competition.CompetitionDate)}");
                     }
                 });
             }
@@ -896,15 +738,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    chkCompClass.CompetitionName);
+                    $"{nameof(Competition)} '{chkCompClass.CompetitionName}' not found!");
                 Assert.That(
                     useComp.HasValue,
                     Is.True,
-                    "{0} '{1}' not found",
-                    nameof(Competition),
-                    chkCompClass.CompetitionName);
+                    $"{nameof(Competition)} '{chkCompClass.CompetitionName}' not found");
 
                 var useCompId = useComp.Value;
                 if (compClassesByCompId.TryGetValue(
@@ -933,20 +771,15 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Assert.That(
                             foundCompClass,
                             Is.Not.Null,
-                            "{0} not found",
-                            compClassLogString);
+                            $"{compClassLogString} not found");
                         Assert.That(
                             foundCompClass?.DisplayInfo,
                             Is.Not.Null,
-                            "{0} not invalid - {1} missing",
-                            compClassLogString,
-                            nameof(CompetitionClass.DisplayInfo));
+                            $"{compClassLogString} not invalid - {nameof(CompetitionClass.DisplayInfo)} missing");
                         Assert.That(
                             foundCompClass?.DisplayInfo?.ExtraParticipants,
                             Is.Not.Null,
-                            "{0} not invalid - {1} missing",
-                            compClassLogString,
-                            nameof(CompetitionClass.DisplayInfo.ExtraParticipants));
+                            $"{compClassLogString} not invalid - {nameof(CompetitionClass.DisplayInfo.ExtraParticipants)} missing");
                     });
 
                 Assert.Multiple(() =>
@@ -960,9 +793,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         foundCompClass.OrgClassId,
                         Is.EqualTo(
                             chkCompClass.OrgClassId),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(CompetitionClass.OrgClassId));
+                        $"{compClassLogString}: {nameof(CompetitionClass.OrgClassId)}");
 
                     if (chkCompClass.Discipline != null)
                     {
@@ -971,9 +802,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.EqualTo(
                                 OetsvConstants.Disciplines.ToDisciplines(
                                     chkCompClass.Discipline)),
-                            "{0}: {1}",
-                            compClassLogString,
-                            nameof(CompetitionClass.Discipline));
+                            $"{compClassLogString}: {nameof(CompetitionClass.Discipline)}");
                     }
 
                     if (chkCompClass.AgeClass != null)
@@ -983,9 +812,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.EqualTo(
                                 OetsvConstants.AgeClasses.ToAgeClasses(
                                     chkCompClass.AgeClass)),
-                            "{0}: {1}",
-                            compClassLogString,
-                            nameof(CompetitionClass.AgeClass));
+                            $"{compClassLogString}: {nameof(CompetitionClass.AgeClass)}");
                     }
 
                     if (chkCompClass.AgeGroup != null)
@@ -995,9 +822,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.EqualTo(
                                 OetsvConstants.AgeGroups.ToAgeGroup(
                                     chkCompClass.AgeGroup)),
-                            "{0}: {1}",
-                            compClassLogString,
-                            nameof(CompetitionClass.AgeGroup));
+                            $"{compClassLogString}: {nameof(CompetitionClass.AgeGroup)}");
                     }
 
                     if (chkCompClass.Class != null)
@@ -1007,9 +832,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.EqualTo(
                                 OetsvConstants.Classes.ToClasses(
                                     chkCompClass.Class)),
-                            "{0}: {1}",
-                            compClassLogString,
-                            nameof(CompetitionClass.Class));
+                            $"{compClassLogString}: {nameof(CompetitionClass.Class)}");
                     }
 
                     if (chkCompClass.MinPointsForPromotion.HasValue)
@@ -1018,9 +841,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClass.MinPointsForPromotion,
                             Is.EqualTo(
                                 chkCompClass.MinPointsForPromotion),
-                            "{0}: {1}",
-                            compClassLogString,
-                            nameof(CompetitionClass.MinPointsForPromotion));
+                            $"{compClassLogString}: {nameof(CompetitionClass.MinPointsForPromotion)}");
                     }
 
                     if (chkCompClass.MinStartsForPromotion.HasValue)
@@ -1029,9 +850,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClass.MinStartsForPromotion,
                             Is.EqualTo(
                                 chkCompClass.MinStartsForPromotion),
-                            "{0}: {1}",
-                            compClassLogString,
-                            nameof(CompetitionClass.MinStartsForPromotion));
+                            $"{compClassLogString}: {nameof(CompetitionClass.MinStartsForPromotion)}");
                     }
 
                     if (chkCompClass.PointsForFirst.HasValue)
@@ -1040,9 +859,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClass.PointsForFirst,
                             Is.EqualTo(
                                 chkCompClass.PointsForFirst),
-                            "{0}: {1}",
-                            compClassLogString,
-                            nameof(CompetitionClass.PointsForFirst));
+                            $"{compClassLogString}: {nameof(CompetitionClass.PointsForFirst)}");
                     }
                 });
 
@@ -1059,39 +876,28 @@ namespace DanceCompetitionHelper.Test.Bindings
                         foundCompClass.DisplayInfo.CountParticipants,
                         Is.EqualTo(
                             chkCompClass.CountParticipants),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(CompetitionClassDisplayInfo.CountParticipants));
+                        $"{compClassLogString}: {nameof(CompetitionClassDisplayInfo.CountParticipants)}");
 
                     Assert.That(
                         foundCompClass.DisplayInfo.ExtraParticipants.ByWinning,
                         Is.EqualTo(
                             chkCompClass.ExtraPartByWinning),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(ExtraParticipants.ByWinning));
+                        $"{compClassLogString}: {nameof(ExtraParticipants.ByWinning)}");
                     Assert.That(
                         foundCompClass.DisplayInfo.ExtraParticipants.ByWinningInfo,
                         Is.Null.Or.Empty.Or.EqualTo(
                             chkCompClass.ExtraPartByWinningInfo),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(ExtraParticipants.ByWinningInfo));
+                        $"{compClassLogString}: {nameof(ExtraParticipants.ByWinningInfo)}");
                     Assert.That(
                         foundCompClass.DisplayInfo.ExtraParticipants.ByPromotion,
                         Is.EqualTo(
                             chkCompClass.ExtraPartByPromotion),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(ExtraParticipants.ByPromotion));
+                        $"{compClassLogString}: {nameof(ExtraParticipants.ByPromotion)}");
                     Assert.That(
                         foundCompClass.DisplayInfo.ExtraParticipants.ByPromotionInfo,
                         Is.Null.Or.Empty.Or.EqualTo(
                             chkCompClass.ExtraPartByPromotionInfo),
-                        "{0}: {1}",
-                        compClassLogString,
-                        nameof(ExtraParticipants.ByPromotionInfo));
-
+                        $"{compClassLogString}: {nameof(ExtraParticipants.ByPromotionInfo)}");
                 });
             }
         }
@@ -1115,15 +921,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         compId,
                         Is.Not.Null,
-                        "Nothign found for '{0}' '{1}' (1)",
-                        nameof(curChk.CompetitionName),
-                        curChk.CompetitionName);
+                        $"Nothign found for '{nameof(curChk.CompetitionName)}' '{curChk.CompetitionName}' (1)");
                     Assert.That(
                         compId.HasValue,
                         Is.True,
-                        "Nothign found for '{0}' '{1}' (1)",
-                        nameof(curChk.CompetitionName),
-                        curChk.CompetitionName);
+                        $"Nothign found for '{nameof(curChk.CompetitionName)}' '{curChk.CompetitionName}' (1)");
 
                     Assert.That(
                         useDanceCompHelper.GetCompetitionClasses(
@@ -1161,15 +963,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    chkMultiStart.CompetitionName);
+                    $"{nameof(Competition)} '{chkMultiStart.CompetitionName}' not found!");
                 Assert.That(
                     useComp.HasValue,
                     Is.True,
-                    "{0} '{1}' not found",
-                    nameof(Competition),
-                    chkMultiStart.CompetitionName);
+                    $"{nameof(Competition)} '{chkMultiStart.CompetitionName}' not found");
 
                 var useCompId = useComp.Value;
                 if (cachedMultipleStarters.TryGetValue(
@@ -1217,8 +1015,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     foundStarter,
                     Is.True,
-                    "Multiple Start '{0}' not found!",
-                    chkMultiStart);
+                    $"Multiple Start '{chkMultiStart}' not found!");
             }
         }
 
@@ -1239,15 +1036,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    chkMultipleStart.CompetitionName);
+                    $"{nameof(Competition)} '{chkMultipleStart.CompetitionName}' not found!");
                 Assert.That(
                     useComp.HasValue,
                     Is.True,
-                    "{0} '{1}' not found",
-                    nameof(Competition),
-                    chkMultipleStart.CompetitionName);
+                    $"{nameof(Competition)} '{chkMultipleStart.CompetitionName}' not found");
 
                 var useCompId = useComp.Value;
                 var curMultiStarter = useDanceCompHelper
@@ -1258,9 +1051,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     curMultiStarter.Count,
                     Is.EqualTo(0),
-                    "Found '{0}' multiple starts in '{1}' instead of none!",
-                    curMultiStarter.Count,
-                    chkMultipleStart.CompetitionName);
+                    $"Found '{curMultiStarter.Count}' multiple starts in '{chkMultipleStart.CompetitionName}' instead of none!");
             }
         }
 
@@ -1283,15 +1074,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    chkPart.CompetitionName);
+                    $"{nameof(Competition)} '{chkPart.CompetitionName}' not found!");
                 Assert.That(
                     useComp.HasValue,
                     Is.True,
-                    "{0} '{1}' not found",
-                    nameof(Competition),
-                    chkPart.CompetitionName);
+                    $"{nameof(Competition)} '{chkPart.CompetitionName}' not found");
 
                 var useCompId = useComp.Value;
                 if (participtansByCompId.TryGetValue(
@@ -1327,28 +1114,19 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         foundPart,
                         Is.Not.Null,
-                        "{0} not found",
-                        partLogString);
+                        $"{partLogString} not found");
                     Assert.That(
                         foundPart?.DisplayInfo,
                         Is.Not.Null,
-                        "{0} not invalid - {1} missing",
-                        partLogString,
-                        nameof(Participant.DisplayInfo));
+                        $"{partLogString} not invalid - {nameof(Participant.DisplayInfo)} missing");
                     Assert.That(
                         foundPart?.DisplayInfo?.PromotionInfo,
                         Is.Not.Null,
-                        "{0} not invalid - {1}.{2} missing",
-                        partLogString,
-                        nameof(Participant.DisplayInfo),
-                        nameof(ParticipantDisplayInfo.PromotionInfo));
+                        $"{partLogString} not invalid - {nameof(Participant.DisplayInfo)}.{nameof(ParticipantDisplayInfo.PromotionInfo)} missing");
                     Assert.That(
                         foundPart?.DisplayInfo?.MultipleStartInfo,
                         Is.Not.Null,
-                        "{0} not invalid - {1}.{2} missing",
-                        partLogString,
-                        nameof(Participant.DisplayInfo),
-                        nameof(ParticipantDisplayInfo.MultipleStartInfo));
+                        $"{partLogString} not invalid - {nameof(Participant.DisplayInfo)}.{nameof(ParticipantDisplayInfo.MultipleStartInfo)} missing");
                 });
 
                 Assert.Multiple(() =>
@@ -1365,39 +1143,29 @@ namespace DanceCompetitionHelper.Test.Bindings
                         foundPart.DisplayInfo.MultipleStartInfo.MultipleStarts,
                         Is.EqualTo(
                             chkPart.MultipleStarts),
-                        "{0}: {1}",
-                        partLogString,
-                        nameof(CheckMultipleStartInfo.MultipleStarts));
+                        $"{partLogString}: {nameof(CheckMultipleStartInfo.MultipleStarts)}");
 
                     Assert.That(
                         foundPart.DisplayInfo.PromotionInfo.PossiblePromotionA,
                         Is.EqualTo(
                             chkPart.PossiblePromotionA),
-                        "{0}: {1}",
-                        partLogString,
-                        nameof(CheckPromotionInfo.PossiblePromotionA));
+                        $"{partLogString}: {nameof(CheckPromotionInfo.PossiblePromotionA)}");
                     Assert.That(
                         foundPart.DisplayInfo.PromotionInfo.PossiblePromotionAInfo,
                         Is.Null.Or.Empty.Or.EqualTo(
                             chkPart.PossiblePromotionAInfo),
-                        "{0}: {1}",
-                        partLogString,
-                        nameof(CheckPromotionInfo.PossiblePromotionAInfo));
+                        $"{partLogString}: {nameof(CheckPromotionInfo.PossiblePromotionAInfo)}");
 
                     Assert.That(
                         foundPart.DisplayInfo.PromotionInfo.PossiblePromotionB,
                         Is.EqualTo(
                             chkPart.PossiblePromotionB),
-                        "{0}: {1}",
-                        partLogString,
-                        nameof(CheckPromotionInfo.PossiblePromotionB));
+                        $"{partLogString}: {nameof(CheckPromotionInfo.PossiblePromotionB)}");
                     Assert.That(
                         foundPart.DisplayInfo.PromotionInfo.PossiblePromotionBInfo,
                         Is.Null.Or.Empty.Or.EqualTo(
                             chkPart.PossiblePromotionBInfo),
-                        "{0}: {1}",
-                        partLogString,
-                        nameof(CheckPromotionInfo.PossiblePromotionBInfo));
+                        $"{partLogString}: {nameof(CheckPromotionInfo.PossiblePromotionBInfo)}");
                 });
             }
         }

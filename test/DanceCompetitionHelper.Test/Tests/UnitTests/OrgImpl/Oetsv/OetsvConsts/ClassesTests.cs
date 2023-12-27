@@ -30,8 +30,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase("", null)]
         [TestCase("dummy", null)]
         public void ToClasses_Test(
-            string input,
-            string expected)
+            string? input,
+            string? expected)
         {
             Assert.That(
                 Classes.ToClasses(
@@ -63,11 +63,11 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase("", "", "", "", null)]
         [TestCase("dummy", "dummy", "dummy", "dummy", null)]
         public void GetHigherClassifications_Test(
-            string forDiscepline,
-            string forAgeClass,
-            string forAgeGroup,
-            string forClass,
-            string expected)
+            string? forDiscepline,
+            string? forAgeClass,
+            string? forAgeGroup,
+            string? forClass,
+            string? expected)
         {
             Assert.That(
                 Classes.GetHigherClassifications(

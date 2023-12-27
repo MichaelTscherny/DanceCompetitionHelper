@@ -42,8 +42,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase("", null)]
         [TestCase("dummy", null)]
         public void ToDisciplines_Test(
-            string input,
-            string expected)
+            string? input,
+            string? expected)
         {
             Assert.That(
                 Disciplines.ToDisciplines(

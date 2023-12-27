@@ -183,10 +183,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         useComp,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Competition),
-                        newAdjPanel.CompetitionName);
-
+                        $"{nameof(Competition)} '{newAdjPanel.CompetitionName}' not found!");
 
                     useDb.AdjudicatorPanels.Add(
                         new AdjudicatorPanel()
@@ -235,9 +232,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         useComp,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(Competition),
-                        newAdj.CompetitionName);
+                        $"{nameof(Competition)} '{newAdj.CompetitionName}' not found!");
 
                     var useAdjPanelName = newAdj.AdjudicatorPanelName;
                     var useAdjPanel = GetAdjudicatorPanel(
@@ -248,9 +243,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Assert.That(
                         useAdjPanel,
                         Is.Not.Null,
-                        "{0} '{1}' not found!",
-                        nameof(AdjudicatorPanel),
-                        useAdjPanelName);
+                        $"{nameof(AdjudicatorPanel)} '{useAdjPanelName}' not found!");
 
                     useDb.Adjudicators.Add(
                         new Adjudicator()
@@ -299,9 +292,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    newCompClass.CompetitionName);
+                    $"{nameof(Competition)} '{newCompClass.CompetitionName}' not found!");
 
                 var useAdjPanel = GetAdjudicatorPanel(
                     useDb,
@@ -311,9 +302,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useAdjPanel,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(AdjudicatorPanel),
-                    newCompClass.AdjudicatorPanelName);
+                    $"{nameof(AdjudicatorPanel)} '{newCompClass.AdjudicatorPanelName}' not found!");
 
                 try
                 {
@@ -375,9 +364,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    newCompClassHist.CompetitionName);
+                    $"{nameof(Competition)} '{newCompClassHist.CompetitionName}' not found!");
 
                 try
                 {
@@ -437,9 +424,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    newPart.CompetitionName);
+                    $"{nameof(Competition)} '{newPart.CompetitionName}' not found!");
 
                 var useCompClass = GetCompetitionClass(
                     useDb,
@@ -449,9 +434,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useCompClass,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(CompetitionClass),
-                    newPart.CompetitionClassName);
+                    $"{nameof(CompetitionClass)} '{newPart.CompetitionClassName}' not found!");
 
                 try
                 {
@@ -510,9 +493,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    newPartHist.CompetitionName);
+                    $"{nameof(Competition)} '{newPartHist.CompetitionName}' not found!");
 
                 // TODO: wrong table!..
                 var useCompClassHist = GetCompetitionClass(
@@ -523,9 +504,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useCompClassHist,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(CompetitionClass),
-                    newPartHist.CompetitionClassName);
+                    $"{nameof(CompetitionClass)} '{newPartHist.CompetitionClassName}' not found!");
 
                 try
                 {
