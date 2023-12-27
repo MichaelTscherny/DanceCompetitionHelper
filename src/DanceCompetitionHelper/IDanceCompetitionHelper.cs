@@ -143,7 +143,8 @@ namespace DanceCompetitionHelper
             double pointsForFirts,
             int extraManualStarter,
             string? comment,
-            bool ignore);
+            bool ignore,
+            string? competitionColor);
 
         void EditCompetitionClass(
             Guid competitionClassId,
@@ -160,7 +161,8 @@ namespace DanceCompetitionHelper
             double pointsForFirst,
             int extraManualStarter,
             string? comment,
-            bool ignore);
+            bool ignore,
+            string? competitionColor);
 
         void RemoveCompetitionClass(
             Guid competitionClassId);

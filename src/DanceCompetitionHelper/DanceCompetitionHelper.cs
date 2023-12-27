@@ -1611,7 +1611,8 @@ namespace DanceCompetitionHelper
             double pointsForFirst,
             int extraManualStarter,
             string? comment,
-            bool ignore)
+            bool ignore,
+            string? competitionColor)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
@@ -1638,7 +1639,9 @@ namespace DanceCompetitionHelper
                         Competition = foundCompId,
                         OrgClassId = orgClassId,
                         CompetitionClassName = competitionClassName,
-                        FollowUpCompetitionClassId = followUpCompetitionClassId,
+                        FollowUpCompetitionClassId = followUpCompetitionClassId == Guid.Empty
+                            ? null
+                            : followUpCompetitionClassId,
                         AdjudicatorPanelId = adjudicatorPanelId,
                         Discipline = discipline,
                         AgeClass = ageClass,
@@ -1650,6 +1653,7 @@ namespace DanceCompetitionHelper
                         ExtraManualStarter = extraManualStarter,
                         Comment = comment,
                         Ignore = ignore,
+                        CompetitionColor = competitionColor,
                     });
 
                 _danceCompHelperDb.SaveChanges();
@@ -1690,7 +1694,8 @@ namespace DanceCompetitionHelper
             double pointsForFirst,
             int extraManualStarter,
             string? comment,
-            bool ignore)
+            bool ignore,
+            string? competitionColor)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction();
 
@@ -1713,7 +1718,9 @@ namespace DanceCompetitionHelper
 
                 foundCompClass.OrgClassId = orgClassId;
                 foundCompClass.CompetitionClassName = competitionClassName;
-                foundCompClass.FollowUpCompetitionClassId = followUpCompetitionClassId;
+                foundCompClass.FollowUpCompetitionClassId = followUpCompetitionClassId == Guid.Empty
+                    ? null
+                    : followUpCompetitionClassId;
                 foundCompClass.AdjudicatorPanelId = adjudicatorPanelId;
                 foundCompClass.Discipline = discipline;
                 foundCompClass.AgeClass = ageClass;
@@ -1725,6 +1732,7 @@ namespace DanceCompetitionHelper
                 foundCompClass.ExtraManualStarter = extraManualStarter;
                 foundCompClass.Comment = comment;
                 foundCompClass.Ignore = ignore;
+                foundCompClass.CompetitionColor = competitionColor;
 
                 _danceCompHelperDb.SaveChanges();
                 dbTrans.Commit();

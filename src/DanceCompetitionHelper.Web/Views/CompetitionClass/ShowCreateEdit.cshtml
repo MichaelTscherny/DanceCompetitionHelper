@@ -298,11 +298,11 @@
                 Color
             </div>
             <div class="col-md-4">
-                <select asp-for="CompetitionColor"
-                        asp-items="Model.CompetitionColors"
-                        class="form-select"
-                        style="width: 100%">
-                </select>
+                <input asp-for="CompetitionColor"
+                       type="color"
+                       asp-items="Model.CompetitionColors"
+                       class="form-control-color"
+                       style="width: 100%" />
                 <span asp-validation-for="CompetitionColor"
                       class="text-danger"></span>
             </div>

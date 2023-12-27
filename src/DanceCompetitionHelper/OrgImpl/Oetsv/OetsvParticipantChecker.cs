@@ -51,6 +51,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             var usePartCompClass = participant.CompetitionClass;
             var allClasses = new List<CompetitionClass>();
 
+            // TODO: rework to use "FollowUpCompetitionClass"
             if (_multiStarterCompClassesByParticipantId.TryGetValue(
                 participant.ParticipantId,
                 out var foundAllStartingClasses))

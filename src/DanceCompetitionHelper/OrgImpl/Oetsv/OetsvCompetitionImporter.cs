@@ -2,9 +2,11 @@
 using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Extensions;
 using DanceCompetitionHelper.OrgImpl.Oetsv.WorkData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Drawing;
 using System.Net;
 using System.Text;
 
@@ -17,6 +19,32 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         public DanceCompetitionHelper? DanceCompetitionHelper { get; set; }
         public DanceCompetitionHelperDbContext? DbCtx => DanceCompetitionHelper?.GetDbCtx();
+
+        public static readonly List<Color> CompetitionClassColors = new List<Color>()
+        {
+            // 0
+            Color.AliceBlue,
+            Color.AntiqueWhite,
+            Color.Aquamarine,
+            Color.BlueViolet,
+            Color.CadetBlue,
+            Color.Coral,
+            Color.Cyan,
+            Color.DarkGoldenrod,
+            Color.DarkGreen,
+            Color.DarkOrange,
+            // 10
+            Color.LightSlateGray,
+            Color.MediumSeaGreen,
+            Color.Pink,
+            Color.RosyBrown,
+            Color.White,
+            Color.Silver,
+            Color.OrangeRed,
+            Color.DarkSalmon,
+            Color.Gold,
+            Color.Honeydew,
+        };
 
         public string Oranizer { get; private set; } = default!;
         public string OrgCompetitionId { get; set; } = default!;
@@ -936,6 +964,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 .ToDictionary(
                     x => x.OrgClassId);
             var allCreatedCompClasses = new HashSet<CompetitionClass>();
+            var useColorIdx = 0;
 
             // TODO: check "missing"/"deleted" participants 
             foreach (var curImportCompClass in CompetitionClasses)
@@ -1033,6 +1062,8 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                                 curImportCompClass.Class),
                             PointsForFirst = OetsvConstants.CompetitionType.GetPointsForWinning(
                                 CompetitionType),
+                            CompetitionColor =
+                                CompetitionClassColors[useColorIdx++ % CompetitionClassColors.Count].ToRgbHexString(),
                         })
                         .Entity;
 

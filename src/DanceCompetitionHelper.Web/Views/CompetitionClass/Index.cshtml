@@ -32,6 +32,9 @@
                         Competition Class (@competitionClassesCount)
                     </th>
                     <th>
+                        Color
+                    </th>
+                    <th>
                         Follow Up
                     </th>
                     <th>
@@ -85,6 +88,12 @@
                         <td class="text-nowrap">
                             @Html.DisplayFor(modelItem => item.CompetitionClassName)
                             (@Html.DisplayFor(modelItem => item.OrgClassId))
+                        </td>
+                        <td>
+                            <input value="@item.CompetitionColor"
+                                   disabled 
+                                   readonly
+                                   type="color" />
                         </td>
                         <td>
                             @{
@@ -209,6 +218,9 @@
                 <tr>
                     <th>
                         Competition Class (@competitionClassesCount)
+                    </th>
+                    <th>
+                        Color
                     </th>
                     <th>
                         Follow up

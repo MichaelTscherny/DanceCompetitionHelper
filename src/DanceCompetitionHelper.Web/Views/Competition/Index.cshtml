@@ -1,4 +1,6 @@
 ﻿@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Extensions
+@using DanceCompetitionHelper.OrgImpl.Oetsv
 @using DanceCompetitionHelper.Web.Controllers;
 
 @model IEnumerable<Competition>
@@ -161,6 +163,7 @@
             </tfoot>
         </table>
     </div>
+
     <hr />
     <div class="row d-flex justify-content-center py-1">
         <div class="col">
@@ -171,4 +174,3 @@
         </div>
     </div>
 </div>
-

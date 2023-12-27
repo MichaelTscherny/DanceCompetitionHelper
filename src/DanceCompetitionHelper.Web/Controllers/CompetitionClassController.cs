@@ -128,6 +128,15 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 createCompetition.Errors = ModelState.GetErrorMessages();
 
+                createCompetition.FollowUpCompetitionClassId = createCompetition.FollowUpCompetitionClassId;
+                createCompetition.FollowUpCompetitionClasses = _danceCompHelper
+                    .GetCompetitionClasses(
+                        createCompetition.CompetitionId)
+                    .ToSelectListItem(
+                        createCompetition.FollowUpCompetitionClassId,
+                        addEmpty: true);
+
+                createCompetition.AdjudicatorPanelId = createCompetition.AdjudicatorPanelId;
                 createCompetition.AdjudicatorPanels = _danceCompHelper
                     .GetAdjudicatorPanels(
                         createCompetition.CompetitionId)
@@ -158,7 +167,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     createCompetition.PointsForFirst,
                     createCompetition.ExtraManualStarter,
                     createCompetition.Comment,
-                    createCompetition.Ignore);
+                    createCompetition.Ignore,
+                    createCompetition.CompetitionColor);
 
                 HttpContext.Session.SetString(
                     CompetitionClassLastCreatedAdjudicatorPanelId,
@@ -175,6 +185,15 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 createCompetition.Errors = exc.InnerException?.Message ?? exc.Message;
 
+                createCompetition.FollowUpCompetitionClassId = createCompetition.FollowUpCompetitionClassId;
+                createCompetition.FollowUpCompetitionClasses = _danceCompHelper
+                    .GetCompetitionClasses(
+                        createCompetition.CompetitionId)
+                    .ToSelectListItem(
+                        createCompetition.FollowUpCompetitionClassId,
+                        addEmpty: true);
+
+                createCompetition.AdjudicatorPanelId = createCompetition.AdjudicatorPanelId;
                 createCompetition.AdjudicatorPanels = _danceCompHelper
                     .GetAdjudicatorPanels(
                         createCompetition.CompetitionId)
@@ -291,7 +310,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     editCompetitionClass.PointsForFirst,
                     editCompetitionClass.ExtraManualStarter,
                     editCompetitionClass.Comment,
-                    editCompetitionClass.Ignore);
+                    editCompetitionClass.Ignore,
+                    editCompetitionClass.CompetitionColor);
 
                 return RedirectToAction(
                     nameof(Index),
@@ -304,6 +324,15 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 editCompetitionClass.Errors = exc.InnerException?.Message ?? exc.Message;
 
+                editCompetitionClass.FollowUpCompetitionClassId = editCompetitionClass.FollowUpCompetitionClassId;
+                editCompetitionClass.FollowUpCompetitionClasses = _danceCompHelper
+                    .GetCompetitionClasses(
+                        editCompetitionClass.CompetitionId)
+                    .ToSelectListItem(
+                        editCompetitionClass.FollowUpCompetitionClassId,
+                        addEmpty: true);
+
+                editCompetitionClass.AdjudicatorPanelId = editCompetitionClass.AdjudicatorPanelId;
                 editCompetitionClass.AdjudicatorPanels = _danceCompHelper
                     .GetAdjudicatorPanels(
                         editCompetitionClass.CompetitionId)
