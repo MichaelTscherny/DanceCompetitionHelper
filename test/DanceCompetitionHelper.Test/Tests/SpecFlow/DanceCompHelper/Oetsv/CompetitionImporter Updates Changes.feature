@@ -6,18 +6,18 @@ Scenario: Update 03 - Changed Points and Starts
     Given following DanceCompetitionHelper "DanceCompHelper"
     # IMPORT 01
     And following data are imported by DanceCompetitionHelper "DanceCompHelper"
-        | Organization | OrgCompetitionId | CompetitionFile                                                                | ParticipantsFile                                                                |
-        | Oetsv        | 6451             | TestData\\Importer\\Oetsv\\Updates\\03\\CompetitionImport03_01_Competition.csv | TestData\\Importer\\Oetsv\\Updates\\03\\CompetitionImport03_01_Participants.csv |
+        | Organization | OrgCompetitionId | CompetitionFile                                                                | ParticipantsFile                                                                | FindFollowUpClasses |
+        | Oetsv        | 6451             | TestData\\Importer\\Oetsv\\Updates\\03\\CompetitionImport03_01_Competition.csv | TestData\\Importer\\Oetsv\\Updates\\03\\CompetitionImport03_01_Participants.csv | true                |
     Then following Competitions exists in DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | Organization | OrgCompetitionId | CompetitionInfo                  | CompetitionDate |
         | Small Tournament | Oetsv        | 2142             | Landesmeisterschaft Unknown Wien | 2013-05-30      |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName  | CompetitionClassName | OrgClassId | Discipline | AgeClass | AgeGroup | Class | MinPointsForPromotion | MinStartsForPromotion | PointsForFirst | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo |
-        | Small Tournament | Allg.Kl. Sta D       | 001        | Sta        | Allg     | 0        | D     | 900                   | 10                    | 150            | 2                 | 0                  |                        |
-        | Small Tournament | Allg.Kl. Sta C       | 002        | Sta        | Allg     | 0        | C     | 1500                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta D (001)   |
-        | Small Tournament | Allg.Kl. Sta B       | 003        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta C (002)   |
-        | Small Tournament | Allg.Kl. Sta A       | 004        | Sta        | Allg     | 0        | A     | 1600                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta B (003)   |
-        | Small Tournament | Allg.Kl. Sta S       | 005        | Sta        | Allg     | 0        | S     | 999999999             | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta A (004)   |
+        | CompetitionName  | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId | Discipline | AgeClass | AgeGroup | Class | MinPointsForPromotion | MinStartsForPromotion | PointsForFirst | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo |
+        | Small Tournament | Allg.Kl. Sta D       | Allg.Kl. Sta C               | 001        | Sta        | Allg     | 0        | D     | 900                   | 10                    | 150            | 2                 | 0                  |                        |
+        | Small Tournament | Allg.Kl. Sta C       | Allg.Kl. Sta B               | 002        | Sta        | Allg     | 0        | C     | 1500                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta D (001)   |
+        | Small Tournament | Allg.Kl. Sta B       | Allg.Kl. Sta A               | 003        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta C (002)   |
+        | Small Tournament | Allg.Kl. Sta A       | Allg.Kl. Sta S               | 004        | Sta        | Allg     | 0        | A     | 1600                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta B (003)   |
+        | Small Tournament | Allg.Kl. Sta S       |                              | 005        | Sta        | Allg     | 0        | S     | 999999999             | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta A (004)   |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionAInfo                 |
         #                                                                                  
@@ -40,18 +40,18 @@ Scenario: Update 03 - Changed Points and Starts
         | Small Tournament |
     # IMPORT 02
     Given following data are imported by DanceCompetitionHelper "DanceCompHelper"
-        | Organization | OrgCompetitionId | CompetitionFile                                                                | ParticipantsFile                                                                |
-        | Oetsv        | 6451             | TestData\\Importer\\Oetsv\\Updates\\03\\CompetitionImport03_02_Competition.csv | TestData\\Importer\\Oetsv\\Updates\\03\\CompetitionImport03_02_Participants.csv |
+        | Organization | OrgCompetitionId | CompetitionFile                                                                | ParticipantsFile                                                                | FindFollowUpClasses |
+        | Oetsv        | 6451             | TestData\\Importer\\Oetsv\\Updates\\03\\CompetitionImport03_02_Competition.csv | TestData\\Importer\\Oetsv\\Updates\\03\\CompetitionImport03_02_Participants.csv | false               |
     Then following Competitions exists in DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | Organization | OrgCompetitionId | CompetitionInfo                  | CompetitionDate |
         | Small Tournament | Oetsv        | 2142             | Landesmeisterschaft Unknown Wien | 2013-05-30      |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName  | CompetitionClassName | OrgClassId | Discipline | AgeClass | AgeGroup | Class | MinPointsForPromotion | MinStartsForPromotion | PointsForFirst | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo |
-        | Small Tournament | Allg.Kl. Sta D       | 001        | Sta        | Allg     | 0        | D     | 900                   | 10                    | 150            | 2                 | 0                  |                        |
-        | Small Tournament | Allg.Kl. Sta C       | 002        | Sta        | Allg     | 0        | C     | 1500                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta D (001)   |
-        | Small Tournament | Allg.Kl. Sta B       | 003        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta C (002)   |
-        | Small Tournament | Allg.Kl. Sta A       | 004        | Sta        | Allg     | 0        | A     | 1600                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta B (003)   |
-        | Small Tournament | Allg.Kl. Sta S       | 005        | Sta        | Allg     | 0        | S     | 999999999             | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta A (004)   |
+        | CompetitionName  | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId | Discipline | AgeClass | AgeGroup | Class | MinPointsForPromotion | MinStartsForPromotion | PointsForFirst | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo |
+        | Small Tournament | Allg.Kl. Sta D       | Allg.Kl. Sta C               | 001        | Sta        | Allg     | 0        | D     | 900                   | 10                    | 150            | 2                 | 0                  |                        |
+        | Small Tournament | Allg.Kl. Sta C       | Allg.Kl. Sta B               | 002        | Sta        | Allg     | 0        | C     | 1500                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta D (001)   |
+        | Small Tournament | Allg.Kl. Sta B       | Allg.Kl. Sta A               | 003        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta C (002)   |
+        | Small Tournament | Allg.Kl. Sta A       | Allg.Kl. Sta S               | 004        | Sta        | Allg     | 0        | A     | 1600                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta B (003)   |
+        | Small Tournament | Allg.Kl. Sta S       |                              | 005        | Sta        | Allg     | 0        | S     | 999999999             | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta A (004)   |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionAInfo                 |
         #                                                                                  

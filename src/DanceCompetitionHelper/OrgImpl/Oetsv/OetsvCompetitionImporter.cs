@@ -15,6 +15,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         private readonly ILogger<OetsvCompetitionImporter> _logger;
         private readonly ImporterSettings _importerSettings;
 
+        public DanceCompetitionHelper? DanceCompetitionHelper { get; set; }
+        public DanceCompetitionHelperDbContext? DbCtx => DanceCompetitionHelper?.GetDbCtx();
+
         public string Oranizer { get; private set; } = default!;
         public string OrgCompetitionId { get; set; } = default!;
         public string CompetitionName { get; private set; } = default!;
@@ -29,6 +32,8 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public List<string> Assessors { get; } = new List<string>();
         public List<string> Adjudicators { get; } = new List<string>();
         public List<CompetitionParticipantImport> Participants { get; } = new List<CompetitionParticipantImport>();
+
+        public bool FindFollowUpClasses { get; set; }
 
         #region Constants...
 
@@ -94,7 +99,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         }
 
         public List<string> ImportOrUpdateByFile(
-            DanceCompetitionHelperDbContext dbCtx,
             string orgCompetitionId,
             string? fullPathCompetition,
             string? fullPathCompetitionClasses,
@@ -109,8 +113,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         fullPathCompetition,
                         fullPathParticipants));
                 retWorkInfo.AddRange(
-                    ImportOrUpdateDatabase(
-                        dbCtx));
+                    ImportOrUpdateDatabase());
             }
             catch (Exception exc)
             {
@@ -130,8 +133,8 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         }
 
         public List<string> ImportOrUpdateByUrl(
-            DanceCompetitionHelperDbContext dbCtx,
             string orgCompetitionId,
+            Uri? uriUpdate,
             Uri? uriCompetition,
             Uri? uriCompetitionClasses,
             Uri? uriParticipants)
@@ -139,6 +142,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             var retWorkInfo = new List<string>();
             try
             {
+                CallUpdateUri(
+                    uriUpdate);
+
                 var fullPathCompetitionCsv = DownloadFile(
                     "comp",
                     orgCompetitionId,
@@ -152,7 +158,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
                 retWorkInfo.AddRange(
                     ImportOrUpdateByFile(
-                        dbCtx,
                         orgCompetitionId,
                         fullPathCompetitionCsv,
                         null,
@@ -173,6 +178,20 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             }
 
             return retWorkInfo;
+        }
+
+        public Uri GetUpdateUriForOrgId(
+            int orgId)
+        {
+            return new Uri(
+                string.Format(
+                    "https://www.tanzsportverband.at/portal/nennungen/starterliste-xls.php?lang=DE&TASNr={0}",
+                    orgId
+                        .ToString(
+                            "D0")
+                        .PadLeft(
+                            4,
+                            '0')));
         }
 
         public Uri GetCompetitioUriForOrgId(
@@ -201,6 +220,47 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         .PadLeft(
                             4,
                             '0')));
+        }
+
+        public void CallUpdateUri(
+            Uri? updateUri)
+        {
+            if (updateUri == null)
+            {
+                return;
+            }
+
+            try
+            {
+                using var httpClient = new HttpClient()
+                {
+                    Timeout = TimeSpan.FromMinutes(1),
+                };
+
+                var retTask = httpClient
+                    .GetAsync(
+                        updateUri);
+                retTask.Wait();
+                var getResp = retTask.Result;
+
+                if (getResp.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new Exception(
+                        string.Format(
+                            "StatuCode {0}",
+                            getResp.StatusCode));
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during updating '{Uri}': {Message}",
+                    updateUri,
+                    exc.Message);
+
+                throw;
+            }
         }
 
         public string? DownloadFile(
@@ -239,11 +299,11 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             {
                 using var httpClient = new HttpClient();
 
-                var getResp = httpClient
+                var retTask = httpClient
                     .GetAsync(
-                        downloadUri)
-                    .GetAwaiter()
-                    .GetResult();
+                        downloadUri);
+                retTask.Wait();
+                var getResp = retTask.Result;
 
                 if (getResp.StatusCode != HttpStatusCode.OK)
                 {
@@ -672,12 +732,13 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 addPartImport);
         }
 
-        public List<string> ImportOrUpdateDatabase(
-            DanceCompetitionHelperDbContext dbCtx)
+        public List<string> ImportOrUpdateDatabase()
         {
             var retWorkInfo = new List<string>();
+            var dbCtx = DbCtx ?? throw new ArgumentNullException(
+                nameof(DbCtx));
 
-            var foundComp = dbCtx.Competitions
+            var foundComp = DbCtx.Competitions
                 .TagWith(
                     nameof(ImportOrUpdateDatabase) + "[01]")
                 .FirstOrDefault(
@@ -874,6 +935,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     x => x.CompetitionId == foundComp.CompetitionId)
                 .ToDictionary(
                     x => x.OrgClassId);
+            var allCreatedCompClasses = new HashSet<CompetitionClass>();
 
             // TODO: check "missing"/"deleted" participants 
             foreach (var curImportCompClass in CompetitionClasses)
@@ -948,7 +1010,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         useClassName);
 
                     // let's add it...
-                    foundCompetitionClass = dbCtx.CompetitionClasses.Add(
+                    var createdCompetitionClass = dbCtx.CompetitionClasses.Add(
                         new CompetitionClass()
                         {
                             Competition = foundComp,
@@ -974,17 +1036,39 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         })
                         .Entity;
 
-                    allCompClasses[foundCompetitionClass.OrgClassId] = foundCompetitionClass;
+                    allCompClasses[createdCompetitionClass.OrgClassId] = createdCompetitionClass;
+                    allCreatedCompClasses.Add(
+                        createdCompetitionClass);
 
                     _logger.LogInformation(
-                        "Added {CompClassName}: {foundCompetitionClass}",
+                        "Added {CompClassName}: {createdCompetitionClass}",
                         nameof(CompetitionClass),
-                        foundCompetitionClass);
+                        createdCompetitionClass);
                     retWorkInfo.Add(
                         string.Format(
                             "Added {0}: {1}",
                             nameof(CompetitionClass),
-                            foundCompetitionClass));
+                            createdCompetitionClass));
+                }
+            }
+
+            // process "follow up"
+            if (FindFollowUpClasses)
+            {
+                ICompetitonClassChecker? compClassChecker = DanceCompetitionHelper?.GetCompetitonClassChecker(
+                    foundComp);
+
+                if (compClassChecker != null)
+                {
+                    foreach (var curNewClass in allCreatedCompClasses)
+                    {
+                        curNewClass.FollowUpCompetitionClass = (compClassChecker?
+                            .GetHigherClassifications(
+                                curNewClass,
+                                allCompClasses.Values)
+                                ?? Enumerable.Empty<CompetitionClass>())
+                            .FirstOrDefault();
+                    }
                 }
             }
 

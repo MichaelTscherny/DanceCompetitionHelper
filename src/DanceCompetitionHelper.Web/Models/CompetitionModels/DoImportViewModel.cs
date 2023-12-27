@@ -26,5 +26,8 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionModels
         [Required]
         [FromForm]
         public string? OrgCompetitionId { get; set; }
+
+        [FromForm]
+        public bool FindFollowUpClasses { get; set; }
     }
 }

@@ -26,6 +26,11 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
         public string CompetitionClassName { get; set; } = default!;
 
         [FromForm]
+        public Guid? FollowUpCompetitionClassId { get; set; }
+
+        public List<SelectListItem> FollowUpCompetitionClasses { get; set; } = new List<SelectListItem>();
+
+        [FromForm]
         [Required]
         public Guid AdjudicatorPanelId { get; set; }
 

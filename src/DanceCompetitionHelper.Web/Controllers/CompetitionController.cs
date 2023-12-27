@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Web.Extensions;
+﻿using DanceCompetitionHelper.OrgImpl.Oetsv;
+using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models;
 using DanceCompetitionHelper.Web.Models.CompetitionModels;
 using Microsoft.AspNetCore.Mvc;
@@ -208,12 +209,22 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             try
             {
+                var useParams = new Dictionary<string, string>();
+
+                if (doImportView.FindFollowUpClasses)
+                {
+                    useParams.Add(
+                        nameof(OetsvCompetitionImporter.FindFollowUpClasses),
+                        "true");
+                };
+
                 // TODO: implement more options/file-uploads/etc...
                 var workStatus = _danceCompHelper.ImportOrUpdateCompetition(
                     doImportView.Organization,
                     doImportView.OrgCompetitionId,
                     doImportView.ImportType,
-                    null);
+                    null,
+                    useParams);
 
                 doImportView.OrgCompetitionId = workStatus.OrgCompetitionId;
                 doImportView.CompetitionId = workStatus.CompetitionId;

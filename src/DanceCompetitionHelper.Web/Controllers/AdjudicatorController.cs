@@ -80,7 +80,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             var helpCompName = string.Empty;
 
-            Guid.TryParse(
+            _ = Guid.TryParse(
                 HttpContext.Session.GetString(
                     ParticipantLastCreatedAdjudicatorPanelId),
                 out var lastCreatedAdjudicatorPanelId);

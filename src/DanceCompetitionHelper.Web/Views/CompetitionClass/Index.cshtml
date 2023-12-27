@@ -32,6 +32,9 @@
                         Competition Class (@competitionClassesCount)
                     </th>
                     <th>
+                        Follow Up
+                    </th>
+                    <th>
                         Comment
                     </th>
                     <th>
@@ -82,6 +85,21 @@
                         <td class="text-nowrap">
                             @Html.DisplayFor(modelItem => item.CompetitionClassName)
                             (@Html.DisplayFor(modelItem => item.OrgClassId))
+                        </td>
+                        <td>
+                            @{
+                                var displayFollowUp = "-";
+                                var followUp = item.FollowUpCompetitionClass;
+
+                                if(followUp != null)
+                                {
+                                    displayFollowUp = string.Format(
+                                        "{0} ({1})",
+                                        followUp.CompetitionClassName,
+                                        followUp.OrgClassId);
+                                }
+                            }
+                            @displayFollowUp
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Comment)
@@ -191,6 +209,9 @@
                 <tr>
                     <th>
                         Competition Class (@competitionClassesCount)
+                    </th>
+                    <th>
+                        Follow up
                     </th>
                     <th>
                         Comment

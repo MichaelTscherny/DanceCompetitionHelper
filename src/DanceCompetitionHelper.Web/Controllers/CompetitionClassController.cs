@@ -97,7 +97,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData["Show" + ParticipantController.RefName] = foundCompId;
             ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
 
-            Guid.TryParse(
+            _ = Guid.TryParse(
                 HttpContext.Session.GetString(
                     CompetitionClassLastCreatedAdjudicatorPanelId),
                 out var lastCreatedAdjudicatorPanelId);
@@ -111,6 +111,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                             foundCompId)
                         .ToSelectListItem(
                             lastCreatedAdjudicatorPanelId),
+                    FollowUpCompetitionClasses = _danceCompHelper
+                        .GetCompetitionClasses(
+                            foundCompId.Value)
+                        .ToSelectListItem(
+                            addEmpty: true)
                 });
         }
 
@@ -141,6 +146,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 _danceCompHelper.CreateCompetitionClass(
                     createCompetition.CompetitionId,
                     createCompetition.CompetitionClassName,
+                    createCompetition.FollowUpCompetitionClassId,
                     useAdjudicatorPanelId,
                     createCompetition.OrgClassId,
                     createCompetition.Discipline,
@@ -210,6 +216,14 @@ namespace DanceCompetitionHelper.Web.Controllers
                     CompetitionId = foundCompClass.CompetitionId,
                     CompetitionClassId = foundCompClass.CompetitionClassId,
                     CompetitionClassName = foundCompClass.CompetitionClassName,
+
+                    FollowUpCompetitionClassId = foundCompClass.FollowUpCompetitionClassId,
+                    FollowUpCompetitionClasses = _danceCompHelper
+                        .GetCompetitionClasses(
+                            foundCompClass.CompetitionId)
+                        .ToSelectListItem(
+                            foundCompClass.FollowUpCompetitionClassId,
+                            addEmpty: true),
                     AdjudicatorPanelId = foundCompClass.AdjudicatorPanelId,
                     AdjudicatorPanels = _danceCompHelper
                         .GetAdjudicatorPanels(
@@ -265,6 +279,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 _danceCompHelper.EditCompetitionClass(
                     editCompetitionClass.CompetitionClassId ?? Guid.Empty,
                     editCompetitionClass.CompetitionClassName,
+                    editCompetitionClass.FollowUpCompetitionClassId,
                     editCompetitionClass.AdjudicatorPanelId,
                     editCompetitionClass.OrgClassId,
                     editCompetitionClass.Discipline,

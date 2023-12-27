@@ -105,7 +105,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             var helpCompName = string.Empty;
 
-            Guid.TryParse(
+            _ = Guid.TryParse(
                 HttpContext.Session.GetString(
                     ParticipantLastCreatedCompetitionClassId),
                 out var lastCreatedClassId);

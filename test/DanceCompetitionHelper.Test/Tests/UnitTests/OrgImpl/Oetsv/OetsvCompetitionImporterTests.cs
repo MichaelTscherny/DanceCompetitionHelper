@@ -365,8 +365,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                 new ImporterSettings());
 
             testImporter.ImportOrUpdateByUrl(
-                null,
                 "1508",
+                null,
                 testImporter.GetCompetitioUriForOrgId(
                     1508),
                 null,

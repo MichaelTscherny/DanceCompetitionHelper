@@ -35,28 +35,49 @@
         <input asp-for="ImportType" value="@nameof(ImportTypeEnum.Url)" />
         <input asp-for="Organization" value="@nameof(OrganizationEnum.Oetsv)" />
         
-        <div class="row row-cols-4 py-1">
-            <div class="col-md text-end">
-                ÖTSV ID
+        <div class="container">
+            <div class="row row-cols-4 py-1">
+                <div class="col-3 text-end">
+                    ÖTSV ID
+                </div>
+                <div class="col-3">
+                    <input asp-for="OrgCompetitionId"
+                           class="form-control"
+                           placeholder="ÖTSV ID"
+                           style="width: 100%" />
+                    <span asp-validation-for="OrgCompetitionId"
+                          class="text-danger"></span>
+                </div>
+                <div class="col-3 text-start">
+                    <label asp-for="OrgCompetitionId"
+                           class="control-label">
+                        ÖTSV ID (e.g. 1234)
+                    </label>
+                </div>
+                <div class="col-3 text-start">
+                    <button class="btn btn-primary px-lg-4" type="submit">
+                        Create/Update
+                    </button>
+                </div>
             </div>
-            <div class="col-md-4">
-                <input asp-for="OrgCompetitionId"
-                       class="form-control"
-                       placeholder="ÖTSV ID"
-                       style="width: 100%" />
-                <span asp-validation-for="OrgCompetitionId"
-                      class="text-danger"></span>
-            </div>
-            <div class="col-md text-start">
-                <label asp-for="OrgCompetitionId"
-                       class="control-label">
-                    ÖTSV ID (e.g. 1234)
-                </label>
-            </div>
-            <div class="col-md text-start">
-                <button class="btn btn-primary px-lg-4" type="submit">
-                    Create/Update
-                </button>
+            <div class="row row-cols-4 py-1">
+                <div class="col-3 text-end">
+                    Find Follow Up
+                </div>
+                <div class="col-3 text-start">
+                    <input asp-for="FindFollowUpClasses"
+                           type="checkbox"
+                           class="form-check-input"
+                            />
+                    <span asp-validation-for="FindFollowUpClasses"
+                          class="text-danger"></span>
+                </div>
+                <div class="col-3 text-start">
+                    &nbsp;
+                </div>
+                <div class="col-3 text-start">
+                    &nbsp;
+                </div>
             </div>
         </div>
 

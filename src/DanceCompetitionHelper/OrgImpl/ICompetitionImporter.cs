@@ -1,19 +1,18 @@
-﻿using DanceCompetitionHelper.Database;
-
-namespace DanceCompetitionHelper.OrgImpl
+﻿namespace DanceCompetitionHelper.OrgImpl
 {
     public interface ICompetitionImporter
     {
+        DanceCompetitionHelper? DanceCompetitionHelper { get; set; }
+
         List<string> ImportOrUpdateByFile(
-            DanceCompetitionHelperDbContext dbCtx,
             string orgCompetitionId,
             string? fullPathCompetition,
             string? fullPathCompetitionClasses,
             string? fullPathParticipants);
 
         List<string> ImportOrUpdateByUrl(
-            DanceCompetitionHelperDbContext dbCtx,
             string orgCompetitionId,
+            Uri? uriUpdate,
             Uri? uriCompetition,
             Uri? uriCompetitionClasses,
             Uri? uriParticipants);

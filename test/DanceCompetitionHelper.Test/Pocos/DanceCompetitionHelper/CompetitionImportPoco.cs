@@ -10,5 +10,7 @@ namespace DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper
         public string? CompetitionFile { get; set; }
         public string? CompetitionClassesFile { get; set; }
         public string? ParticipantsFile { get; set; }
+
+        public bool FindFollowUpClasses { get; set; }
     }
 }

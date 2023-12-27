@@ -1,6 +1,7 @@
 ﻿using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos;
+using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
 using Microsoft.EntityFrameworkCore;
 using TestHelper.Extensions;
 
@@ -150,7 +151,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         public CompetitionClass? GetCompetitionClass(
             DanceCompetitionHelperDbContext dbCtx,
             Guid byCompetitionId,
-            string byCompetitionClassName)
+            string? byCompetitionClassName)
         {
             if (dbCtx == null)
             {
@@ -174,6 +175,12 @@ namespace DanceCompetitionHelper.Test.Bindings
                 byDbCtx[byCompetitionId] = byDbCtxAndCompId;
             }
 
+            if (string.IsNullOrEmpty(
+                byCompetitionClassName))
+            {
+                return null;
+            }
+
             if (byDbCtxAndCompId.TryGetValue(
                 byCompetitionClassName,
                 out var foundCompClass) == false)
@@ -191,8 +198,68 @@ namespace DanceCompetitionHelper.Test.Bindings
             return foundCompClass;
         }
 
-
         #endregion // Data Caching Stuff
+
+        #region Special Sort Stuff
+
+        public static IEnumerable<CompetitionClassPoco> SortForCreation(
+            IEnumerable<CompetitionClassPoco>? compClasses)
+        {
+            var retItems = new List<CompetitionClassPoco>();
+            var workItems = (compClasses ?? Enumerable.Empty<CompetitionClassPoco>()).ToList();
+
+            // ------------------------
+            // all with no "deps"
+            var filteredItems = workItems.Where(
+                x => string.IsNullOrEmpty(
+                    x.FollowUpCompetitionClassName))
+                .ToList();
+
+            retItems.AddRange(
+                filteredItems);
+            workItems = workItems
+                .Except(
+                    filteredItems)
+                .ToList();
+
+            // ------------------------
+            // all with deps...
+            while (workItems.Count >= 1)
+            {
+                var allRetItems = retItems
+                    .Select(
+                        x => x.CompetitionClassName)
+                    .ToHashSet();
+
+                filteredItems = workItems
+                    .Where(
+                        x => allRetItems.Contains(
+                            x.FollowUpCompetitionClassName ?? string.Empty))
+                    .ToList();
+
+                //
+                if (filteredItems.Count <= 0)
+                {
+                    break;
+                }
+
+                retItems.AddRange(
+                    filteredItems);
+                workItems = workItems
+                    .Except(
+                        filteredItems)
+                    .ToList();
+            }
+
+            // ------------------------
+            // add what's left
+            retItems.AddRange(
+                workItems);
+
+            return retItems;
+        }
+
+        #endregion Special Sort Stuff
 
         #region Dispose Stuff
 

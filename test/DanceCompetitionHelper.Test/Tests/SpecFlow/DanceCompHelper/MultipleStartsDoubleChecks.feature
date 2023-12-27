@@ -31,17 +31,17 @@ Scenario: None - 2 Comps with same starters
         | Test-Comp-02    | Panel 02-01          | D-02         | Adjudicator 02-01-04 | 02-01-04 |
         | Test-Comp-02    | Panel 02-01          | E-02         | Adjudicator 02-01-05 | 02-01-05 |
     And following Competition Classes in "DanceCompHelper-db"
-        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId  | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-01 | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
-        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-02 | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
-        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-03 | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
-        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-04 | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId  | CompetitionClassName | FollowUpCompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
+        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-01 | Sen 1 Sta D          | Sen 1 Sta C                  | Sta        | Sen      | 1        | D     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-02 | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
+        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-03 | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-04 | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
     And following Competition Classes in "DanceCompHelper-db"
-        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId  | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-01 | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
-        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-02 | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
-        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-03 | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
-        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-04 | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId  | CompetitionClassName | FollowUpCompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
+        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-01 | Sen 1 Sta D          | Sen 1 Sta C                  | Sta        | Sen      | 1        | D     | 10                    | 900                   |
+        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-02 | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
+        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-03 | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
+        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-04 | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #                                                                                                              
@@ -75,17 +75,17 @@ Scenario: None - 2 Comps with same starters
         | CompetitionName |
         | Test-Comp-02    |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | OrgClassId  | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo    | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
-        | Test-Comp-01    | Sen 1 Sta D          | Class-01-01 | 2                 | 0                  |                           | 0                    |                          | 0                  |
-        | Test-Comp-01    | Sen 2 Sta D          | Class-01-02 | 1                 | 0                  |                           | 0                    |                          | 0                  |
-        | Test-Comp-01    | Sen 1 Sta C          | Class-01-03 | 2                 | 1                  | Sen 1 Sta D (Class-01-01) | 0                    |                          | 0                  |
-        | Test-Comp-01    | Sen 2 Sta C          | Class-01-04 | 2                 | 1                  | Sen 2 Sta D (Class-01-02) | 0                    |                          | 0                  |
+        | CompetitionName | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId  | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo    | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Sen 1 Sta D          | Sen 1 Sta C                  | Class-01-01 | 2                 | 0                  |                           | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta D          | Sen 2 Sta C                  | Class-01-02 | 1                 | 0                  |                           | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 1 Sta C          |                              | Class-01-03 | 2                 | 1                  | Sen 1 Sta D (Class-01-01) | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta C          |                              | Class-01-04 | 2                 | 1                  | Sen 2 Sta D (Class-01-02) | 0                    |                          | 0                  |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | OrgClassId  | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo    | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
-        | Test-Comp-02    | Sen 1 Sta D          | Class-02-01 | 2                 | 0                  |                           | 0                    |                          | 0                  |
-        | Test-Comp-02    | Sen 2 Sta D          | Class-02-02 | 1                 | 0                  |                           | 0                    |                          | 0                  |
-        | Test-Comp-02    | Sen 1 Sta C          | Class-02-03 | 2                 | 1                  | Sen 1 Sta D (Class-02-01) | 0                    |                          | 0                  |
-        | Test-Comp-02    | Sen 2 Sta C          | Class-02-04 | 2                 | 1                  | Sen 2 Sta D (Class-02-02) | 0                    |                          | 0                  |
+        | CompetitionName | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId  | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo    | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-02    | Sen 1 Sta D          | Sen 1 Sta C                  | Class-02-01 | 2                 | 0                  |                           | 0                    |                          | 0                  |
+        | Test-Comp-02    | Sen 2 Sta D          | Sen 2 Sta C                  | Class-02-02 | 1                 | 0                  |                           | 0                    |                          | 0                  |
+        | Test-Comp-02    | Sen 1 Sta C          |                              | Class-02-03 | 2                 | 1                  | Sen 1 Sta D (Class-02-01) | 0                    |                          | 0                  |
+        | Test-Comp-02    | Sen 2 Sta C          |                              | Class-02-04 | 2                 | 1                  | Sen 2 Sta D (Class-02-02) | 0                    |                          | 0                  |
         
         
 Scenario: None - 2 Comps with (mixed) same starters
@@ -117,17 +117,17 @@ Scenario: None - 2 Comps with (mixed) same starters
         | Test-Comp-02    | Panel 02-01          | D-02         | Adjudicator 02-01-04 | 02-01-04 |
         | Test-Comp-02    | Panel 02-01          | E-02         | Adjudicator 02-01-05 | 02-01-05 |
     And following Competition Classes in "DanceCompHelper-db"
-        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId  | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-01 | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
-        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-02 | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
-        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-03 | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
-        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-04 | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId  | CompetitionClassName | FollowUpCompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
+        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-01 | Sen 1 Sta D          | Sen 1 Sta C                  | Sta        | Sen      | 1        | D     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-02 | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
+        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-03 | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
+        | Test-Comp-01    | Panel 01-01          | 1       | Class-01-04 | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
     And following Competition Classes in "DanceCompHelper-db"
-        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId  | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
-        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-01 | Sen 1 Sta D          | Sta        | Sen      | 1        | D     | 10                    | 900                   |
-        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-02 | Sen 2 Sta D          | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
-        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-03 | Sen 1 Sta C          | Sta        | Sen      | 1        | C     | 10                    | 900                   |
-        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-04 | Sen 2 Sta C          | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+        | CompetitionName | AdjudicatorPanelName | Version | OrgClassId  | CompetitionClassName | FollowUpCompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
+        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-01 | Sen 1 Sta D          | Sen 1 Sta C                  | Sta        | Sen      | 1        | D     | 10                    | 900                   |
+        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-02 | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
+        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-03 | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
+        | Test-Comp-02    | Panel 02-01          | 1       | Class-02-04 | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #                                                                                                              
@@ -161,14 +161,14 @@ Scenario: None - 2 Comps with (mixed) same starters
         | CompetitionName |
         | Test-Comp-02    |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | OrgClassId  | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo    | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
-        | Test-Comp-01    | Sen 1 Sta D          | Class-01-01 | 2                 | 0                  |                           | 0                    |                          | 0                  |
-        | Test-Comp-01    | Sen 2 Sta D          | Class-01-02 | 1                 | 0                  |                           | 0                    |                          | 0                  |
-        | Test-Comp-01    | Sen 1 Sta C          | Class-01-03 | 2                 | 1                  | Sen 1 Sta D (Class-01-01) | 0                    |                          | 0                  |
-        | Test-Comp-01    | Sen 2 Sta C          | Class-01-04 | 2                 | 1                  | Sen 2 Sta D (Class-01-02) | 0                    |                          | 0                  |
+        | CompetitionName | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId  | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo    | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-01    | Sen 1 Sta D          | Sen 1 Sta C                  | Class-01-01 | 2                 | 0                  |                           | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta D          | Sen 2 Sta C                  | Class-01-02 | 1                 | 0                  |                           | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 1 Sta C          |                              | Class-01-03 | 2                 | 1                  | Sen 1 Sta D (Class-01-01) | 0                    |                          | 0                  |
+        | Test-Comp-01    | Sen 2 Sta C          |                              | Class-01-04 | 2                 | 1                  | Sen 2 Sta D (Class-01-02) | 0                    |                          | 0                  |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | OrgClassId  | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo    | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
-        | Test-Comp-02    | Sen 1 Sta D          | Class-02-01 | 2                 | 0                  |                           | 0                    |                          | 0                  |
-        | Test-Comp-02    | Sen 2 Sta D          | Class-02-02 | 1                 | 0                  |                           | 0                    |                          | 0                  |
-        | Test-Comp-02    | Sen 1 Sta C          | Class-02-03 | 2                 | 1                  | Sen 1 Sta D (Class-02-01) | 0                    |                          | 0                  |
-        | Test-Comp-02    | Sen 2 Sta C          | Class-02-04 | 2                 | 1                  | Sen 2 Sta D (Class-02-02) | 0                    |                          | 0                  |
+        | CompetitionName | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId  | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo    | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
+        | Test-Comp-02    | Sen 1 Sta D          | Sen 1 Sta C                  | Class-02-01 | 2                 | 0                  |                           | 0                    |                          | 0                  |
+        | Test-Comp-02    | Sen 2 Sta D          | Sen 2 Sta C                  | Class-02-02 | 1                 | 0                  |                           | 0                    |                          | 0                  |
+        | Test-Comp-02    | Sen 1 Sta C          |                              | Class-02-03 | 2                 | 1                  | Sen 1 Sta D (Class-02-01) | 0                    |                          | 0                  |
+        | Test-Comp-02    | Sen 2 Sta C          |                              | Class-02-04 | 2                 | 1                  | Sen 2 Sta D (Class-02-02) | 0                    |                          | 0                  |

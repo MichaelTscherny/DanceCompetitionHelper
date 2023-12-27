@@ -7,9 +7,21 @@ namespace DanceCompetitionHelper.Web.Extensions
     {
         public static List<SelectListItem> ToSelectListItem(
             this IEnumerable<CompetitionClass> competitionClasses,
-            Guid? selectedItem = null)
+            Guid? selectedItem = null,
+            bool addEmpty = false)
         {
             var retList = new List<SelectListItem>();
+
+            if (addEmpty)
+            {
+                retList.Add(
+                    new SelectListItem()
+                    {
+                        Value = Guid.Empty.ToString(),
+                        Text = "None",
+                        Selected = false
+                    });
+            }
 
             if (competitionClasses != null)
             {

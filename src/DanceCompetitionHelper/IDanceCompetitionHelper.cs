@@ -1,4 +1,5 @@
 ﻿using DanceCompetitionHelper.Data;
+using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
@@ -8,6 +9,8 @@ namespace DanceCompetitionHelper
     public interface IDanceCompetitionHelper : IDisposable
     {
         #region Administration stuff
+
+        DanceCompetitionHelperDbContext GetDbCtx();
         void AddTestData();
         void Migrate();
         void CreateTableHistory(
@@ -128,6 +131,7 @@ namespace DanceCompetitionHelper
         void CreateCompetitionClass(
             Guid competitionId,
             string competitionClassName,
+            Guid? followUpCompetitionClassId,
             Guid adjudicatorPanelId,
             string orgClassId,
             string? discipline,
@@ -144,6 +148,7 @@ namespace DanceCompetitionHelper
         void EditCompetitionClass(
             Guid competitionClassId,
             string competitionClassName,
+            Guid? followUpCompetitionClassId,
             Guid adjudicatorPanelId,
             string orgClassId,
             string? discipline,
@@ -221,7 +226,8 @@ namespace DanceCompetitionHelper
             OrganizationEnum Organization,
             string? OrgCompetitionId,
             ImportTypeEnum ImportType,
-            IEnumerable<string>? filePaths);
+            IEnumerable<string>? filePaths,
+            Dictionary<string, string>? parameters = null);
 
         #endregion // Importer
 

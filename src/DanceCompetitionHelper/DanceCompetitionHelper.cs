@@ -38,6 +38,11 @@ namespace DanceCompetitionHelper
 
         #region Administration stuff
 
+        public DanceCompetitionHelperDbContext GetDbCtx()
+        {
+            return _danceCompHelperDb;
+        }
+
         public void AddTestData()
         {
             _logger.LogDebug(
@@ -305,11 +310,21 @@ namespace DanceCompetitionHelper
                 // collect "higher classes"...
                 foreach (var curCompClass in allCompetitionClasses)
                 {
+                    if (curCompClass.FollowUpCompetitionClass == null)
+                    {
+                        continue;
+                    }
+
+                    /* ToDo: simplify!..
                     var higherClasses = (compClassChecker?.GetHigherClassifications(
                             curCompClass,
                             allCompetitionClasses)
                             ?? Enumerable.Empty<CompetitionClass>())
                         .ToList();
+                    */
+                    var higherClasses = new List<CompetitionClass>() {
+                        curCompClass.FollowUpCompetitionClass
+                    };
 
                     higherClassificationsByLowerCompClassId[curCompClass.CompetitionClassId]
                         = higherClasses;
@@ -1584,6 +1599,7 @@ namespace DanceCompetitionHelper
         public void CreateCompetitionClass(
             Guid competitionId,
             string competitionClassName,
+            Guid? followUpCompetitionClassId,
             Guid adjudicatorPanelId,
             string orgClassId,
             string? discipline,
@@ -1622,6 +1638,7 @@ namespace DanceCompetitionHelper
                         Competition = foundCompId,
                         OrgClassId = orgClassId,
                         CompetitionClassName = competitionClassName,
+                        FollowUpCompetitionClassId = followUpCompetitionClassId,
                         AdjudicatorPanelId = adjudicatorPanelId,
                         Discipline = discipline,
                         AgeClass = ageClass,
@@ -1661,6 +1678,7 @@ namespace DanceCompetitionHelper
         public void EditCompetitionClass(
             Guid competitionClassId,
             string competitionClassName,
+            Guid? followUpCompetitionClassId,
             Guid adjudicatorPanelId,
             string orgClassId,
             string? discipline,
@@ -1695,6 +1713,7 @@ namespace DanceCompetitionHelper
 
                 foundCompClass.OrgClassId = orgClassId;
                 foundCompClass.CompetitionClassName = competitionClassName;
+                foundCompClass.FollowUpCompetitionClassId = followUpCompetitionClassId;
                 foundCompClass.AdjudicatorPanelId = adjudicatorPanelId;
                 foundCompClass.Discipline = discipline;
                 foundCompClass.AgeClass = ageClass;
@@ -2078,7 +2097,8 @@ namespace DanceCompetitionHelper
             OrganizationEnum organization,
             string? orgCompetitionId,
             ImportTypeEnum importType,
-            IEnumerable<string>? filePaths)
+            IEnumerable<string>? filePaths,
+            Dictionary<string, string>? parameters = null)
         {
             var retWorkStatus = new ImportOrUpdateCompetitionStatus();
 
@@ -2099,6 +2119,9 @@ namespace DanceCompetitionHelper
                         }
 
                         var oetsvImporter = _serviceProvider.GetRequiredService<OetsvCompetitionImporter>();
+                        oetsvImporter.DanceCompetitionHelper = this;
+                        oetsvImporter.FindFollowUpClasses = parameters?.ContainsKey(
+                            nameof(OetsvCompetitionImporter.FindFollowUpClasses)) ?? false;
 
                         Func<List<string>> importFunc;
 
@@ -2108,8 +2131,9 @@ namespace DanceCompetitionHelper
                                 importFunc = () =>
                                 {
                                     return oetsvImporter.ImportOrUpdateByUrl(
-                                        _danceCompHelperDb,
                                         orgCompetitionId,
+                                        oetsvImporter.GetUpdateUriForOrgId(
+                                            useCompetitionId),
                                         oetsvImporter.GetCompetitioUriForOrgId(
                                             useCompetitionId),
                                         null,
@@ -2132,7 +2156,6 @@ namespace DanceCompetitionHelper
                                 importFunc = () =>
                                 {
                                     return oetsvImporter.ImportOrUpdateByFile(
-                                        _danceCompHelperDb,
                                         orgCompetitionId,
                                         useFiles[0],
                                         null,

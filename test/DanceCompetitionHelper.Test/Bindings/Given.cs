@@ -276,7 +276,10 @@ namespace DanceCompetitionHelper.Test.Bindings
             string danceCompHelperDb,
             Table table)
         {
-            var newCompClasses = table.CreateSet<CompetitionClassPoco>();
+            // CAUTION: special stuff... otherwise the creation will fail...
+            var newCompClasses = SortForCreation(
+                table
+                    .CreateSet<CompetitionClassPoco>());
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
@@ -304,6 +307,20 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Is.Not.Null,
                     $"{nameof(AdjudicatorPanel)} '{newCompClass.AdjudicatorPanelName}' not found!");
 
+                var useFollowUpCopmpClass = GetCompetitionClass(
+                    useDb,
+                    useComp.CompetitionId,
+                    newCompClass.FollowUpCompetitionClassName);
+
+                if (string.IsNullOrEmpty(
+                    newCompClass.FollowUpCompetitionClassName) == false)
+                {
+                    Assert.That(
+                        useFollowUpCopmpClass,
+                        Is.Not.Null,
+                        $"Follow Up {nameof(CompetitionClass)} '{newCompClass.FollowUpCompetitionClassName}' not found!");
+                }
+
                 try
                 {
                     useDb.CompetitionClasses.Add(
@@ -312,6 +329,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Competition = useComp,
                             OrgClassId = newCompClass.OrgClassId,
                             CompetitionClassName = newCompClass.CompetitionClassName,
+                            FollowUpCompetitionClass = useFollowUpCopmpClass,
                             AdjudicatorPanel = useAdjPanel,
                             Discipline = newCompClass.Discipline,
                             AgeClass = newCompClass.AgeClass,
@@ -581,6 +599,15 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             foreach (var toImport in compsToImport)
             {
+                var useParams = new Dictionary<string, string>();
+
+                if (toImport.FindFollowUpClasses)
+                {
+                    useParams.Add(
+                        nameof(OetsvCompetitionImporter.FindFollowUpClasses),
+                        "true");
+                }
+
                 useDanceCompHelper.ImportOrUpdateCompetition(
                     toImport.Organization,
                     toImport.OrgCompetitionId,
@@ -592,7 +619,8 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Path.Combine(
                             rootPath,
                             toImport.ParticipantsFile ?? string.Empty)
-                    });
+                    },
+                    useParams);
             }
         }
 

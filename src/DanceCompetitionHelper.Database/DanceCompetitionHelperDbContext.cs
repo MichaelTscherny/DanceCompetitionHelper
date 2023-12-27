@@ -115,8 +115,9 @@ namespace DanceCompetitionHelper.Database
         public void Migrate()
             => Database.Migrate();
 
+        // TODO: what to do here?..
         public IDbContextTransaction BeginTransaction()
-            => Database.BeginTransaction();
+            => Database.CurrentTransaction ?? Database.BeginTransaction();
 
         #endregion Usefull methods
 
@@ -139,7 +140,6 @@ namespace DanceCompetitionHelper.Database
                 "{Method}() done",
                 nameof(OnSavingChanges));
         }
-
 
         private static void UpdateTimestamps(
             EntityEntry entity,

@@ -112,18 +112,58 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.Not.Null,
                         $"{nameof(CompetitionClass)} '{curChk}' not found!");
 
+                    var checkFollowUpCompClass = GetCompetitionClass(
+                        useDb,
+                        foundComp.CompetitionId,
+                        curChk.FollowUpCompetitionClassName);
+
+                    if (string.IsNullOrEmpty(
+                        curChk.FollowUpCompetitionClassName) == false)
+                    {
+                        Assert.That(
+                            checkFollowUpCompClass,
+                            Is.Not.Null,
+                            $"Follow Up {nameof(CompetitionClass)} '{curChk.FollowUpCompetitionClassName}' not found!");
+                    }
+
+                    var checkAdjudicatorPanel = GetAdjudicatorPanel(
+                        useDb,
+                        foundComp.CompetitionId,
+                        curChk.AdjudicatorPanelName);
+
+                    Assert.That(
+                        checkAdjudicatorPanel,
+                        Is.Not.Null,
+                        $"{nameof(AdjudicatorPanel)} '{curChk}' not found!");
+
                     Assert.Multiple(() =>
                     {
                         Assert.That(
                             foundCompClass.CompetitionId,
                             Is.EqualTo(
                                 foundComp.CompetitionId),
-                            "{curChk}: {nameof(foundComp.CompetitionId)}");
+                            $"{curChk}: {nameof(foundComp.CompetitionId)}");
                         Assert.That(
                             foundCompClass.OrgClassId,
                             Is.EqualTo(
                                 curChk.OrgClassId),
                             $"{curChk}: {nameof(curChk.OrgClassId)}");
+
+                        if (checkFollowUpCompClass != null)
+                        {
+                            Assert.That(
+                                foundCompClass.FollowUpCompetitionClass?.CompetitionClassName,
+                                Is.EqualTo(
+                                    checkFollowUpCompClass.CompetitionClassName),
+                                $"{curChk}: {nameof(curChk.FollowUpCompetitionClassName)}");
+                        }
+
+                        Assert.That(
+                            foundCompClass.AdjudicatorPanelId,
+                            Is.EqualTo(
+                                checkAdjudicatorPanel.AdjudicatorPanelId),
+                            $"{curChk}: {nameof(curChk.AdjudicatorPanelName)}");
+
                         Assert.That(
                             foundCompClass.Discipline,
                             Is.EqualTo(
