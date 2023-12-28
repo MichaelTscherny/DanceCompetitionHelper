@@ -7,7 +7,9 @@ namespace DanceCompetitionHelper.Database.Extensions
         public static void AddTestData(
             this DanceCompetitionHelperDbContext dbCtx)
         {
-            var useTrans = dbCtx.BeginTransaction();
+            var useTrans = dbCtx?.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             try
             {
@@ -23,7 +25,7 @@ namespace DanceCompetitionHelper.Database.Extensions
             {
                 Console.WriteLine(
                     exc);
-                useTrans.Rollback();
+                useTrans?.Rollback();
             }
         }
 

@@ -32,9 +32,6 @@
                         Competition Class (@competitionClassesCount)
                     </th>
                     <th>
-                        Color
-                    </th>
-                    <th>
                         Follow Up
                     </th>
                     <th>
@@ -85,29 +82,27 @@
                 @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<CompetitionClass>())
                 {
                     <tr>
-                        <td class="text-nowrap">
+                        <td class="text-nowrap" style="background-color: @item.CompetitionColor">
                             @Html.DisplayFor(modelItem => item.CompetitionClassName)
                             (@Html.DisplayFor(modelItem => item.OrgClassId))
                         </td>
-                        <td>
-                            <input value="@item.CompetitionColor"
-                                   disabled 
-                                   readonly
-                                   type="color" />
-                        </td>
-                        <td>
-                            @{
-                                var displayFollowUp = "-";
-                                var followUp = item.FollowUpCompetitionClass;
+                        @{
+                            var displayFollowUp = "-";
+                            var followUpBackgroundColor = "";
+                            var followUp = item.FollowUpCompetitionClass;
 
-                                if(followUp != null)
-                                {
-                                    displayFollowUp = string.Format(
-                                        "{0} ({1})",
-                                        followUp.CompetitionClassName,
-                                        followUp.OrgClassId);
-                                }
+                            if(followUp != null)
+                            {
+                                displayFollowUp = string.Format(
+                                    "{0} ({1})",
+                                    followUp.CompetitionClassName,
+                                    followUp.OrgClassId);
+
+                                followUpBackgroundColor = followUp.CompetitionColor;
                             }
+                        }
+
+                        <td class="text-nowrap" style="background-color: @(followUpBackgroundColor)">
                             @displayFollowUp
                         </td>
                         <td>
@@ -218,9 +213,6 @@
                 <tr>
                     <th>
                         Competition Class (@competitionClassesCount)
-                    </th>
-                    <th>
-                        Color
                     </th>
                     <th>
                         Follow up

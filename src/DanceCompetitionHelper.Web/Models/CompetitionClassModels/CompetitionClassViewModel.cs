@@ -89,8 +89,6 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
         [StringLength(DanceCompetitionHelperConstants.MaxLengthCreatedBy)]
         public string? CompetitionColor { get; set; }
 
-        public List<SelectListItem> CompetitionColors { get; set; } = new List<SelectListItem>();
-
         [FromForm]
         public bool Ignore { get; set; }
     }

@@ -218,6 +218,13 @@ namespace DanceCompetitionHelper.Web.Controllers
                         "true");
                 };
 
+                if (doImportView.UpdateData)
+                {
+                    useParams.Add(
+                        nameof(OetsvCompetitionImporter.UpdateData),
+                        "true");
+                };
+
                 // TODO: implement more options/file-uploads/etc...
                 var workStatus = _danceCompHelper.ImportOrUpdateCompetition(
                     doImportView.Organization,

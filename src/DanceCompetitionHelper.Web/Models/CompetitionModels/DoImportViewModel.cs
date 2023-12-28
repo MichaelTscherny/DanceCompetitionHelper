@@ -29,5 +29,8 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionModels
 
         [FromForm]
         public bool FindFollowUpClasses { get; set; }
+
+        [FromForm]
+        public bool UpdateData { get; set; }
     }
 }

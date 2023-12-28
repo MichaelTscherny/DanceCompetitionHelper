@@ -62,6 +62,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public List<CompetitionParticipantImport> Participants { get; } = new List<CompetitionParticipantImport>();
 
         public bool FindFollowUpClasses { get; set; }
+        public bool UpdateData { get; set; }
 
         #region Constants...
 

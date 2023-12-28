@@ -28,7 +28,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             try
             {
@@ -88,7 +90,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
             try
             {
                 foreach (var curChk in checkCompClasses)
@@ -213,7 +217,10 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
             try
             {
                 foreach (var curChk in checkAdjPanels)
@@ -272,7 +279,10 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
             try
             {
                 foreach (var curChk in checkAdjs)
@@ -345,7 +355,10 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
             try
             {
                 foreach (var curChkHist in checkCompClassesHist)
@@ -439,7 +452,10 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
             try
             {
                 foreach (var curChk in checkParticipants)
@@ -568,7 +584,10 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
             try
             {
                 foreach (var curChkHist in checkParticipantsHist)
@@ -715,7 +734,8 @@ namespace DanceCompetitionHelper.Test.Bindings
                 {
                     if (foundComp == null)
                     {
-                        throw new ArgumentNullException();
+                        throw new ArgumentNullException(
+                            nameof(foundComp));
                     }
 
                     Assert.That(

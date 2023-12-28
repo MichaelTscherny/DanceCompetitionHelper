@@ -114,9 +114,11 @@ namespace DanceCompetitionHelper.Database
         public void Migrate()
             => Database.Migrate();
 
-        // TODO: what to do here?..
-        public IDbContextTransaction BeginTransaction()
-            => Database.CurrentTransaction ?? Database.BeginTransaction();
+        public IDbContextTransaction? BeginTransaction(
+            bool useTransaction = true)
+            => useTransaction
+                ? Database.CurrentTransaction ?? Database.BeginTransaction()
+                : null;
 
         #endregion Usefull methods
 

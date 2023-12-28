@@ -124,7 +124,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newComp in newComps)
             {
@@ -170,7 +172,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newAdjPanel in newAdjPanels)
             {
@@ -219,7 +223,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newAdj in newAdjs)
             {
@@ -284,7 +290,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newCompClass in newCompClasses)
             {
@@ -371,7 +379,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newCompClassHist in newCompClassesHistory)
             {
@@ -431,7 +441,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newPart in newParticipants)
             {
@@ -500,7 +512,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newPartHist in newParticipantsHistory)
             {
@@ -513,8 +527,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Is.Not.Null,
                     $"{nameof(Competition)} '{newPartHist.CompetitionName}' not found!");
 
-                // TODO: wrong table!..
-                var useCompClassHist = GetCompetitionClass(
+                var useCompClassHist = GetCompetitionClassHistory(
                     useDb,
                     useComp.CompetitionId,
                     newPartHist.CompetitionClassName);
@@ -522,7 +535,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 Assert.That(
                     useCompClassHist,
                     Is.Not.Null,
-                    $"{nameof(CompetitionClass)} '{newPartHist.CompetitionClassName}' not found!");
+                    $"{nameof(CompetitionClassHistory)} '{newPartHist.CompetitionClassName}' not found!");
 
                 try
                 {
@@ -530,7 +543,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         new ParticipantHistory()
                         {
                             Competition = useComp,
-                            // CompetitionClassHistory = useCompClassHist,
+                            CompetitionClassHistory = useCompClassHist,
                             Version = newPartHist.Version,
                             StartNumber = newPartHist.StartNumber,
                             NamePartA = newPartHist.NamePartA,
