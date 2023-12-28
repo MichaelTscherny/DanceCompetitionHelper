@@ -1,4 +1,4 @@
-﻿Feature: DanceCompHelper - Promotion Tests - PartA Only - Multiple Starts
+﻿Feature: DanceCompHelper - Promotion Tests - PartA Only - Multiple Starts - FollowUp
 
 A short summary of the feature
 
@@ -41,12 +41,12 @@ Scenario: Multiple Start - None
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo           |
         #                                                                                  
-        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | true           | false              | [A] 0/0 + 100/1 = 100/1 -> False |
+        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | true           | false              | [A] 0/0 + 200/2 = 200/2 -> False |
         #                                                                               
         | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False |
         #                                                        
-        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False |
-        | Test-Comp-01    | Allg La D            | 100         | Dancer 10-A | true           | false              | [A] 0/0 + 100/1 = 100/1 -> False |
+        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 200/2 = 200/2 -> False |
+        | Test-Comp-01    | Allg La D            | 100         | Dancer 10-A | true           | false              | [A] 0/0 + 200/2 = 200/2 -> False |
         #                                                        
         | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"

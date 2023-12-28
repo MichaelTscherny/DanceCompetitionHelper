@@ -20,9 +20,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 ?? throw new ArgumentNullException(
                         nameof(logger));
 
-            var myCompClassChecker = new OetsvCompetitonClassChecker();
-
-            _competitonClassChecker = myCompClassChecker;
+            _competitonClassChecker = new OetsvCompetitonClassChecker();
         }
 
         public void SetCompetitionClasses(
@@ -69,7 +67,35 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     usePartCompClass);
             }
 
-            var pointsForFirst = allClasses.Sum(x => x.PointsForFirst);
+            // check all follow-up classes...
+            foreach (var curClass in allClasses.ToList())
+            {
+                var useFollowUpClass = curClass.FollowUpCompetitionClass;
+
+                // check all follow-ups...
+                while (useFollowUpClass != null)
+                {
+                    if (useFollowUpClass.Ignore == true)
+                    {
+                        break;
+                    }
+
+                    if (allClasses.Contains(useFollowUpClass) == false)
+                    {
+                        allClasses.Add(
+                            useFollowUpClass);
+                    }
+
+                    useFollowUpClass = useFollowUpClass.FollowUpCompetitionClass;
+                }
+            }
+
+            // let's check...
+            var pointsForFirst = allClasses
+                .Where(
+                    x => x.PointsForFirst != OetsvConstants.Classes.NoPromotionPossible)
+                .Sum(
+                    x => x.PointsForFirst);
             var countStarts = allClasses.Count;
 
             var newPartAPoints = (participant.OrgPointsPartA + pointsForFirst);

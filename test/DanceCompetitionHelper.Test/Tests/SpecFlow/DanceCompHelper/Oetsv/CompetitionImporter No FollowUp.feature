@@ -1,4 +1,4 @@
-﻿Feature: DanceCompHelper - CompetitionImporter - Basics
+﻿Feature: DanceCompHelper - CompetitionImporter - Basics - No FollowUp
 
 A short summary of the feature
 
@@ -6,16 +6,16 @@ Scenario: Import 01
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following data are imported by DanceCompetitionHelper "DanceCompHelper"
         | Organization | OrgCompetitionId | CompetitionFile                                                | ParticipantsFile                                                | FindFollowUpClasses |
-        | Oetsv        | 6451             | TestData\\Importer\\Oetsv\\CompetitionImport01_Competition.csv | TestData\\Importer\\Oetsv\\CompetitionImport01_Participants.csv | true                |
+        | Oetsv        | 6451             | TestData\\Importer\\Oetsv\\CompetitionImport01_Competition.csv | TestData\\Importer\\Oetsv\\CompetitionImport01_Participants.csv | False               |
     Then following Competitions exists in DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName            | Organization | OrgCompetitionId | CompetitionInfo                        | CompetitionDate |
         | Hans-Rueff-Gedächtnispokal | Oetsv        | 6451             | Bewertungsturnier HdB Floridsdorf Wien | 2013-05-22      |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName            | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId | Discipline | AgeClass | AgeGroup | Class | MinPointsForPromotion | MinStartsForPromotion | PointsForFirst | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo |
-        | Hans-Rueff-Gedächtnispokal | Allg.Kl. Sta D       | Allg.Kl. Sta C               | 001        | Sta        | Allg     | 0        | D     | 900                   | 10                    | 100            | 1                 | 0                  |                        |
-        | Hans-Rueff-Gedächtnispokal | Allg.Kl. Sta C       | Allg.Kl. Sta B               | 002        | Sta        | Allg     | 0        | C     | 1500                  | 10                    | 100            | 1                 | 1                  | Allg.Kl. Sta D (001)   |
-        | Hans-Rueff-Gedächtnispokal | Allg.Kl. La B        | Allg.Kl. La A                | 003        | La         | Allg     | 0        | B     | 1300                  | 10                    | 100            | 0                 | 0                  |                        |
-        | Hans-Rueff-Gedächtnispokal | Allg.Kl. Sta B       |                              | 004        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 100            | 0                 | 1                  | Allg.Kl. Sta C (002)   |
+        | Hans-Rueff-Gedächtnispokal | Allg.Kl. Sta D       |                              | 001        | Sta        | Allg     | 0        | D     | 900                   | 10                    | 100            | 1                 | 0                  |                        |
+        | Hans-Rueff-Gedächtnispokal | Allg.Kl. Sta C       |                              | 002        | Sta        | Allg     | 0        | C     | 1500                  | 10                    | 100            | 1                 | 0                  |                        |
+        | Hans-Rueff-Gedächtnispokal | Allg.Kl. La B        |                              | 003        | La         | Allg     | 0        | B     | 1300                  | 10                    | 100            | 0                 | 0                  |                        |
+        | Hans-Rueff-Gedächtnispokal | Allg.Kl. Sta B       |                              | 004        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 100            | 0                 | 0                  |                        |
         | Hans-Rueff-Gedächtnispokal | Allg.Kl. La A        |                              | 005        | La         | Allg     | 0        | A     | 1600                  | 10                    | 100            | 0                 | 0                  |                        |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName            | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionAInfo               |
@@ -31,17 +31,17 @@ Scenario: Import 02
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following data are imported by DanceCompetitionHelper "DanceCompHelper"
         | Organization | OrgCompetitionId | CompetitionFile                                                | ParticipantsFile                                                | FindFollowUpClasses |
-        | Oetsv        | 2142             | TestData\\Importer\\Oetsv\\CompetitionImport02_Competition.csv | TestData\\Importer\\Oetsv\\CompetitionImport02_Participants.csv | true                |
+        | Oetsv        | 2142             | TestData\\Importer\\Oetsv\\CompetitionImport02_Competition.csv | TestData\\Importer\\Oetsv\\CompetitionImport02_Participants.csv | False               |
     Then following Competitions exists in DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | Organization | OrgCompetitionId | CompetitionInfo                  | CompetitionDate |
         | Small Tournament | Oetsv        | 2142             | Landesmeisterschaft Unknown Wien | 2013-05-30      |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId | Discipline | AgeClass | AgeGroup | Class | MinPointsForPromotion | MinStartsForPromotion | PointsForFirst | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo |
-        | Small Tournament | Allg.Kl. Sta D       | Allg.Kl. Sta C               | 001        | Sta        | Allg     | 0        | D     | 900                   | 10                    | 150            | 2                 | 0                  |                        |
-        | Small Tournament | Allg.Kl. Sta C       | Allg.Kl. Sta B               | 002        | Sta        | Allg     | 0        | C     | 1500                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta D (001)   |
-        | Small Tournament | Allg.Kl. Sta B       | Allg.Kl. Sta A               | 003        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta C (002)   |
-        | Small Tournament | Allg.Kl. Sta A       | Allg.Kl. Sta S               | 004        | Sta        | Allg     | 0        | A     | 1600                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta B (003)   |
-        | Small Tournament | Allg.Kl. Sta S       |                              | 005        | Sta        | Allg     | 0        | S     | 999999999             | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta A (004)   |
+        | Small Tournament | Allg.Kl. Sta D       |                              | 001        | Sta        | Allg     | 0        | D     | 900                   | 10                    | 150            | 2                 | 0                  |                        |
+        | Small Tournament | Allg.Kl. Sta C       |                              | 002        | Sta        | Allg     | 0        | C     | 1500                  | 10                    | 150            | 2                 | 0                  |                        |
+        | Small Tournament | Allg.Kl. Sta B       |                              | 003        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 150            | 2                 | 0                  |                        |
+        | Small Tournament | Allg.Kl. Sta A       |                              | 004        | Sta        | Allg     | 0        | A     | 1600                  | 10                    | 150            | 2                 | 0                  |                        |
+        | Small Tournament | Allg.Kl. Sta S       |                              | 005        | Sta        | Allg     | 0        | S     | 999999999             | 10                    | 150            | 2                 | 0                  |                        |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionAInfo                 |
         #                                                                                  

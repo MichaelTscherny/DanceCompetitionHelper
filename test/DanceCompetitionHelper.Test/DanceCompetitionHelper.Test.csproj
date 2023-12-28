@@ -19,6 +19,8 @@
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\MultipleStarts - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\BigCompetitions\CompetitionImporter.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts - Copy.feature.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,14 +65,26 @@
     <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\BigCompetitions\CompetitionImporter.feature.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
-    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter.feature.cs">
-      <DependentUpon>CompetitionImporter.feature</DependentUpon>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter FollowUp.feature.cs">
+      <DependentUpon>CompetitionImporter FollowUp.feature</DependentUpon>
     </Compile>
-    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts.feature.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter No FollowUp.feature.cs">
+      <DependentUpon>CompetitionImporter No FollowUp.feature</DependentUpon>
     </Compile>
-    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA.feature.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts No FollowUp.feature.cs">
+      <DependentUpon>Promotions PartA MultipleStarts No FollowUp.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA No FollowUp.feature.cs">
+      <Visible>true</Visible>
+      <DependentUpon>Promotions PartA No FollowUp.feature</DependentUpon>
+      <DesignTime>true</DesignTime>
+      <AutoGen>true</AutoGen>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts FollowUp.feature.cs">
+      <DependentUpon>Promotions PartA MultipleStarts FollowUp.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA FollowUp.feature.cs">
+      <DependentUpon>Promotions PartA FollowUp.feature</DependentUpon>
     </Compile>
     <Compile Update="Tests\SpecFlow\Database\Adjudicator.feature.cs">
       <DependentUpon>Adjudicator.feature</DependentUpon>
@@ -106,19 +120,31 @@
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter Updates Changes.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter.feature">
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter No FollowUp.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts.feature">
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts No FollowUp.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA.feature">
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA No FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA FollowUp.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>

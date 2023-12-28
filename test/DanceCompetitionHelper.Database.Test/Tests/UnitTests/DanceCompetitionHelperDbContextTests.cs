@@ -125,7 +125,9 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
         public void SimpleCreate()
         {
             using var dbCtx = GetDanceCompetitionHelperDbContext();
-            using var dbTrans = dbCtx.BeginTransaction();
+            using var dbTrans = dbCtx.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             try
             {

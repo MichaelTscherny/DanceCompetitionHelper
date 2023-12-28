@@ -36,6 +36,9 @@ namespace DanceCompetitionHelper.Database.Tables
         [ForeignKey(nameof(FollowUpCompetitionClassId))]
         public CompetitionClass? FollowUpCompetitionClass { get; set; }
 
+        [NotMapped]
+        public CompetitionClass? PreviousCompetitionClass { get; set; }
+
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Comment("Ref to " + nameof(AdjudicatorPanel))]

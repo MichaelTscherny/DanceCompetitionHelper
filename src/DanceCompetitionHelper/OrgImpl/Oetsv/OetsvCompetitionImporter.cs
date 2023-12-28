@@ -23,27 +23,21 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         public static readonly List<Color> CompetitionClassColors = new List<Color>()
         {
             // 0
-            Color.AliceBlue,
-            Color.AntiqueWhite,
-            Color.Aquamarine,
-            Color.BlueViolet,
-            Color.CadetBlue,
-            Color.Coral,
-            Color.Cyan,
-            Color.DarkGoldenrod,
-            Color.DarkGreen,
-            Color.DarkOrange,
+            Color.FromArgb(255, 255, 255),
+            Color.FromArgb(255, 0, 0),
+            Color.FromArgb(255, 255, 0),
+            Color.FromArgb(128, 255, 0),
+            Color.FromArgb(0, 255, 255),
+            Color.FromArgb(192, 192, 192),
+            Color.FromArgb(255, 128, 255),
+            Color.FromArgb(255, 0, 255),
+            Color.FromArgb(255, 128, 0),
+            Color.FromArgb(0, 128, 128),
             // 10
-            Color.LightSlateGray,
-            Color.MediumSeaGreen,
-            Color.Pink,
-            Color.RosyBrown,
-            Color.White,
-            Color.Silver,
-            Color.OrangeRed,
-            Color.DarkSalmon,
-            Color.Gold,
-            Color.Honeydew,
+            Color.FromArgb(128, 128, 0),
+            Color.FromArgb(128, 128, 128),
+            Color.FromArgb(89, 178, 0),
+            Color.FromArgb(0, 204, 204),
         };
 
         public string Oranizer { get; private set; } = default!;

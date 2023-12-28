@@ -289,9 +289,7 @@ namespace DanceCompetitionHelper
 
                 ICompetitonClassChecker? compClassChecker = GetCompetitonClassChecker(
                     foundComp);
-                var higherClassificationsByLowerCompClassId = new Dictionary<Guid, List<CompetitionClass>>();
-
-                var possibleWinnerFromCompClass = new Dictionary<Guid, List<CompetitionClass>>();
+                var higherClassificationsByLowerCompClassId = new Dictionary<Guid, CompetitionClass>();
                 var foundPromotionFromCompClass = new Dictionary<Guid, List<Participant>>();
 
                 var getAllCompClasses = _danceCompHelperDb.CompetitionClasses
@@ -313,6 +311,12 @@ namespace DanceCompetitionHelper
                             x => x.Ignore == false)
                         .ToList();
 
+                // cleanup "PreviousCompetitionClass"
+                foreach (var curCompClass in allCompetitionClasses)
+                {
+                    curCompClass.PreviousCompetitionClass = null;
+                }
+
                 // collect "higher classes"...
                 foreach (var curCompClass in allCompetitionClasses)
                 {
@@ -322,14 +326,10 @@ namespace DanceCompetitionHelper
                         continue;
                     }
 
+                    useFollowUpComp.PreviousCompetitionClass = curCompClass;
+
                     higherClassificationsByLowerCompClassId[curCompClass.CompetitionClassId]
-                        = new List<CompetitionClass>()
-                        {
-                            useFollowUpComp
-                        };
-                    possibleWinnerFromCompClass.AddToBucket(
-                        useFollowUpComp.CompetitionClassId,
-                        curCompClass);
+                        = useFollowUpComp;
                 }
 
                 if (includeInfos)
@@ -358,12 +358,9 @@ namespace DanceCompetitionHelper
                                     curPart.CompetitionClassId,
                                     out var foundHigherClasses))
                                 {
-                                    foreach (var curHighClass in foundHigherClasses)
-                                    {
-                                        foundPromotionFromCompClass.AddToBucket(
-                                            curHighClass.CompetitionClassId,
-                                            curPart);
-                                    }
+                                    foundPromotionFromCompClass.AddToBucket(
+                                        foundHigherClasses.CompetitionClassId,
+                                        curPart);
                                 }
                             }
                         }
@@ -397,7 +394,7 @@ namespace DanceCompetitionHelper
                     if (includeInfos)
                     {
                         // CAUTION: EF is caching, if we dont want wrong values
-                        // we need to recreate this!..
+                        // we need to re-create this!..
                         curCompClass.DisplayInfo = new CompetitionClassDisplayInfo();
 
                         var useDisplayInfo = curCompClass.DisplayInfo;
@@ -432,30 +429,31 @@ namespace DanceCompetitionHelper
                         var useCompClassId = curCompClass.CompetitionClassId;
                         var validClasses = new List<CompetitionClass>();
 
-                        if (possibleWinnerFromCompClass.TryGetValue(
-                            useCompClassId,
-                            out var possibleWinners))
+                        var usePrevCompClass = curCompClass.PreviousCompetitionClass;
+                        if (usePrevCompClass != null
+                            /* TODO: filter her?..
+                            && usePrevCompClass.Ignore == false
+                            */)
                         {
-                            foreach (var curWin in possibleWinners)
+                            // --- BY WINNING ---
+                            // TODO: filter her?.. ?? only if we got a "running comp"...
+                            if (usePrevCompClass.DisplayInfo?.Participants.Count >= 1)
                             {
-                                // ?? only if we got a "running comp"...
-                                if (curWin.DisplayInfo?.Participants.Count >= 1)
-                                {
-                                    validClasses.Add(
-                                        curWin);
-                                }
+                                validClasses.Add(
+                                    usePrevCompClass);
                             }
 
                             useExtraPart.ByWinning += validClasses.Count;
                             useExtraPart.ByWinningInfo += validClasses.GetCompetitionClasseNames();
-                        }
 
-                        if (foundPromotionFromCompClass.TryGetValue(
-                            useCompClassId,
-                            out var possiblePromotions))
-                        {
-                            useExtraPart.ByPromotion += possiblePromotions.Count;
-                            useExtraPart.ByPromotionInfo += possiblePromotions.GetStartNumber();
+                            // --- BY PROMOTION ---
+                            if (foundPromotionFromCompClass.TryGetValue(
+                                useCompClassId,
+                                out var possiblePromotions))
+                            {
+                                useExtraPart.ByPromotion += possiblePromotions.Count;
+                                useExtraPart.ByPromotionInfo += possiblePromotions.GetStartNumber();
+                            }
                         }
                     }
 
