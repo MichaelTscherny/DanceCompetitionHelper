@@ -1,0 +1,105 @@
+﻿@using DanceCompetitionHelper.Database.Extensions;
+@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
+@using DanceCompetitionHelper.Web.Models.ParticipantModels;
+
+@model AdjudicatorOverviewViewModel
+
+@{
+    var compInfo = Model.Competition;
+    var compInfoStr = compInfo.GetCompetitionName();
+    var adjudicatorsCount = Model.OverviewItems?.Count() ?? 0;
+
+    ViewData["Title"] = string.Format(
+        Model.DetailedView
+            ? "{0} Adjudicator Details of {1}"
+            : "{0} Adjudicators of {1}",
+        adjudicatorsCount,
+        compInfoStr);
+}
+
+<div class="text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+    
+    <div class="table-responsive-xxl">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Adj. Panel
+                    </th>
+                    <th>
+                        Abbreviation
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<Adjudicator>())
+                {
+                    <tr>
+                        <td class="text-nowrap">
+                            <a asp-controller="@AdjudicatorPanelController.RefName"
+                               asp-action="@nameof(AdjudicatorPanelController.Index)" 
+                               asp-route-id="@Model.Competition?.CompetitionId">
+                                @Html.DisplayFor(modelItem => item.AdjudicatorPanel.Name)
+                            </a>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Abbreviation)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td class="text-nowrap">
+                            <a asp-controller="@AdjudicatorController.RefName"
+                               asp-action="@nameof(AdjudicatorController.ShowEdit)" 
+                               asp-route-id="@item.AdjudicatorId">Edit</a> |
+                            <a asp-controller="@AdjudicatorController.RefName"
+                               asp-action="@nameof(AdjudicatorController.Delete)"
+                               asp-route-id="@item.AdjudicatorId">Delete</a> |
+                            Clone
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>
+                        Adj. Panel
+                    </th>
+                    <th>
+                        Abbreviation
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="row d-flex justify-content-center py-1">
+        <div class="col">
+            <a asp-controller="@AdjudicatorController.RefName"
+               asp-action="@nameof(AdjudicatorController.ShowCreateEdit)"
+               asp-route-id="@Model.Competition?.CompetitionId"
+               class="btn btn-primary px-lg-4">
+               Create new
+            </a>
+            &nbsp;
+            <a asp-controller="@CompetitionClassController.RefName"
+               asp-action="@nameof(CompetitionClassController.Index)"
+               asp-route-id="@Model.Competition?.CompetitionId"
+               class="btn btn-secondary px-lg-4">
+                Back
+            </a>            
+        </div>
+    </div>
+</div>

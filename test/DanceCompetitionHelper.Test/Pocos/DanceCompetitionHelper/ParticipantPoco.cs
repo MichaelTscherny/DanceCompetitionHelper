@@ -14,17 +14,24 @@
         public int OrgPointsPartA { get; set; }
         public int OrgStartsPartA { get; set; }
         public int? MinStartsForPromotionPartA { get; set; }
+        public bool? OrgAlreadyPromotedPartA { get; set; }
+        public string? OrgAlreadyPromotedInfoPartA { get; set; }
 
         public int? OrgPointsPartB { get; set; }
         public int? OrgStartsPartB { get; set; }
         public int? MinStartsForPromotionPartB { get; set; }
+        public bool? OrgAlreadyPromotedPartB { get; set; }
+        public string? OrgAlreadyPromotedInfoPartB { get; set; }
+
         public bool Ignore { get; set; }
 
         public bool MultipleStarts { get; set; }
         public bool PossiblePromotionA { get; set; }
+        public bool AlreadyPromotionA { get; set; }
         public string? PossiblePromotionAInfo { get; set; }
         public bool? PossiblePromotionB { get; set; }
         public string? PossiblePromotionBInfo { get; set; }
+        public bool? AlreadyPromotionB { get; set; }
 
         public override string ToString()
         {

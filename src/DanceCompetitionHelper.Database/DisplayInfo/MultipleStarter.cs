@@ -10,10 +10,10 @@ namespace DanceCompetitionHelper.Database.DisplayInfo
 
         public string Name { get; }
 
-        public int PointsA { get; }
+        public double PointsA { get; }
         public int StartsA { get; }
 
-        public int PointsB { get; }
+        public double PointsB { get; }
         public int StartsB { get; }
 
         public Dictionary<Guid, int> StartnumberByClassId { get; } = new Dictionary<Guid, int>();

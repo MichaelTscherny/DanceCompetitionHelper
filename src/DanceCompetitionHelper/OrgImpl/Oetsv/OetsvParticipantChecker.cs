@@ -20,9 +20,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 ?? throw new ArgumentNullException(
                         nameof(logger));
 
-            var myCompClassChecker = new OetsvCompetitonClassChecker();
-
-            _competitonClassChecker = myCompClassChecker;
+            _competitonClassChecker = new OetsvCompetitonClassChecker();
         }
 
         public void SetCompetitionClasses(
@@ -51,6 +49,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             var usePartCompClass = participant.CompetitionClass;
             var allClasses = new List<CompetitionClass>();
 
+            // TODO: rework to use "FollowUpCompetitionClass"
             if (_multiStarterCompClassesByParticipantId.TryGetValue(
                 participant.ParticipantId,
                 out var foundAllStartingClasses))
@@ -68,28 +67,81 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     usePartCompClass);
             }
 
-            var pointsForFirst = allClasses.Sum(x => x.PointsForFirst);
+            // check all follow-up classes...
+            foreach (var curClass in allClasses.ToList())
+            {
+                var useFollowUpClass = curClass.FollowUpCompetitionClass;
+
+                // check all follow-ups...
+                while (useFollowUpClass != null)
+                {
+                    if (useFollowUpClass.Ignore == true)
+                    {
+                        break;
+                    }
+
+                    if (allClasses.Contains(useFollowUpClass) == false)
+                    {
+                        allClasses.Add(
+                            useFollowUpClass);
+                    }
+
+                    useFollowUpClass = useFollowUpClass.FollowUpCompetitionClass;
+                }
+            }
+
+            // let's check...
+            var pointsForFirst = allClasses
+                .Where(
+                    x => x.PointsForFirst != OetsvConstants.Classes.NoPromotionPossible)
+                .Sum(
+                    x => x.PointsForFirst);
             var countStarts = allClasses.Count;
 
             var newPartAPoints = (participant.OrgPointsPartA + pointsForFirst);
-            var promotionPartAPoints = newPartAPoints >= usePartCompClass.MinPointsForPromotion;
-            int? newPartBPoints = ((participant.OrgPointsPartB ?? 0) + pointsForFirst);
-            bool? promotionPartBPoints = newPartBPoints >= usePartCompClass.MinPointsForPromotion;
+            var promotionPartAPoints = usePartCompClass.MinPointsForPromotion > 0
+                && newPartAPoints >= usePartCompClass.MinPointsForPromotion;
+            double? newPartBPoints = ((participant.OrgPointsPartB ?? 0) + pointsForFirst);
+            bool? promotionPartBPoints = usePartCompClass.MinPointsForPromotion > 0
+                && newPartBPoints >= usePartCompClass.MinPointsForPromotion;
+            var (alreadyPromotedA, alreadyPromotedAInfo) = CheckAlreadyPromoted(
+                participant.OrgAlreadyPromotedPartA,
+                participant.OrgPointsPartA,
+                participant.OrgStartsPartA,
+                participant.CompetitionClass.MinPointsForPromotion,
+                participant.CompetitionClass.MinStartsForPromotion);
 
             var newPartAStarts = (participant.OrgStartsPartA + countStarts);
-            var promotionPartAStarts = newPartAStarts >= (participant.MinStartsForPromotionPartA ?? usePartCompClass.MinStartsForPromotion);
+            var useMinStartsForPromotionPartA = (participant.MinStartsForPromotionPartA ?? usePartCompClass.MinStartsForPromotion);
+            var promotionPartAStarts = useMinStartsForPromotionPartA > 0
+                && newPartAStarts >= useMinStartsForPromotionPartA;
             int? newPartBStarts = ((participant.OrgStartsPartB ?? 0) + countStarts);
-            bool? promotionPartBStarts = newPartBStarts >= (participant.MinStartsForPromotionPartB ?? usePartCompClass.MinStartsForPromotion);
+            var useMinStartsForPromotionPartB = (participant.MinStartsForPromotionPartB ?? usePartCompClass.MinStartsForPromotion);
+            bool? promotionPartBStarts = useMinStartsForPromotionPartB > 0
+                && newPartBStarts >= useMinStartsForPromotionPartB;
+            bool? alreadyPromotedB = null;
+            string? alreadyPromotedBInfo = null;
 
-            var retPromotionA = promotionPartAPoints
-                && promotionPartAStarts;
+            // AND NOW?..
+            var retPromotionA = (participant.OrgAlreadyPromotedPartA ?? false)
+                || (promotionPartAPoints
+                && promotionPartAStarts);
 
             bool? retPromotionB = null;
 
+            // check already promoted
             if (participant.OrgPointsPartB.HasValue)
             {
-                retPromotionB = promotionPartBPoints.Value
-                    && promotionPartBStarts.Value;
+                retPromotionB = (participant.OrgAlreadyPromotedPartB ?? false)
+                    || (promotionPartBPoints.Value
+                    && promotionPartBStarts.Value);
+
+                (alreadyPromotedB, alreadyPromotedBInfo) = CheckAlreadyPromoted(
+                    participant.OrgAlreadyPromotedPartB,
+                    participant.OrgPointsPartB,
+                    participant.OrgStartsPartB,
+                    participant.CompetitionClass.MinPointsForPromotion,
+                    participant.CompetitionClass.MinStartsForPromotion);
             }
             else
             {
@@ -137,6 +189,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             return new CheckPromotionInfo()
             {
+                // A
                 PossiblePromotionA = retPromotionA,
                 PossiblePromotionAInfo = string.Format(
                     "[A] {0}/{1} + {2}/{3} = {4}/{5} -> {6}",
@@ -147,6 +200,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     newPartAPoints,
                     newPartAStarts,
                     retPromotionA),
+                AlreadyPromotionA = alreadyPromotedA,
+                AlreadyPromotionAInfo = alreadyPromotedAInfo,
+                // B
                 PossiblePromotionB = retPromotionB,
                 PossiblePromotionBInfo = participant.OrgPointsPartB.HasValue
                     ? string.Format(
@@ -159,8 +215,45 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         newPartBStarts,
                         retPromotionB)
                     : null,
+                AlreadyPromotionB = alreadyPromotedB,
+                AlreadyPromotionBInfo = alreadyPromotedBInfo,
+
                 IncludedCompetitionClasses = allClasses,
             };
+        }
+
+        public (bool? AlreadyPromoted, string? AlreadyPromotedInfo) CheckAlreadyPromoted(
+            bool? orgAlreadyPromoted,
+            double? curOrgPoints,
+            int? curOrgStarts,
+            double minPointsForPromotion,
+            int minStartsForPromotion)
+        {
+            if (orgAlreadyPromoted ?? false)
+            {
+                return (
+                    true,
+                    "Already Promted by Org");
+            }
+
+            if (minPointsForPromotion > 0
+                && minStartsForPromotion > 0
+                && curOrgPoints >= minPointsForPromotion
+                && curOrgStarts >= minStartsForPromotion)
+            {
+                return (
+                    true,
+                    string.Format(
+                    "{0}/{1} >= {2}/{3}",
+                    curOrgPoints,
+                    curOrgStarts,
+                    minPointsForPromotion,
+                    minStartsForPromotion));
+            }
+
+            return (
+                null,
+                null);
         }
     }
 }

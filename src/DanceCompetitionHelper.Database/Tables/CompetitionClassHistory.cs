@@ -7,11 +7,13 @@ namespace DanceCompetitionHelper.Database.Tables
     [Comment("History of Classes of a " + nameof(Competition))]
     [Index(nameof(CompetitionId), nameof(OrgClassId), nameof(Version), IsUnique = true)]
     [Index(nameof(CompetitionId), nameof(CompetitionClassName), nameof(Version), IsUnique = true)]
-    [Keyless]
+    [Index(nameof(AdjudicatorPanelHistoryId), nameof(AdjudicatorPanelHistoryVersion), IsUnique = false)]
+    [PrimaryKey(nameof(CompetitionClassHistoryId), nameof(Version))]
     public class CompetitionClassHistory : TableBase
     {
         [Required]
-        public Guid CompetitionClassId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public Guid CompetitionClassHistoryId { get; set; }
 
         [Required]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
@@ -25,6 +27,25 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [ForeignKey(nameof(CompetitionId))]
         public Competition Competition { get; set; } = default!;
+
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Comment("Ref to follow up " + nameof(Tables.CompetitionClassHistory))]
+        public Guid? FollowUpCompetitionClassHistoryId { get; set; }
+
+        [ForeignKey(nameof(FollowUpCompetitionClassHistoryId) + "," + nameof(Version))]
+        public CompetitionClassHistory? FollowUpCompetitionClassHistory { get; set; }
+
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Comment("Ref to " + nameof(AdjudicatorPanelHistory))]
+        public Guid AdjudicatorPanelHistoryId { get; set; }
+
+        [Required]
+        [Range(0, int.MaxValue)]
+        public int AdjudicatorPanelHistoryVersion { get; set; }
+
+        [ForeignKey(nameof(AdjudicatorPanelHistoryId) + "," + nameof(AdjudicatorPanelHistoryVersion))]
+        public AdjudicatorPanelHistory AdjudicatorPanelHistory { get; set; } = default!;
 
         [Required]
         [Range(0, int.MaxValue)]
@@ -47,17 +68,20 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [Range(0, int.MaxValue)]
         public int MinStartsForPromotion { get; set; }
-        [Range(0, int.MaxValue)]
-        public int MinPointsForPromotion { get; set; }
+        [Range(0, double.MaxValue)]
+        public double MinPointsForPromotion { get; set; }
 
-        [Range(0, int.MaxValue)]
-        public int PointsForFirst { get; set; }
+        [Range(0, double.MaxValue)]
+        public double PointsForFirst { get; set; }
 
         [Range(0, int.MaxValue)]
         public int ExtraManualStarter { get; set; }
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }
+
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthCreatedBy)]
+        public string? CompetitionColor { get; set; }
 
         public bool Ignore { get; set; }
     }

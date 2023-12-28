@@ -1,0 +1,59 @@
+﻿@using DanceCompetitionHelper.Database.DisplayInfo;
+@using DanceCompetitionHelper.Database.Extensions;
+@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models;
+@using DanceCompetitionHelper.Web.Models.CompetitionModels;
+
+@model DoImportViewModel
+
+@{
+    ViewData["Title"] = string.Format(
+        "{0} Import of ID '{1}' by {2}",
+        Model.Organization,
+        Model.OrgCompetitionId,
+        Model.ImportType);
+}
+
+<div class="text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    @if ((Model.Errors?.Count ?? 0) >= 1)
+    {
+        <div>
+            @foreach (var curError in Model.Errors ?? Enumerable.Empty<string>())
+            {
+                <div class="row py-2 text-danger">
+                    @curError
+                </div>
+            }
+        </div>
+    }
+
+    <div>
+        @foreach (var curInfo in Model.WorkInfo ?? Enumerable.Empty<string>())
+        {
+            <div class="row d-flex justify-content-left py-1">
+            @curInfo
+            </div>
+        }
+    </div>
+    
+    <div class="row d-flex justify-content-center py-1">
+        <div class="col">
+            <a asp-controller="@CompetitionController.RefName"
+               asp-action="@nameof(CompetitionController.Index)"
+               class="btn btn-primary px-lg-4">
+                Back
+            </a>
+            <a asp-controller="@CompetitionClassController.RefName"
+               asp-action="@nameof(CompetitionClassController.Index)"
+               asp-route-id="@Model.CompetitionId"
+               class="btn btn-primary px-lg-4">
+                To Competition
+            </a>
+        </div>
+    </div>
+</div>
+

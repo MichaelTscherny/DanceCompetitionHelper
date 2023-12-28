@@ -1,9 +1,12 @@
-﻿using DanceCompetitionHelper.Database;
+﻿using DanceCompetitionHelper.Config;
+using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Config;
 using DanceCompetitionHelper.Database.Diagnostic;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
+using DanceCompetitionHelper.OrgImpl.Oetsv;
+using DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -33,10 +36,19 @@ namespace DanceCompetitionHelper.Test.Bindings
                             SqLiteDbFile = GetNewDbName(),
                             // LogAllSqls = true,
                         });
+                    config.AddTransient(
+                        (srvProv) => new ImporterSettings()
+                        {
+                            // LogAllSqls = true,
+                        });
                     // config.AddSingleton<ILoggerProvider, NUnitLoggerProvider>();
                     config.AddTransient<IDanceCompetitionHelper, DanceCompetitionHelper>();
                     config.AddTransient<IObserver<DiagnosticListener>, DbDiagnosticObserver>();
                     config.AddTransient<IObserver<KeyValuePair<string, object?>>, DbKeyValueObserver>();
+
+                    // OeTSV Stuff...
+                    config.AddTransient<OetsvCompetitionImporter>();
+                    config.AddTransient<OetsvParticipantChecker>();
                 })
                 .ConfigureLogging((_, config) =>
                 {
@@ -50,13 +62,18 @@ namespace DanceCompetitionHelper.Test.Bindings
 
         private static long _databaseId = 0;
 
-        public string GetNewDbName()
+        public string GetNewDbName(
+            bool incrementDatabaseId = true)
         {
+            var dbId = incrementDatabaseId
+                ? Interlocked.Increment(ref _databaseId)
+                : (Interlocked.Read(ref _databaseId) + 1);
+
             return string.Format(
                 "{0}_{1}_{2}.sqlite",
                 UseNow.ToString("yyyyMMdd_HHmmss"),
                 nextDanceCompHelperDb,
-                Interlocked.Increment(ref _databaseId));
+                dbId);
         }
 
         [Given(@"following DanceComp-DB ""([^""]*)""")]
@@ -64,7 +81,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             string danceCompHelperDb)
         {
             nextDanceCompHelperDb = danceCompHelperDb;
-            var newDbFile = GetNewDbName();
+            var newDbFile = GetNewDbName(
+                false);
 
             Console.WriteLine(
                 "Create Test-DB '{0}' -> {1}",
@@ -106,7 +124,9 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newComp in newComps)
             {
@@ -143,29 +163,171 @@ namespace DanceCompetitionHelper.Test.Bindings
             dbTrans.Commit();
         }
 
+        [Given(@"following Adjudicator Panels in ""([^""]*)""")]
+        public void GivenFollowingAdjudicatorPanelsIn(
+            string danceCompHelperDb,
+            Table table)
+        {
+            var newAdjPanels = table.CreateSet<AdjudicatorPanelPoco>();
+            var useDb = GetDanceCompetitionHelperDbContext(
+                danceCompHelperDb);
+
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            foreach (var newAdjPanel in newAdjPanels)
+            {
+                try
+                {
+                    var useComp = GetCompetition(
+                        useDb,
+                        newAdjPanel.CompetitionName);
+
+                    Assert.That(
+                        useComp,
+                        Is.Not.Null,
+                        $"{nameof(Competition)} '{newAdjPanel.CompetitionName}' not found!");
+
+                    useDb.AdjudicatorPanels.Add(
+                        new AdjudicatorPanel()
+                        {
+                            CompetitionId = useComp.CompetitionId,
+                            Name = newAdjPanel.Name,
+                            Comment = newAdjPanel.Comment,
+                        });
+
+                    useDb.SaveChanges();
+                }
+                catch (Exception exc)
+                {
+                    dbTrans.Rollback();
+
+                    Console.WriteLine(
+                        "Error during add of '{0}': {1}",
+                        newAdjPanel,
+                        exc);
+                    throw;
+                }
+            }
+
+            dbTrans.Commit();
+        }
+
+        [Given(@"following Adjudicators in ""([^""]*)""")]
+        public void GivenFollowingAdjudicatorsIn(
+            string danceCompHelperDb,
+            Table table)
+        {
+            var newAdjs = table.CreateSet<AdjudicatorPoco>();
+            var useDb = GetDanceCompetitionHelperDbContext(
+                danceCompHelperDb);
+
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            foreach (var newAdj in newAdjs)
+            {
+                try
+                {
+                    var useComp = GetCompetition(
+                    useDb,
+                    newAdj.CompetitionName);
+
+                    Assert.That(
+                        useComp,
+                        Is.Not.Null,
+                        $"{nameof(Competition)} '{newAdj.CompetitionName}' not found!");
+
+                    var useAdjPanelName = newAdj.AdjudicatorPanelName;
+                    var useAdjPanel = GetAdjudicatorPanel(
+                        useDb,
+                        useComp.CompetitionId,
+                        useAdjPanelName);
+
+                    Assert.That(
+                        useAdjPanel,
+                        Is.Not.Null,
+                        $"{nameof(AdjudicatorPanel)} '{useAdjPanelName}' not found!");
+
+                    useDb.Adjudicators.Add(
+                        new Adjudicator()
+                        {
+                            AdjudicatorPanelId = useAdjPanel.AdjudicatorPanelId,
+                            Abbreviation = newAdj.Abbreviation,
+                            Name = newAdj.Name,
+                            Comment = newAdj.Comment,
+                        });
+
+                    useDb.SaveChanges();
+                }
+                catch (Exception exc)
+                {
+                    dbTrans.Rollback();
+
+                    Console.WriteLine(
+                        "Error during add of '{0}': {1}",
+                        newAdj,
+                        exc);
+                    throw;
+                }
+            }
+
+            dbTrans.Commit();
+        }
+
         [Given(@"following Competition Classes in ""([^""]*)""")]
         public void GivenFollowingCompetitionClassesIn(
             string danceCompHelperDb,
             Table table)
         {
-            var newCompClasses = table.CreateSet<CompetitionClassPoco>();
+            // CAUTION: special stuff... otherwise the creation will fail...
+            var newCompClasses = SortForCreation(
+                table
+                    .CreateSet<CompetitionClassPoco>());
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newCompClass in newCompClasses)
             {
-                var useComp = useDb.Competitions.FirstOrDefault(
-                    x => x.CompetitionName == newCompClass.CompetitionName);
+                var useComp = GetCompetition(
+                    useDb,
+                    newCompClass.CompetitionName);
 
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    newCompClass.CompetitionName);
+                    $"{nameof(Competition)} '{newCompClass.CompetitionName}' not found!");
+
+                var useAdjPanel = GetAdjudicatorPanel(
+                    useDb,
+                    useComp.CompetitionId,
+                    newCompClass.AdjudicatorPanelName);
+
+                Assert.That(
+                    useAdjPanel,
+                    Is.Not.Null,
+                    $"{nameof(AdjudicatorPanel)} '{newCompClass.AdjudicatorPanelName}' not found!");
+
+                var useFollowUpCopmpClass = GetCompetitionClass(
+                    useDb,
+                    useComp.CompetitionId,
+                    newCompClass.FollowUpCompetitionClassName);
+
+                if (string.IsNullOrEmpty(
+                    newCompClass.FollowUpCompetitionClassName) == false)
+                {
+                    Assert.That(
+                        useFollowUpCopmpClass,
+                        Is.Not.Null,
+                        $"Follow Up {nameof(CompetitionClass)} '{newCompClass.FollowUpCompetitionClassName}' not found!");
+                }
 
                 try
                 {
@@ -175,15 +337,17 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Competition = useComp,
                             OrgClassId = newCompClass.OrgClassId,
                             CompetitionClassName = newCompClass.CompetitionClassName,
+                            FollowUpCompetitionClass = useFollowUpCopmpClass,
+                            AdjudicatorPanel = useAdjPanel,
                             Discipline = newCompClass.Discipline,
                             AgeClass = newCompClass.AgeClass,
                             AgeGroup = newCompClass.AgeGroup,
                             Class = newCompClass.Class,
 
-                            MinStartsForPromotion = newCompClass.MinStartsForPromotion,
-                            MinPointsForPromotion = newCompClass.MinPointsForPromotion,
+                            MinStartsForPromotion = newCompClass.MinStartsForPromotion ?? 0,
+                            MinPointsForPromotion = newCompClass.MinPointsForPromotion ?? 0,
 
-                            PointsForFirst = newCompClass.PointsForFirst,
+                            PointsForFirst = newCompClass.PointsForFirst ?? 0.0,
                             ExtraManualStarter = newCompClass.ExtraManualStarter,
                             Comment = newCompClass.Comment,
                         });
@@ -215,19 +379,20 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newCompClassHist in newCompClassesHistory)
             {
-                var useComp = useDb.Competitions.FirstOrDefault(
-                    x => x.CompetitionName == newCompClassHist.CompetitionName);
+                var useComp = GetCompetition(
+                    useDb,
+                    newCompClassHist.CompetitionName);
 
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    newCompClassHist.CompetitionName);
+                    $"{nameof(Competition)} '{newCompClassHist.CompetitionName}' not found!");
 
                 try
                 {
@@ -276,29 +441,30 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newPart in newParticipants)
             {
-                var useComp = useDb.Competitions.FirstOrDefault(
-                    x => x.CompetitionName == newPart.CompetitionName);
+                var useComp = GetCompetition(
+                    useDb,
+                    newPart.CompetitionName);
 
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    newPart.CompetitionName);
+                    $"{nameof(Competition)} '{newPart.CompetitionName}' not found!");
 
-                var useCompClass = useDb.CompetitionClasses.FirstOrDefault(
-                    x => x.CompetitionClassName == newPart.CompetitionClassName);
+                var useCompClass = GetCompetitionClass(
+                    useDb,
+                    useComp.CompetitionId,
+                    newPart.CompetitionClassName);
 
                 Assert.That(
                     useCompClass,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(CompetitionClass),
-                    newPart.CompetitionClassName);
+                    $"{nameof(CompetitionClass)} '{newPart.CompetitionClassName}' not found!");
 
                 try
                 {
@@ -346,29 +512,30 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction();
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             foreach (var newPartHist in newParticipantsHistory)
             {
-                var useComp = useDb.Competitions.FirstOrDefault(
-                    x => x.CompetitionName == newPartHist.CompetitionName);
+                var useComp = GetCompetition(
+                    useDb,
+                    newPartHist.CompetitionName);
 
                 Assert.That(
                     useComp,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(Competition),
-                    newPartHist.CompetitionName);
+                    $"{nameof(Competition)} '{newPartHist.CompetitionName}' not found!");
 
-                var useCompClass = useDb.CompetitionClasses.FirstOrDefault(
-                    x => x.CompetitionClassName == newPartHist.CompetitionClassName);
+                var useCompClassHist = GetCompetitionClassHistory(
+                    useDb,
+                    useComp.CompetitionId,
+                    newPartHist.CompetitionClassName);
 
                 Assert.That(
-                    useCompClass,
+                    useCompClassHist,
                     Is.Not.Null,
-                    "{0} '{1}' not found!",
-                    nameof(CompetitionClass),
-                    newPartHist.CompetitionClassName);
+                    $"{nameof(CompetitionClassHistory)} '{newPartHist.CompetitionClassName}' not found!");
 
                 try
                 {
@@ -376,7 +543,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         new ParticipantHistory()
                         {
                             Competition = useComp,
-                            CompetitionClass = useCompClass,
+                            CompetitionClassHistory = useCompClassHist,
                             Version = newPartHist.Version,
                             StartNumber = newPartHist.StartNumber,
                             NamePartA = newPartHist.NamePartA,
@@ -430,6 +597,44 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             AddToDispose(
                 newDanceCompHelper);
+        }
+
+        [Given(@"following data are imported by DanceCompetitionHelper ""([^""]*)""")]
+        public void GivenFollowingDataAreImportedByDanceCompetitionHelper(
+            string danceCompHelper,
+            Table table)
+        {
+            var compsToImport = table.CreateSet<CompetitionImportPoco>();
+            var useDanceCompHelper = GetDanceCompetitionHelper(
+                danceCompHelper);
+
+            var rootPath = AssemblyExtensions.GetAssemblyPath() ?? string.Empty;
+
+            foreach (var toImport in compsToImport)
+            {
+                var useParams = new Dictionary<string, string>();
+
+                if (toImport.FindFollowUpClasses)
+                {
+                    useParams.Add(
+                        nameof(OetsvCompetitionImporter.FindFollowUpClasses),
+                        "true");
+                }
+
+                useDanceCompHelper.ImportOrUpdateCompetition(
+                    toImport.Organization,
+                    toImport.OrgCompetitionId,
+                    Database.Enum.ImportTypeEnum.Excel,
+                    new[] {
+                        Path.Combine(
+                            rootPath,
+                            toImport.CompetitionFile ?? string.Empty),
+                        Path.Combine(
+                            rootPath,
+                            toImport.ParticipantsFile ?? string.Empty)
+                    },
+                    useParams);
+            }
         }
 
         #endregion Dance Competition Helper 

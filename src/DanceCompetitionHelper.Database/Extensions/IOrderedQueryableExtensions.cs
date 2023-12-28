@@ -12,7 +12,7 @@ namespace DanceCompetitionHelper.Database.Extensions
                 // just in case...
                 return Enumerable.Empty<Participant>()
                     .AsQueryable()
-                    .OrderBy(x => x.ParticipantId);
+                    .OrderBy(x => x.NamePartA);
             }
 
             return byOrderBy

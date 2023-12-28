@@ -7,7 +7,9 @@ namespace DanceCompetitionHelper.Database.Extensions
         public static void AddTestData(
             this DanceCompetitionHelperDbContext dbCtx)
         {
-            var useTrans = dbCtx.BeginTransaction();
+            var useTrans = dbCtx?.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
 
             try
             {
@@ -19,9 +21,11 @@ namespace DanceCompetitionHelper.Database.Extensions
                 dbCtx.SaveChanges();
                 useTrans.Commit();
             }
-            catch
+            catch (Exception exc)
             {
-                useTrans.Rollback();
+                Console.WriteLine(
+                    exc);
+                useTrans?.Rollback();
             }
         }
 
@@ -50,11 +54,56 @@ namespace DanceCompetitionHelper.Database.Extensions
                     Comment = "yet another comp",
                 });
 
+            // ----
+            var newAdjPanel0101 = dbCtx.AdjudicatorPanels.Add(
+                new Tables.AdjudicatorPanel()
+                {
+                    Competition = newComp01.Entity,
+                    Name = "Panel 1-1",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0101.Entity,
+                    Name = "Adj 01-01",
+                    Abbreviation = "01-01",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0101.Entity,
+                    Name = "Adj 01-02",
+                    Abbreviation = "01-02",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0101.Entity,
+                    Name = "Adj 01-03",
+                    Abbreviation = "01-03",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0101.Entity,
+                    Name = "Adj 01-04",
+                    Abbreviation = "01-04",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0101.Entity,
+                    Name = "Adj 01-05",
+                    Abbreviation = "01-05",
+                });
+
+            // ----
             var newCompClass0101 = dbCtx.CompetitionClasses.Add(
                 new Tables.CompetitionClass()
                 {
                     Competition = newComp01.Entity,
                     CompetitionClassName = "Allg. Sta D",
+                    AdjudicatorPanel = newAdjPanel0101.Entity,
                     OrgClassId = "1",
                     Discipline = "Sta",
                     AgeClass = "Allg",
@@ -77,6 +126,8 @@ namespace DanceCompetitionHelper.Database.Extensions
                     OrgIdPartA = "100",
                     OrgPointsPartA = 100,
                     OrgStartsPartA = 1,
+                    OrgAlreadyPromotedPartA = true,
+                    OrgAlreadyPromotedInfoPartA = "just a test!",
                     NamePartB = "Dancer 01-B",
                     OrgIdPartB = "101",
                     ClubName = "Club-01",
@@ -103,6 +154,7 @@ namespace DanceCompetitionHelper.Database.Extensions
                 {
                     Competition = newComp01.Entity,
                     CompetitionClassName = "Allg. Sta C",
+                    AdjudicatorPanel = newAdjPanel0101.Entity,
                     OrgClassId = "2",
                     Discipline = "Sta",
                     AgeClass = "Allg",
@@ -144,11 +196,56 @@ namespace DanceCompetitionHelper.Database.Extensions
                     Comment = "too much to do...",
                 });
 
+            // ----
+            var newAdjPanel0201 = dbCtx.AdjudicatorPanels.Add(
+                new Tables.AdjudicatorPanel()
+                {
+                    Competition = newComp02.Entity,
+                    Name = "Panel 2-1",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0201.Entity,
+                    Name = "Adj 02-01",
+                    Abbreviation = "02-01",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0201.Entity,
+                    Name = "Adj 02-02",
+                    Abbreviation = "02-02",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0201.Entity,
+                    Name = "Adj 02-03",
+                    Abbreviation = "02-03",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0201.Entity,
+                    Name = "Adj 02-04",
+                    Abbreviation = "02-04",
+                });
+            dbCtx.Adjudicators.Add(
+                new Tables.Adjudicator()
+                {
+                    AdjudicatorPanel = newAdjPanel0201.Entity,
+                    Name = "Adj 02-05",
+                    Abbreviation = "02-05",
+                });
+
+            // ----
             var newCompClass0201 = dbCtx.CompetitionClasses.Add(
                 new Tables.CompetitionClass()
                 {
                     Competition = newComp02.Entity,
                     CompetitionClassName = "Allg. La D",
+                    AdjudicatorPanel = newAdjPanel0201.Entity,
                     OrgClassId = "1",
                     Discipline = "La",
                     AgeClass = "Allg",
@@ -189,6 +286,7 @@ namespace DanceCompetitionHelper.Database.Extensions
                 {
                     Competition = newComp02.Entity,
                     CompetitionClassName = "Allg. La C",
+                    AdjudicatorPanel = newAdjPanel0201.Entity,
                     OrgClassId = "2",
                     Discipline = "La",
                     AgeClass = "Allg",
@@ -227,6 +325,7 @@ namespace DanceCompetitionHelper.Database.Extensions
                 {
                     Competition = newComp02.Entity,
                     CompetitionClassName = "Allg. La B",
+                    AdjudicatorPanel = newAdjPanel0201.Entity,
                     OrgClassId = "3",
                     Discipline = "La",
                     AgeClass = "Allg",
@@ -278,6 +377,7 @@ namespace DanceCompetitionHelper.Database.Extensions
                 {
                     Competition = newComp02.Entity,
                     CompetitionClassName = "Allg. La A",
+                    AdjudicatorPanel = newAdjPanel0201.Entity,
                     OrgClassId = "4",
                     Discipline = "La",
                     AgeClass = "Allg",

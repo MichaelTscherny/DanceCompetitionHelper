@@ -4,13 +4,14 @@
 @using DanceCompetitionHelper.Extensions;
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 
 @model ShowPossiblePromotionsViewModel
 
 @{
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
-    var possiblePromotionsCount = Model.PossiblePromotions?.Count() == 0;
+    var possiblePromotionsCount = Model.OverviewItems?.Count() ?? 0;
 
     ViewData["Title"] = string.Format(
         "{0} Possible Promotions of {1}",
@@ -20,13 +21,15 @@
     var helpIncludedClasses = new List<CompetitionClass>();
     var maxDisplayClasses = 0;
 
-    foreach(var curPossibleProm in Model.PossiblePromotions
+    foreach (var curPossibleProm in Model.OverviewItems
         ?.Where(
             x => x.DisplayInfo != null
-            && x.DisplayInfo.PromotionInfo != null))
+            && x.DisplayInfo.PromotionInfo != null)
+        ?? Enumerable.Empty<Participant>())
 
     {
-        var curClasses = curPossibleProm.DisplayInfo.PromotionInfo.IncludedCompetitionClasses;
+        var curClasses = curPossibleProm?.DisplayInfo?.PromotionInfo?.IncludedCompetitionClasses 
+            ?? new List<CompetitionClass>();
 
         maxDisplayClasses = Math.Max(
             maxDisplayClasses,
@@ -48,15 +51,7 @@
         displayInfoCompClasses.Select(
             x => x.ClassId));
 
-    var emptyHelper = string.Join(
-        "&nbsp;",
-        Enumerable.Repeat(
-            string.Empty,
-            displayInfoCompClasses
-                .Select(
-                    x => x.ClassName.Length)
-                .Max()));
-
+    var emptyHelper = "&nbsp;";
     var columnWith = 100 / (maxDisplayClasses + 1);
     var partInfoByCompetitionClass = new Dictionary<Guid, Dictionary<Guid, Participant>>();
 
@@ -86,16 +81,16 @@
     <h1 class="display-6">@ViewData["Title"]</h1>
 
 
-    @foreach (var curPossPromotion in Model.PossiblePromotions ?? Enumerable.Empty<Participant>())
+    @foreach (var curPossPromotion in Model.OverviewItems ?? Enumerable.Empty<Participant>())
     {
         <div class="table-responsive-xxl">
             @{
                 var curClassesByClassId = curPossPromotion.DisplayInfo?.PromotionInfo?.IncludedCompetitionClasses
-                        .ToDictionary(
-                            x => x.CompetitionClassId) 
-                            ?? new Dictionary<Guid, CompetitionClass>();
+                .ToDictionary(
+                    x => x.CompetitionClassId) 
+                    ?? new Dictionary<Guid, CompetitionClass>();
             }
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover table-striped-columns">
                 <thead>
                     <tr>
                         <th style="width: @columnWith%">
@@ -127,9 +122,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    @{
+                        var extraTrClass = string.Empty;
+                        var isAlreadyPromoted = curPossPromotion.DisplayInfo?.PromotionInfo?.AlreadyPromoted ?? false;
+
+                        if (isAlreadyPromoted)
+                        {
+                            extraTrClass = "table-danger";
+                        }
+                    }
+
+                    <tr class="@extraTrClass">
                         <td class="text-nowrap">
                             @(curPossPromotion.GetNames())
+                            (<a asp-controller="@ParticipantController.RefName"
+                               asp-action="@nameof(ParticipantController.ShowEdit)"
+                               asp-route-id="@curPossPromotion.ParticipantId">Edit</a>)
                         </td>
 
                         @{
@@ -154,13 +162,21 @@
                                         useStartNumber = foundPart.StartNumber;
                                     }
                                 }
+                                else
+                                {
+                                    if(curClassId == curPossPromotion.CompetitionClassId)
+                                    {
+                                        useStartNumber = curPossPromotion.StartNumber;
+                                    }
+                                }
 
                                 displayedColumns++;
 
                                 <td>
+                                    @curClass.MinPointsForPromotion
+                                    / @curClass.MinStartsForPromotion<br>
                                     #@useStartNumber
-                                    / @curClass.MinPointsForPromotion
-                                    / @curClass.MinStartsForPromotion
+                                    : +@curClass.PointsForFirst / +1
                                 </td>
                             }
                         }

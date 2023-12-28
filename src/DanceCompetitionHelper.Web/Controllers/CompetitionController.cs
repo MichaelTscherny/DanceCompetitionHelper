@@ -1,5 +1,7 @@
-﻿using DanceCompetitionHelper.Web.Extensions;
+﻿using DanceCompetitionHelper.OrgImpl.Oetsv;
+using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models;
+using DanceCompetitionHelper.Web.Models.CompetitionModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -13,10 +15,12 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<CompetitionController> _logger;
+        private readonly IServiceProvider _serviceProvider;
 
         public CompetitionController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<CompetitionController> logger)
+            ILogger<CompetitionController> logger,
+            IServiceProvider serviceProvider)
         {
             _danceCompHelper = danceCompHelper
                 ?? throw new ArgumentNullException(
@@ -24,6 +28,9 @@ namespace DanceCompetitionHelper.Web.Controllers
             _logger = logger
                 ?? throw new ArgumentNullException(
                     nameof(logger));
+            _serviceProvider = serviceProvider
+                ?? throw new ArgumentNullException(
+                    nameof(serviceProvider));
 
             if (_initialMigrationDone == false)
             {
@@ -159,9 +166,88 @@ namespace DanceCompetitionHelper.Web.Controllers
                 nameof(Index));
         }
 
+        public IActionResult CreateTableHistory(
+            Guid id)
+        {
+            var foundComp = _danceCompHelper.GetCompetition(
+                id);
+
+            if (foundComp != null)
+            {
+                _danceCompHelper.CreateTableHistory(
+                    foundComp.CompetitionId);
+            }
+
+            return RedirectToAction(
+                nameof(Index));
+        }
+
         public IActionResult ShowImport()
         {
-            return View();
+            return View(
+                new DoImportViewModel()
+                {
+                    OrgCompetitionId = "1524",
+                });
+        }
+
+        public IActionResult DoImport(
+            DoImportViewModel doImportView)
+        {
+            if (ModelState.IsValid == false)
+            {
+                doImportView.Errors.AddRange(
+                    ModelState.GetErrorMessages()
+                    .Split(
+                        new[] { "\r\n" },
+                        StringSplitOptions.RemoveEmptyEntries));
+
+                return View(
+                    nameof(ShowImport),
+                    doImportView);
+            }
+
+            try
+            {
+                var useParams = new Dictionary<string, string>();
+
+                if (doImportView.FindFollowUpClasses)
+                {
+                    useParams.Add(
+                        nameof(OetsvCompetitionImporter.FindFollowUpClasses),
+                        "true");
+                };
+
+                if (doImportView.UpdateData)
+                {
+                    useParams.Add(
+                        nameof(OetsvCompetitionImporter.UpdateData),
+                        "true");
+                };
+
+                // TODO: implement more options/file-uploads/etc...
+                var workStatus = _danceCompHelper.ImportOrUpdateCompetition(
+                    doImportView.Organization,
+                    doImportView.OrgCompetitionId,
+                    doImportView.ImportType,
+                    null,
+                    useParams);
+
+                doImportView.OrgCompetitionId = workStatus.OrgCompetitionId;
+                doImportView.CompetitionId = workStatus.CompetitionId;
+                doImportView.Errors.AddRange(
+                    workStatus.Errors);
+                doImportView.WorkInfo.AddRange(
+                    workStatus.WorkInfo);
+            }
+            catch (Exception exc)
+            {
+                doImportView.Errors.Add(
+                    exc.Message);
+            }
+
+            return View(
+                doImportView);
         }
 
         public IActionResult Privacy()

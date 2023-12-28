@@ -2,13 +2,14 @@
 @using DanceCompetitionHelper.Database.Tables;
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models.ParticipantModels;
 
 @model ParticipantOverviewViewModel
 
 @{
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
-    var participantsCount = Model.Participtans?.Count() ?? 0;
+    var participantsCount = Model.OverviewItems?.Count() ?? 0;
 
     ViewData["Title"] = string.Format(
         Model.DetailedView
@@ -89,9 +90,17 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.Participtans ?? Enumerable.Empty<Participant>())
+                @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<Participant>())
                 {
-                    <tr>
+                    var extraTrClass = string.Empty;
+                    var isAlreadyPromoted = item.DisplayInfo?.PromotionInfo?.AlreadyPromoted ?? false;
+
+                    if (isAlreadyPromoted)
+                    {
+                        extraTrClass = "table-danger";
+                    }
+
+                    <tr class="@extraTrClass">
                         <td class="text-nowrap">
                             @item.CompetitionClass.CompetitionClassName
                             [@(item.CompetitionClass.Comment)]
@@ -128,8 +137,7 @@
                         else 
                         {
                             <td class="text-nowrap">
-                                @Html.DisplayFor(modelItem => item.NamePartA)
-                                @Html.DisplayFor(modelItem => item.NamePartB)
+                                @item.GetNames()
                             </td>
                         }
                         @if (Model.DetailedView)
@@ -156,17 +164,28 @@
                         <td>
                             @{
                                 var useBool = item.DisplayInfo?.PromotionInfo?.PossiblePromotionA ?? false;
+                                var useTooltipText = string.Format(
+                                    "{0} | {1}",
+                                    item.DisplayInfo?.PromotionInfo?.PossiblePromotionAInfo ?? "-",
+                                    item.DisplayInfo?.PromotionInfo?.AlreadyPromotionAInfo ?? "")
+                                    .Trim()
+                                    .Trim('|');
                             }
                             <div class="row row-cols justify-content-center">
                                 <div class="col-auto text-end"
                                      data-bs-toggle="tooltip"
                                      data-bs-custom-class="custom-tooltip"
-                                     data-bs-title="@(item.DisplayInfo?.PromotionInfo?.PossiblePromotionAInfo ?? "-")">
+                                     data-bs-title="@useTooltipText">
                                     @Html.DisplayFor(modelItem => useBool)
                                 </div>
 
                             @{
                                 var useBool02 = item.DisplayInfo?.PromotionInfo?.PossiblePromotionB;
+                                var useTooltipText02 = string.Format(
+                                    "{0}<br>{1}",
+                                    item.DisplayInfo?.PromotionInfo?.PossiblePromotionBInfo ?? "-",
+                                    item.DisplayInfo?.PromotionInfo?.AlreadyPromotionBInfo ?? "")
+                                    .Trim();
                             }
                             @if (useBool02.HasValue)
                             {
@@ -174,11 +193,11 @@
                                     /
                                 </div>
                                 <div class="col-auto"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-custom-class="custom-tooltip"
-                                        data-bs-title="@(item.DisplayInfo?.PromotionInfo?.PossiblePromotionBInfo ?? "-")">
+                                     data-bs-toggle="tooltip"
+                                     data-bs-custom-class="custom-tooltip"
+                                     data-bs-title="@useTooltipText02">
                                     @Html.DisplayFor(modelItem => useBool02.Value)
-                                </div>                            
+                                </div>
                             }
                             </div>
                         </td>

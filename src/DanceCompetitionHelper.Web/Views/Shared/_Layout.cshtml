@@ -2,6 +2,8 @@
 
 @{
     var backToCompClass = ViewData["BackTo" + CompetitionClassController.RefName] as Guid?;
+    var showAdjucatorPanels = ViewData["Show" + AdjudicatorPanelController.RefName] as Guid?;
+    var showAdjucators = ViewData["Show" + AdjudicatorController.RefName] as Guid?;
     var showParticipants = ViewData["Show" + ParticipantController.RefName] as Guid?;
     var showMultipleStarters = ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] as Guid?;
     var showPossiblePromotions = ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] as Guid?;
@@ -12,10 +14,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="expires" content="0" />
     <title>@ViewData["Title"] - DanceCompetitionHelper</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/DanceCompetitionHelper.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
@@ -35,6 +37,26 @@
                                    asp-controller="@CompetitionClassController.RefName"
                                    asp-action="@nameof(CompetitionClassController.Index)"
                                    asp-route-id="@backToCompClass">Competition Classes</a>
+                            </li>
+                        }
+
+                        @if (showAdjucatorPanels !=  null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area=""
+                                   asp-controller="@AdjudicatorPanelController.RefName"
+                                   asp-action="@nameof(AdjudicatorPanelController.Index)"
+                                   asp-route-id="@showAdjucatorPanels">Adj. Panels</a>
+                            </li>
+                        }
+
+                        @if (showAdjucators != null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area=""
+                               asp-controller="@AdjudicatorController.RefName"
+                               asp-action="@nameof(AdjudicatorController.Index)"
+                               asp-route-id="@showAdjucators">Adjudicators</a>
                             </li>
                         }
 

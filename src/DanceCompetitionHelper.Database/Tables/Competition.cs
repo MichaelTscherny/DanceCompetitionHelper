@@ -38,5 +38,16 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [NotMapped]
         public CompetitionDisplayInfo? DisplayInfo { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0} '{1}' ({2}) '{3}' '{4}'",
+                Organization,
+                CompetitionName,
+                OrgCompetitionId,
+                CompetitionDate,
+                CompetitionInfo);
+        }
     }
 }

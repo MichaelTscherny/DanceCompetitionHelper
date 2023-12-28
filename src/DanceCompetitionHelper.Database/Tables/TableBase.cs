@@ -3,6 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using System.ComponentModel.DataAnnotations;
 
+    [Index(nameof(Created), IsUnique = false)]
     public abstract class TableBase
     {
         [Required]

@@ -6,10 +6,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("The Participants of a " + nameof(Competition))]
+    [Index(nameof(CompetitionId), nameof(ParticipantId), IsUnique = true)]
+    [PrimaryKey(nameof(ParticipantId))]
     public class Participant : TableBase
     {
         [Required]
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid ParticipantId { get; set; }
 
@@ -54,19 +55,26 @@ namespace DanceCompetitionHelper.Database.Tables
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthOrgId)]
         public string? OrgIdClub { get; set; }
 
-        [Range(0, int.MaxValue)]
-        public int OrgPointsPartA { get; set; }
+        [Range(0, double.MaxValue)]
+        public double OrgPointsPartA { get; set; }
         [Range(0, int.MaxValue)]
         public int OrgStartsPartA { get; set; }
         [Range(0, int.MaxValue)]
         public int? MinStartsForPromotionPartA { get; set; }
+        public bool? OrgAlreadyPromotedPartA { get; set; }
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? OrgAlreadyPromotedInfoPartA { get; set; }
 
-        [Range(0, int.MaxValue)]
-        public int? OrgPointsPartB { get; set; }
+        [Range(0, double.MaxValue)]
+        public double? OrgPointsPartB { get; set; }
         [Range(0, int.MaxValue)]
         public int? OrgStartsPartB { get; set; }
         [Range(0, int.MaxValue)]
         public int? MinStartsForPromotionPartB { get; set; }
+        public bool? OrgAlreadyPromotedPartB { get; set; }
+        [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
+        public string? OrgAlreadyPromotedInfoPartB { get; set; }
+
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }
@@ -75,5 +83,31 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [NotMapped]
         public ParticipantDisplayInfo? DisplayInfo { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0} {1}/{2} ({3}/{4}) - {5} ({6}) - P {7}/{8} - S {9}/{10} - Prom {11}/{12} ({13}/{14})",
+                StartNumber,
+                // 1
+                NamePartA,
+                NamePartB,
+                OrgIdPartA,
+                OrgIdPartB,
+                // 5
+                ClubName,
+                OrgIdClub,
+                // 6
+                OrgPointsPartA,
+                OrgPointsPartB,
+                // 9
+                OrgStartsPartA,
+                OrgStartsPartB,
+                // 11
+                OrgAlreadyPromotedPartA ?? false,
+                OrgAlreadyPromotedPartB ?? false,
+                OrgAlreadyPromotedInfoPartA ?? "-",
+                OrgAlreadyPromotedInfoPartB ?? "-");
+        }
     }
 }

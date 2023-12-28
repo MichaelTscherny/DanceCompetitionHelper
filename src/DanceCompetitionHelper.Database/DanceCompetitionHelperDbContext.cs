@@ -19,6 +19,12 @@ namespace DanceCompetitionHelper.Database
         public virtual DbSet<CompetitionClassHistory> CompetitionClassesHistory { get; set; }
         public virtual DbSet<Participant> Participants { get; set; }
         public virtual DbSet<ParticipantHistory> ParticipantsHistory { get; set; }
+
+        public virtual DbSet<AdjudicatorPanel> AdjudicatorPanels { get; set; }
+        public virtual DbSet<AdjudicatorPanelHistory> AdjudicatorPanelsHistroy { get; set; }
+        public virtual DbSet<Adjudicator> Adjudicators { get; set; }
+        public virtual DbSet<AdjudicatorHistory> AdjudicatorsHistory { get; set; }
+
         public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; }
 
         public DanceCompetitionHelperDbContext(
@@ -80,7 +86,6 @@ namespace DanceCompetitionHelper.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             base.OnModelCreating(modelBuilder);
 
             _logger.LogTrace(
@@ -109,8 +114,11 @@ namespace DanceCompetitionHelper.Database
         public void Migrate()
             => Database.Migrate();
 
-        public IDbContextTransaction BeginTransaction()
-            => Database.BeginTransaction();
+        public IDbContextTransaction? BeginTransaction(
+            bool useTransaction = true)
+            => useTransaction
+                ? Database.CurrentTransaction ?? Database.BeginTransaction()
+                : null;
 
         #endregion Usefull methods
 
@@ -133,7 +141,6 @@ namespace DanceCompetitionHelper.Database
                 "{Method}() done",
                 nameof(OnSavingChanges));
         }
-
 
         private static void UpdateTimestamps(
             EntityEntry entity,

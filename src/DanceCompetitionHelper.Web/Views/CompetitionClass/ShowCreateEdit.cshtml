@@ -1,6 +1,7 @@
 ﻿@using DanceCompetitionHelper.Database.Enum;
 @using DanceCompetitionHelper.Database.Tables;
 @using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 
 @model CompetitionClassViewModel
 
@@ -71,6 +72,46 @@
                 <label asp-for="OrgClassId"
                        class="control-label">
                     Internal ID of your organization
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1 bg-black bg-opacity-10">
+            <div class="col-md text-end">
+                Follow Up Class
+            </div>
+            <div class="col-md-4">
+                <select asp-for="FollowUpCompetitionClassId"
+                        asp-items="Model.FollowUpCompetitionClasses"
+                        class="form-select"
+                        style="width: 100%">
+                </select>
+                <span asp-validation-for="FollowUpCompetitionClassId"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="FollowUpCompetitionClassId"
+                       class="control-label">
+                    Next class
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Adjudicator Panel
+            </div>
+            <div class="col-md-4">
+                <select asp-for="AdjudicatorPanelId"
+                        asp-items="Model.AdjudicatorPanels"
+                        class="form-select"
+                        style="width: 100%">
+                </select>
+                <span asp-validation-for="AdjudicatorPanelId"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="AdjudicatorPanelId"
+                       class="control-label">
+                    Panel for this Adjudicator
                 </label>
             </div>
         </div>
@@ -211,7 +252,7 @@
                 </label>
             </div>
         </div>        
-        <div class="row row-cols-3 py-1 bg-black bg-opacity-25">
+        <div class="row row-cols-3 py-1 bg-black bg-opacity-10">
             <div class="col-md text-end">
                 Extra Starter
             </div>
@@ -251,6 +292,28 @@
                 </label>
             </div>
         </div>
+        
+        <div class="row row-cols-3 py-1 bg-black bg-opacity-10">
+            <div class="col-md text-end">
+                Color
+            </div>
+            <div class="col-md-4">
+                <input asp-for="CompetitionColor"
+                       type="color"
+                       asp-items="Model.CompetitionColors"
+                       class="form-control-color"
+                       style="width: 100%" />
+                <span asp-validation-for="CompetitionColor"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="CompetitionColor"
+                       class="control-label">
+                    Color of Competition Class for Timeschedule
+                </label>
+            </div>
+        </div>             
+        
         <div class="row row-cols-3 py-1">
             <div class="col-md text-end">
                 Ignore

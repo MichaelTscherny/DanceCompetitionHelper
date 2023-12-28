@@ -1,42 +1,48 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
 
-    <Copyright>2022 (c) Michael Tscherny</Copyright>
+    <Copyright>2022-2023 (c) Michael Tscherny</Copyright>
 
-    <AssemblyVersion>0.2.0</AssemblyVersion>
+    <FileVersion>0.5.0</FileVersion>
 
-    <FileVersion>0.2.0</FileVersion>
+    <OutputType>Library</OutputType>
 
-    <OutputType>Library</OutputType>  
+    <AssemblyVersion>0.5.0</AssemblyVersion>  
   </PropertyGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\MultipleStarts - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\BigCompetitions\CompetitionImporter.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts - Copy.feature.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="6.9.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
-    <PackageReference Include="NUnit.Analyzers" Version="3.5.0">
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Moq" Version="4.20.70" />
+    <PackageReference Include="NUnit" Version="4.0.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.10.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="3.2.0">
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="SpecFlow.NUnit" Version="3.9.74" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,14 +56,41 @@
     <Compile Update="Tests\SpecFlow\DanceCompHelper\DanceCompHelperBasics.feature.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\MultipleStartsDoubleChecks.feature.cs">
+      <DependentUpon>MultipleStartsDoubleChecks.feature</DependentUpon>
+    </Compile>
     <Compile Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
-    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts.feature.cs">
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\BigCompetitions\CompetitionImporter.feature.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
-    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA.feature.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter FollowUp.feature.cs">
+      <DependentUpon>CompetitionImporter FollowUp.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter No FollowUp.feature.cs">
+      <DependentUpon>CompetitionImporter No FollowUp.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts No FollowUp.feature.cs">
+      <DependentUpon>Promotions PartA MultipleStarts No FollowUp.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA No FollowUp.feature.cs">
+      <Visible>true</Visible>
+      <DependentUpon>Promotions PartA No FollowUp.feature</DependentUpon>
+      <DesignTime>true</DesignTime>
+      <AutoGen>true</AutoGen>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts FollowUp.feature.cs">
+      <DependentUpon>Promotions PartA MultipleStarts FollowUp.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA FollowUp.feature.cs">
+      <DependentUpon>Promotions PartA FollowUp.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\Database\Adjudicator.feature.cs">
+      <DependentUpon>Adjudicator.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\Database\AdjudicatorPanel.feature.cs">
+      <DependentUpon>AdjudicatorPanel.feature</DependentUpon>
     </Compile>
     <Compile Update="Tests\SpecFlow\Database\Competition.feature.cs">
       <DependentUpon>%(Filename)</DependentUpon>
@@ -75,15 +108,51 @@
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\MultipleStartsDoubleChecks.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\MultipleStarts.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts.feature">
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\BigCompetitions\CompetitionImporter.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA.feature">
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter Updates Changes.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter No FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts No FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA No FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\Database\Adjudicator.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\Database\AdjudicatorPanel.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
@@ -99,6 +168,39 @@
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="TestData\Importer\Oetsv\CompetitionImport02_Competition.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\CompetitionImport01_Competition.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\CompetitionImport02_Participants.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\CompetitionImport01_Participants.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\CompetitionImport03_Competition.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\CompetitionImport03_Participants.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\Updates\03\CompetitionImport03_02_Competition.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\Updates\03\CompetitionImport03_01_Competition.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\Updates\03\CompetitionImport03_02_Participants.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Importer\Oetsv\Updates\03\CompetitionImport03_01_Participants.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

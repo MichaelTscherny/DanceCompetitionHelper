@@ -1,32 +1,104 @@
 ﻿@using DanceCompetitionHelper.Database.Enum;
 @using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Models.CompetitionModels;
+
+@model DoImportViewModel
 
 @{
     var isCreate = Model.CompetitionId.HasValue == false;
 
     ViewData["Title"] = "Import new Competition";
-
-    var formAction = "DoImport";
 }
 
 <div class="container text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
-    <form asp-action="@formAction" method="post"
-          class="form-horizontal needs-validation"
+    @if ((Model.Errors?.Count ?? 0) >= 1)
+    {
+        <div class="row py-2 text-danger">
+            @foreach (var curError in Model.Errors ?? Enumerable.Empty<string>())
+            {
+                <div class="col-md">
+                    @curError
+                </div>
+            }
+        </div>
+    }
+
+    <form asp-action="@nameof(CompetitionController.DoImport)" method="post"
+          class="form-horizontal needs-validation border rounded"
           enctype="multipart/form-data"
           role="form">
+
+        <input asp-for="CompetitionId" />
+        <input asp-for="ImportType" value="@nameof(ImportTypeEnum.Url)" />
+        <input asp-for="Organization" value="@nameof(OrganizationEnum.Oetsv)" />
         
-        <div class="row d-flex justify-content-center py-1">
-            <div class="col">
-                <button class="btn btn-primary px-lg-4" type="submit">
-                    Save
-                </button>
-                &nbsp;
-                <a asp-action="Index" class="btn btn-secondary px-lg-4">
-                    Cancel
-                </a>
+        <div class="container">
+            <div class="row row-cols-4 py-1">
+                <div class="col-3 text-end">
+                    ÖTSV ID
+                </div>
+                <div class="col-3">
+                    <input asp-for="OrgCompetitionId"
+                           class="form-control"
+                           placeholder="ÖTSV ID"
+                           style="width: 100%" />
+                    <span asp-validation-for="OrgCompetitionId"
+                          class="text-danger"></span>
+                </div>
+                <div class="col-3 text-start">
+                    <label asp-for="OrgCompetitionId"
+                           class="control-label">
+                        ÖTSV ID (e.g. 1234)
+                    </label>
+                </div>
+                <div class="col-3 text-start">
+                    <button class="btn btn-primary px-lg-4" type="submit">
+                        Create/Update
+                    </button>
+                </div>
+            </div>
+            <div class="row row-cols-4 py-1">
+                <div class="col-3 text-end">
+                    Find Follow Up
+                </div>
+                <div class="col-3 text-start">
+                    <input asp-for="FindFollowUpClasses"
+                           type="checkbox"
+                           class="form-check-input"
+                           checked />
+                    <span asp-validation-for="FindFollowUpClasses"
+                          class="text-danger"></span>
+                </div>
+                <div class="col-3 text-start">
+                    &nbsp;
+                </div>
+                <div class="col-3 text-start">
+                    &nbsp;
+                </div>
+            </div>
+            <div class="row row-cols-4 py-1">
+                <div class="col-3 text-end">
+                    Update ÖTSV-Data
+                </div>
+                <div class="col-3 text-start">
+                    <input asp-for="UpdateData"
+                           type="checkbox"
+                           class="form-check-input"
+                           checked />
+                    <span asp-validation-for="UpdateData"
+                          class="text-danger"></span>
+                </div>
+                <div class="col-3 text-start">
+                    &nbsp;
+                </div>
+                <div class="col-3 text-start">
+                    &nbsp;
+                </div>
             </div>
         </div>
     </form>
+    <br />
 </div>

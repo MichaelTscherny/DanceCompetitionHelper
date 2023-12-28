@@ -1,0 +1,134 @@
+﻿@using DanceCompetitionHelper.Database.Enum;
+@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
+@using DanceCompetitionHelper.Web.Models.ParticipantModels;
+
+@model AdjudicatorViewModel
+
+@{
+    var isCreate = Model.AdjudicatorId.HasValue == false;
+
+    ViewData["Title"] = string.Format(
+        "{0} Adjudicator for {1}",
+        isCreate
+            ? "Create new"
+            : "Edit ",
+        Model.CompetitionName);
+
+    var formAction = isCreate
+        ? nameof(AdjudicatorController.CreateNew)
+        : nameof(AdjudicatorController.EditSave);
+}
+
+<div class="container text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    @if (string.IsNullOrEmpty(Model.Errors) == false)
+    {
+        <div class="row py-2 text-danger">
+            <div class="col-md">
+                @Model.Errors
+            </div>
+        </div>
+    }
+
+    <form asp-action="@formAction" method="post">
+        <input asp-for="CompetitionId" />
+        <input asp-for="AdjudicatorId" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Adjudicator Panel
+            </div>
+            <div class="col-md-4">
+                <select asp-for="AdjudicatorPanelId"
+                        asp-items="Model.AdjudicatorPanels"
+                        class="form-select"
+                        style="width: 100%">
+                </select>
+                <span asp-validation-for="AdjudicatorPanelId"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="AdjudicatorPanelId"
+                       class="control-label">
+                    Panel for this Adjudicator
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Abbreviation
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Abbreviation"
+                       class="form-control"
+                       placeholder="Abbreviation (e.g. A)"
+                       style="width: 100%" />
+                <span asp-validation-for="Abbreviation"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Abbreviation"
+                       class="control-label">
+                    Abbreviation for this Adjudicator
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Name
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Name"
+                       class="form-control"
+                       placeholder="Name"
+                       style="width: 100%" />
+                <span asp-validation-for="Name"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Name"
+                       class="control-label">
+                    Name of Adjudicator
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Comment
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Comment"
+                       class="form-control"
+                       placeholder="Comment"
+                       style="width: 100%" />
+                <span asp-validation-for="Comment"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Comment"
+                       class="control-label">
+                    Comment
+                </label>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center py-1">
+            <div class="col">
+                <input type="submit" 
+                       value="@(isCreate ? "Create" : "Save")" 
+                       class="btn btn-primary px-lg-4" />
+                &nbsp;
+                <a asp-controller="@AdjudicatorController.RefName" 
+                   asp-action="@nameof(AdjudicatorController.Index)"
+                   asp-route-id="@Model.CompetitionId"
+                   class="btn btn-secondary px-lg-4">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

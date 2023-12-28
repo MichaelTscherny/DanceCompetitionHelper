@@ -7,9 +7,21 @@ namespace DanceCompetitionHelper.Web.Extensions
     {
         public static List<SelectListItem> ToSelectListItem(
             this IEnumerable<CompetitionClass> competitionClasses,
-            Guid? selectedItem = null)
+            Guid? selectedItem = null,
+            bool addEmpty = false)
         {
             var retList = new List<SelectListItem>();
+
+            if (addEmpty)
+            {
+                retList.Add(
+                    new SelectListItem()
+                    {
+                        Value = Guid.Empty.ToString(),
+                        Text = "None",
+                        Selected = false
+                    });
+            }
 
             if (competitionClasses != null)
             {
@@ -20,6 +32,49 @@ namespace DanceCompetitionHelper.Web.Extensions
                             Value = x.CompetitionClassId.ToString(),
                             Text = x.CompetitionClassName,
                             Selected = x.CompetitionClassId == selectedItem
+                        }));
+            }
+
+            return retList;
+        }
+
+        public static List<SelectListItem> ToSelectListItem(
+            this IEnumerable<AdjudicatorPanel> adjudicatorPanels,
+            Guid? selectedItem = null)
+        {
+            var retList = new List<SelectListItem>();
+
+            if (adjudicatorPanels != null)
+            {
+                retList.AddRange(
+                    adjudicatorPanels.Select(
+                        x => new SelectListItem()
+                        {
+                            Value = x.AdjudicatorPanelId.ToString(),
+                            Text = x.Name,
+                            Selected = x.AdjudicatorPanelId == selectedItem
+                        }));
+            }
+
+            return retList;
+        }
+
+        // TODO: needed?..
+        public static List<SelectListItem> ToSelectListItem(
+            this IEnumerable<Adjudicator> adjudicators,
+            Guid? selectedItem = null)
+        {
+            var retList = new List<SelectListItem>();
+
+            if (adjudicators != null)
+            {
+                retList.AddRange(
+                    adjudicators.Select(
+                        x => new SelectListItem()
+                        {
+                            Value = x.AdjudicatorId.ToString(),
+                            Text = x.Name,
+                            Selected = x.AdjudicatorId == selectedItem
                         }));
             }
 
