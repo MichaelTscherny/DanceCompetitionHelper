@@ -26,7 +26,7 @@ of lists of staring participants.
 ### Competition organization in Austria
 
 The [Österreichicher TanzSport Verband (ÖTSV)](https://www.tanzsportverband.at/) 
-is "the head" origanization of competitive ballroom dancesport in Austria and
+is "the head" organization of competitive ballroom dancesport in Austria and
 member of [WDSF](https://www.worlddancesport.org/). In Austria its common 
 that a club request
 a competition with a various number of classes (age, classification, etc.).
@@ -66,7 +66,7 @@ This software is supposted to work with folloing information.
 ### Participants List/Start numbers
 
 * Full Name (First-, Middle- Last-Name) or parts of it for the participants lists
-* Name (or Parts) of club or origanization the participant is member of
+* Name (or Parts) of club or organization the participant is member of
 * Nationality of participants and club/organizations ("available" via addresses)
 * Address/Location of the competition
 

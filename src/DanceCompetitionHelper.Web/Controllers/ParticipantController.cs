@@ -1,4 +1,5 @@
 ﻿using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.ParticipantModels;
 using Microsoft.AspNetCore.Mvc;
@@ -36,10 +37,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
 
-            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
-            ViewData[nameof(AdjudicatorController.RefName)] = foundCompId;
+            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             return View(
                 new ParticipantOverviewViewModel()
@@ -61,10 +59,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
 
-            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
-            ViewData[nameof(AdjudicatorController.RefName)] = foundCompId;
+            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             return View(
                 nameof(Index),
@@ -97,11 +92,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             var foundComp = _danceCompHelper.GetCompetition(
                 foundCompId);
 
-            ViewData["Show" + ParticipantController.RefName] = foundCompId;
-            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
-            ViewData[nameof(AdjudicatorController.RefName)] = foundCompId;
+            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             var helpCompName = string.Empty;
 
@@ -215,6 +206,13 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             var foundComp = _danceCompHelper.GetCompetition(
                 foundParticipant.CompetitionId);
+
+            if (foundComp == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["Use" + nameof(CompetitionClass)] = foundComp.CompetitionId;
 
             return View(
                 nameof(ShowCreateEdit),

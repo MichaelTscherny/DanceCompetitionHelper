@@ -63,8 +63,16 @@
                             <td>
                                 @if (item.CompetitionClassNamesByClassId.ContainsKey(curDisplayInfo.ClassId))
                                 {
+                                    var usePart = item.Participants
+                                        .FirstOrDefault(
+                                            x => x.CompetitionClassId == curDisplayInfo.ClassId);
+
                                     <div class="text-nowrap">
-                                        # @item.StartnumberByClassId[curDisplayInfo.ClassId]
+                                        # <a asp-controller="@ParticipantController.RefName"
+                                            asp-action="@nameof(ParticipantController.ShowEdit)"
+                                            asp-route-id="@usePart?.ParticipantId">
+                                            @item.StartnumberByClassId[curDisplayInfo.ClassId]
+                                        </a>
                                     </div>
                                 }
                             </td>

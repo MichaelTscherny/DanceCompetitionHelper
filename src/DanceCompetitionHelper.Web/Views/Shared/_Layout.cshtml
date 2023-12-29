@@ -1,12 +1,25 @@
-﻿@using DanceCompetitionHelper.Web.Controllers;
+﻿@using DanceCompetitionHelper.Database.Tables
+@using DanceCompetitionHelper.Web.Controllers;
 
 @{
-    var backToCompClass = ViewData["BackTo" + CompetitionClassController.RefName] as Guid?;
-    var showAdjucatorPanels = ViewData["Show" + AdjudicatorPanelController.RefName] as Guid?;
-    var showAdjucators = ViewData["Show" + AdjudicatorController.RefName] as Guid?;
-    var showParticipants = ViewData["Show" + ParticipantController.RefName] as Guid?;
-    var showMultipleStarters = ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] as Guid?;
-    var showPossiblePromotions = ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] as Guid?;
+    var useCompetitionClass = ViewData["Use" + nameof(CompetitionClass)] as Guid?;
+    var currentViewName = (ViewData["CurrentShowing"] as string) ?? string.Empty;
+
+    var currentControllerName = string.Empty;
+    var currentControllerAction = string.Empty;
+
+    if(ViewContext.RouteData.Values.TryGetValue(
+        "controller",
+        out var curControllerName)) 
+    {
+        currentControllerName = curControllerName?.ToString();
+    }
+    if(ViewContext.RouteData.Values.TryGetValue(
+        "action",
+        out var curControllerAction)) 
+    {
+        currentControllerAction = curControllerAction?.ToString();
+    }
 }
 
 <!DOCTYPE html>
@@ -23,70 +36,51 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Competition" asp-action="Index">DanceCompetitionHelper</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <a class="navbar-brand" asp-area="" asp-controller="Competition" asp-action="Index">DaCH</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                        data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if (backToCompClass !=  null)
+                        @if (useCompetitionClass != null)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area=""
+                            <li class="nav-item ">
+                                <a class="nav-link @(currentControllerName == CompetitionClassController.RefName && currentControllerAction == nameof(CompetitionClassController.Index) ? "active" : "")" asp-area=""
                                    asp-controller="@CompetitionClassController.RefName"
                                    asp-action="@nameof(CompetitionClassController.Index)"
-                                   asp-route-id="@backToCompClass">Competition Classes</a>
+                                   asp-route-id="@useCompetitionClass">Competition Classes</a>
                             </li>
-                        }
-
-                        @if (showAdjucatorPanels !=  null)
-                        {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area=""
+                                <a class="nav-link @(currentControllerName == AdjudicatorPanelController.RefName ? "active" : "")" asp-area=""
                                    asp-controller="@AdjudicatorPanelController.RefName"
                                    asp-action="@nameof(AdjudicatorPanelController.Index)"
-                                   asp-route-id="@showAdjucatorPanels">Adj. Panels</a>
+                                   asp-route-id="@useCompetitionClass">Adj. Panels</a>
                             </li>
-                        }
-
-                        @if (showAdjucators != null)
-                        {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area=""
+                                <a class="nav-link @(currentControllerName == AdjudicatorController.RefName ? "active" : "")" asp-area=""
                                asp-controller="@AdjudicatorController.RefName"
                                asp-action="@nameof(AdjudicatorController.Index)"
-                               asp-route-id="@showAdjucators">Adjudicators</a>
+                                   asp-route-id="@useCompetitionClass">Adjudicators</a>
                             </li>
-                        }
-
-                        @if (showParticipants != null)
-                        {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area=""
+                                <a class="nav-link @(currentControllerName == ParticipantController.RefName ? "active" : "")" asp-area=""
                                    asp-controller="@ParticipantController.RefName"
                                    asp-action="@nameof(ParticipantController.Index)"
-                                   asp-route-id="@showParticipants">Participants</a>
+                                   asp-route-id="@useCompetitionClass">Participants</a>
                             </li>
-                        }
-
-                        @if (showMultipleStarters != null)
-                        {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area=""
+                                <a class="nav-link @(currentControllerName == CompetitionClassController.RefName && currentControllerAction == nameof(CompetitionClassController.ShowMultipleStarters) ? "active" : "")" asp-area=""
                                    asp-controller="@CompetitionClassController.RefName"
                                    asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
-                                   asp-route-id="@showMultipleStarters">Multiple Starters</a>
+                                   asp-route-id="@useCompetitionClass">Multiple Starters</a>
                             </li>
-                        }
-
-                        @if (showPossiblePromotions != null)
-                        {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area=""
+                                <a class="nav-link @(currentControllerName == CompetitionClassController.RefName && currentControllerAction == nameof(CompetitionClassController.ShowPossiblePromotions) ? "active" : "")" asp-area=""
                                    asp-controller="@CompetitionClassController.RefName"
                                    asp-action="@nameof(CompetitionClassController.ShowPossiblePromotions)"
-                                   asp-route-id="@showPossiblePromotions">Promotions</a>
+                                   asp-route-id="@useCompetitionClass">Promotions</a>
                             </li>
                         }
 

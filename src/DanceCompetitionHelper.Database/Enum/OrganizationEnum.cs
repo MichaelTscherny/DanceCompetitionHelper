@@ -2,6 +2,7 @@
 {
     public enum OrganizationEnum
     {
-        Oetsv = 0,
+        Any = 0,
+        Oetsv,
     }
 }

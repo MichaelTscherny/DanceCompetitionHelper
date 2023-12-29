@@ -5,8 +5,8 @@ A short summary of the feature
 Scenario: Single Competition Class
     Given following DanceComp-DB "Dach_db_compClass_01"
     And following Competitions in "Dach_db_compClass_01"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "Dach_db_compClass_01"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -22,8 +22,8 @@ Scenario: Single Competition Class
         | Test-Comp-01    | Panel 01             | 1       | Class-01   | Allg. Sta D          | Sta        | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
     # #######
     Then following Competitions exists in "Dach_db_compClass_01"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Competition Classes exists in "Dach_db_compClass_01"
         | CompetitionName | AdjudicatorPanelName | Version | OrgClassId | CompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion | PointsForFirst | PointsForLast |
         | Test-Comp-01    | Panel 01             | 1       | Class-01   | Allg. Sta D          | Sta        | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
@@ -31,9 +31,9 @@ Scenario: Single Competition Class
 Scenario: Multiple Competition Classes
     Given following DanceComp-DB "Dach_db_compClass_02"
     And following Competitions in "Dach_db_compClass_02"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo   |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test       |
-        | Test-Comp-02    | Oetsv         | ÖTSV-02          | Just another test |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo   |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test       |
+        | Test-Comp-02    | Oetsv        | ÖTSV-02          | Just another test |
     And following Adjudicator Panels in "Dach_db_compClass_02"
         | CompetitionName | Name     | Comment            |
         | Test-Comp-01    | Panel 01 | Just one Panel     |
@@ -62,9 +62,9 @@ Scenario: Multiple Competition Classes
         | Test-Comp-02    | Panel 02             | 1       | Class-02   | Allg. Sta S          |                              | Sta        | Allg     | 0        | S     | 10                    | 9999                  | 100            | 10            |
     # #######
     Then following Competitions exists in "Dach_db_compClass_02"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo   |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test       |
-        | Test-Comp-02    | Oetsv         | ÖTSV-02          | Just another test |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo   |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test       |
+        | Test-Comp-02    | Oetsv        | ÖTSV-02          | Just another test |
     And following Competition Classes exists in "Dach_db_compClass_02"
         | CompetitionName | AdjudicatorPanelName | Version | OrgClassId | CompetitionClassName | FollowUpCompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion | PointsForFirst | PointsForLast |
         | Test-Comp-01    | Panel 01             | 1       | Class-01   | Allg. Sta D          | Allg. Sta C                  | Sta        | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |

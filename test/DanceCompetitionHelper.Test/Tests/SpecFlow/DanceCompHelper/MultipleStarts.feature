@@ -5,8 +5,8 @@ A short summary of the feature
 Scenario: None
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -49,8 +49,8 @@ Scenario: None
 Scenario: One in Sen Sta D
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -95,8 +95,8 @@ Scenario: One in Sen Sta D
 Scenario: One in Sen Sta D and C
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |

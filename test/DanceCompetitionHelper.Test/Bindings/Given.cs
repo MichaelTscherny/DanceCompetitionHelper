@@ -2,6 +2,7 @@
 using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Config;
 using DanceCompetitionHelper.Database.Diagnostic;
+using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
@@ -573,6 +574,111 @@ namespace DanceCompetitionHelper.Test.Bindings
             dbTrans.Commit();
         }
 
+        [Given(@"following Configuration Values exists in ""([^""]*)""")]
+        public void GivenFollowingConfigurationValuesExistsIn(
+            string danceCompHelperDb,
+            Table table)
+        {
+            // CAUTION: special stuff... otherwise the creation will fail...
+            var newConfigValues = table
+                .CreateSet<ConfigurationValuePoco>();
+
+            var useDb = GetDanceCompetitionHelperDbContext(
+                danceCompHelperDb);
+
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            foreach (var newCfg in newConfigValues)
+            {
+                try
+                {
+                    newCfg.SanityCheck();
+
+                    OrganizationEnum useOrganization = newCfg.Organization ?? OrganizationEnum.Any;
+                    Guid useCompId = Guid.Empty;
+                    Guid useCompClassId = Guid.Empty;
+                    Guid useCompVenueId = Guid.Empty;
+
+                    if (string.IsNullOrEmpty(
+                        newCfg.CompetitionName) == false)
+                    {
+                        var useComp = GetCompetition(
+                            useDb,
+                            newCfg.CompetitionName);
+
+                        Assert.That(
+                            useComp,
+                            Is.Not.Null,
+                            $"{nameof(Competition)} '{newCfg.CompetitionName}' not found!");
+
+                        Assert.That(
+                            useComp.Organization,
+                            Is.EqualTo(
+                                newCfg.Organization),
+                            $"{nameof(Competition)} '{newCfg.CompetitionName}' {nameof(useComp.Organization)} missmatch!");
+
+                        useCompId = useComp.CompetitionId;
+                    }
+
+                    if (string.IsNullOrEmpty(
+                        newCfg.CompetitionClassName) == false)
+                    {
+                        var useCompClass = GetCompetitionClass(
+                            useDb,
+                            useCompId,
+                            newCfg.CompetitionClassName);
+
+                        Assert.That(
+                            useCompClass,
+                            Is.Not.Null,
+                            $"{nameof(CompetitionClass)} '{newCfg.CompetitionClassName}' not found!");
+                        Assert.That(
+                            useCompClass.CompetitionId,
+                            Is.EqualTo(
+                                useCompId),
+                            $"{nameof(CompetitionClass)} '{newCfg.CompetitionClassName}' ID missmatch!");
+
+                        useCompClassId = useCompClass.CompetitionClassId;
+                    }
+
+                    if (string.IsNullOrEmpty(
+                        newCfg.CompetitionVenueName) == false)
+                    {
+                        // ToDo: extend when "CompetitionVenue" implemented
+                        useCompVenueId = Guid.Empty;
+                    }
+
+                    useDb.Configurations.Add(
+                        new ConfigurationValue()
+                        {
+                            Organization = useOrganization,
+                            CompetitionId = useCompId,
+                            CompetitionClassId = useCompClassId,
+                            CompetitionVenueId = useCompVenueId,
+                            Key = newCfg.Key,
+                            Value = newCfg.Value,
+                        });
+
+                    useDb.SaveChanges();
+                }
+                catch (Exception exc)
+                {
+                    dbTrans.Rollback();
+
+                    Console.WriteLine(
+                        "Error during add of '{0}': {1}",
+                        newCfg,
+                        exc);
+                    throw;
+                }
+            }
+
+            dbTrans.Commit();
+        }
+
+
         #endregion Dance Competition Helper Database
 
         #region Dance Competition Helper 
@@ -589,6 +695,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             var newDanceCompHelper = _useHost.Services
                 .GetRequiredService<IDanceCompetitionHelper>();
             newDanceCompHelper.Migrate();
+            newDanceCompHelper.CheckMandatoryConfiguration();
 
             _scenarioContext.AddToScenarioContext(
                 SpecFlowConstants.DanceCompetitionHelper,

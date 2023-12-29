@@ -5,8 +5,8 @@ A short summary of the feature
 Scenario: No Multiple Start - None
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -57,8 +57,8 @@ Scenario: No Multiple Start - None
 Scenario: No Multiple Start - No Promotion - Too less starts - #10
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -108,8 +108,8 @@ Scenario: No Multiple Start - No Promotion - Too less starts - #10
 Scenario: No Multiple Start - No Promotion - Too less points - #10
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -159,8 +159,8 @@ Scenario: No Multiple Start - No Promotion - Too less points - #10
 Scenario: No Multiple Start - Promotion - #10
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |

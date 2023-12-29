@@ -5,10 +5,10 @@ A short summary of the feature
 Scenario: None - 2 Comps with same starters
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test 01  |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test 01  |
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
         | Test-Comp-02    | Oetsv         | ÖTSV-02          | Just a test 02  |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name        | Comment              |
@@ -91,11 +91,11 @@ Scenario: None - 2 Comps with same starters
 Scenario: None - 2 Comps with (mixed) same starters
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test 01  |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test 01  |
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-02    | Oetsv         | ÖTSV-02          | Just a test 02  |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-02    | Oetsv        | ÖTSV-02          | Just a test 02  |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name        | Comment              |
         | Test-Comp-01    | Panel 01-01 | Just one Panel 01-01 |

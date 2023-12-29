@@ -20,6 +20,8 @@
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\MultipleStarts - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\BigCompetitions\CompetitionImporter.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\Configuration - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\Configuration.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts - Copy.feature.cs" />
   </ItemGroup>
 
@@ -70,6 +72,9 @@
     </Compile>
     <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter No FollowUp.feature.cs">
       <DependentUpon>CompetitionImporter No FollowUp.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Configuration.feature.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
     <Compile Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Promotions PartA MultipleStarts No FollowUp.feature.cs">
       <DependentUpon>Promotions PartA MultipleStarts No FollowUp.feature</DependentUpon>
@@ -129,6 +134,14 @@
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\CompetitionImporter No FollowUp.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Configuration Mixed.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Tests\SpecFlow\DanceCompHelper\Oetsv\Configuration.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>

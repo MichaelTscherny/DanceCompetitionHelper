@@ -20,6 +20,33 @@ namespace DanceCompetitionHelper
         private readonly ILogger<DanceCompetitionHelperDbContext> _logger;
         private readonly IServiceProvider _serviceProvider;
 
+        public IReadOnlyList<ConfigurationValue> MandatoryConfigurationValues { get; } = new List<ConfigurationValue>()
+        {
+            // GLOBAL
+            new ConfigurationValue()
+            {
+                Key = GlobalConfigurationConstants.MaxCouplesPerHeat,
+                Value = "6"
+            },
+            new ConfigurationValue()
+            {
+                Key = GlobalConfigurationConstants.MinCooldownTimePerRound,
+                Value = "10:00"
+            },
+            new ConfigurationValue()
+            {
+                Key = GlobalConfigurationConstants.MinChangeClothesTime,
+                Value = "15:00"
+            },
+            // Oetsv
+            new ConfigurationValue()
+            {
+                Organization = OrganizationEnum.Oetsv,
+                Key = OetsvConfigurationConstants.MinTimePerDance,
+                Value = "1:30"
+            },
+        }.AsReadOnly();
+
         public DanceCompetitionHelper(
             DanceCompetitionHelperDbContext danceCompHelperDb,
             ILogger<DanceCompetitionHelperDbContext> logger,
@@ -59,6 +86,46 @@ namespace DanceCompetitionHelper
                 nameof(Migrate));
 
             _danceCompHelperDb.Migrate();
+        }
+
+        public void CheckMandatoryConfiguration()
+        {
+            _logger.LogDebug(
+                "Do '{Method}'",
+                nameof(CheckMandatoryConfiguration));
+
+            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            try
+            {
+                foreach (var mandConfig in MandatoryConfigurationValues)
+                {
+                    var retConfig = GetConfiguration(
+                        mandConfig,
+                        false);
+
+                    if (retConfig == null)
+                    {
+                        _danceCompHelperDb.Configurations.Add(
+                            mandConfig);
+                    }
+                }
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "{Method} failed: {ErrorMessage}",
+                    nameof(CheckMandatoryConfiguration),
+                    exc.Message);
+
+                dbTrans?.Rollback();
+            }
         }
 
         public void CreateTableHistory(
@@ -400,6 +467,15 @@ namespace DanceCompetitionHelper
                         var useDisplayInfo = curCompClass.DisplayInfo;
                         var useExtraPart = useDisplayInfo.ExtraParticipants;
                         var useCompClassId = curCompClass.CompetitionClassId;
+
+                        useDisplayInfo.MaxCouplesPerHeat = Convert.ToInt16(
+                            GetConfiguration(
+                                GlobalConfigurationConstants.MaxCouplesPerHeat,
+                                curCompClass,
+                                false)
+                            ?.ValueParser
+                            ?.AsDecimal()
+                            ?? 1);
 
                         if (partsByCompClass.TryGetValue(
                             useCompClassId,
@@ -2090,6 +2166,175 @@ namespace DanceCompetitionHelper
         }
 
         #endregion // Participant Crud
+
+        #region Configuration
+
+        public ConfigurationValue? GetConfiguration(
+            string key,
+            bool useTransaction = true)
+        {
+            return GetConfiguration(
+                new ConfigurationValue()
+                {
+                    Key = key
+                },
+                useTransaction);
+        }
+
+        public ConfigurationValue? GetConfiguration(
+            string key,
+            OrganizationEnum organization,
+            bool useTransaction = true)
+        {
+            return GetConfiguration(
+                new ConfigurationValue()
+                {
+                    Organization = organization,
+                    Key = key,
+                },
+                useTransaction)
+                // fallback up...
+                ?? GetConfiguration(
+                    key,
+                    useTransaction);
+        }
+
+        public ConfigurationValue? GetConfiguration(
+            string key,
+            Competition? competition,
+            bool useTransaction = true)
+        {
+            if (competition == null)
+            {
+                return null;
+            }
+
+            return GetConfiguration(
+                new ConfigurationValue()
+                {
+                    Organization = competition.Organization,
+                    CompetitionId = competition.CompetitionId,
+                    Key = key,
+                },
+                useTransaction)
+                // fallback up...
+                ?? GetConfiguration(
+                    key,
+                    competition.Organization,
+                    useTransaction);
+        }
+
+        public ConfigurationValue? GetConfiguration(
+            string key,
+            CompetitionClass? competitionClass,
+            bool useTransaction = true)
+        {
+            if (competitionClass == null)
+            {
+                return null;
+            }
+
+            var useCompetition = competitionClass.Competition;
+
+            return GetConfiguration(
+                new ConfigurationValue()
+                {
+                    Organization = useCompetition.Organization,
+                    CompetitionId = useCompetition.CompetitionId,
+                    CompetitionClassId = competitionClass.CompetitionClassId,
+                    Key = key,
+                },
+                useTransaction)
+                // fallback up...
+                ?? GetConfiguration(
+                    key,
+                    useCompetition,
+                    useTransaction);
+        }
+
+        public ConfigurationValue? GetConfiguration(
+            string key,
+            CompetitionClass? competitionClass,
+            CompetitionVenue? competitionVenue,
+            bool useTransaction = true)
+        {
+            if (competitionClass == null
+                && competitionVenue == null)
+            {
+                return null;
+            }
+
+            if (competitionVenue == null)
+            {
+                return null;
+            }
+
+            var useCompetition = competitionVenue.Competition;
+            var usecompetitionClassId = competitionClass?.CompetitionClassId ?? Guid.Empty;
+
+            return GetConfiguration(
+                new ConfigurationValue()
+                {
+                    Organization = useCompetition.Organization,
+                    CompetitionId = useCompetition.CompetitionId,
+                    CompetitionClassId = usecompetitionClassId,
+                    CompetitionVenueId = competitionVenue.CompetitionVenueId,
+                    Key = key,
+                },
+                useTransaction)
+                // fallback up...
+                ?? GetConfiguration(
+                    key,
+                    competitionClass,
+                    useTransaction)
+                ?? GetConfiguration(
+                    key,
+                    competitionVenue.Competition,
+                    useTransaction);
+        }
+
+        public ConfigurationValue? GetConfiguration(
+            ConfigurationValue? cfgValue,
+            bool useTransaction = true)
+        {
+            if (cfgValue == null)
+            {
+                return null;
+            }
+
+            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+                useTransaction);
+
+            try
+            {
+                return _danceCompHelperDb.Configurations
+                    .TagWith(
+                        nameof(GetConfiguration) + "(ConfigurationValue)")
+                    .FirstOrDefault(
+                        x => x.Organization == cfgValue.Organization
+                        && x.CompetitionId == cfgValue.CompetitionId
+                        && x.CompetitionClassId == cfgValue.CompetitionClassId
+                        && x.CompetitionVenueId == cfgValue.CompetitionVenueId
+                        && x.Key == cfgValue.Key);
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {GetConfiguration}({ConfigurationValue}): {Message}",
+                    nameof(RemoveParticipant),
+                    nameof(ConfigurationValue),
+                    exc.Message);
+
+                return null;
+            }
+            finally
+            {
+                dbTrans?.Rollback();
+            }
+        }
+
+        #endregion Configuration
 
         #region IDisposable
 

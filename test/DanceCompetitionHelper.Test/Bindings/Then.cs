@@ -47,6 +47,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Not.Null,
                             $"{nameof(Competition)} '{toChk}' not found!");
 
+                        if (foundComp == null)
+                        {
+                            continue;
+                        }
+
                         Assert.Multiple(() =>
                         {
                             Assert.That(
@@ -111,6 +116,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Not.Null,
                             $"{nameof(Competition)} '{curChk}' not found!");
 
+                        if (foundComp == null)
+                        {
+                            continue;
+                        }
+
                         var foundCompClass = GetCompetitionClass(
                             useDb,
                             foundComp.CompetitionId,
@@ -120,6 +130,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClass,
                             Is.Not.Null,
                             $"{nameof(CompetitionClass)} '{curChk}' not found!");
+
+                        if (foundCompClass == null)
+                        {
+                            continue;
+                        }
 
                         var checkFollowUpCompClass = GetCompetitionClass(
                             useDb,
@@ -144,6 +159,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             checkAdjudicatorPanel,
                             Is.Not.Null,
                             $"{nameof(AdjudicatorPanel)} '{curChk}' not found!");
+
+                        if (checkAdjudicatorPanel == null)
+                        {
+                            continue;
+                        }
 
                         Assert.Multiple(() =>
                         {
@@ -242,6 +262,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Not.Null,
                             $"{nameof(Competition)} '{curChk}' not found!");
 
+                        if (foundComp == null)
+                        {
+                            continue;
+                        }
+
                         var foundAdjPanel = GetAdjudicatorPanel(
                             useDb,
                             foundComp.CompetitionId,
@@ -251,6 +276,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundAdjPanel,
                             Is.Not.Null,
                             $"{nameof(AdjudicatorPanel)} '{curChk}' not found!");
+
+                        if (foundAdjPanel == null)
+                        {
+                            continue;
+                        }
 
                         Assert.Multiple(() =>
                         {
@@ -307,6 +337,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Not.Null,
                             $"{nameof(Competition)} '{curChk}' not found!");
 
+                        if (foundComp == null)
+                        {
+                            continue;
+                        }
+
                         var foundAdjPanel = GetAdjudicatorPanel(
                             useDb,
                             foundComp.CompetitionId,
@@ -317,6 +352,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Not.Null,
                             $"{nameof(AdjudicatorPanel)} '{curChk}' not found!");
 
+                        if (foundAdjPanel == null)
+                        {
+                            continue;
+                        }
+
                         var foundAdj = useDb.Adjudicators.FirstOrDefault(
                             x => x.AdjudicatorPanelId == foundAdjPanel.AdjudicatorPanelId
                             && x.Name == curChk.Name);
@@ -325,6 +365,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundAdj,
                             Is.Not.Null,
                             $"{nameof(Adjudicator)} '{curChk}' not found!");
+
+                        if (foundAdj == null)
+                        {
+                            continue;
+                        }
 
                         Assert.Multiple(() =>
                         {
@@ -386,6 +431,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Not.Null,
                             $"{nameof(Competition)} '{curChkHist}' not found!");
 
+                        if (foundComp == null)
+                        {
+                            continue;
+                        }
+
                         var foundCompClassHist = useDb.CompetitionClassesHistory.FirstOrDefault(
                             x => x.Competition == foundComp
                             && x.CompetitionClassName == curChkHist.CompetitionClassName);
@@ -394,6 +444,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClassHist,
                             Is.Not.Null,
                             $"{nameof(CompetitionClass)} '{curChkHist}' not found!");
+
+                        if (foundCompClassHist == null)
+                        {
+                            continue;
+                        }
 
                         Assert.Multiple(() =>
                         {
@@ -486,6 +541,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Not.Null,
                             $"{nameof(Competition)} '{curChk}' not found!");
 
+                        if (foundComp == null)
+                        {
+                            continue;
+                        }
+
                         var foundCompClass = GetCompetitionClass(
                             useDb,
                             foundComp.CompetitionId,
@@ -495,6 +555,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClass,
                             Is.Not.Null,
                             $"{nameof(CompetitionClass)} '{curChk}' not found!");
+
+                        if (foundCompClass == null)
+                        {
+                            continue;
+                        }
 
                         var foundParticipant = useDb.Participants.FirstOrDefault(
                             x => x.Competition == foundComp
@@ -506,6 +571,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundParticipant,
                             Is.Not.Null,
                             $"{nameof(Participant)} '{curChk}' not found!");
+
+                        if (foundParticipant == null)
+                        {
+                            continue;
+                        }
 
                         Assert.Multiple(() =>
                         {
@@ -621,6 +691,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Not.Null,
                             $"{nameof(Competition)} '{curChkHist}' not found!");
 
+                        if (foundComp == null)
+                        {
+                            continue;
+                        }
+
                         var foundCompClassHist = useDb.CompetitionClassesHistory.FirstOrDefault(
                             x => x.Competition == foundComp
                             && x.CompetitionClassName == curChkHist.CompetitionClassName);
@@ -629,6 +704,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClassHist,
                             Is.Not.Null,
                             $"{nameof(CompetitionClass)} '{curChkHist}' not found!");
+
+                        if (foundCompClassHist == null)
+                        {
+                            continue;
+                        }
 
                         var foundParticipant = useDb.ParticipantsHistory.FirstOrDefault(
                             x => x.Competition == foundComp
@@ -640,6 +720,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundParticipant,
                             Is.Not.Null,
                             $"{nameof(Participant)} '{curChkHist}' not found!");
+
+                        if (foundParticipant == null)
+                        {
+                            continue;
+                        }
 
                         Assert.Multiple(() =>
                         {
@@ -748,6 +833,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.Not.Null,
                         $"{nameof(Competition)} '{chkCmp.CompetitionName}' not found!");
 
+                    if (foundComp == null)
+                    {
+                        continue;
+                    }
+
                     var compLogString = string.Format(
                         "{0} '{1}'",
                         nameof(Competition),
@@ -829,6 +919,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                         useComp.HasValue,
                         Is.True,
                         $"{nameof(Competition)} '{chkCompClass.CompetitionName}' not found");
+
+                    if (useComp == null)
+                    {
+                        continue;
+                    }
 
                     var useCompId = useComp.Value;
                     if (compClassesByCompId.TryGetValue(
@@ -1078,6 +1173,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.True,
                         $"{nameof(Competition)} '{chkMultiStart.CompetitionName}' not found");
 
+                    if (useComp == null)
+                    {
+                        continue;
+                    }
+
                     var useCompId = useComp.Value;
                     if (cachedMultipleStarters.TryGetValue(
                         useCompId,
@@ -1154,6 +1254,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.True,
                         $"{nameof(Competition)} '{chkMultipleStart.CompetitionName}' not found");
 
+                    if (useComp == null)
+                    {
+                        continue;
+                    }
+
                     var useCompId = useComp.Value;
                     var curMultiStarter = useDanceCompHelper
                         .GetMultipleStarter(
@@ -1194,6 +1299,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                         useComp.HasValue,
                         Is.True,
                         $"{nameof(Competition)} '{chkPart.CompetitionName}' not found");
+
+                    if (useComp == null)
+                    {
+                        continue;
+                    }
 
                     var useCompId = useComp.Value;
                     if (participtansByCompId.TryGetValue(
@@ -1286,7 +1396,153 @@ namespace DanceCompetitionHelper.Test.Bindings
             });
         }
 
+        [Then(@"following Configuration Values exists in DanceCompetitionHelper ""([^""]*)""")]
+        public void ThenFollowingConfigurationValuesExistsInDanceCompetitionHelper(
+            string danceCompHelper,
+            Table table)
+        {
+            var checkCfgValues = table.CreateSet<ConfigurationValuePoco>();
+            var useDanceCompHelper = GetDanceCompetitionHelper(
+                danceCompHelper);
 
+            Assert.Multiple(() =>
+            {
+                foreach (var curCfgVal in checkCfgValues)
+                {
+                    // sanity checks...
+                    curCfgVal.SanityCheck();
+
+                    var useOrganization = curCfgVal.Organization;
+                    Competition? useComp = null;
+                    CompetitionClass? useCompClass = null;
+                    CompetitionVenue? useCompVenue = null;
+
+                    if (string.IsNullOrEmpty(
+                        curCfgVal.CompetitionName) == false)
+                    {
+                        useComp = useDanceCompHelper
+                            .GetCompetition(
+                                useDanceCompHelper.GetCompetition(
+                                    curCfgVal.CompetitionName ?? string.Empty));
+
+                        Assert.That(
+                            useComp,
+                            Is.Not.Null,
+                            $"[{curCfgVal}]: {nameof(Competition)} '{curCfgVal.CompetitionName}' is missing");
+
+                        if (useComp == null)
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(
+                        curCfgVal.CompetitionClassName) == false)
+                    {
+                        var useCompetitionClassId = useDanceCompHelper.GetCompetitionClass(
+                            curCfgVal.CompetitionClassName);
+
+                        useCompClass = useDanceCompHelper
+                            .GetCompetitionClasses(
+                                useComp?.CompetitionId ?? Guid.Empty)
+                            ?.FirstOrDefault(
+                                x => x.CompetitionClassId == useCompetitionClassId);
+
+                        Assert.That(
+                            useCompClass,
+                            Is.Not.Null,
+                            $"[{curCfgVal}]: {nameof(CompetitionClass)} '{curCfgVal.CompetitionClassName}' is missing");
+
+                        if (useCompClass == null)
+                        {
+                            continue;
+                        }
+
+                        Assert.That(
+                            useCompClass.CompetitionId,
+                            Is.EqualTo(
+                                useComp?.CompetitionId),
+                            $"[{curCfgVal}]: {nameof(CompetitionClass)} '{curCfgVal.CompetitionClassName}' ID missmatch");
+                    }
+
+                    if (string.IsNullOrEmpty(
+                        curCfgVal.CompetitionVenueName) == false)
+                    {
+                        // ToDo: extend when "CompetitionVenue" implemented
+                        useCompVenue = null;
+                    }
+
+                    ConfigurationValue? foundCfg = null;
+
+                    if (foundCfg == null
+                        && useOrganization == null
+                        && useComp == null
+                        && useCompClass == null
+                        && useCompVenue == null)
+                    {
+                        foundCfg = useDanceCompHelper.GetConfiguration(
+                            curCfgVal.Key);
+                    }
+
+                    if (foundCfg == null
+                        && useOrganization != null
+                        && useComp != null
+                        && useCompClass != null
+                        && useCompVenue != null)
+                    {
+                        foundCfg = useDanceCompHelper.GetConfiguration(
+                            curCfgVal.Key,
+                            useCompClass,
+                            useCompVenue);
+                    }
+
+                    if (foundCfg == null
+                        && useOrganization != null
+                        && useComp != null
+                        && useCompClass != null)
+                    {
+                        foundCfg = useDanceCompHelper.GetConfiguration(
+                            curCfgVal.Key,
+                            useCompClass);
+                    }
+
+                    if (foundCfg == null
+                        && useOrganization != null
+                        && useComp != null)
+                    {
+                        foundCfg = useDanceCompHelper.GetConfiguration(
+                            curCfgVal.Key,
+                            useComp);
+                    }
+
+                    if (foundCfg == null
+                        && useOrganization != null)
+                    {
+                        foundCfg = useDanceCompHelper.GetConfiguration(
+                            curCfgVal.Key,
+                            useOrganization.Value);
+                    }
+
+                    // check...
+                    if (string.IsNullOrEmpty(
+                        curCfgVal.Value))
+                    {
+                        Assert.That(
+                            foundCfg?.Value,
+                            Is.Null.Or.Empty,
+                            $"[{curCfgVal}]: {nameof(ConfigurationValue.Value)} missmatch (1)");
+                    }
+                    else
+                    {
+                        Assert.That(
+                            foundCfg?.Value,
+                            Is.Not.Null.And.EqualTo(
+                                curCfgVal.Value),
+                            $"[{curCfgVal}]: {nameof(ConfigurationValue.Value)} missmatch (2)");
+                    }
+                }
+            });
+        }
 
         #endregion Dance Competition Helper
 
