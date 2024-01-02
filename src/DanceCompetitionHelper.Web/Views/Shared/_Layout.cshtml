@@ -83,7 +83,12 @@
                                    asp-route-id="@useCompetitionClass">Promotions</a>
                             </li>
                         }
-
+                        <li class="nav-item">
+                            <a class="nav-link @(currentControllerName == ConfigurationController.RefName ? "active" : "")" asp-area=""
+                               asp-controller="@ConfigurationController.RefName"
+                               asp-action="@nameof(ConfigurationController.Index)"
+                               asp-route-id="@useCompetitionClass">Config</a>
+                        </li>
                     </ul>
                 </div>
             </div>

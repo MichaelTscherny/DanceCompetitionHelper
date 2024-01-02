@@ -2169,6 +2169,92 @@ namespace DanceCompetitionHelper
 
         #region Configuration
 
+        public (IEnumerable<ConfigurationValue> ConfigurationValues,
+            Competition? Competition,
+            IEnumerable<Competition>? Competitions,
+            IEnumerable<CompetitionClass>? CompetitionClasses,
+            IEnumerable<CompetitionVenue>? CompetitionVenues)
+            GetConfigurations(
+                Guid? competitionId,
+                bool useTransaction = true)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+                useTransaction);
+
+            IEnumerable<ConfigurationValue> retConfValues;
+            Competition? retComp;
+            IEnumerable<Competition>? retComps = null;
+            IEnumerable<CompetitionClass>? retCompClasses = null;
+            IEnumerable<CompetitionVenue>? retCompVenues = null;
+
+            try
+            {
+                retComp = GetCompetition(
+                    competitionId,
+                    false);
+
+                retConfValues = _danceCompHelperDb.Configurations
+                    .TagWith(
+                        nameof(GetConfigurations));
+
+                if (retComp != null)
+                {
+                    var helpOrgs = new HashSet<OrganizationEnum>()
+                {
+                    OrganizationEnum.Any,
+                    retComp.Organization,
+                };
+
+                    retConfValues = retConfValues
+                        .Where(
+                            x => helpOrgs.Contains(
+                                x.Organization));
+
+                    retComps = new List<Competition>()
+                    {
+                        retComp
+                    };
+
+                    retCompClasses = GetCompetitionClasses(
+                        retComp.CompetitionId,
+                        showAll: true);
+
+                    // TODO: implement when "CompetitionVenues" are added/implemented.
+                    retCompVenues = null;
+                }
+                else
+                {
+                    retComps = GetCompetitions(
+                        false);
+                }
+
+                // sort...
+                retConfValues = retConfValues
+                    .OrderBy(
+                        x => x.Key);
+
+                return (retConfValues,
+                    retComp,
+                    retComps,
+                    retCompClasses,
+                    retCompVenues);
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {GetConfigurations}(): {Message}",
+                    nameof(RemoveParticipant),
+                    exc.Message);
+
+                throw;
+            }
+            finally
+            {
+                dbTrans?.Rollback();
+            }
+        }
+
         public ConfigurationValue? GetConfiguration(
             string key,
             bool useTransaction = true)
@@ -2332,6 +2418,72 @@ namespace DanceCompetitionHelper
             {
                 dbTrans?.Rollback();
             }
+        }
+
+        public void AddConfiguration(
+            OrganizationEnum organization,
+            Guid competitionId,
+            Guid competitionClassId,
+            Guid competitionVenueId,
+            string key,
+            string? value,
+            string? comment)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            try
+            {
+                _danceCompHelperDb.Configurations
+                    .Add(
+                        new ConfigurationValue()
+                        {
+                            Organization = organization,
+                            CompetitionId = competitionId,
+                            CompetitionClassId = competitionClassId,
+                            CompetitionVenueId = competitionVenueId,
+                            Key = key,
+                            Value = value,
+                            Comment = comment,
+                        });
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {AddConfiguration}(): {Message}",
+                    nameof(AddConfiguration),
+                    exc.Message);
+
+                dbTrans.Rollback();
+                throw;
+            }
+        }
+
+        public void EditConfiguration(
+            OrganizationEnum organization,
+            Guid competitionId,
+            Guid competitionClassId,
+            Guid competitionVenueId,
+            string key,
+            string? value,
+            string? comment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveConfiguration(
+            OrganizationEnum organization,
+            Guid competitionId,
+            Guid competitionClassId,
+            Guid competitionVenueId,
+            string key)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion Configuration

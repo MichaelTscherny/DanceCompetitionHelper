@@ -241,6 +241,15 @@ namespace DanceCompetitionHelper
 
         #region Configuration
 
+        (IEnumerable<ConfigurationValue> ConfigurationValues,
+            Competition? Competition,
+            IEnumerable<Competition>? Competitions,
+            IEnumerable<CompetitionClass>? CompetitionClasses,
+            IEnumerable<CompetitionVenue>? CompetitionVenues)
+            GetConfigurations(
+                Guid? competitionId,
+                bool useTransaction = true);
+
         ConfigurationValue? GetConfiguration(
             string key,
             bool useTransaction = true);
@@ -260,15 +269,40 @@ namespace DanceCompetitionHelper
             CompetitionClass? competitionClass,
             bool useTransaction = true);
 
-        public ConfigurationValue? GetConfiguration(
+        ConfigurationValue? GetConfiguration(
             string key,
             CompetitionClass? competitionClass,
             CompetitionVenue? competitionVenue,
             bool useTransaction = true);
 
-        public ConfigurationValue? GetConfiguration(
+        ConfigurationValue? GetConfiguration(
             ConfigurationValue? cfgValue,
             bool useTransaction = true);
+
+        void AddConfiguration(
+            OrganizationEnum organization,
+            Guid competitionId,
+            Guid competitionClassId,
+            Guid competitionVenueId,
+            string key,
+            string? value,
+            string? comment);
+
+        void EditConfiguration(
+            OrganizationEnum organization,
+            Guid competitionId,
+            Guid competitionClassId,
+            Guid competitionVenueId,
+            string key,
+            string? value,
+            string? comment);
+
+        void RemoveConfiguration(
+            OrganizationEnum organization,
+            Guid competitionId,
+            Guid competitionClassId,
+            Guid competitionVenueId,
+            string key);
 
         #endregion Configuration
 

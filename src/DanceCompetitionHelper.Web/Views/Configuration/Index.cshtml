@@ -1,0 +1,174 @@
+﻿@using DanceCompetitionHelper.Database.Enum
+@using DanceCompetitionHelper.Database.Extensions;
+@using DanceCompetitionHelper.Database.Tables
+@using DanceCompetitionHelper.Web.Controllers
+@using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+@using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models.Configuration;
+
+@model ConfigurationOverviewViewModel
+
+@{
+    var compInfo = Model.Competition;
+    var compInfoStr = compInfo?.GetCompetitionName() ?? "Global";
+    var competitionClassesCount = Model.OverviewItems?.Count() ?? 0;
+
+    ViewData["Title"] = string.Format(
+        compInfo != null
+            ? "Configuration of Class {0}"
+            : "{0} Configuration",
+        compInfoStr);
+
+    var allConfigScopes = new List<ConfigurationScopeEnum>();
+    var configKeysByScope = new Dictionary<string, ConfigurationScopeEnum>();
+    foreach (var curItem in Model.OverviewItems ?? Enumerable.Empty<ConfigurationValue>())
+    {
+        allConfigScopes.Add(
+            curItem.Scope);
+
+        configKeysByScope[curItem.Key] = curItem.Scope;
+    }
+
+    allConfigScopes = allConfigScopes
+        .Distinct()
+        .OrderBy(
+            x => (int)x)
+        .ToList();
+}
+
+<div class="container text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    <div class="table-responsive-xxl">
+        <table class="table table-striped table-hover .table-striped-columns">
+            <thead>
+                <tr>
+                    <th>
+                        Key
+                    </th>
+                    @foreach (var curScope in allConfigScopes)
+                    {
+                        <th>
+                            @curScope
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<ConfigurationValue>())
+                {
+                    <tr>
+                        <td class="text-nowrap w-25">
+                            @Html.DisplayFor(modelItem => item.Key)
+                        </td>
+                    @foreach (var curScope in allConfigScopes)
+                    {
+                        var show = item.Scope == curScope
+                            ? item.Value
+                            : string.Empty;
+
+                        <td>
+                            @show
+                        </td>
+                    }
+                    </tr>
+                }
+            </tbody>
+            <thead>
+                <tr>
+                    <th>
+                        Key
+                    </th>
+                    @foreach (var curScope in allConfigScopes)
+                    {
+                        <th>
+                            @curScope
+                        </th>
+                    }
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div class="container text-center">
+    <form asp-action="@nameof(ConfigurationController.CreateNew)" method="post">
+        <input id="@nameof(ConfigurationViewModel.OriginCompetitionId)"
+               name="@nameof(ConfigurationViewModel.OriginCompetitionId)"
+               type="hidden" />
+
+        <div class="mb-3 text-start">
+            <label for="@nameof(ConfigurationViewModel.Key)" 
+                   class="form-label">New Configuration Value
+            </label>
+            <div class="input-group">            
+                <span class="input-group-text">Key</span>
+                <input asp-for="Dummy" 
+                       id="@nameof(ConfigurationViewModel.Key)"
+                       name="@nameof(ConfigurationViewModel.Key)"
+                       placeholder="For Key"
+                       class="form-control" />
+                <span class="input-group-text">Org</span>
+                @{
+                    var isDisabled = (Model.AvailableOrganizations?.Count ?? 0) <= 1;
+                }
+                <select asp-for="Dummy"
+                        id="@nameof(ConfigurationViewModel.Organization)"
+                        name="@nameof(ConfigurationViewModel.Organization)"                        
+                        asp-items="Model.AvailableOrganizations" 
+                        class="form-control"
+                        disabled="@isDisabled">
+                </select>
+                <span class="input-group-text">Comp</span>
+                @{
+                    isDisabled = (Model.AvailableCompetitions?.Count ?? 0) <= 1;
+                }
+                <select asp-for="Dummy"
+                        id="@nameof(ConfigurationViewModel.CompetitionId)"
+                        name="@nameof(ConfigurationViewModel.CompetitionId)"
+                        asp-items="Model.AvailableCompetitions" 
+                        class="form-control"
+                        disabled="@isDisabled">
+                </select>
+                <span class="input-group-text">Class</span>
+                @{
+                    isDisabled = (Model.AvailableCompetitionClasses?.Count ?? 0) <= 1;
+                }
+                <select asp-for="Dummy"
+                        id="@nameof(ConfigurationViewModel.CompetitionClassId)"
+                        name="@nameof(ConfigurationViewModel.CompetitionClassId)"
+                        asp-items="Model.AvailableCompetitionClasses" 
+                        class="form-control"
+                        disabled="@isDisabled">
+                </select>
+                <span class="input-group-text">Venues</span>
+                @{
+                    isDisabled = (Model.AvailableCompetitionVenues?.Count ?? 0) <= 1;
+                }
+                <select asp-for="Dummy"
+                        id="@nameof(ConfigurationViewModel.CompetitionVenueId)"
+                        name="@nameof(ConfigurationViewModel.CompetitionVenueId)"
+                        asp-items="Model.AvailableCompetitionVenues" 
+                        class="form-control"
+                        disabled="@isDisabled">
+                </select>
+                <span class="input-group-text">Value</span>
+                <input asp-for="Dummy"
+                       id="@nameof(ConfigurationViewModel.Value)"
+                       name="@nameof(ConfigurationViewModel.Value)"
+                       placeholder="Use Value"
+                       class="form-control" />
+                <input type="submit"
+                       value="Create"
+                       class="btn btn-outline-secondary" />
+            </div>
+            @if (string.IsNullOrEmpty(Model.Errors) == false)
+            {
+                <div class="text-danger">
+                    @Model.Errors
+                </div>
+            }
+        </div>
+    </form>
+    <br />
+</div>
