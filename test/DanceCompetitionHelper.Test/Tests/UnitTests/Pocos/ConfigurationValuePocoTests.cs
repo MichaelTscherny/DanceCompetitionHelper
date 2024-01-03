@@ -158,6 +158,12 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
             },
         };
 
+        /// <summary>
+        /// Yes, this is similar to <see cref="DanceCompetitionHelper.Database.Test.Tests.UnitTests.ConfigurationValueTests.SanityCheck_Test"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="toCheck"></param>
+        /// <param name="throwsException"></param>
         [Test]
         [TestCaseSource(nameof(SanityCheck_TestData))]
         public void SanityCheck_Test(
@@ -168,7 +174,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
             if (throwsException)
             {
                 Assert.Throws<ArgumentNullException>(
-                    toCheck.SanityCheck);
+                    toCheck.SanityCheck,
+                    name);
             }
             else
             {

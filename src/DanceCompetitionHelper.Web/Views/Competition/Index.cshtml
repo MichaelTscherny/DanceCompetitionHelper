@@ -164,12 +164,11 @@
         </table>
     </div>
 
-    <div class="row d-flex justify-content-center py-1">
-        <div class="col">
-            <a asp-action="@nameof(CompetitionController.ShowCreateEdit)"
-               class="btn btn-primary px-lg-4">Create new</a>&nbsp;
-            <a asp-action="@nameof(CompetitionController.ShowImport)" 
-               class="btn btn-primary px-lg-4">Import new/update</a>
-        </div>
+    <div class="hstack gap-2 justify-content-center">
+        <a asp-action="@nameof(CompetitionController.ShowCreateEdit)"
+            class="btn btn-primary px-lg-4">Create new</a>&nbsp;
+        <a asp-action="@nameof(CompetitionController.ShowImport)" 
+            class="btn btn-primary px-lg-4">Import new/update</a>
     </div>
+    <br />
 </div>

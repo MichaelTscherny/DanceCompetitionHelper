@@ -38,6 +38,8 @@
 
   <ItemGroup>
     <Folder Include="Enum\" />
+    <Folder Include="Views\Shared\DisplayTemplates\" />
+    <Folder Include="wwwroot\lib\bootstrap-icons\" />
   </ItemGroup>
 
 </Project>

@@ -41,12 +41,17 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         private IActionResult ShowConfig(
-             Guid id,
+             Guid? id,
              ConfigurationViewModel? showConfiguration = null,
-             string? errors = null)
+             string? errorsAdd = null,
+             string? errorsChange = null)
         {
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
+            var anyError = string.IsNullOrEmpty(errorsAdd) == false
+                || string.IsNullOrEmpty(errorsChange) == false;
+
+            showConfiguration?.SanityCheck();
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
@@ -67,6 +72,9 @@ namespace DanceCompetitionHelper.Web.Controllers
                     .ToSelectListItem();
                 availComps = useComps
                     ?.ToSelectListItem(
+                        anyError
+                            ? showConfiguration?.CompetitionId
+                            : null,
                         addEmpty: true);
             }
             else
@@ -76,20 +84,27 @@ namespace DanceCompetitionHelper.Web.Controllers
                         foundComp.Organization
                     }
                     .ToSelectListItem(
-                        foundComp.Organization,
+                        anyError
+                            ? showConfiguration?.Organization ?? foundComp.Organization
+                            : foundComp.Organization,
                         addEmpty: false);
                 availComps = new[]
                     {
                         foundComp
                     }
                     .ToSelectListItem(
-                        foundComp.CompetitionId,
+                        anyError
+                            ? showConfiguration?.CompetitionId ?? foundComp.CompetitionId
+                            : foundComp.CompetitionId,
                         addEmpty: false);
             }
 
             // general...
             availCompClasses = useCompClasses
                 ?.ToSelectListItem(
+                    anyError
+                        ? showConfiguration?.CompetitionClassId
+                        : null,
                     addEmpty: true);
 
             var useCfgViewModel = showConfiguration ?? new ConfigurationViewModel()
@@ -103,7 +118,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                 new ConfigurationOverviewViewModel()
                 {
                     ConfigurationViewModel = useCfgViewModel,
-                    Errors = errors,
+                    ErrorsAdd = errorsAdd,
+                    ErrorsChange = errorsChange,
                     // 
                     Competition = foundComp,
                     OverviewItems = showConfig.ToList(),
@@ -126,10 +142,12 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult CreateNew(
             ConfigurationViewModel createConfiguration)
         {
+            createConfiguration.SanityCheck();
+
             if (ModelState.IsValid == false)
             {
                 return ShowConfig(
-                    createConfiguration.OriginCompetitionId ?? Guid.Empty,
+                    createConfiguration.OriginCompetitionId,
                     createConfiguration,
                     ModelState.GetErrorMessages());
             }
@@ -148,13 +166,99 @@ namespace DanceCompetitionHelper.Web.Controllers
             catch (Exception exc)
             {
                 return ShowConfig(
-                    createConfiguration.OriginCompetitionId ?? Guid.Empty,
+                    createConfiguration.OriginCompetitionId,
                     createConfiguration,
-                    exc.InnerException?.Message ?? exc.Message);
+                    errorsAdd: exc.InnerException?.Message ?? exc.Message);
             }
 
             return RedirectToAction(
-                nameof(ConfigurationController.Index));
+                nameof(ConfigurationController.Index),
+                new
+                {
+                    Id = createConfiguration.OriginCompetitionId,
+                });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(
+            ConfigurationViewModel editConfiguration)
+        {
+            editConfiguration.SanityCheck();
+
+            if (ModelState.IsValid == false)
+            {
+                return ShowConfig(
+                    editConfiguration.OriginCompetitionId,
+                    editConfiguration,
+                    errorsChange: ModelState.GetErrorMessages());
+            }
+
+            try
+            {
+                _danceCompHelper.EditConfiguration(
+                    editConfiguration.Organization ?? OrganizationEnum.Any,
+                    editConfiguration.CompetitionId ?? Guid.Empty,
+                    editConfiguration.CompetitionClassId ?? Guid.Empty,
+                    editConfiguration.CompetitionVenueId ?? Guid.Empty,
+                    editConfiguration.Key,
+                    editConfiguration.Value,
+                    editConfiguration.Comment);
+            }
+            catch (Exception exc)
+            {
+                return ShowConfig(
+                    editConfiguration.OriginCompetitionId,
+                    editConfiguration,
+                    errorsChange: exc.InnerException?.Message ?? exc.Message);
+            }
+
+            return RedirectToAction(
+                nameof(ConfigurationController.Index),
+                new
+                {
+                    Id = editConfiguration.OriginCompetitionId,
+                });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(
+            ConfigurationViewModel deleteConfiguration)
+        {
+            deleteConfiguration.SanityCheck();
+
+            if (ModelState.IsValid == false)
+            {
+                return ShowConfig(
+                    deleteConfiguration.OriginCompetitionId,
+                    deleteConfiguration,
+                    errorsChange: ModelState.GetErrorMessages());
+            }
+
+            try
+            {
+                _danceCompHelper.RemoveConfiguration(
+                    deleteConfiguration.Organization ?? OrganizationEnum.Any,
+                    deleteConfiguration.CompetitionId ?? Guid.Empty,
+                    deleteConfiguration.CompetitionClassId ?? Guid.Empty,
+                    deleteConfiguration.CompetitionVenueId ?? Guid.Empty,
+                    deleteConfiguration.Key);
+            }
+            catch (Exception exc)
+            {
+                return ShowConfig(
+                    deleteConfiguration.OriginCompetitionId,
+                    deleteConfiguration,
+                    errorsChange: exc.InnerException?.Message ?? exc.Message);
+            }
+
+            return RedirectToAction(
+                nameof(ConfigurationController.Index),
+                new
+                {
+                    Id = deleteConfiguration.OriginCompetitionId,
+                });
         }
     }
 }

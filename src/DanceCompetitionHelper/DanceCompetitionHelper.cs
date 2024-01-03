@@ -2199,16 +2199,11 @@ namespace DanceCompetitionHelper
 
                 if (retComp != null)
                 {
-                    var helpOrgs = new HashSet<OrganizationEnum>()
-                {
-                    OrganizationEnum.Any,
-                    retComp.Organization,
-                };
-
                     retConfValues = retConfValues
                         .Where(
-                            x => helpOrgs.Contains(
-                                x.Organization));
+                            x => x.Organization == OrganizationEnum.Any
+                            || (x.Organization == retComp.Organization
+                            && x.CompetitionId == retComp.CompetitionId));
 
                     retComps = new List<Competition>()
                     {
@@ -2473,7 +2468,42 @@ namespace DanceCompetitionHelper
             string? value,
             string? comment)
         {
-            throw new NotImplementedException();
+            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            try
+            {
+                var toEdit = _danceCompHelperDb.Configurations
+                    .TagWith(
+                        nameof(EditConfiguration))
+                    .FirstOrDefault(
+                        x => x.Organization == organization
+                            && x.CompetitionId == competitionId
+                            && x.CompetitionClassId == competitionClassId
+                            && x.CompetitionVenueId == competitionVenueId
+                            && x.Key == key);
+
+                if (toEdit != null)
+                {
+                    toEdit.Value = value;
+                    toEdit.Comment = comment;
+                }
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {EditConfiguration}(): {Message}",
+                    nameof(EditConfiguration),
+                    exc.Message);
+
+                dbTrans.Rollback();
+                throw;
+            }
         }
 
         public void RemoveConfiguration(
@@ -2483,7 +2513,42 @@ namespace DanceCompetitionHelper
             Guid competitionVenueId,
             string key)
         {
-            throw new NotImplementedException();
+            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            try
+            {
+                var toRemove = _danceCompHelperDb.Configurations
+                        .TagWith(
+                            nameof(RemoveConfiguration))
+                        .FirstOrDefault(
+                            x => x.Organization == organization
+                                && x.CompetitionId == competitionId
+                                && x.CompetitionClassId == competitionClassId
+                                && x.CompetitionVenueId == competitionVenueId
+                                && x.Key == key);
+
+                if (toRemove != null)
+                {
+                    _danceCompHelperDb.Configurations.Remove(
+                        toRemove);
+                }
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {RemoveConfiguration}(): {Message}",
+                    nameof(RemoveConfiguration),
+                    exc.Message);
+
+                dbTrans.Rollback();
+                throw;
+            }
         }
 
         #endregion Configuration

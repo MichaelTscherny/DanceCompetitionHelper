@@ -77,5 +77,182 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                     expectedScope),
                 $"[{name}] {nameof(ConfigurationValue.Scope)}");
         }
+
+        public static readonly object[][] SanityCheck_TestData = new object[][]
+        {
+            // --------------------
+            new object[]
+            {
+                "OK 01",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Oetsv,
+                    CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    CompetitionVenueId = TestGuid03,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                false,
+            },
+            new object[]
+            {
+                "OK 02",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Oetsv,
+                    CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                false,
+            },
+            new object[]
+            {
+                "OK 03",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Oetsv,
+                    CompetitionId = TestGuid01,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                false,
+            },
+            new object[]
+            {
+                "OK 04",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Oetsv,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                false,
+            },
+            new object[]
+            {
+                "OK 05",
+                new ConfigurationValue()
+                {
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                false,
+            },
+            // --------------------
+            // -- 
+            new object[]
+            {
+                "Error 00",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Oetsv,
+                    CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    CompetitionVenueId = TestGuid03,
+                    Key = string.Empty,
+                },
+                true,
+            },
+            // -- 
+            new object[]
+            {
+                "Error 01-01",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Any,
+                    CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    CompetitionVenueId = TestGuid03,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                true,
+            },
+            new object[]
+            {
+                "Error 01-02",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Any,
+                    // CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    CompetitionVenueId = TestGuid03,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                true,
+            },
+            new object[]
+            {
+                "Error 01-03",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Any,
+                    CompetitionId = TestGuid01,
+                    // CompetitionClassId = TestGuid02,
+                    CompetitionVenueId = TestGuid03,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                true,
+            },
+            // --
+            new object[]
+            {
+                "Error 02-01",
+                new ConfigurationValue()
+                {
+                    // Organization = OrganizationEnum.Any,
+                    CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                true,
+            },
+            new object[]
+            {
+                "Error 02-02",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Any,
+                    // CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                true,
+            },
+            // --
+            new object[]
+            {
+                "Error 03-01",
+                new ConfigurationValue()
+                {
+                    // Organization = OrganizationEnum.Any,
+                    CompetitionId = TestGuid01,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                true,
+            },
+        };
+
+        /// <summary>
+        /// Yes, this is similar to <see cref="DanceCompetitionHelper.Test.Tests.UnitTests.Pocos.ConfigurationValuePocoTests.SanityCheck_Test"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="toCheck"></param>
+        /// <param name="throwsException"></param>
+        [Test]
+        [TestCaseSource(nameof(SanityCheck_TestData))]
+        public void SanityCheck_Test(
+            string name,
+            ConfigurationValue toCheck,
+            bool throwsException)
+        {
+            if (throwsException)
+            {
+                Assert.Throws<ArgumentNullException>(
+                    toCheck.SanityCheck,
+                    name);
+            }
+            else
+            {
+                toCheck.SanityCheck();
+            }
+        }
     }
 }

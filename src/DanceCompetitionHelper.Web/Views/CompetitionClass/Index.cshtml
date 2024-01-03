@@ -262,40 +262,38 @@
             </tfoot>
         </table>
     </div>
-    <div class="row d-flex justify-content-center py-1">
-        <div class="col">
+    <div class="hstack gap-2 justify-content-center">
+        <a asp-controller="@CompetitionClassController.RefName"
+           asp-action="@nameof(CompetitionClassController.ShowCreateEdit)"
+           asp-route-id="@Model.Competition?.CompetitionId"
+           class="btn btn-primary ">
+           Create new
+        </a>
+        <a asp-controller="@CompetitionController.RefName"
+           asp-action="@nameof(CompetitionController.Index)"
+           class="btn btn-secondary ">
+           Back
+        </a>
+        <div class="vr"></div>
+        @if (Model.DetailedView)
+        {
             <a asp-controller="@CompetitionClassController.RefName"
-               asp-action="@nameof(CompetitionClassController.ShowCreateEdit)"
+               asp-action="@nameof(CompetitionClassController.Index)"
                asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-primary px-lg-4">
-                Create new
+               class="btn btn-primary ">
+               Normal View
             </a>
-            &nbsp;
-            <a asp-controller="@CompetitionController.RefName"
-               asp-action="@nameof(CompetitionController.Index)"
-               class="btn btn-secondary px-lg-4">
-                Back
+        }
+        else
+        {
+            <a asp-controller="@CompetitionClassController.RefName"
+                asp-action="@nameof(CompetitionClassController.DetailedView)"
+                asp-route-id="@Model.Competition?.CompetitionId"
+                class="btn btn-primary">
+                Detailed View
             </a>
-            |
-            @if (Model.DetailedView)
-            {
-                <a asp-controller="@CompetitionClassController.RefName"
-                   asp-action="@nameof(CompetitionClassController.Index)"
-                   asp-route-id="@Model.Competition?.CompetitionId"
-                   class="btn btn-primary px-lg-4">
-                    Normal View
-                </a>
-            }
-            else
-            {
-                <a asp-controller="@CompetitionClassController.RefName"
-                   asp-action="@nameof(CompetitionClassController.DetailedView)"
-                   asp-route-id="@Model.Competition?.CompetitionId"
-                   class="btn btn-primary px-lg-4">
-                    Detailed View
-                </a>
-            }
-        </div>
+        }
     </div>
+    <br />
 </div>
 

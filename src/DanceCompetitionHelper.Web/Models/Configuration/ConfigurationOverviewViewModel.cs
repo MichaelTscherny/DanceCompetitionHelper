@@ -8,7 +8,8 @@ namespace DanceCompetitionHelper.Web.Models.Configuration
         public ConfigurationViewModel ConfigurationViewModel { get; set; } = new ConfigurationViewModel();
 
         public string? Dummy { get; set; }
-        public string? Errors { get; set; }
+        public string? ErrorsAdd { get; set; }
+        public string? ErrorsChange { get; set; }
 
         public List<SelectListItem>? AvailableOrganizations { get; set; } = new List<SelectListItem>();
 

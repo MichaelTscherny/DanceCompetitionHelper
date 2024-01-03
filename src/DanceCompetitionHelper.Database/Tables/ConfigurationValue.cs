@@ -79,6 +79,64 @@ namespace DanceCompetitionHelper.Database.Tables
             }
         }
 
+        public void SanityCheck()
+        {
+            var chkOrganizationEmpty = Organization == OrganizationEnum.Any;
+            var chkCompetitionIdEmpty = CompetitionId == Guid.Empty;
+            var chkCompetitionClassIdmpty = CompetitionClassId == Guid.Empty;
+            var chkCompetitionVenueIdEmpty = CompetitionVenueId == Guid.Empty;
+            var chkKeyEmpty = string.IsNullOrEmpty(Key);
+
+            if (chkKeyEmpty)
+            {
+                throw new ArgumentNullException(
+                    nameof(Key),
+                    ToString());
+            }
+
+            if (chkCompetitionVenueIdEmpty == false
+                && (chkOrganizationEmpty
+                || chkCompetitionIdEmpty
+                || chkCompetitionClassIdmpty))
+            {
+                throw new ArgumentNullException(
+                    string.Join(
+                        ", ",
+                        new[] {
+                            nameof(Organization),
+                            nameof(CompetitionId),
+                            nameof(CompetitionClassId),
+                        }),
+                    ToString());
+            }
+
+            if (chkCompetitionClassIdmpty == false
+                && (chkOrganizationEmpty
+                || chkCompetitionIdEmpty))
+            {
+                throw new ArgumentNullException(
+                    string.Join(
+                        ", ",
+                        new[] {
+                            nameof(Organization),
+                            nameof(CompetitionId),
+                        }),
+                    ToString());
+            }
+
+            if (chkCompetitionIdEmpty == false
+                && (chkOrganizationEmpty))
+            {
+                throw new ArgumentNullException(
+                    string.Join(
+                        ", ",
+                        new[] {
+                            nameof(Organization),
+                        }),
+                    ToString());
+            }
+        }
+
         [NotMapped]
         public ConfigurationValueParser ValueParser =>
             new ConfigurationValueParser(this);

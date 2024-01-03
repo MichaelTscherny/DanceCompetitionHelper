@@ -1,5 +1,6 @@
 ﻿using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Enum;
+using DanceCompetitionHelper.Database.Tables;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -33,5 +34,17 @@ namespace DanceCompetitionHelper.Web.Models.Configuration
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }
+
+        public void SanityCheck()
+        {
+            new ConfigurationValue()
+            {
+                Organization = Organization ?? OrganizationEnum.Any,
+                CompetitionId = CompetitionId ?? Guid.Empty,
+                CompetitionClassId = CompetitionClassId ?? Guid.Empty,
+                CompetitionVenueId = CompetitionVenueId ?? Guid.Empty,
+                Key = Key
+            }.SanityCheck();
+        }
     }
 }

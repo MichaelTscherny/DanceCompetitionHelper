@@ -1,6 +1,7 @@
 ﻿@using DanceCompetitionHelper.Database.Enum
 @using DanceCompetitionHelper.Database.Extensions;
 @using DanceCompetitionHelper.Database.Tables
+@using DanceCompetitionHelper.Extensions
 @using DanceCompetitionHelper.Web.Controllers
 @using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 @using DanceCompetitionHelper.Web.Extensions;
@@ -19,30 +20,51 @@
             : "{0} Configuration",
         compInfoStr);
 
-    var allConfigScopes = new List<ConfigurationScopeEnum>();
-    var configKeysByScope = new Dictionary<string, ConfigurationScopeEnum>();
+    var allConfigScopes = new List<ConfigurationScopeEnum>(
+        EnumExtensions
+            .GetValues<ConfigurationScopeEnum>()
+            .OrderBy(
+                x => (int)x));
+    var configKeysByScope = new Dictionary<string, Dictionary<ConfigurationScopeEnum, List<ConfigurationValue>>>();
+    var compsById = Model.Competitions?.ToDictionary(
+        x => x.CompetitionId,
+        x => x)
+        ?? new Dictionary<Guid, Competition>();
+    var compClassesById = Model.CompetitionClasses?.ToDictionary(
+        x => x.CompetitionClassId,
+        x => x)
+        ?? new Dictionary<Guid, CompetitionClass>();
+    // ToDo: implement when "CompetitionVenue"s added...
+    var compVenuesById = new Dictionary<Guid, CompetitionVenue>();
+
     foreach (var curItem in Model.OverviewItems ?? Enumerable.Empty<ConfigurationValue>())
     {
-        allConfigScopes.Add(
-            curItem.Scope);
+        if(curItem == null)
+        {
+            continue;
+        }
 
-        configKeysByScope[curItem.Key] = curItem.Scope;
+        configKeysByScope.AddToBucket(
+            curItem.Key,
+            curItem.Scope,
+            curItem);
     }
-
-    allConfigScopes = allConfigScopes
-        .Distinct()
-        .OrderBy(
-            x => (int)x)
-        .ToList();
 }
 
 <div class="container text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
+    @if (string.IsNullOrEmpty(Model.ErrorsChange) == false)
+    {
+        <div class="text-danger">
+            @Model.ErrorsChange
+        </div>
+    }
+
     <div class="table-responsive-xxl">
         <table class="table table-striped table-hover .table-striped-columns">
             <thead>
-                <tr>
+                <tr role="rowheader">
                     <th>
                         Key
                     </th>
@@ -55,27 +77,41 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<ConfigurationValue>())
+                @foreach (var curKey in configKeysByScope.Keys
+                    .OrderBy(
+                        x => x))
                 {
-                    <tr>
-                        <td class="text-nowrap w-25">
-                            @Html.DisplayFor(modelItem => item.Key)
-                        </td>
-                    @foreach (var curScope in allConfigScopes)
-                    {
-                        var show = item.Scope == curScope
-                            ? item.Value
-                            : string.Empty;
+                    var itemScopes = configKeysByScope[curKey];
 
-                        <td>
-                            @show
+                    <tr role="row">
+                        <td class="text-nowrap w-25 align-middle">
+                            @Html.DisplayFor(modelItem => curKey)
                         </td>
-                    }
+
+                        @foreach (var curScope in allConfigScopes)
+                        {
+                            <td class="align-bottom">
+                                @if (itemScopes.TryGetValue(
+                                    curScope,
+                                    out var item))
+                                {
+                                    @Html.EditorFor(
+                                        m => item, 
+                                        new 
+                                        {
+                                            OriginCompetitionId = Model.ConfigurationViewModel?.OriginCompetitionId,
+                                            CompetitionsById = compsById,
+                                            CompetitionClassesById = compClassesById,
+                                            CompetitionVenuesById = compVenuesById,                                            
+                                        })
+                                }
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>
             <thead>
-                <tr>
+                <tr role="rowheader">
                     <th>
                         Key
                     </th>
@@ -91,23 +127,25 @@
     </div>
 </div>
 
-<div class="container text-center">
+<div class="container text-center" role="group">
     <form asp-action="@nameof(ConfigurationController.CreateNew)" method="post">
         <input id="@nameof(ConfigurationViewModel.OriginCompetitionId)"
                name="@nameof(ConfigurationViewModel.OriginCompetitionId)"
-               type="hidden" />
+               type="hidden" 
+               value="@compInfo?.CompetitionId"/>
 
         <div class="mb-3 text-start">
             <label for="@nameof(ConfigurationViewModel.Key)" 
                    class="form-label">New Configuration Value
             </label>
-            <div class="input-group">            
+            <div class="input-group">
                 <span class="input-group-text">Key</span>
                 <input asp-for="Dummy" 
                        id="@nameof(ConfigurationViewModel.Key)"
                        name="@nameof(ConfigurationViewModel.Key)"
                        placeholder="For Key"
-                       class="form-control" />
+                       class="form-control" 
+                       value="@(string.IsNullOrEmpty(Model.ErrorsAdd) ? string.Empty : Model.ConfigurationViewModel?.Key)"/>
                 <span class="input-group-text">Org</span>
                 @{
                     var isDisabled = (Model.AvailableOrganizations?.Count ?? 0) <= 1;
@@ -117,7 +155,7 @@
                         name="@nameof(ConfigurationViewModel.Organization)"                        
                         asp-items="Model.AvailableOrganizations" 
                         class="form-control"
-                        disabled="@isDisabled">
+                        readonly="@isDisabled">
                 </select>
                 <span class="input-group-text">Comp</span>
                 @{
@@ -128,7 +166,7 @@
                         name="@nameof(ConfigurationViewModel.CompetitionId)"
                         asp-items="Model.AvailableCompetitions" 
                         class="form-control"
-                        disabled="@isDisabled">
+                        readonly="@isDisabled">
                 </select>
                 <span class="input-group-text">Class</span>
                 @{
@@ -139,7 +177,7 @@
                         name="@nameof(ConfigurationViewModel.CompetitionClassId)"
                         asp-items="Model.AvailableCompetitionClasses" 
                         class="form-control"
-                        disabled="@isDisabled">
+                        readonly="@isDisabled">
                 </select>
                 <span class="input-group-text">Venues</span>
                 @{
@@ -150,22 +188,23 @@
                         name="@nameof(ConfigurationViewModel.CompetitionVenueId)"
                         asp-items="Model.AvailableCompetitionVenues" 
                         class="form-control"
-                        disabled="@isDisabled">
+                        readonly="@isDisabled">
                 </select>
                 <span class="input-group-text">Value</span>
                 <input asp-for="Dummy"
                        id="@nameof(ConfigurationViewModel.Value)"
                        name="@nameof(ConfigurationViewModel.Value)"
                        placeholder="Use Value"
-                       class="form-control" />
-                <input type="submit"
+                       class="form-control" 
+                       value="@(string.IsNullOrEmpty(Model.ErrorsAdd) ? string.Empty : Model.ConfigurationViewModel?.Value)"/>
+                <button type="submit"
                        value="Create"
-                       class="btn btn-outline-secondary" />
+                       class="btn btn-outline-success bi bi-floppy" />
             </div>
-            @if (string.IsNullOrEmpty(Model.Errors) == false)
+            @if (string.IsNullOrEmpty(Model.ErrorsAdd) == false)
             {
                 <div class="text-danger">
-                    @Model.Errors
+                    @Model.ErrorsAdd
                 </div>
             }
         </div>
