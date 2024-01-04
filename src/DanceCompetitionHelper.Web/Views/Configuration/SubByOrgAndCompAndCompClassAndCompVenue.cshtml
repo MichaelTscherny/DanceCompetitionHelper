@@ -1,0 +1,95 @@
+﻿@using DanceCompetitionHelper.Database.Enum
+@using DanceCompetitionHelper.Database.Tables
+@using DanceCompetitionHelper.Database.Extensions
+@using DanceCompetitionHelper.Web.Helper.Configuration
+
+@* SubByOrgAndCompAndCompClassAndCompVenue.cshtml *@
+@model Dictionary<Guid, ConfigurationValue>
+
+@{
+    var originCompetitionId = (ViewData["OriginCompetitionId"] as Guid?);
+    var curKey = (ViewData["curKey"] as string);
+    var curOrgPassed = (ViewData["curOrg"] as OrganizationEnum?);
+    var curCompIdPassed = (ViewData["curCompId"] as Guid?);
+    var curCompClassIdPassed = (ViewData["curCompClassId"] as Guid?);
+    // 0
+    var byKeyAndOrgAndCompIdAndCompClassId = Model;
+    // 2
+    var allConfigKeysBy = (ViewData["allConfigKeysBy"] as CompetitionVenueDisplayHelper);
+    var allOrgs = (ViewData["allOrgs"] as List<OrganizationEnum>) ?? new List<OrganizationEnum>();
+    // 4
+    var compsById = (ViewData["compsById"] as Dictionary<Guid, Competition>) ?? new Dictionary<Guid, Competition>();
+    var allCompIds = (ViewData["allCompIds"] as List<Guid>) ?? new List<Guid>();
+    // 6
+    var compClassesById = (ViewData["compClassesById"] as Dictionary<Guid, CompetitionClass>) ?? new Dictionary<Guid, CompetitionClass>();
+    var allCompClassIds = (ViewData["allCompClassIds"] as List<Guid>) ?? new List<Guid>();
+    // 8
+    var compVenuesById = (ViewData["compVenuesById"] as Dictionary<Guid, CompetitionVenue>) ?? new Dictionary<Guid, CompetitionVenue>();
+    var allCompVenueIds = (ViewData["allCompVenueIds"] as List<Guid>) ?? new List<Guid>();
+    // 10
+    var useAllOrgs = (ViewData["useAllOrgs"] as List<OrganizationEnum>) ?? new List<OrganizationEnum>();
+    var useAllComps = (ViewData["useAllComps"] as List<Guid>) ?? new List<Guid>();
+    // 12
+    var useAllCompClasses = (ViewData["useAllCompClasses"] as List<Guid>) ?? new List<Guid>();
+    var useAllCompVenues = (ViewData["useAllCompVenues"] as List<Guid>) ?? new List<Guid>();
+
+    if (string.IsNullOrEmpty(curKey)
+        || curOrgPassed == null
+        || curCompIdPassed == null
+        || curCompClassIdPassed == null
+        //
+        || allConfigKeysBy == null
+        //
+        || useAllCompVenues.Count <= 0)
+    {
+        return;
+    }
+
+    var curOrg = curOrgPassed.Value;
+    var curCompId = curCompIdPassed.Value;
+    var curCompClassId = curCompClassIdPassed.Value;
+}
+
+@foreach (var curCompVenueId in useAllCompVenues)
+{    
+    var curItem = allConfigKeysBy.Get(
+        curKey,
+        curOrg,
+        curCompId,
+        curCompClassId,
+        curCompVenueId);
+
+    if (curItem == null)
+    {
+        continue;
+    }
+
+    compVenuesById.TryGetValue(
+        curCompVenueId,
+        out var curCompVenueInfo);
+
+    <table class="table table-striped table-hover table-bordered m-0 p-0 table-danger"> <!-- SubByOrgAndCompAndCompClassAndCompVenuestart -->
+        <thead>
+            <tr>
+                <th>
+                    @(curCompVenueInfo?.Name ?? curCompVenueId.ToString())
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    @Html.EditorFor(
+                        m => curItem,
+                        new
+                        {
+                            OriginCompetitionId = originCompetitionId,
+                            CompetitionsById = compsById,
+                            CompetitionClassesById = compClassesById,
+                            CompetitionVenuesById = compVenuesById,
+                        })
+                </td>
+            </tr>
+        </tbody>
+    </table> <!-- SubByOrgAndCompAndCompClassAndCompVenue end -->
+}

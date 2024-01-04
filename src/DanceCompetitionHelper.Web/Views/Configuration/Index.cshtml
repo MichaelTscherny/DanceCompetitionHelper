@@ -3,6 +3,7 @@
 @using DanceCompetitionHelper.Database.Tables
 @using DanceCompetitionHelper.Extensions
 @using DanceCompetitionHelper.Web.Controllers
+@using DanceCompetitionHelper.Web.Helper.Configuration
 @using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models.Configuration;
@@ -20,38 +21,48 @@
             : "{0} Configuration",
         compInfoStr);
 
-    var allConfigScopes = new List<ConfigurationScopeEnum>(
+    var allOrgs = new List<OrganizationEnum>(
         EnumExtensions
-            .GetValues<ConfigurationScopeEnum>()
+            .GetValues<OrganizationEnum>()
+            .Except(
+                new [] 
+                {
+                    OrganizationEnum.Any,
+                })
             .OrderBy(
                 x => (int)x));
-    var configKeysByScope = new Dictionary<string, Dictionary<ConfigurationScopeEnum, List<ConfigurationValue>>>();
+
+    // TODO: check why 
+    //   MinCooldownTimePerRound -> Oetsv / Test Comp 01 (org-Id 01) / Allg. Sta D (1)
+    // is not shown in "global"
+
+    var allConfigKeysBy = new CompetitionVenueDisplayHelper(
+        Model.OverviewItems);
     var compsById = Model.Competitions?.ToDictionary(
         x => x.CompetitionId,
         x => x)
         ?? new Dictionary<Guid, Competition>();
+    var allCompIds = (Model.Competitions
+        ?.Select(
+            x => x.CompetitionId)
+        ?? Enumerable.Empty<Guid>())
+        .ToList();
     var compClassesById = Model.CompetitionClasses?.ToDictionary(
         x => x.CompetitionClassId,
         x => x)
         ?? new Dictionary<Guid, CompetitionClass>();
+    var allCompClassIds = (Model.CompetitionClasses
+        ?.Select(
+            x => x.CompetitionClassId)
+        ?? Enumerable.Empty<Guid>())
+        .ToList();
+
     // ToDo: implement when "CompetitionVenue"s added...
     var compVenuesById = new Dictionary<Guid, CompetitionVenue>();
-
-    foreach (var curItem in Model.OverviewItems ?? Enumerable.Empty<ConfigurationValue>())
-    {
-        if(curItem == null)
-        {
-            continue;
-        }
-
-        configKeysByScope.AddToBucket(
-            curItem.Key,
-            curItem.Scope,
-            curItem);
-    }
+    var allCompVenueIds = new List<Guid>();
 }
 
-<div class="container text-center">
+<div class="text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
     @if (string.IsNullOrEmpty(Model.ErrorsChange) == false)
@@ -62,52 +73,80 @@
     }
 
     <div class="table-responsive-xxl">
-        <table class="table table-striped table-hover .table-striped-columns">
+        <table class="table table-striped table-hover">
             <thead>
                 <tr role="rowheader">
                     <th>
                         Key
                     </th>
-                    @foreach (var curScope in allConfigScopes)
-                    {
-                        <th>
-                            @curScope
-                        </th>
-                    }
+                    <th>
+                        @ConfigurationScopeEnum.Global
+                    </th>
+                    <th>
+                        Specific
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var curKey in configKeysByScope.Keys
-                    .OrderBy(
-                        x => x))
+                @foreach (var curKey in allConfigKeysBy.Keys)
                 {
-                    var itemScopes = configKeysByScope[curKey];
+                    if (allConfigKeysBy.AllConfigKeysBy.TryGetValue(
+                        curKey,
+                        out var byKey) == false) 
+                    {
+                        continue;
+                    }
 
-                    <tr role="row">
-                        <td class="text-nowrap w-25 align-middle">
+                    <tr role="row" data-test="mark-01"> <!-- data-test="mark-01" start -->
+                        <td class="text-nowrap w-25 align-middle"> <!-- Mark 01-01 start -->
                             @Html.DisplayFor(modelItem => curKey)
-                        </td>
+                        </td> <!-- Mark 01-01 end -->
 
-                        @foreach (var curScope in allConfigScopes)
-                        {
-                            <td class="align-bottom">
-                                @if (itemScopes.TryGetValue(
-                                    curScope,
-                                    out var item))
+                        <td class="text-nowrap align-bottom"> <!-- Mark 01-02 start -->
+                            @{
+                                var curItem = allConfigKeysBy.Get(
+                                    curKey);
+
+                                if(curItem != null)
                                 {
                                     @Html.EditorFor(
-                                        m => item, 
-                                        new 
+                                        m => curItem,
+                                        new
                                         {
                                             OriginCompetitionId = Model.ConfigurationViewModel?.OriginCompetitionId,
                                             CompetitionsById = compsById,
                                             CompetitionClassesById = compClassesById,
-                                            CompetitionVenuesById = compVenuesById,                                            
+                                            CompetitionVenuesById = compVenuesById,
                                         })
                                 }
-                            </td>
-                        }
-                    </tr>
+                            }
+                        </td> <!-- Mark 01-02 end -->
+                        <td class="align-bottom p-0"> <!-- Mark 01-03 start -->
+                            @await Html.PartialAsync(
+                                "SubByOrg",
+                                byKey,
+                                new ViewDataDictionary(
+                                    ViewData)
+                                {
+                                    { "originCompetitionId", Model.ConfigurationViewModel?.OriginCompetitionId },
+                                    { "curKey", curKey },
+                                    // 0
+                                    { "byKey", byKey },
+                                    // 2
+                                    { "allConfigKeysBy", allConfigKeysBy },
+                                    { "allOrgs", allOrgs },
+                                    // 4
+                                    { "compsById", compsById },
+                                    { "allCompIds", allCompIds },
+                                    // 6
+                                    { "compClassesById", compClassesById },
+                                    { "allCompClassIds", allCompClassIds },
+                                    // 8
+                                    { "compVenuesById", compVenuesById },
+                                    { "allCompVenueIds", allCompVenueIds },
+                                })
+                        </td> <!-- Mark 01-03 end -->
+                    </tr> <!-- data-test="mark-01" end -->                
                 }
             </tbody>
             <thead>
@@ -115,12 +154,12 @@
                     <th>
                         Key
                     </th>
-                    @foreach (var curScope in allConfigScopes)
-                    {
-                        <th>
-                            @curScope
-                        </th>
-                    }
+                    <th>
+                        @ConfigurationScopeEnum.Global
+                    </th>
+                    <th>
+                        Specific
+                    </th>
                 </tr>
             </thead>
         </table>
@@ -199,7 +238,8 @@
                        value="@(string.IsNullOrEmpty(Model.ErrorsAdd) ? string.Empty : Model.ConfigurationViewModel?.Value)"/>
                 <button type="submit"
                        value="Create"
-                       class="btn btn-outline-success bi bi-floppy" />
+                       class="btn btn-outline-success bi bi-floppy">
+                </button>
             </div>
             @if (string.IsNullOrEmpty(Model.ErrorsAdd) == false)
             {

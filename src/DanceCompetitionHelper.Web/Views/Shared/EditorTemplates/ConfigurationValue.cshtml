@@ -13,6 +13,12 @@
     var compsById = (ViewData["CompetitionsById"] as Dictionary<Guid, Competition>) ?? new Dictionary<Guid, Competition>();
     var compClassesById = (ViewData["CompetitionClassesById"] as Dictionary<Guid, CompetitionClass>) ?? new Dictionary<Guid, CompetitionClass>();
     var compVenuesById = (ViewData["CompetitionVenuesById"] as Dictionary<Guid, CompetitionVenue>) ?? new Dictionary<Guid, CompetitionVenue>();
+
+    if(cfgVal == null)
+    {
+        <div class="text-danger">INVALID VALUE!</div>
+        return;
+    }
 }
 
 <div role="group">
@@ -43,7 +49,7 @@
                value="@cfgVal.Key" />
 
         @{
-            var extraInfo = string.Empty;
+            var extraInfo = "-";
             var extraInfos = new List<string>();
 
             if (cfgVal.Organization != OrganizationEnum.Any)
@@ -100,49 +106,41 @@
                 }
             }
 
+            extraInfos.Add(
+                cfgVal.Key);
+
             extraInfo = string.Join(
-                "<br/>",
-                // "/",
+                // "<br/>",
+                "/",
                 extraInfos);
-        }
 
-        @if (string.IsNullOrEmpty(extraInfo) == false)
-        {
-            <label for="@nameof(ConfigurationViewModel.Value)" class="form-label">
-                @Html.Raw(extraInfo)
-            </label>
-
-            @*
-            <span for="@nameof(ConfigurationViewModel.Value)" class="input-group-text">
-                @Html.Raw(extraInfo)
-            </span>
-            *@
+            if(string.IsNullOrEmpty(
+                extraInfo))
+            {
+                extraInfo = "-";
+            }
         }
-
-        @*
-        @if(Model.Organization != OrganizationEnum.Any)
-        {
-            <span for="@nameof(ConfigurationViewModel.Value)" class="input-group-text">
-                @Model.Organization
-            </span>
-        }
-        *@
 
         <div class="input-group mw-100">
-            <input id="@nameof(ConfigurationViewModel.Value)"
-                    name="@nameof(ConfigurationViewModel.Value)"
-                   value="@cfgVal.Value"
-                    placeholder="Use Value"
-                    class="form-control" />
-
+            <div data-bs-toggle="tooltip"
+                 data-bs-custom-class="custom-tooltip"
+                 data-bs-title="@(extraInfo)">
+                <input id="@nameof(ConfigurationViewModel.Value)"
+                        name="@nameof(ConfigurationViewModel.Value)"
+                        value="@cfgVal.Value"
+                        placeholder="Use Value"
+                        class="form-control" />
+            </div>
             <button type="submit"
                     value="edit"
                     asp-action="@nameof(ConfigurationController.Edit)"
-                    class="btn btn-outline-success bi bi-floppy" />
+                    class="btn btn-outline-success bi bi-floppy">
+            </button>
             <button type="submit"
                     value="delete"
                     asp-action="@nameof(ConfigurationController.Delete)"
-                    class="btn btn-outline-danger bi bi-trash" />
+                    class="btn btn-outline-danger bi bi-trash">
+            </button>
         </div>
     </form>
 </div>

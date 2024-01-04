@@ -15,15 +15,15 @@ namespace DanceCompetitionHelper.Web.Extensions
             }
 
             return string.Join(
-                    separator,
-                    fromModel.Values
-                        .Where(
-                            x => x.ValidationState != ModelValidationState.Valid
-                            && x.Errors.Count >= 1)
-                        .SelectMany(
-                            x => x.Errors)
-                        .Select(
-                            x => x.ErrorMessage));
+                separator,
+                fromModel.Values
+                    .Where(
+                        x => x.ValidationState != ModelValidationState.Valid
+                        && x.Errors.Count >= 1)
+                    .SelectMany(
+                        x => x.Errors)
+                    .Select(
+                        x => x.ErrorMessage));
         }
     }
 }

@@ -71,11 +71,6 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 participant,
                 allClasses);
 
-            if (participant.StartNumber == 35)
-            {
-                var gotIt = true;
-            }
-
             // check all follow-up classes till "promotion"
             // is reached...
             foreach (var curClass in allClasses.ToList())
