@@ -22,7 +22,7 @@ Scenario: Update 03 - Changed Points and Starts
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionA | PossiblePromotionAInfo                 |
         #                                                                                  
         | Small Tournament | Allg.Kl. Sta D       | 101         | Dancer-A 01 | Dancer-B 01 | False              | [A] 152/4 + 750/5 = 902/9 -> False     |
-        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 500/11 + 750/5 = 1250/16 -> True   |
+        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 500/11 + 450/3 = 950/14 -> True    |
         #                                                                               
         | Small Tournament | Allg.Kl. Sta C       | 201         | Dancer-A 03 | Dancer-B 03 | False              | [A] 333/3 + 600/4 = 933/7 -> False     |
         | Small Tournament | Allg.Kl. Sta C       | 202         | Dancer-A 04 | Dancer-B 04 | False              | [A] 666/6 + 600/4 = 1266/10 -> False   |
@@ -56,7 +56,7 @@ Scenario: Update 03 - Changed Points and Starts
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionA | PossiblePromotionAInfo                 |
         #                                                                                  
         | Small Tournament | Allg.Kl. Sta D       | 101         | Dancer-A 01 | Dancer-B 01 | True               | [A] 300/5 + 750/5 = 1050/10 -> True    |
-        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 600/12 + 750/5 = 1350/17 -> True   |
+        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 600/12 + 300/2 = 900/14 -> True    |
         #                                                                               
         | Small Tournament | Allg.Kl. Sta C       | 201         | Dancer-A 03 | Dancer-B 03 | False              | [A] 444/4 + 600/4 = 1044/8 -> False    |
         | Small Tournament | Allg.Kl. Sta C       | 202         | Dancer-A 04 | Dancer-B 04 | False              | [A] 777/7 + 600/4 = 1377/11 -> False   |

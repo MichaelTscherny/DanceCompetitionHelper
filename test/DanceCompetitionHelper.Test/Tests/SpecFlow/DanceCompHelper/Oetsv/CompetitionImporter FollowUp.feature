@@ -46,7 +46,7 @@ Scenario: Import 02
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionA | PossiblePromotionAInfo                 |
         #                                                                                  
         | Small Tournament | Allg.Kl. Sta D       | 101         | Dancer-A 01 | Dancer-B 01 | False              | [A] 152/4 + 750/5 = 902/9 -> False     |
-        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 500/11 + 750/5 = 1250/16 -> True   |
+        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 500/11 + 450/3 = 950/14 -> True    |
         #                                                                               
         | Small Tournament | Allg.Kl. Sta C       | 201         | Dancer-A 03 | Dancer-B 03 | False              | [A] 333/3 + 600/4 = 933/7 -> False     |
         | Small Tournament | Allg.Kl. Sta C       | 202         | Dancer-A 04 | Dancer-B 04 | False              | [A] 666/6 + 600/4 = 1266/10 -> False   |

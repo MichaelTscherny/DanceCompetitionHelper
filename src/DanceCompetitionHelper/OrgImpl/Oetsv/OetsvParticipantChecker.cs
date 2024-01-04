@@ -44,7 +44,8 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             }
         }
 
-        public CheckPromotionInfo CheckParticipantPromotion(Participant participant)
+        public CheckPromotionInfo CheckParticipantPromotion(
+            Participant participant)
         {
             var usePartCompClass = participant.CompetitionClass;
             var allClasses = new List<CompetitionClass>();
@@ -66,10 +67,25 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                     usePartCompClass);
             }
 
-            // check all follow-up classes...
+            var retChkPromo = GetCheckPromotionInfo(
+                participant,
+                allClasses);
+
+            if (participant.StartNumber == 35)
+            {
+                var gotIt = true;
+            }
+
+            // check all follow-up classes till "promotion"
+            // is reached...
             foreach (var curClass in allClasses.ToList())
             {
                 var useFollowUpClass = curClass.FollowUpCompetitionClass;
+
+                if (retChkPromo.PossiblePromotion)
+                {
+                    return retChkPromo;
+                }
 
                 // check all follow-ups...
                 while (useFollowUpClass != null)
@@ -79,15 +95,34 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         break;
                     }
 
-                    if (allClasses.Contains(useFollowUpClass) == false)
+                    if (allClasses.Contains(
+                        useFollowUpClass) == false)
                     {
                         allClasses.Add(
                             useFollowUpClass);
                     }
 
                     useFollowUpClass = useFollowUpClass.FollowUpCompetitionClass;
+
+                    retChkPromo = GetCheckPromotionInfo(
+                        participant,
+                        allClasses);
+
+                    if (retChkPromo.PossiblePromotion)
+                    {
+                        return retChkPromo;
+                    }
                 }
             }
+
+            return retChkPromo;
+        }
+
+        public CheckPromotionInfo GetCheckPromotionInfo(
+            Participant participant,
+            List<CompetitionClass> allClasses)
+        {
+            var usePartCompClass = participant.CompetitionClass;
 
             // let's check...
             var pointsForFirst = allClasses

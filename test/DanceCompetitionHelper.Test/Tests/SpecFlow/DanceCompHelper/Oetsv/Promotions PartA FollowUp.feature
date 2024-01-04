@@ -191,15 +191,15 @@ Scenario: No Multiple Start - Promotion - #10 - First Class
         | CompetitionName |
         | Test-Comp-01    |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo              |
+        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo             |
         #                                                                                  
-        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | true               | [A] 800/9 + 200/2 = 1000/11 -> True |
+        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | true               | [A] 800/9 + 100/1 = 900/10 -> True |
         #                                                                               
-        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False    |
+        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False   |
         #                                                        
-        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 200/2 = 200/2 -> False    |
+        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 200/2 = 200/2 -> False   |
         #                                                        
-        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False    |
+        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False   |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
         | Test-Comp-01    | Allg Sta D           | Allg Sta C                   | Class-01   | 1                 | 0                  |                        | 0                    |                          | 0                  |
