@@ -280,28 +280,28 @@ namespace DanceCompetitionHelper
             bool useTransaction = true);
 
         void AddConfiguration(
-            OrganizationEnum organization,
-            Guid competitionId,
-            Guid competitionClassId,
-            Guid competitionVenueId,
+            OrganizationEnum? organization,
+            Guid? competitionId,
+            Guid? competitionClassId,
+            Guid? competitionVenueId,
             string key,
             string? value,
             string? comment);
 
         void EditConfiguration(
-            OrganizationEnum organization,
-            Guid competitionId,
-            Guid competitionClassId,
-            Guid competitionVenueId,
+            OrganizationEnum? organization,
+            Guid? competitionId,
+            Guid? competitionClassId,
+            Guid? competitionVenueId,
             string key,
             string? value,
             string? comment);
 
         void RemoveConfiguration(
-            OrganizationEnum organization,
-            Guid competitionId,
-            Guid competitionClassId,
-            Guid competitionVenueId,
+            OrganizationEnum? organization,
+            Guid? competitionId,
+            Guid? competitionClassId,
+            Guid? competitionVenueId,
             string key);
 
         #endregion Configuration

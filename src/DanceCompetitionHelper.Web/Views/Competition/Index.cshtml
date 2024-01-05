@@ -1,4 +1,5 @@
 ﻿@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Database.Extensions;
 @using DanceCompetitionHelper.Extensions
 @using DanceCompetitionHelper.OrgImpl.Oetsv
 @using DanceCompetitionHelper.Web.Controllers;
@@ -68,8 +69,7 @@
                             <a asp-controller="@CompetitionClassController.RefName"
                                asp-action="@nameof(CompetitionClassController.Index)"
                                asp-route-id="@item.CompetitionId">
-                                @Html.DisplayFor(modelItem => item.CompetitionName)
-                                (@Html.DisplayFor(modelItem => item.OrgCompetitionId))
+                                @item.GetCompetitionName()
                             </a>
                         </td>
                         <td>

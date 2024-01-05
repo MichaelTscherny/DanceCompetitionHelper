@@ -1,6 +1,7 @@
 ﻿@using DanceCompetitionHelper.Database.Enum
 @using DanceCompetitionHelper.Database.Tables
 @using DanceCompetitionHelper.Database.Extensions
+@using DanceCompetitionHelper.Web.Controllers
 @using DanceCompetitionHelper.Web.Helper.Configuration
 
 @* SubByOrgAndComp.cshtml *@
@@ -62,7 +63,11 @@
         <thead>
             <tr>
                 <th>
-                    @(curCompInfo?.GetCompetitionName() ?? curCompId.ToString())
+                    <a asp-controller="@CompetitionClassController.RefName"
+                       asp-action="@nameof(CompetitionClassController.Index)"
+                       asp-route-id="@curCompInfo?.CompetitionId">
+                        @(curCompInfo?.GetCompetitionName() ?? curCompId.ToString())
+                    </a>
                 </th>
             </tr>
         </thead>

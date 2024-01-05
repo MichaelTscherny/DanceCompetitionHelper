@@ -39,10 +39,10 @@ namespace DanceCompetitionHelper.Web.Models.Configuration
         {
             new ConfigurationValue()
             {
-                Organization = Organization ?? OrganizationEnum.Any,
-                CompetitionId = CompetitionId ?? Guid.Empty,
-                CompetitionClassId = CompetitionClassId ?? Guid.Empty,
-                CompetitionVenueId = CompetitionVenueId ?? Guid.Empty,
+                Organization = Organization,
+                CompetitionId = CompetitionId,
+                CompetitionClassId = CompetitionClassId,
+                CompetitionVenueId = CompetitionVenueId,
                 Key = Key
             }.SanityCheck();
         }

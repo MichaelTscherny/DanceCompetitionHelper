@@ -83,8 +83,7 @@
                 {
                     <tr>
                         <td class="text-nowrap" style="background-color: @item.CompetitionColor">
-                            @Html.DisplayFor(modelItem => item.CompetitionClassName)
-                            (@Html.DisplayFor(modelItem => item.OrgClassId))
+                            @item.GetCompetitionClassName()
                         </td>
                         @{
                             var displayFollowUp = "-";

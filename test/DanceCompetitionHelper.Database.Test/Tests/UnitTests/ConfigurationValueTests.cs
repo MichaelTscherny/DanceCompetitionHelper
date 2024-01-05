@@ -4,7 +4,7 @@ using DanceCompetitionHelper.Database.Tables;
 namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
 {
     [TestFixture]
-    public class ConfigurationValueTests
+    internal class ConfigurationValueTests
     {
         public static readonly Guid TestGuid01 = new Guid("11111111-1111-1111-1111-111111111111");
         public static readonly Guid TestGuid02 = new Guid("22222222-2222-2222-2222-222222222222");
@@ -14,9 +14,18 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
         {
             new object[]
             {
-                ConfigurationScopeEnum.Global.ToString(),
+                ConfigurationScopeEnum.Global.ToString() + " 01",
                 new ConfigurationValue()
                 {
+                },
+                ConfigurationScopeEnum.Global,
+            },
+            new object[]
+            {
+                ConfigurationScopeEnum.Global.ToString() + " 02",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Any,
                 },
                 ConfigurationScopeEnum.Global,
             },
@@ -52,12 +61,24 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             },
             new object[]
             {
-                ConfigurationScopeEnum.CompetitionVenue.ToString(),
+                ConfigurationScopeEnum.CompetitionVenue.ToString() + " 01",
                 new ConfigurationValue()
                 {
                     Organization = OrganizationEnum.Oetsv,
                     CompetitionId = TestGuid01,
                     CompetitionClassId = TestGuid02,
+                    CompetitionVenueId = TestGuid03,
+                },
+                ConfigurationScopeEnum.CompetitionVenue,
+            },
+            new object[]
+            {
+                ConfigurationScopeEnum.CompetitionVenue.ToString() + " 02",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Oetsv,
+                    CompetitionId = TestGuid01,
+                    // CompetitionClassId = TestGuid02,
                     CompetitionVenueId = TestGuid03,
                 },
                 ConfigurationScopeEnum.CompetitionVenue,
@@ -101,7 +122,8 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                 {
                     Organization = OrganizationEnum.Oetsv,
                     CompetitionId = TestGuid01,
-                    CompetitionClassId = TestGuid02,
+                    // CompetitionClassId = TestGuid02,
+                    CompetitionVenueId = TestGuid03,
                     Key = nameof(ConfigurationValue.Key),
                 },
                 false,
@@ -113,6 +135,8 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                 {
                     Organization = OrganizationEnum.Oetsv,
                     CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
                     Key = nameof(ConfigurationValue.Key),
                 },
                 false,
@@ -123,6 +147,9 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                 new ConfigurationValue()
                 {
                     Organization = OrganizationEnum.Oetsv,
+                    CompetitionId = TestGuid01,
+                    // CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
                     Key = nameof(ConfigurationValue.Key),
                 },
                 false,
@@ -132,6 +159,36 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                 "OK 05",
                 new ConfigurationValue()
                 {
+                    Organization = OrganizationEnum.Oetsv,
+                    // CompetitionId = TestGuid01,
+                    // CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                false,
+            },
+            new object[]
+            {
+                "OK 06",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Any,
+                    // CompetitionId = TestGuid01,
+                    // CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                false,
+            },
+            new object[]
+            {
+                "OK 07",
+                new ConfigurationValue()
+                {
+                    // Organization = OrganizationEnum.Any,
+                    // CompetitionId = TestGuid01,
+                    // CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
                     Key = nameof(ConfigurationValue.Key),
                 },
                 false,
@@ -170,8 +227,8 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                 "Error 01-02",
                 new ConfigurationValue()
                 {
-                    Organization = OrganizationEnum.Any,
-                    // CompetitionId = TestGuid01,
+                    // Organization = OrganizationEnum.Oetsv,
+                    CompetitionId = TestGuid01,
                     CompetitionClassId = TestGuid02,
                     CompetitionVenueId = TestGuid03,
                     Key = nameof(ConfigurationValue.Key),
@@ -181,6 +238,19 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             new object[]
             {
                 "Error 01-03",
+                new ConfigurationValue()
+                {
+                    Organization = OrganizationEnum.Oetsv,
+                    // CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    CompetitionVenueId = TestGuid03,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                true,
+            },
+            new object[]
+            {
+                "Error 01-04",
                 new ConfigurationValue()
                 {
                     Organization = OrganizationEnum.Any,
@@ -197,9 +267,10 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                 "Error 02-01",
                 new ConfigurationValue()
                 {
-                    // Organization = OrganizationEnum.Any,
+                    // Organization = OrganizationEnum.Oetsv,
                     CompetitionId = TestGuid01,
                     CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
                     Key = nameof(ConfigurationValue.Key),
                 },
                 true,
@@ -209,9 +280,10 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                 "Error 02-02",
                 new ConfigurationValue()
                 {
-                    Organization = OrganizationEnum.Any,
+                    Organization = OrganizationEnum.Oetsv,
                     // CompetitionId = TestGuid01,
                     CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
                     Key = nameof(ConfigurationValue.Key),
                 },
                 true,
@@ -222,8 +294,37 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                 "Error 03-01",
                 new ConfigurationValue()
                 {
+                    Organization = OrganizationEnum.Oetsv,
+                    // CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                true,
+            },
+            new object[]
+            {
+                "Error 03-02",
+                new ConfigurationValue()
+                {
+                    // Organization = OrganizationEnum.Oetsv,
+                    CompetitionId = TestGuid01,
+                    CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
+                    Key = nameof(ConfigurationValue.Key),
+                },
+                true,
+            },
+            // --
+            new object[]
+            {
+                "Error 04-01",
+                new ConfigurationValue()
+                {
                     // Organization = OrganizationEnum.Any,
                     CompetitionId = TestGuid01,
+                    // CompetitionClassId = TestGuid02,
+                    // CompetitionVenueId = TestGuid03,
                     Key = nameof(ConfigurationValue.Key),
                 },
                 true,

@@ -14,7 +14,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                 "OK 01",
                 new ConfigurationValuePoco()
                 {
-                    Organization = OrganizationEnum.Any,
+                    Organization = OrganizationEnum.Oetsv,
                     CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
                     CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
                     CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
@@ -27,9 +27,10 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                 "OK 02",
                 new ConfigurationValuePoco()
                 {
-                    Organization = OrganizationEnum.Any,
+                    Organization = OrganizationEnum.Oetsv,
                     CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
-                    CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
                     Key = nameof(ConfigurationValuePoco.Key),
                 },
                 false,
@@ -39,8 +40,10 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                 "OK 03",
                 new ConfigurationValuePoco()
                 {
-                    Organization = OrganizationEnum.Any,
+                    Organization = OrganizationEnum.Oetsv,
                     CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
                     Key = nameof(ConfigurationValuePoco.Key),
                 },
                 false,
@@ -50,7 +53,10 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                 "OK 04",
                 new ConfigurationValuePoco()
                 {
-                    Organization = OrganizationEnum.Any,
+                    Organization = OrganizationEnum.Oetsv,
+                    CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    // CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
                     Key = nameof(ConfigurationValuePoco.Key),
                 },
                 false,
@@ -60,6 +66,36 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                 "OK 05",
                 new ConfigurationValuePoco()
                 {
+                    Organization = OrganizationEnum.Oetsv,
+                    // CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    // CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
+                    Key = nameof(ConfigurationValuePoco.Key),
+                },
+                false,
+            },
+            new object[]
+            {
+                "OK 06",
+                new ConfigurationValuePoco()
+                {
+                    Organization = OrganizationEnum.Any,
+                    // CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    // CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
+                    Key = nameof(ConfigurationValuePoco.Key),
+                },
+                false,
+            },
+            new object[]
+            {
+                "OK 07",
+                new ConfigurationValuePoco()
+                {
+                    Organization = OrganizationEnum.Any,
+                    // CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    // CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
                     Key = nameof(ConfigurationValuePoco.Key),
                 },
                 false,
@@ -85,7 +121,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                 "Error 01-01",
                 new ConfigurationValuePoco()
                 {
-                    // Organization = OrganizationEnum.Any,
+                    Organization = OrganizationEnum.Any,
                     CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
                     CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
                     CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
@@ -98,8 +134,8 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                 "Error 01-02",
                 new ConfigurationValuePoco()
                 {
-                    Organization = OrganizationEnum.Any,
-                    // CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    // Organization = OrganizationEnum.Oetsv,
+                    CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
                     CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
                     CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
                     Key = nameof(ConfigurationValuePoco.Key),
@@ -109,6 +145,19 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
             new object[]
             {
                 "Error 01-03",
+                new ConfigurationValuePoco()
+                {
+                    Organization = OrganizationEnum.Oetsv,
+                    // CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
+                    Key = nameof(ConfigurationValuePoco.Key),
+                },
+                true,
+            },
+            new object[]
+            {
+                "Error 01-04",
                 new ConfigurationValuePoco()
                 {
                     Organization = OrganizationEnum.Any,
@@ -128,6 +177,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                     // Organization = OrganizationEnum.Any,
                     CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
                     CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
                     Key = nameof(ConfigurationValuePoco.Key),
                 },
                 true,
@@ -140,6 +190,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                     Organization = OrganizationEnum.Any,
                     // CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
                     CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
                     Key = nameof(ConfigurationValuePoco.Key),
                 },
                 true,
@@ -150,8 +201,37 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Pocos
                 "Error 03-01",
                 new ConfigurationValuePoco()
                 {
+                    Organization = OrganizationEnum.Oetsv,
+                    // CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
+                    Key = nameof(ConfigurationValuePoco.Key),
+                },
+                true,
+            },
+            new object[]
+            {
+                "Error 03-02",
+                new ConfigurationValuePoco()
+                {
+                    // Organization = OrganizationEnum.Oetsv,
+                    CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
+                    Key = nameof(ConfigurationValuePoco.Key),
+                },
+                true,
+            },
+            // --
+            new object[]
+            {
+                "Error 04-01",
+                new ConfigurationValuePoco()
+                {
                     // Organization = OrganizationEnum.Any,
                     CompetitionName = nameof(ConfigurationValuePoco.CompetitionName),
+                    // CompetitionClassName = nameof(ConfigurationValuePoco.CompetitionClassName),
+                    // CompetitionVenueName = nameof(ConfigurationValuePoco.CompetitionVenueName),
                     Key = nameof(ConfigurationValuePoco.Key),
                 },
                 true,

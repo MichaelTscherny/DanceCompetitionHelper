@@ -2199,11 +2199,30 @@ namespace DanceCompetitionHelper
 
                 if (retComp != null)
                 {
+                    var orgIds = new HashSet<OrganizationEnum?>()
+                    {
+                        null,
+                        OrganizationEnum.Any,
+                        retComp.Organization
+                    };
+                    var compIds = new HashSet<Guid?>()
+                    {
+                        null,
+                        retComp.CompetitionId,
+                    };
+
+                    /*
                     retConfValues = retConfValues
                         .Where(
-                            x => x.Organization == OrganizationEnum.Any
+                            x => (x.Organization == null
+                            || x.Organization == OrganizationEnum.Any)
                             || (x.Organization == retComp.Organization
                             && x.CompetitionId == retComp.CompetitionId));
+                    */
+                    retConfValues = retConfValues
+                        .Where(
+                            x => orgIds.Contains(x.Organization)
+                            && compIds.Contains(x.CompetitionId));
 
                     retComps = new List<Competition>()
                     {
@@ -2226,7 +2245,8 @@ namespace DanceCompetitionHelper
                 // sort...
                 retConfValues = retConfValues
                     .OrderBy(
-                        x => x.Key);
+                        x => x.Key)
+                    .ToList();
 
                 return (retConfValues,
                     retComp,
@@ -2416,10 +2436,10 @@ namespace DanceCompetitionHelper
         }
 
         public void AddConfiguration(
-            OrganizationEnum organization,
-            Guid competitionId,
-            Guid competitionClassId,
-            Guid competitionVenueId,
+            OrganizationEnum? organization,
+            Guid? competitionId,
+            Guid? competitionClassId,
+            Guid? competitionVenueId,
             string key,
             string? value,
             string? comment)
@@ -2430,11 +2450,17 @@ namespace DanceCompetitionHelper
 
             try
             {
+                var useOrganization = organization;
+                if (useOrganization == OrganizationEnum.Any)
+                {
+                    organization = null;
+                }
+
                 _danceCompHelperDb.Configurations
                     .Add(
                         new ConfigurationValue()
                         {
-                            Organization = organization,
+                            Organization = useOrganization,
                             CompetitionId = competitionId,
                             CompetitionClassId = competitionClassId,
                             CompetitionVenueId = competitionVenueId,
@@ -2460,10 +2486,10 @@ namespace DanceCompetitionHelper
         }
 
         public void EditConfiguration(
-            OrganizationEnum organization,
-            Guid competitionId,
-            Guid competitionClassId,
-            Guid competitionVenueId,
+            OrganizationEnum? organization,
+            Guid? competitionId,
+            Guid? competitionClassId,
+            Guid? competitionVenueId,
             string key,
             string? value,
             string? comment)
@@ -2507,10 +2533,10 @@ namespace DanceCompetitionHelper
         }
 
         public void RemoveConfiguration(
-            OrganizationEnum organization,
-            Guid competitionId,
-            Guid competitionClassId,
-            Guid competitionVenueId,
+            OrganizationEnum? organization,
+            Guid? competitionId,
+            Guid? competitionClassId,
+            Guid? competitionVenueId,
             string key)
         {
             using var dbTrans = _danceCompHelperDb.BeginTransaction()

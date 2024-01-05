@@ -61,21 +61,21 @@
             <tr>
                 <td class="text-nowrap align-bottom">
                     @{
-                    var curItem = allConfigKeysBy.Get(
-                        curKey,
-                        curOrg);
+                        var curItem = allConfigKeysBy.Get(
+                            curKey,
+                            curOrg);
 
-                    if(curItem != null)
-                    {
-                        @Html.EditorFor(
-                            m => curItem,
-                            new
-                            {
-                                OriginCompetitionId = originCompetitionId,
-                                CompetitionsById = compsById,
-                                CompetitionClassesById = compClassesById,
-                                CompetitionVenuesById = compVenuesById,
-                            })
+                        if(curItem != null)
+                        {
+                            @Html.EditorFor(
+                                m => curItem,
+                                new
+                                {
+                                    OriginCompetitionId = originCompetitionId,
+                                    CompetitionsById = compsById,
+                                    CompetitionClassesById = compClassesById,
+                                    CompetitionVenuesById = compVenuesById,
+                                })
                         }
                     }
                 </td>

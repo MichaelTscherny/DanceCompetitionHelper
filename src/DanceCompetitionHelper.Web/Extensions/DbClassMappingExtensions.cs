@@ -52,7 +52,8 @@ namespace DanceCompetitionHelper.Web.Extensions
                 retList.Add(
                     new SelectListItem()
                     {
-                        Value = Guid.Empty.ToString(),
+                        // ToDo: is this ok?..
+                        Value = string.Empty, /* Guid.Empty.ToString(), */
                         Text = "None",
                         Selected = false
                     });

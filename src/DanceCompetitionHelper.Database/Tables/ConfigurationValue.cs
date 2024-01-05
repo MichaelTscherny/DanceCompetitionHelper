@@ -7,24 +7,38 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("Configurations")]
-    [PrimaryKey(nameof(Organization), nameof(CompetitionId), nameof(CompetitionClassId), nameof(CompetitionVenueId), nameof(Key))]
+    [PrimaryKey(nameof(ConfigurationValueId))]
+    [Index(nameof(Organization), nameof(CompetitionId), nameof(CompetitionClassId), nameof(CompetitionVenueId), nameof(Key), IsUnique = true)]
     [Index(nameof(Key), IsUnique = false)]
     public class ConfigurationValue : TableBase
     {
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid ConfigurationValueId { get; set; }
+
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public OrganizationEnum Organization { get; set; } = OrganizationEnum.Any;
+        public OrganizationEnum? Organization { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Comment("Ref to " + nameof(Tables.Competition))]
-        public Guid CompetitionId { get; set; } = Guid.Empty;
+        public Guid? CompetitionId { get; set; }
+
+        [ForeignKey(nameof(CompetitionId))]
+        public Competition? Competition { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Comment("Ref to " + nameof(Tables.CompetitionClass))]
-        public Guid CompetitionClassId { get; set; } = Guid.Empty;
+        public Guid? CompetitionClassId { get; set; }
+
+        [ForeignKey(nameof(CompetitionClassId))]
+        public CompetitionClass? CompetitionClass { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Comment("Ref to " + nameof(Tables.CompetitionVenue))]
-        public Guid CompetitionVenueId { get; set; } = Guid.Empty;
+        public Guid? CompetitionVenueId { get; set; }
+
+        [ForeignKey(nameof(CompetitionVenueId))]
+        public CompetitionVenue? CompetitionVenue { get; set; }
 
         [Required]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsLarge)]
@@ -40,37 +54,40 @@ namespace DanceCompetitionHelper.Database.Tables
         [NotMapped]
         public ConfigurationScopeEnum Scope
         {
-            // TODO: add tests!..
             get
             {
-                if (Organization != OrganizationEnum.Any
-                    && CompetitionId != Guid.Empty
-                    && CompetitionClassId != Guid.Empty
-                    && CompetitionVenueId != Guid.Empty)
+                if (Organization != null
+                    && Organization != OrganizationEnum.Any
+                    && CompetitionId != null
+                    /* && CompetitionClassId != null */
+                    && CompetitionVenueId != null)
                 {
                     return ConfigurationScopeEnum.CompetitionVenue;
                 }
 
-                if (Organization != OrganizationEnum.Any
-                    && CompetitionId != Guid.Empty
-                    && CompetitionClassId != Guid.Empty
-                    && CompetitionVenueId == Guid.Empty)
+                if (Organization != null
+                    && Organization != OrganizationEnum.Any
+                    && CompetitionId != null
+                    && CompetitionClassId != null
+                    && CompetitionVenueId == null)
                 {
                     return ConfigurationScopeEnum.CompetitionClass;
                 }
 
-                if (Organization != OrganizationEnum.Any
-                    && CompetitionId != Guid.Empty
-                    && CompetitionClassId == Guid.Empty
-                    && CompetitionVenueId == Guid.Empty)
+                if (Organization != null
+                    && Organization != OrganizationEnum.Any
+                    && CompetitionId != null
+                    && CompetitionClassId == null
+                    && CompetitionVenueId == null)
                 {
                     return ConfigurationScopeEnum.Competition;
                 }
 
-                if (Organization != OrganizationEnum.Any
-                    && CompetitionId == Guid.Empty
-                    && CompetitionClassId == Guid.Empty
-                    && CompetitionVenueId == Guid.Empty)
+                if (Organization != null
+                    && Organization != OrganizationEnum.Any
+                    && CompetitionId == null
+                    && CompetitionClassId == null
+                    && CompetitionVenueId == null)
                 {
                     return ConfigurationScopeEnum.Organization;
                 }
@@ -81,10 +98,10 @@ namespace DanceCompetitionHelper.Database.Tables
 
         public void SanityCheck()
         {
-            var chkOrganizationEmpty = Organization == OrganizationEnum.Any;
-            var chkCompetitionIdEmpty = CompetitionId == Guid.Empty;
-            var chkCompetitionClassIdmpty = CompetitionClassId == Guid.Empty;
-            var chkCompetitionVenueIdEmpty = CompetitionVenueId == Guid.Empty;
+            var chkOrganizationEmpty = Organization == null || Organization == OrganizationEnum.Any;
+            var chkCompetitionIdEmpty = CompetitionId == null;
+            var chkCompetitionClassIdEmpty = CompetitionClassId == null;
+            var chkCompetitionVenueIdEmpty = CompetitionVenueId == null;
             var chkKeyEmpty = string.IsNullOrEmpty(Key);
 
             if (chkKeyEmpty)
@@ -97,7 +114,7 @@ namespace DanceCompetitionHelper.Database.Tables
             if (chkCompetitionVenueIdEmpty == false
                 && (chkOrganizationEmpty
                 || chkCompetitionIdEmpty
-                || chkCompetitionClassIdmpty))
+                /* || chkCompetitionClassIdmpty */))
             {
                 throw new ArgumentNullException(
                     string.Join(
@@ -110,7 +127,7 @@ namespace DanceCompetitionHelper.Database.Tables
                     ToString());
             }
 
-            if (chkCompetitionClassIdmpty == false
+            if (chkCompetitionClassIdEmpty == false
                 && (chkOrganizationEmpty
                 || chkCompetitionIdEmpty))
             {

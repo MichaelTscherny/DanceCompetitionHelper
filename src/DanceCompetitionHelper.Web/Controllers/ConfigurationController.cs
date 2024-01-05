@@ -51,7 +51,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             var anyError = string.IsNullOrEmpty(errorsAdd) == false
                 || string.IsNullOrEmpty(errorsChange) == false;
 
-            showConfiguration?.SanityCheck();
+            // showConfiguration?.SanityCheck();
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
@@ -69,7 +69,10 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 availOrgs = EnumExtensions
                     .GetValues<OrganizationEnum>()
-                    .ToSelectListItem();
+                    .ToSelectListItem(
+                        anyError
+                            ? showConfiguration?.Organization
+                            : null);
                 availComps = useComps
                     ?.ToSelectListItem(
                         anyError
@@ -142,8 +145,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult CreateNew(
             ConfigurationViewModel createConfiguration)
         {
-            createConfiguration.SanityCheck();
-
             if (ModelState.IsValid == false)
             {
                 return ShowConfig(
@@ -154,11 +155,13 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             try
             {
+                createConfiguration.SanityCheck();
+
                 _danceCompHelper.AddConfiguration(
-                    createConfiguration.Organization ?? OrganizationEnum.Any,
-                    createConfiguration.CompetitionId ?? Guid.Empty,
-                    createConfiguration.CompetitionClassId ?? Guid.Empty,
-                    createConfiguration.CompetitionVenueId ?? Guid.Empty,
+                    createConfiguration.Organization,
+                    createConfiguration.CompetitionId,
+                    createConfiguration.CompetitionClassId,
+                    createConfiguration.CompetitionVenueId,
                     createConfiguration.Key,
                     createConfiguration.Value,
                     createConfiguration.Comment);
@@ -184,8 +187,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult Edit(
             ConfigurationViewModel editConfiguration)
         {
-            editConfiguration.SanityCheck();
-
             if (ModelState.IsValid == false)
             {
                 return ShowConfig(
@@ -196,11 +197,13 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             try
             {
+                editConfiguration.SanityCheck();
+
                 _danceCompHelper.EditConfiguration(
-                    editConfiguration.Organization ?? OrganizationEnum.Any,
-                    editConfiguration.CompetitionId ?? Guid.Empty,
-                    editConfiguration.CompetitionClassId ?? Guid.Empty,
-                    editConfiguration.CompetitionVenueId ?? Guid.Empty,
+                    editConfiguration.Organization,
+                    editConfiguration.CompetitionId,
+                    editConfiguration.CompetitionClassId,
+                    editConfiguration.CompetitionVenueId,
                     editConfiguration.Key,
                     editConfiguration.Value,
                     editConfiguration.Comment);
@@ -226,8 +229,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult Delete(
             ConfigurationViewModel deleteConfiguration)
         {
-            deleteConfiguration.SanityCheck();
-
             if (ModelState.IsValid == false)
             {
                 return ShowConfig(
@@ -238,11 +239,13 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             try
             {
+                deleteConfiguration.SanityCheck();
+
                 _danceCompHelper.RemoveConfiguration(
-                    deleteConfiguration.Organization ?? OrganizationEnum.Any,
-                    deleteConfiguration.CompetitionId ?? Guid.Empty,
-                    deleteConfiguration.CompetitionClassId ?? Guid.Empty,
-                    deleteConfiguration.CompetitionVenueId ?? Guid.Empty,
+                    deleteConfiguration.Organization,
+                    deleteConfiguration.CompetitionId,
+                    deleteConfiguration.CompetitionClassId,
+                    deleteConfiguration.CompetitionVenueId,
                     deleteConfiguration.Key);
             }
             catch (Exception exc)

@@ -52,16 +52,17 @@
             var extraInfo = "-";
             var extraInfos = new List<string>();
 
-            if (cfgVal.Organization != OrganizationEnum.Any)
+            if (cfgVal.Organization != null
+                && cfgVal.Organization != OrganizationEnum.Any)
             {
                 extraInfos.Add(
-                    cfgVal.Organization.ToString());
+                    cfgVal.Organization.Value.ToString());
             }
 
-            if (cfgVal.CompetitionId != Guid.Empty)
+            if (cfgVal.CompetitionId != null)
             {
                 if (compsById?.TryGetValue(
-                        cfgVal.CompetitionId,
+                        cfgVal.CompetitionId.Value,
                     out var foundComp) == true)
                 {                        
                     extraInfos.Add(
@@ -70,14 +71,14 @@
                 else
                 {
                     extraInfos.Add(
-                        cfgVal.CompetitionId.ToString());
+                        cfgVal.CompetitionId.Value.ToString());
                 }
             }
 
-            if (cfgVal.CompetitionClassId != Guid.Empty)
+            if (cfgVal.CompetitionClassId != null)
             {
                 if (compClassesById?.TryGetValue(
-                    cfgVal.CompetitionClassId,
+                    cfgVal.CompetitionClassId.Value,
                     out var foundCompClass) == true)
                 {                        
                     extraInfos.Add(
@@ -86,14 +87,14 @@
                 else
                 {
                     extraInfos.Add(
-                    cfgVal.CompetitionClassId.ToString());
+                        cfgVal.CompetitionClassId.Value.ToString());
                 }
             }
 
-            if (cfgVal.CompetitionVenueId != Guid.Empty)
+            if (cfgVal.CompetitionVenueId != null)
             {
                 if (compVenuesById?.TryGetValue(
-                    cfgVal.CompetitionVenueId,
+                    cfgVal.CompetitionVenueId.Value,
                     out var foundVenues) == true)
                 {                        
                     extraInfos.Add(
@@ -102,7 +103,7 @@
                 else
                 {
                     extraInfos.Add(
-                        cfgVal.CompetitionVenueId.ToString());
+                        cfgVal.CompetitionVenueId.Value.ToString());
                 }
             }
 
@@ -121,16 +122,15 @@
             }
         }
 
-        <div class="input-group mw-100">
-            <div data-bs-toggle="tooltip"
-                 data-bs-custom-class="custom-tooltip"
-                 data-bs-title="@(extraInfo)">
-                <input id="@nameof(ConfigurationViewModel.Value)"
-                        name="@nameof(ConfigurationViewModel.Value)"
-                        value="@cfgVal.Value"
-                        placeholder="Use Value"
-                        class="form-control" />
-            </div>
+        <div class="input-group">
+            <input id="@nameof(ConfigurationViewModel.Value)"
+                   name="@nameof(ConfigurationViewModel.Value)"
+                   value="@cfgVal.Value"
+                   placeholder="Use Value"
+                   class="form-control"
+                   data-bs-toggle="tooltip"
+                   data-bs-custom-class="custom-tooltip"
+                   data-bs-title="@(extraInfo)" />
             <button type="submit"
                     value="edit"
                     asp-action="@nameof(ConfigurationController.Edit)"

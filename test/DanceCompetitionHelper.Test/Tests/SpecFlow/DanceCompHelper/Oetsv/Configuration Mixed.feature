@@ -23,7 +23,7 @@ Scenario: With Organization Configuration
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            |
-    And following Configuration Values exists in "DanceCompHelper-db"
+    And following Configuration Values in "DanceCompHelper-db"
         | Organization | CompetitionName | CompetitionClassName | CompetitionVenueName | Key                     | Value |
         | Oetsv        |                 |                      |                      | MaxCouplesPerHeat       | 111   |
     # Basic configuration
@@ -86,7 +86,7 @@ Scenario: With Organization And Competition Configuration
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            |
-    And following Configuration Values exists in "DanceCompHelper-db"
+    And following Configuration Values in "DanceCompHelper-db"
         | Organization | CompetitionName | CompetitionClassName | CompetitionVenueName | Key               | Value |
         | Oetsv        |                 |                      |                      | MaxCouplesPerHeat | 111   |
         | Oetsv        | Test-Comp-01    |                      |                      | MaxCouplesPerHeat | 222   |
@@ -149,7 +149,7 @@ Scenario: With Organization And Competition And Competition Class Configuration
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            |
-    And following Configuration Values exists in "DanceCompHelper-db"
+    And following Configuration Values in "DanceCompHelper-db"
         | Organization | CompetitionName | CompetitionClassName | CompetitionVenueName | Key               | Value |
         | Oetsv        |                 |                      |                      | MaxCouplesPerHeat | 111   |
         | Oetsv        | Test-Comp-01    |                      |                      | MaxCouplesPerHeat | 222   |
@@ -221,7 +221,7 @@ Scenario: With Organization And Competition And Competition Class And Venue Conf
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            |
-    And following Configuration Values exists in "DanceCompHelper-db"
+    And following Configuration Values in "DanceCompHelper-db"
         | Organization | CompetitionName | CompetitionClassName | CompetitionVenueName | Key               | Value |
         | Oetsv        |                 |                      |                      | MaxCouplesPerHeat | 111   |
         | Oetsv        | Test-Comp-01    |                      |                      | MaxCouplesPerHeat | 222   |

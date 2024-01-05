@@ -42,11 +42,16 @@
         x => x.CompetitionId,
         x => x)
         ?? new Dictionary<Guid, Competition>();
-    var allCompIds = (Model.Competitions
-        ?.Select(
-            x => x.CompetitionId)
-        ?? Enumerable.Empty<Guid>())
-        .ToList();
+    var allCompIds = new Guid[]
+        {
+            // ToDo: go on here...
+            // Guid.Empty,
+        }.Union(
+            Model.Competitions
+                ?.Select(
+                    x => x.CompetitionId)
+                ?? Enumerable.Empty<Guid>())
+            .ToList();
     var compClassesById = Model.CompetitionClasses?.ToDictionary(
         x => x.CompetitionClassId,
         x => x)
@@ -193,7 +198,7 @@
                         id="@nameof(ConfigurationViewModel.Organization)"
                         name="@nameof(ConfigurationViewModel.Organization)"                        
                         asp-items="Model.AvailableOrganizations" 
-                        class="form-control"
+                        class="form-select"
                         readonly="@isDisabled">
                 </select>
                 <span class="input-group-text">Comp</span>
@@ -204,7 +209,7 @@
                         id="@nameof(ConfigurationViewModel.CompetitionId)"
                         name="@nameof(ConfigurationViewModel.CompetitionId)"
                         asp-items="Model.AvailableCompetitions" 
-                        class="form-control"
+                        class="form-select"
                         readonly="@isDisabled">
                 </select>
                 <span class="input-group-text">Class</span>
@@ -215,7 +220,7 @@
                         id="@nameof(ConfigurationViewModel.CompetitionClassId)"
                         name="@nameof(ConfigurationViewModel.CompetitionClassId)"
                         asp-items="Model.AvailableCompetitionClasses" 
-                        class="form-control"
+                        class="form-select"
                         readonly="@isDisabled">
                 </select>
                 <span class="input-group-text">Venues</span>
@@ -226,7 +231,7 @@
                         id="@nameof(ConfigurationViewModel.CompetitionVenueId)"
                         name="@nameof(ConfigurationViewModel.CompetitionVenueId)"
                         asp-items="Model.AvailableCompetitionVenues" 
-                        class="form-control"
+                        class="form-select"
                         readonly="@isDisabled">
                 </select>
                 <span class="input-group-text">Value</span>

@@ -574,8 +574,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             dbTrans.Commit();
         }
 
-        [Given(@"following Configuration Values exists in ""([^""]*)""")]
-        public void GivenFollowingConfigurationValuesExistsIn(
+        [Given(@"following Configuration Values in ""([^""]*)""")]
+        public void GivenFollowingConfigurationExistsIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -596,10 +596,10 @@ namespace DanceCompetitionHelper.Test.Bindings
                 {
                     newCfg.SanityCheck();
 
-                    OrganizationEnum useOrganization = newCfg.Organization ?? OrganizationEnum.Any;
-                    Guid useCompId = Guid.Empty;
-                    Guid useCompClassId = Guid.Empty;
-                    Guid useCompVenueId = Guid.Empty;
+                    OrganizationEnum? useOrganization = newCfg.Organization;
+                    Guid? useCompId = null;
+                    Guid? useCompClassId = null;
+                    Guid? useCompVenueId = null;
 
                     if (string.IsNullOrEmpty(
                         newCfg.CompetitionName) == false)
@@ -627,7 +627,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     {
                         var useCompClass = GetCompetitionClass(
                             useDb,
-                            useCompId,
+                            useCompId ?? Guid.Empty,
                             newCfg.CompetitionClassName);
 
                         Assert.That(
@@ -647,7 +647,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         newCfg.CompetitionVenueName) == false)
                     {
                         // ToDo: extend when "CompetitionVenue" implemented
-                        useCompVenueId = Guid.Empty;
+                        useCompVenueId = null;
                     }
 
                     useDb.Configurations.Add(

@@ -43,31 +43,34 @@ namespace DanceCompetitionHelper.Web.Helper.Configuration
                     AllConfigKeysBy[curItem.Key] = foundByKey;
                 }
 
+                var useOrganization = curItem.Organization ?? OrganizationEnum.Any;
                 if (foundByKey.TryGetValue(
-                    curItem.Organization,
+                    useOrganization,
                     out var foundByKeyAndOrg) == false)
                 {
                     foundByKeyAndOrg = new Dictionary<Guid, Dictionary<Guid, Dictionary<Guid, ConfigurationValue>>>();
-                    foundByKey[curItem.Organization] = foundByKeyAndOrg;
+                    foundByKey[useOrganization] = foundByKeyAndOrg;
                 }
 
+                var useCompetitionId = curItem.CompetitionId ?? Guid.Empty;
                 if (foundByKeyAndOrg.TryGetValue(
-                    curItem.CompetitionId,
+                    useCompetitionId,
                     out var foundByKeyAndOrgAndCompId) == false)
                 {
                     foundByKeyAndOrgAndCompId = new Dictionary<Guid, Dictionary<Guid, ConfigurationValue>>();
-                    foundByKeyAndOrg[curItem.CompetitionId] = foundByKeyAndOrgAndCompId;
+                    foundByKeyAndOrg[useCompetitionId] = foundByKeyAndOrgAndCompId;
                 }
 
+                var useCompetitionClassId = curItem.CompetitionClassId ?? Guid.Empty;
                 if (foundByKeyAndOrgAndCompId.TryGetValue(
-                    curItem.CompetitionClassId,
+                    useCompetitionClassId,
                     out var foundByKeyAndOrgAndCompIdAndCompClassId) == false)
                 {
                     foundByKeyAndOrgAndCompIdAndCompClassId = new Dictionary<Guid, ConfigurationValue>();
-                    foundByKeyAndOrgAndCompId[curItem.CompetitionClassId] = foundByKeyAndOrgAndCompIdAndCompClassId;
+                    foundByKeyAndOrgAndCompId[useCompetitionClassId] = foundByKeyAndOrgAndCompIdAndCompClassId;
                 }
 
-                foundByKeyAndOrgAndCompIdAndCompClassId[curItem.CompetitionVenueId] = curItem;
+                foundByKeyAndOrgAndCompIdAndCompClassId[curItem.CompetitionVenueId ?? Guid.Empty] = curItem;
             }
         }
 
@@ -81,46 +84,46 @@ namespace DanceCompetitionHelper.Web.Helper.Configuration
 
         public ConfigurationValue? Get(
             string key,
-            OrganizationEnum organization)
+            OrganizationEnum? organization)
         {
             return Get(
                 key,
                 organization,
-                Guid.Empty);
+                null);
         }
 
         public ConfigurationValue? Get(
             string key,
-            OrganizationEnum organization,
-            Guid competitionId)
+            OrganizationEnum? organization,
+            Guid? competitionId)
         {
             return Get(
                 key,
                 organization,
                 competitionId,
-                Guid.Empty);
+                null);
         }
 
         public ConfigurationValue? Get(
             string key,
-            OrganizationEnum organization,
-            Guid competitionId,
-            Guid competitionClassId)
+            OrganizationEnum? organization,
+            Guid? competitionId,
+            Guid? competitionClassId)
         {
             return Get(
                 key,
                 organization,
                 competitionId,
                 competitionClassId,
-                Guid.Empty);
+                null);
         }
 
         public ConfigurationValue? Get(
             string key,
-            OrganizationEnum organization,
-            Guid competitionId,
-            Guid competitionClassId,
-            Guid competitionVenueId)
+            OrganizationEnum? organization,
+            Guid? competitionId,
+            Guid? competitionClassId,
+            Guid? competitionVenueId)
         {
             if (AllConfigKeysBy.TryGetValue(
                 key,
@@ -130,28 +133,28 @@ namespace DanceCompetitionHelper.Web.Helper.Configuration
             }
 
             if (byKey.TryGetValue(
-                organization,
+                organization ?? OrganizationEnum.Any,
                 out var byKeyAndOrg) == false)
             {
                 return null;
             }
 
             if (byKeyAndOrg.TryGetValue(
-                competitionId,
+                competitionId ?? Guid.Empty,
                 out var byKeyAndOrgAndCompId) == false)
             {
                 return null;
             }
 
             if (byKeyAndOrgAndCompId.TryGetValue(
-                competitionClassId,
+                competitionClassId ?? Guid.Empty,
                 out var byKeyAndOrgAndCompIdAndCompClassId) == false)
             {
                 return null;
             }
 
             byKeyAndOrgAndCompIdAndCompClassId.TryGetValue(
-                competitionVenueId,
+                competitionVenueId ?? Guid.Empty,
                 out var foundConfigVal);
 
             return foundConfigVal;

@@ -25,6 +25,14 @@ namespace DanceCompetitionHelper.Database.Tables
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string Name { get; set; } = default!;
 
+        [Required]
+        [Range(0, int.MaxValue)]
+        public int LengthInMeter { get; set; } = default!;
+
+        [Required]
+        [Range(0, int.MaxValue)]
+        public int WidthInMeter { get; set; } = default!;
+
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }
     }

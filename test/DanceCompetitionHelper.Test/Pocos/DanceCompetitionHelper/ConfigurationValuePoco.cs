@@ -13,7 +13,7 @@ namespace DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper
 
         public void SanityCheck()
         {
-            var chkOrganizationEmpty = Organization.HasValue == false;
+            var chkOrganizationEmpty = Organization == null || Organization == OrganizationEnum.Any;
             var chkCompetitionNameEmpty = string.IsNullOrEmpty(CompetitionName);
             var chkCompetitionClassNameEmpty = string.IsNullOrEmpty(CompetitionClassName);
             var chkCompetitionVenueNameEmpty = string.IsNullOrEmpty(CompetitionVenueName);
@@ -29,7 +29,7 @@ namespace DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper
             if (chkCompetitionVenueNameEmpty == false
                 && (chkOrganizationEmpty
                 || chkCompetitionNameEmpty
-                || chkCompetitionClassNameEmpty))
+                /* || chkCompetitionClassNameEmpty */))
             {
                 throw new ArgumentNullException(
                     string.Join(
