@@ -93,3 +93,6 @@ Scenario: Import 01 - Competition only
         | Gänserndorf Cup | Single o.Startbuch (LW, TA, WW)        |                              | 067        | Sta        | Offen    |          | Bsp   | 999999999             | 10                    |
         | Gänserndorf Cup | Single m.Startbuch (SA, CC, JI)        |                              | 068        | La         | Offen    |          | D     | 999999999             | 10                    |
         | Gänserndorf Cup | Single m.Startbuch (LW, TA, WW)        |                              | 069        | Sta        | Offen    |          | D     | 999999999             | 10                    |
+    And following Competition Venues exists in DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName | Name       | Comment                             |
+        | Gänserndorf Cup | Main Floor | Created by OetsvCompetitionImporter |

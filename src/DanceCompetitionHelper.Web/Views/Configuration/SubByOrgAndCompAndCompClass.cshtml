@@ -1,6 +1,7 @@
 ﻿@using DanceCompetitionHelper.Database.Enum
 @using DanceCompetitionHelper.Database.Tables
 @using DanceCompetitionHelper.Database.Extensions
+@using DanceCompetitionHelper.Web.Controllers
 @using DanceCompetitionHelper.Web.Helper.Configuration
 
 @* SubByOrgAndCompAndCompClass.cshtml *@
@@ -49,11 +50,26 @@
 @foreach (var curCompClassId in useAllCompClasses)
 {
     if (byKeyAndOrgAndCompId.TryGetValue(
-        curCompClassId,
-        out var byKeyAndOrgAndCompIdAndCompClassId) == false)
+            curCompClassId,
+            out var byKeyAndOrgAndCompIdAndCompClassId) == false)
     {
         continue;
     }
+
+    var useAllCompVenues = allCompVenueIds
+        .Where(
+            x => byKeyAndOrgAndCompIdAndCompClassId.ContainsKey(x)
+            || x == Guid.Empty)
+        .ToList();
+
+    @* ToDo: empy "for all" not yet working...
+    if (byKeyAndOrgAndCompIdAndCompClassId.Count == 1
+        && byKeyAndOrgAndCompIdAndCompClassId.ContainsKey(
+            Guid.Empty))
+    {
+        continue;
+    }
+    *@
 
     compClassesById.TryGetValue(
         curCompClassId,
@@ -63,13 +79,24 @@
         <thead>
             <tr>
                 <th>
-                    @(curCompClassInfo?.GetCompetitionClassName() ?? curCompClassId.ToString())
+                    @if (curCompClassId != Guid.Empty)
+                    {
+                        <a asp-controller="@CompetitionClassController.RefName"
+                           asp-action="@nameof(CompetitionClassController.ShowEdit)"
+                           asp-route-id="@curCompClassId">
+                            @(curCompClassInfo?.GetCompetitionClassName() ?? curCompClassId.ToString())
+                        </a>
+                    }
+                    else 
+                    {
+                        <div class="text-danger">@(ConfigurationController.ForAll)!</div>
+                    }
                 </th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>
+                <td class="text-nowrap align-bottom">
                     @{
                         var curItem = allConfigKeysBy.Get(
                             curKey,
@@ -77,7 +104,8 @@
                             curCompId,
                             curCompClassId);
 
-                        if (curItem != null)
+                        if (curCompClassId != Guid.Empty
+                            && curItem != null)
                         {
                             @Html.EditorFor(
                                  m => curItem,
@@ -93,11 +121,6 @@
                 </td>
 
                 @{
-                    var useAllCompVenues = allCompVenueIds
-                        .Where(
-                            x => byKeyAndOrgAndCompIdAndCompClassId.ContainsKey(x))
-                        .ToList();
-
                     if(useAllCompVenues.Count >= 1)
                     {
                         <td class="align-bottom p-0"> <!-- SubByOrgAndCompAndCompClass - SubByOrgAndCompAndCompClassAndCompVenue start -->

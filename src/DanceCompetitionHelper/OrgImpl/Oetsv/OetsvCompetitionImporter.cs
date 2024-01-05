@@ -793,6 +793,27 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                         "Added {0}: {1}",
                         nameof(Competition),
                         foundComp));
+
+                var newCompVenue = dbCtx.CompetitionVenues.Add(
+                    new CompetitionVenue()
+                    {
+                        Competition = foundComp,
+                        Name = "Main Floor",
+                        Comment = string.Format(
+                            "Created by {0}",
+                            nameof(OetsvCompetitionImporter)),
+                    })
+                    .Entity;
+
+                _logger.LogInformation(
+                    "Added {CompetitionVenueName}: {newCompVenue}",
+                    nameof(CompetitionVenue),
+                    newCompVenue);
+                retWorkInfo.Add(
+                    string.Format(
+                        "Added {0}: {1}",
+                        nameof(CompetitionVenue),
+                        newCompVenue));
             }
             else
             {

@@ -63,24 +63,28 @@
         <thead>
             <tr>
                 <th>
-                    <a asp-controller="@CompetitionClassController.RefName"
-                       asp-action="@nameof(CompetitionClassController.Index)"
-                       asp-route-id="@curCompInfo?.CompetitionId">
-                        @(curCompInfo?.GetCompetitionName() ?? curCompId.ToString())
-                    </a>
+                    @if (curCompId != Guid.Empty)
+                    {
+                        <a asp-controller="@CompetitionClassController.RefName"
+                           asp-action="@nameof(CompetitionClassController.Index)"
+                           asp-route-id="@curCompInfo?.CompetitionId">
+                            @(curCompInfo?.GetCompetitionName() ?? curCompId.ToString())
+                        </a>
+                    }
                 </th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>
+                <td class="text-nowrap align-bottom">
                     @{
                         var curItem = allConfigKeysBy.Get(
                             curKey,
                             curOrg,
                             curCompId);
 
-                        if (curItem != null)
+                        if (curCompId != Guid.Empty
+                            && curItem != null)
                         {
                             @Html.EditorFor(
                                  m => curItem,
@@ -98,7 +102,8 @@
                 @{
                     var useAllCompClasses = allCompClassIds
                         .Where(
-                            x => byKeyAndOrgAndCompId.ContainsKey(x))
+                            x => byKeyAndOrgAndCompId.ContainsKey(x)
+                            || x == Guid.Empty)
                         .ToList();
 
                     if (useAllCompClasses.Count >= 1)

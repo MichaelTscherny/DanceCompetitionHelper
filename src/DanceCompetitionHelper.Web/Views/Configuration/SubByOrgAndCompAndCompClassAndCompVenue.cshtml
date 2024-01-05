@@ -1,6 +1,7 @@
 ﻿@using DanceCompetitionHelper.Database.Enum
 @using DanceCompetitionHelper.Database.Tables
 @using DanceCompetitionHelper.Database.Extensions
+@using DanceCompetitionHelper.Web.Controllers
 @using DanceCompetitionHelper.Web.Helper.Configuration
 
 @* SubByOrgAndCompAndCompClassAndCompVenue.cshtml *@
@@ -51,7 +52,7 @@
 }
 
 @foreach (var curCompVenueId in useAllCompVenues)
-{    
+{   
     var curItem = allConfigKeysBy.Get(
         curKey,
         curOrg,
@@ -59,7 +60,8 @@
         curCompClassId,
         curCompVenueId);
 
-    if (curItem == null)
+    if (curCompVenueId == Guid.Empty
+        || curItem == null)
     {
         continue;
     }
@@ -72,7 +74,11 @@
         <thead>
             <tr>
                 <th>
-                    @(curCompVenueInfo?.Name ?? curCompVenueId.ToString())
+                    <a asp-controller="@CompetitionVenueController.RefName"
+                       asp-action="@nameof(CompetitionVenueController.ShowEdit)"
+                       asp-route-id="@curCompVenueId">
+                        @(curCompVenueInfo?.Name ?? curCompVenueId.ToString())
+                    </a>
                 </th>
             </tr>
         </thead>

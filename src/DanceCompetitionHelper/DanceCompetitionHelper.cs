@@ -371,12 +371,12 @@ namespace DanceCompetitionHelper
                     .ThenBy(
                         x => x.CompetitionClassName);
 
-                var allCompetitionClasses = showAll
-                    ? getAllCompClasses.ToList()
+                var allCompetitionClasses = (showAll
+                    ? getAllCompClasses
                     : getAllCompClasses
                         .Where(
-                            x => x.Ignore == false)
-                        .ToList();
+                            x => x.Ignore == false))
+                    .ToList();
 
                 // cleanup "PreviousCompetitionClass"
                 foreach (var curCompClass in allCompetitionClasses)
@@ -535,6 +535,44 @@ namespace DanceCompetitionHelper
 
                     yield return curCompClass;
                 }
+            }
+            finally
+            {
+                dbTrans?.Rollback();
+            }
+        }
+
+        public IEnumerable<CompetitionVenue> GetCompetitionVenues(
+            Guid? competitionId,
+            bool useTransaction = true)
+        {
+            if (competitionId == null)
+            {
+                return Enumerable.Empty<CompetitionVenue>();
+            }
+
+            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+                useTransaction);
+
+            try
+            {
+                var foundComp = GetCompetition(
+                    competitionId,
+                    false);
+
+                if (foundComp == null)
+                {
+                    return Enumerable.Empty<CompetitionVenue>();
+                }
+
+                // we do only basic info..
+                return _danceCompHelperDb.CompetitionVenues
+                    .TagWith(
+                        nameof(GetCompetitionVenues))
+                    .Where(
+                        x => x.CompetitionId == competitionId)
+                    .OrderBy(
+                        x => x.Name);
             }
             finally
             {
@@ -1023,6 +1061,16 @@ namespace DanceCompetitionHelper
                         ?.CompetitionId;
                 }
 
+                if (foundCompId == null)
+                {
+                    foundCompId = _danceCompHelperDb.CompetitionVenues
+                        .TagWith(
+                            nameof(FindCompetition) + "(Guid)[7]")
+                        .FirstOrDefault(
+                            x => x.CompetitionVenueId == byAnyId)
+                        ?.CompetitionId;
+                }
+
                 return foundCompId;
             }
             finally
@@ -1094,7 +1142,7 @@ namespace DanceCompetitionHelper
                         nameof(GetCompetitionClass) + "(string)[0]")
                     .FirstOrDefault(
                         x => x.CompetitionClassName == byName
-                        /* TODO: realy need ignore?.. */
+                        /* TODO: really need ignore?.. */
                         && x.Ignore == false)
                     ?.CompetitionClassId;
             }
@@ -1122,6 +1170,32 @@ namespace DanceCompetitionHelper
                         nameof(GetCompetitionClass) + "(Guid)[0]")
                     .FirstOrDefault(
                         x => x.CompetitionClassId == competitionClassId);
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(GetCompetitionClass));
+
+                dbTrans?.Rollback();
+            }
+        }
+
+        public CompetitionVenue? GetCompetitionVenue(
+            Guid? competitionVenueId,
+            bool useTransaction = true)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+                useTransaction);
+
+            try
+            {
+                return _danceCompHelperDb.CompetitionVenues
+                    .TagWith(
+                        nameof(GetCompetitionVenue) + "(Guid)[0]")
+                    .Include(x => x.Competition)
+                    .FirstOrDefault(
+                        x => x.CompetitionVenueId == competitionVenueId);
             }
             finally
             {
@@ -1341,6 +1415,18 @@ namespace DanceCompetitionHelper
                         competitionId);
                     return;
                 }
+
+                // dependent items...
+                // because cascade delete does not work...
+                _danceCompHelperDb.Configurations.RemoveRange(
+                    _danceCompHelperDb.Configurations.Where(
+                        x => x.Organization == foundComp.Organization
+                        && x.CompetitionId == foundComp.CompetitionId));
+                /*
+                _danceCompHelperDb.CompetitionVenues.RemoveRange(
+                    _danceCompHelperDb.CompetitionVenues.Where(
+                        x => x.CompetitionId == foundComp.CompetitionId));
+                */
 
                 _danceCompHelperDb.Competitions.Remove(
                     foundComp);
@@ -1896,6 +1982,158 @@ namespace DanceCompetitionHelper
 
         #endregion //  CompetitionClass Crud
 
+        #region CompetitionVanue Crud
+
+        public void CreateCompetitionVenue(
+            Guid competitionId,
+            string name,
+            int lengthInMeter,
+            int widthInMeter,
+            string? comment)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            try
+            {
+                _danceCompHelperDb.CompetitionVenues.Add(
+                    new CompetitionVenue()
+                    {
+                        CompetitionId = competitionId,
+                        Name = name,
+                        LengthInMeter = lengthInMeter,
+                        WidthInMeter = widthInMeter,
+                        Comment = comment,
+                    });
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(CreateCompetitionVenue),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(CreateCompetitionVenue));
+            }
+        }
+
+        public void EditCompetitionVenue(
+            Guid competitionVenueId,
+            string name,
+            int lengthInMeter,
+            int widthInMeter,
+            string? comment)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            try
+            {
+                var foundCompVenue = GetCompetitionVenue(
+                    competitionVenueId,
+                    false);
+
+                if (foundCompVenue == null)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            "{0} with id '{1}' not found!",
+                            nameof(CompetitionVenue),
+                            competitionVenueId));
+                }
+
+                foundCompVenue.Name = name;
+                foundCompVenue.LengthInMeter = lengthInMeter;
+                foundCompVenue.WidthInMeter = widthInMeter;
+                foundCompVenue.Comment = comment;
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(EditCompetitionVenue),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(EditCompetitionVenue));
+            }
+        }
+
+        public void RemoveCompetitionVenue(
+            Guid competitionVenueId)
+        {
+            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            try
+            {
+                var foundCompVenue = GetCompetitionVenue(
+                    competitionVenueId,
+                    false);
+
+                if (foundCompVenue == null)
+                {
+                    _logger.LogWarning(
+                        "{CompetitionVenue} with id '{CompetitionVenueId}' not found!",
+                        nameof(CompetitionVenue),
+                        competitionVenueId);
+                    return;
+                }
+
+                _danceCompHelperDb.CompetitionVenues.Remove(
+                    foundCompVenue);
+
+                _danceCompHelperDb.SaveChanges();
+                dbTrans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(RemoveCompetitionVenue),
+                    exc.Message);
+
+                dbTrans.Rollback();
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(RemoveCompetitionVenue));
+            }
+        }
+
+        #endregion //  CompetitionVanue Crud
+
         #region Participant Crud
 
         public void CreateParticipant(
@@ -2169,7 +2407,7 @@ namespace DanceCompetitionHelper
 
         #region Configuration
 
-        public (IEnumerable<ConfigurationValue> ConfigurationValues,
+        public (IEnumerable<ConfigurationValue>? ConfigurationValues,
             Competition? Competition,
             IEnumerable<Competition>? Competitions,
             IEnumerable<CompetitionClass>? CompetitionClasses,
@@ -2181,7 +2419,7 @@ namespace DanceCompetitionHelper
             using var dbTrans = _danceCompHelperDb.BeginTransaction(
                 useTransaction);
 
-            IEnumerable<ConfigurationValue> retConfValues;
+            IEnumerable<ConfigurationValue>? retConfValues;
             Competition? retComp;
             IEnumerable<Competition>? retComps = null;
             IEnumerable<CompetitionClass>? retCompClasses = null;
@@ -2195,7 +2433,16 @@ namespace DanceCompetitionHelper
 
                 retConfValues = _danceCompHelperDb.Configurations
                     .TagWith(
-                        nameof(GetConfigurations));
+                        nameof(GetConfigurations) + "[0]");
+                retComps = _danceCompHelperDb.Competitions
+                    .TagWith(
+                        nameof(GetConfigurations) + "[1]");
+                retCompClasses = _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(GetConfigurations) + "[2]");
+                retCompVenues = _danceCompHelperDb.CompetitionVenues
+                    .TagWith(
+                        nameof(GetConfigurations) + "[3]");
 
                 if (retComp != null)
                 {
@@ -2211,48 +2458,46 @@ namespace DanceCompetitionHelper
                         retComp.CompetitionId,
                     };
 
-                    /*
-                    retConfValues = retConfValues
-                        .Where(
-                            x => (x.Organization == null
-                            || x.Organization == OrganizationEnum.Any)
-                            || (x.Organization == retComp.Organization
-                            && x.CompetitionId == retComp.CompetitionId));
-                    */
                     retConfValues = retConfValues
                         .Where(
                             x => orgIds.Contains(x.Organization)
                             && compIds.Contains(x.CompetitionId));
 
-                    retComps = new List<Competition>()
-                    {
-                        retComp
-                    };
+                    retComps = retComps
+                        .Where(
+                            x => x.CompetitionId == retComp.CompetitionId);
 
-                    retCompClasses = GetCompetitionClasses(
-                        retComp.CompetitionId,
-                        showAll: true);
+                    retCompClasses = retCompClasses
+                        .Where(
+                            x => x.CompetitionId == retComp.CompetitionId);
 
-                    // TODO: implement when "CompetitionVenues" are added/implemented.
-                    retCompVenues = null;
-                }
-                else
-                {
-                    retComps = GetCompetitions(
-                        false);
+                    retCompVenues = retCompVenues
+                        .Where(
+                            x => x.CompetitionId == retComp.CompetitionId);
                 }
 
                 // sort...
                 retConfValues = retConfValues
                     .OrderBy(
-                        x => x.Key)
-                    .ToList();
+                        x => x.Key);
+                retComps = retComps
+                    .OrderBy(
+                        x => x.CompetitionName);
+                retCompClasses = retCompClasses
+                    .OrderBy(
+                        x => x.OrgClassId)
+                    .ThenBy(
+                        x => x.CompetitionClassName);
+                retCompVenues = retCompVenues
+                    .OrderBy(
+                        x => x.Name);
 
-                return (retConfValues,
+                return (
+                    retConfValues?.ToList(),
                     retComp,
-                    retComps,
-                    retCompClasses,
-                    retCompVenues);
+                    retComps?.ToList(),
+                    retCompClasses?.ToList(),
+                    retCompVenues?.ToList());
             }
             catch (Exception exc)
             {
@@ -2353,6 +2598,48 @@ namespace DanceCompetitionHelper
                     useTransaction);
         }
 
+        [Obsolete("really needed except from tests?..")]
+        // TODO: really needed except from tests?..
+        public ConfigurationValue? GetConfiguration(
+            string key,
+            Competition? competition,
+            CompetitionVenue? competitionVenue,
+            bool useTransaction = true)
+        {
+            if (competition == null
+                && competitionVenue == null)
+            {
+                return null;
+            }
+
+            if (competitionVenue == null)
+            {
+                return null;
+            }
+
+            var useCompetition = competitionVenue.Competition;
+
+            return GetConfiguration(
+                new ConfigurationValue()
+                {
+                    Organization = useCompetition.Organization,
+                    CompetitionId = useCompetition.CompetitionId,
+                    CompetitionClassId = null,
+                    CompetitionVenueId = competitionVenue.CompetitionVenueId,
+                    Key = key,
+                },
+                useTransaction)
+                // fallback up...
+                ?? GetConfiguration(
+                    key,
+                    competition,
+                    useTransaction)
+                ?? GetConfiguration(
+                    key,
+                    competitionVenue.Competition,
+                    useTransaction);
+        }
+
         public ConfigurationValue? GetConfiguration(
             string key,
             CompetitionClass? competitionClass,
@@ -2383,6 +2670,16 @@ namespace DanceCompetitionHelper
                     Key = key,
                 },
                 useTransaction)
+                ?? GetConfiguration(
+                    new ConfigurationValue()
+                    {
+                        Organization = useCompetition.Organization,
+                        CompetitionId = useCompetition.CompetitionId,
+                        CompetitionClassId = null,
+                        CompetitionVenueId = competitionVenue.CompetitionVenueId,
+                        Key = key,
+                    },
+                    useTransaction)
                 // fallback up...
                 ?? GetConfiguration(
                     key,
@@ -2435,7 +2732,7 @@ namespace DanceCompetitionHelper
             }
         }
 
-        public void AddConfiguration(
+        public void CreateConfiguration(
             OrganizationEnum? organization,
             Guid? competitionId,
             Guid? competitionClassId,
@@ -2454,6 +2751,48 @@ namespace DanceCompetitionHelper
                 if (useOrganization == OrganizationEnum.Any)
                 {
                     organization = null;
+                }
+
+                Competition? chkComp = null;
+                if (competitionId != null)
+                {
+                    chkComp = GetCompetition(
+                        competitionId,
+                        false);
+
+                    if (chkComp != null
+                        && chkComp.Organization != useOrganization)
+                    {
+                        throw new ArgumentOutOfRangeException(
+                            nameof(competitionClassId),
+                            string.Format(
+                                "{0} ({1}) does not match passed {2} ({3})",
+                                nameof(organization),
+                                organization,
+                                nameof(Competition),
+                                chkComp.Organization));
+                    }
+                }
+
+                CompetitionClass? chkCompClass = null;
+                if (competitionClassId != null)
+                {
+                    chkCompClass = GetCompetitionClass(
+                        competitionClassId.Value,
+                        false);
+
+                    if (chkCompClass == null
+                        || chkCompClass.CompetitionId != chkComp?.CompetitionId)
+                    {
+                        throw new ArgumentOutOfRangeException(
+                            nameof(competitionClassId),
+                            string.Format(
+                                "{0} ({1}) does not match passed {2} ({3})",
+                                nameof(CompetitionClass),
+                                competitionClassId,
+                                nameof(Competition),
+                                competitionId));
+                    }
                 }
 
                 _danceCompHelperDb.Configurations
@@ -2477,7 +2816,7 @@ namespace DanceCompetitionHelper
                 _logger.LogError(
                     exc,
                     "Error during {AddConfiguration}(): {Message}",
-                    nameof(AddConfiguration),
+                    nameof(CreateConfiguration),
                     exc.Message);
 
                 dbTrans.Rollback();

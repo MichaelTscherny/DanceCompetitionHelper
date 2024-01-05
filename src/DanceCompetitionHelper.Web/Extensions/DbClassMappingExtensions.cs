@@ -52,8 +52,7 @@ namespace DanceCompetitionHelper.Web.Extensions
                 retList.Add(
                     new SelectListItem()
                     {
-                        // ToDo: is this ok?..
-                        Value = string.Empty, /* Guid.Empty.ToString(), */
+                        Value = string.Empty,
                         Text = "None",
                         Selected = false
                     });
@@ -86,7 +85,7 @@ namespace DanceCompetitionHelper.Web.Extensions
                 retList.Add(
                     new SelectListItem()
                     {
-                        Value = Guid.Empty.ToString(),
+                        Value = string.Empty,
                         Text = "None",
                         Selected = false
                     });
@@ -101,6 +100,39 @@ namespace DanceCompetitionHelper.Web.Extensions
                             Value = x.CompetitionClassId.ToString(),
                             Text = x.CompetitionClassName,
                             Selected = x.CompetitionClassId == selectedItem
+                        }));
+            }
+
+            return retList;
+        }
+
+        public static List<SelectListItem> ToSelectListItem(
+            this IEnumerable<CompetitionVenue> competitionVenues,
+            Guid? selectedItem = null,
+            bool addEmpty = false)
+        {
+            var retList = new List<SelectListItem>();
+
+            if (addEmpty)
+            {
+                retList.Add(
+                    new SelectListItem()
+                    {
+                        Value = string.Empty,
+                        Text = "None",
+                        Selected = false
+                    });
+            }
+
+            if (competitionVenues != null)
+            {
+                retList.AddRange(
+                    competitionVenues.Select(
+                        x => new SelectListItem()
+                        {
+                            Value = x.CompetitionVenueId.ToString(),
+                            Text = x.Name,
+                            Selected = x.CompetitionVenueId == selectedItem
                         }));
             }
 

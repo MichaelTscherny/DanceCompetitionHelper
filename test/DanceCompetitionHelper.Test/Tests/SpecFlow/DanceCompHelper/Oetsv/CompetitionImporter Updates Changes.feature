@@ -18,6 +18,9 @@ Scenario: Update 03 - Changed Points and Starts
         | Small Tournament | Allg.Kl. Sta B       | Allg.Kl. Sta A               | 003        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta C (002)   | 0                    |                          |
         | Small Tournament | Allg.Kl. Sta A       | Allg.Kl. Sta S               | 004        | Sta        | Allg     | 0        | A     | 1600                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta B (003)   | 0                    |                          |
         | Small Tournament | Allg.Kl. Sta S       |                              | 005        | Sta        | Allg     | 0        | S     | 999999999             | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta A (004)   | 0                    |                          |
+    And following Competition Venues exists in DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName  | Name       | Comment                             |
+        | Small Tournament | Main Floor | Created by OetsvCompetitionImporter |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionA | PossiblePromotionAInfo                 |
         #                                                                                  

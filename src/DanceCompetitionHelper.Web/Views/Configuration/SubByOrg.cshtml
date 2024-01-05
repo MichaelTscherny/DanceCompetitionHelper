@@ -83,7 +83,8 @@
                 @{
                     var useAllComps = allCompIds
                         .Where(
-                            x => byKeyAndOrg.ContainsKey(x))
+                            x => byKeyAndOrg.ContainsKey(x)
+                            || x == Guid.Empty)
                         .ToList();
 
                     if (useAllOrgs.Count >= 1)

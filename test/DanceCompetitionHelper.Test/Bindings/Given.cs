@@ -233,8 +233,8 @@ namespace DanceCompetitionHelper.Test.Bindings
                 try
                 {
                     var useComp = GetCompetition(
-                    useDb,
-                    newAdj.CompetitionName);
+                        useDb,
+                        newAdj.CompetitionName);
 
                     Assert.That(
                         useComp,
@@ -425,6 +425,57 @@ namespace DanceCompetitionHelper.Test.Bindings
                     Console.WriteLine(
                         "Error during add of '{0}': {1}",
                         newCompClassHist,
+                        exc);
+                    throw;
+                }
+            }
+
+            dbTrans.Commit();
+        }
+
+        [Given(@"following Competition Venues in ""([^""]*)""")]
+        public void GivenFollowingCompetitionVenuesIn(
+            string danceCompHelperDb,
+            Table table)
+        {
+            var newCompVenues = table.CreateSet<CompetitionVenuePoco>();
+            var useDb = GetDanceCompetitionHelperDbContext(
+                danceCompHelperDb);
+
+            using var dbTrans = useDb.BeginTransaction()
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            foreach (var newCompVenue in newCompVenues)
+            {
+                try
+                {
+                    var useComp = GetCompetition(
+                        useDb,
+                        newCompVenue.CompetitionName);
+
+                    Assert.That(
+                        useComp,
+                        Is.Not.Null,
+                        $"{nameof(Competition)} '{newCompVenue.CompetitionName}' not found!");
+
+                    useDb.CompetitionVenues.Add(
+                        new CompetitionVenue()
+                        {
+                            CompetitionId = useComp.CompetitionId,
+                            Name = newCompVenue.Name,
+                            Comment = newCompVenue.Comment,
+                        });
+
+                    useDb.SaveChanges();
+                }
+                catch (Exception exc)
+                {
+                    dbTrans.Rollback();
+
+                    Console.WriteLine(
+                        "Error during add of '{0}': {1}",
+                        newCompVenue,
                         exc);
                     throw;
                 }
@@ -646,8 +697,22 @@ namespace DanceCompetitionHelper.Test.Bindings
                     if (string.IsNullOrEmpty(
                         newCfg.CompetitionVenueName) == false)
                     {
-                        // ToDo: extend when "CompetitionVenue" implemented
-                        useCompVenueId = null;
+                        var useCompVenue = GetCompetitionVenue(
+                            useDb,
+                            useCompId ?? Guid.Empty,
+                            newCfg.CompetitionVenueName);
+
+                        Assert.That(
+                            useCompVenue,
+                            Is.Not.Null,
+                            $"{nameof(CompetitionVenue)} '{newCfg.CompetitionVenueName}' not found!");
+                        Assert.That(
+                            useCompVenue.CompetitionId,
+                            Is.EqualTo(
+                                useCompId),
+                            $"{nameof(CompetitionVenue)} '{newCfg.CompetitionVenueName}' ID missmatch!");
+
+                        useCompVenueId = useCompVenue.CompetitionVenueId;
                     }
 
                     useDb.Configurations.Add(

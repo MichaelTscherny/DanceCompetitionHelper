@@ -23,6 +23,9 @@ Scenario: No Multiple Start - None
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   
@@ -75,6 +78,9 @@ Scenario: No Multiple Start - No Promotion - Too less starts - #10
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   
@@ -126,6 +132,9 @@ Scenario: No Multiple Start - No Promotion - Too less points - #10
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   
@@ -177,6 +186,9 @@ Scenario: No Multiple Start - Promotion - #10 - First Class
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   
@@ -228,6 +240,9 @@ Scenario: No Multiple Start - Promotion - #10 - Second Class
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   

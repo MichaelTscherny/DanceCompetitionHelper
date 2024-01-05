@@ -29,6 +29,9 @@ namespace DanceCompetitionHelper
             bool includeInfos = false,
             bool showAll = false,
             bool useTransaction = true);
+        IEnumerable<CompetitionVenue> GetCompetitionVenues(
+            Guid? competitionId,
+            bool useTransaction = true);
         IEnumerable<Participant> GetParticipants(
             Guid? competitionId,
             Guid? competitionClassId,
@@ -64,7 +67,9 @@ namespace DanceCompetitionHelper
         CompetitionClass? GetCompetitionClass(
             Guid competitionClassId,
             bool useTransaction = true);
-
+        CompetitionVenue? GetCompetitionVenue(
+            Guid? competitionVenueId,
+            bool useTransaction = true);
         Participant? GetParticipant(
             Guid participantId,
             bool useTransaction = true);
@@ -72,7 +77,6 @@ namespace DanceCompetitionHelper
         AdjudicatorPanel? GetAdjudicatorPanel(
             Guid adjudicatorPanelId,
             bool useTransaction = true);
-
         Adjudicator? GetAdjudicator(
             Guid adjudicatorId,
             bool useTransaction = true);
@@ -186,6 +190,27 @@ namespace DanceCompetitionHelper
 
         #endregion //  CompetitionClass Crud 
 
+        #region CompetitionVanue Crud
+
+        void CreateCompetitionVenue(
+            Guid competitionId,
+            string name,
+            int lengthInMeter,
+            int widthInMeter,
+            string? comment);
+
+        void EditCompetitionVenue(
+            Guid competitionVenueId,
+            string name,
+            int lengthInMeter,
+            int widthInMeter,
+            string? comment);
+
+        void RemoveCompetitionVenue(
+            Guid competitionVenueId);
+
+        #endregion //  CompetitionVanue Crud
+
         #region Participant Crud
 
         void CreateParticipant(
@@ -241,7 +266,7 @@ namespace DanceCompetitionHelper
 
         #region Configuration
 
-        (IEnumerable<ConfigurationValue> ConfigurationValues,
+        (IEnumerable<ConfigurationValue>? ConfigurationValues,
             Competition? Competition,
             IEnumerable<Competition>? Competitions,
             IEnumerable<CompetitionClass>? CompetitionClasses,
@@ -269,6 +294,14 @@ namespace DanceCompetitionHelper
             CompetitionClass? competitionClass,
             bool useTransaction = true);
 
+        [Obsolete("really needed except from tests?..")]
+        // TODO: really needed except from tests?..
+        ConfigurationValue? GetConfiguration(
+            string key,
+            Competition? competition,
+            CompetitionVenue? competitionVenue,
+            bool useTransaction = true);
+
         ConfigurationValue? GetConfiguration(
             string key,
             CompetitionClass? competitionClass,
@@ -279,7 +312,7 @@ namespace DanceCompetitionHelper
             ConfigurationValue? cfgValue,
             bool useTransaction = true);
 
-        void AddConfiguration(
+        void CreateConfiguration(
             OrganizationEnum? organization,
             Guid? competitionId,
             Guid? competitionClassId,

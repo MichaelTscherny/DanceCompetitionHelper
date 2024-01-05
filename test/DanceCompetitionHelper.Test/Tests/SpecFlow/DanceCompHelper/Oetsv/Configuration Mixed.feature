@@ -23,6 +23,9 @@ Scenario: With Organization Configuration
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Configuration Values in "DanceCompHelper-db"
         | Organization | CompetitionName | CompetitionClassName | CompetitionVenueName | Key                     | Value |
         | Oetsv        |                 |                      |                      | MaxCouplesPerHeat       | 111   |
@@ -86,6 +89,9 @@ Scenario: With Organization And Competition Configuration
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Configuration Values in "DanceCompHelper-db"
         | Organization | CompetitionName | CompetitionClassName | CompetitionVenueName | Key               | Value |
         | Oetsv        |                 |                      |                      | MaxCouplesPerHeat | 111   |
@@ -154,6 +160,9 @@ Scenario: With Organization And Competition And Competition Class Configuration
         | Oetsv        |                 |                      |                      | MaxCouplesPerHeat | 111   |
         | Oetsv        | Test-Comp-01    |                      |                      | MaxCouplesPerHeat | 222   |
         | Oetsv        | Test-Comp-01    | Allg Sta C           |                      | MaxCouplesPerHeat | 333   |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     # Basic configuration
     Then following Configuration Values exists in DanceCompetitionHelper "DanceCompHelper"
         | Organization | CompetitionName | CompetitionClassName | CompetitionVenueName | Key                     | Value |
@@ -198,8 +207,6 @@ Scenario: With Organization And Competition And Competition Class Configuration
         | Oetsv        | Test-Comp-01    | Allg Sta C           | Venue-01             | MinChangeClothesTime    | 15:00 |
         | Oetsv        | Test-Comp-01    | Allg Sta C           | Venue-01             | MinTimePerDance         | 1:30  |
 
-@ignore
-# Enable when "CompetitionVenue" implemented
 Scenario: With Organization And Competition And Competition Class And Venue Configuration
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
@@ -221,6 +228,9 @@ Scenario: With Organization And Competition And Competition Class And Venue Conf
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Configuration Values in "DanceCompHelper-db"
         | Organization | CompetitionName | CompetitionClassName | CompetitionVenueName | Key               | Value |
         | Oetsv        |                 |                      |                      | MaxCouplesPerHeat | 111   |

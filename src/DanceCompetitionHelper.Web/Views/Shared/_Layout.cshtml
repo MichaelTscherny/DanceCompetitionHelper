@@ -61,9 +61,15 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link @(currentControllerName == AdjudicatorController.RefName ? "active" : "")" asp-area=""
-                               asp-controller="@AdjudicatorController.RefName"
-                               asp-action="@nameof(AdjudicatorController.Index)"
+                                   asp-controller="@AdjudicatorController.RefName"
+                                   asp-action="@nameof(AdjudicatorController.Index)"
                                    asp-route-id="@useCompetitionClass">Adjudicators</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(currentControllerName == CompetitionVenueController.RefName ? "active" : "")" asp-area=""
+                                   asp-controller="@CompetitionVenueController.RefName"
+                                   asp-action="@nameof(CompetitionVenueController.Index)"
+                                   asp-route-id="@useCompetitionClass">Venues</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link @(currentControllerName == ParticipantController.RefName ? "active" : "")" asp-area=""

@@ -11,6 +11,7 @@ namespace DanceCompetitionHelper.Web.Controllers
     public class ConfigurationController : Controller
     {
         public const string RefName = "Configuration";
+        public const string ForAll = "FOR ALL";
 
         private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<CompetitionController> _logger;
@@ -100,15 +101,19 @@ namespace DanceCompetitionHelper.Web.Controllers
                             ? showConfiguration?.CompetitionId ?? foundComp.CompetitionId
                             : foundComp.CompetitionId,
                         addEmpty: false);
+                availCompClasses = useCompClasses
+                    ?.ToSelectListItem(
+                        anyError
+                            ? showConfiguration?.CompetitionClassId
+                            : null,
+                        addEmpty: true);
+                availCompVenues = useCompVenues
+                    ?.ToSelectListItem(
+                        anyError
+                            ? showConfiguration?.CompetitionVenueId
+                            : null,
+                        addEmpty: true);
             }
-
-            // general...
-            availCompClasses = useCompClasses
-                ?.ToSelectListItem(
-                    anyError
-                        ? showConfiguration?.CompetitionClassId
-                        : null,
-                    addEmpty: true);
 
             var useCfgViewModel = showConfiguration ?? new ConfigurationViewModel()
             {
@@ -125,7 +130,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     ErrorsChange = errorsChange,
                     // 
                     Competition = foundComp,
-                    OverviewItems = showConfig.ToList(),
+                    OverviewItems = showConfig,
                     // for displaying all...
                     AvailableOrganizations = availOrgs,
                     //
@@ -134,7 +139,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     // 
                     CompetitionClasses = useCompClasses,
                     AvailableCompetitionClasses = availCompClasses,
-                    // TODO: implement when "CompetitionVenues" added
+                    //
                     CompetitionVenues = useCompVenues,
                     AvailableCompetitionVenues = availCompVenues,
                 });
@@ -157,7 +162,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 createConfiguration.SanityCheck();
 
-                _danceCompHelper.AddConfiguration(
+                _danceCompHelper.CreateConfiguration(
                     createConfiguration.Organization,
                     createConfiguration.CompetitionId,
                     createConfiguration.CompetitionClassId,

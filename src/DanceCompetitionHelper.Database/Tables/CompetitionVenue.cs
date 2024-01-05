@@ -35,5 +35,15 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0} ({1}x{2} - '{3}')",
+                Name,
+                LengthInMeter,
+                WidthInMeter,
+                Competition);
+        }
     }
 }

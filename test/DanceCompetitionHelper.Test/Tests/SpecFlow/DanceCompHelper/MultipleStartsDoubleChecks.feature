@@ -36,12 +36,18 @@ Scenario: None - 2 Comps with same starters
         | Test-Comp-01    | Panel 01-01          | 1       | Class-01-02 | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
         | Test-Comp-01    | Panel 01-01          | 1       | Class-01-03 | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
         | Test-Comp-01    | Panel 01-01          | 1       | Class-01-04 | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Competition Classes in "DanceCompHelper-db"
         | CompetitionName | AdjudicatorPanelName | Version | OrgClassId  | CompetitionClassName | FollowUpCompetitionClassName | Discipline | AgeClass | AgeGroup | Class | MinStartsForPromotion | MinPointsForPromotion |
         | Test-Comp-02    | Panel 02-01          | 1       | Class-02-01 | Sen 1 Sta D          | Sen 1 Sta C                  | Sta        | Sen      | 1        | D     | 10                    | 900                   |
         | Test-Comp-02    | Panel 02-01          | 1       | Class-02-02 | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
         | Test-Comp-02    | Panel 02-01          | 1       | Class-02-03 | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
         | Test-Comp-02    | Panel 02-01          | 1       | Class-02-04 | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-02    | Venue-02 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #                                                                                                              
@@ -128,6 +134,12 @@ Scenario: None - 2 Comps with (mixed) same starters
         | Test-Comp-02    | Panel 02-01          | 1       | Class-02-02 | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
         | Test-Comp-02    | Panel 02-01          | 1       | Class-02-03 | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
         | Test-Comp-02    | Panel 02-01          | 1       | Class-02-04 | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-02    | Venue-02 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #                                                                                                              

@@ -20,6 +20,8 @@ namespace DanceCompetitionHelper.Test.Bindings
         private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionClass?>>> _competitionClassesByCompIdAndName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionClass?>>>();
         private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionClassHistory?>>> _competitionClassesHistoryByCompIdAndName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionClassHistory?>>>();
 
+        private readonly Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionVenue?>>> _competitionVanesByCompIdAndName = new Dictionary<DanceCompetitionHelperDbContext, Dictionary<Guid, Dictionary<string, CompetitionVenue?>>>();
+
         public BindingBase(
             ScenarioContext scenarioContext)
         {
@@ -247,6 +249,56 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
 
             return foundCompClass;
+        }
+
+        public CompetitionVenue? GetCompetitionVenue(
+            DanceCompetitionHelperDbContext dbCtx,
+            Guid byCompetitionId,
+            string? byCompetitionVenueName)
+        {
+            if (dbCtx == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(dbCtx));
+            }
+
+            if (_competitionVanesByCompIdAndName.TryGetValue(
+                dbCtx,
+                out var byDbCtx) == false)
+            {
+                byDbCtx = new Dictionary<Guid, Dictionary<string, CompetitionVenue?>>();
+                _competitionVanesByCompIdAndName[dbCtx] = byDbCtx;
+            }
+
+            if (byDbCtx.TryGetValue(
+                byCompetitionId,
+                out var byDbCtxAndCompId) == false)
+            {
+                byDbCtxAndCompId = new Dictionary<string, CompetitionVenue?>();
+                byDbCtx[byCompetitionId] = byDbCtxAndCompId;
+            }
+
+            if (string.IsNullOrEmpty(
+                byCompetitionVenueName))
+            {
+                return null;
+            }
+
+            if (byDbCtxAndCompId.TryGetValue(
+                byCompetitionVenueName,
+                out var foundCompVenue) == false)
+            {
+                foundCompVenue = dbCtx.CompetitionVenues
+                    .TagWith(
+                        nameof(GetCompetitionVenue))
+                    .FirstOrDefault(
+                        x => x.CompetitionId == byCompetitionId
+                        && x.Name == byCompetitionVenueName);
+
+                byDbCtxAndCompId[byCompetitionVenueName] = foundCompVenue;
+            }
+
+            return foundCompVenue;
         }
 
         #endregion // Data Caching Stuff

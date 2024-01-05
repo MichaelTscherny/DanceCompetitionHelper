@@ -32,39 +32,43 @@
             .OrderBy(
                 x => (int)x));
 
-    // TODO: check why 
-    //   MinCooldownTimePerRound -> Oetsv / Test Comp 01 (org-Id 01) / Allg. Sta D (1)
-    // is not shown in "global"
-
     var allConfigKeysBy = new CompetitionVenueDisplayHelper(
         Model.OverviewItems);
     var compsById = Model.Competitions?.ToDictionary(
         x => x.CompetitionId,
         x => x)
         ?? new Dictionary<Guid, Competition>();
-    var allCompIds = new Guid[]
-        {
-            // ToDo: go on here...
-            // Guid.Empty,
-        }.Union(
-            Model.Competitions
-                ?.Select(
-                    x => x.CompetitionId)
-                ?? Enumerable.Empty<Guid>())
-            .ToList();
+    var allCompIds = (Model.Competitions
+        ?.Select(
+            x => x.CompetitionId)
+        ?? Enumerable.Empty<Guid>())
+        .ToList();
     var compClassesById = Model.CompetitionClasses?.ToDictionary(
         x => x.CompetitionClassId,
         x => x)
         ?? new Dictionary<Guid, CompetitionClass>();
-    var allCompClassIds = (Model.CompetitionClasses
-        ?.Select(
-            x => x.CompetitionClassId)
-        ?? Enumerable.Empty<Guid>())
+    var allCompClassIds = new Guid[]
+        {
+            Guid.Empty,
+        }.Union(
+            Model.CompetitionClasses
+                ?.Select(
+                    x => x.CompetitionClassId)
+                ?? Enumerable.Empty<Guid>())
         .ToList();
-
-    // ToDo: implement when "CompetitionVenue"s added...
-    var compVenuesById = new Dictionary<Guid, CompetitionVenue>();
-    var allCompVenueIds = new List<Guid>();
+    var compVenuesById = (Model.CompetitionVenues?.ToDictionary(
+        x => x.CompetitionVenueId,
+        x => x))
+        ?? new Dictionary<Guid, CompetitionVenue>();
+    var allCompVenueIds = new Guid[]
+        {
+            Guid.Empty,
+        }.Union(
+            Model.CompetitionVenues
+                ?.Select(
+                    x => x.CompetitionVenueId)
+                ?? Enumerable.Empty<Guid>())
+        .ToList();
 }
 
 <div class="text-center">
@@ -103,7 +107,7 @@
                     }
 
                     <tr role="row" data-test="mark-01"> <!-- data-test="mark-01" start -->
-                        <td class="text-nowrap w-25 align-middle"> <!-- Mark 01-01 start -->
+                        <td class="text-nowrap align-middle"> <!-- Mark 01-01 start -->
                             @Html.DisplayFor(modelItem => curKey)
                         </td> <!-- Mark 01-01 end -->
 
