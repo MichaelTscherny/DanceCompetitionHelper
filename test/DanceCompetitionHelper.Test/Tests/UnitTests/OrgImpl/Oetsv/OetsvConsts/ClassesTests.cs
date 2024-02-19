@@ -26,6 +26,19 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase(Classes.S, Classes.S)]
         [TestCase("S", Classes.S)]
         // -------------
+        [TestCase(Classes.GirlsOnly, Classes.GirlsOnly)]
+        [TestCase("G", Classes.GirlsOnly)]
+        [TestCase("Girls", Classes.GirlsOnly)]
+        [TestCase("GO", Classes.GirlsOnly)]
+        // -------------
+        [TestCase(Classes.SoloStarter, Classes.SoloStarter)]
+        [TestCase("SE", Classes.SoloStarter)]
+        [TestCase("se", Classes.SoloStarter)]
+        // -------------
+        [TestCase(Classes.SoloAdvanced, Classes.SoloAdvanced)]
+        [TestCase("SF", Classes.SoloAdvanced)]
+        [TestCase("sf", Classes.SoloAdvanced)]
+        // -------------
         [TestCase(null, null)]
         [TestCase("", null)]
         [TestCase("dummy", null)]
@@ -77,7 +90,6 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
                     forClass),
                 Is.EqualTo(
                     expected));
-
         }
     }
 }
