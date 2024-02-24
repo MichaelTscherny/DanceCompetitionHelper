@@ -4,22 +4,22 @@ namespace DanceCompetitionHelper.Database.Extensions
 {
     public static class TestDataExtensions
     {
-        public static void AddTestData(
+        public static async Task AddTestData(
             this DanceCompetitionHelperDbContext dbCtx)
         {
-            var useTrans = dbCtx?.BeginTransaction()
+            var useTrans = await dbCtx.BeginTransactionAsync()
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                AddSmallCompetitions(
+                await AddSmallCompetitionsAsync(
                     dbCtx);
-                AddFathCompetition(
+                await AddFathCompetitionAsync(
                     dbCtx);
 
-                dbCtx.SaveChanges();
-                useTrans.Commit();
+                await dbCtx.SaveChangesAsync();
+                await useTrans.CommitAsync();
             }
             catch (Exception exc)
             {
@@ -29,14 +29,14 @@ namespace DanceCompetitionHelper.Database.Extensions
             }
         }
 
-        private static void AddSmallCompetitions(
+        private static async Task AddSmallCompetitionsAsync(
             DanceCompetitionHelperDbContext dbCtx)
         {
             // we only add data if we do not have any...
-            if (dbCtx.Competitions
+            if (await dbCtx.Competitions
                 .TagWith(
-                    nameof(AddSmallCompetitions) + "(db)[0]")
-                .Count() >= 1)
+                    nameof(AddSmallCompetitionsAsync) + "(db)[0]")
+                .CountAsync() >= 1)
             {
                 return;
             }
@@ -425,15 +425,15 @@ namespace DanceCompetitionHelper.Database.Extensions
             dbCtx.SaveChanges();
         }
 
-        private static void AddFathCompetition(
+        private static async Task AddFathCompetitionAsync(
             DanceCompetitionHelperDbContext dbCtx)
         {
             const string fathCompName = "Big-Fat-Competition";
 
-            var foundFatComp = dbCtx.Competitions
+            var foundFatComp = await dbCtx.Competitions
                 .TagWith(
-                    nameof(AddFathCompetition) + "(db)[0]")
-                .FirstOrDefault(
+                    nameof(AddFathCompetitionAsync) + "(db)[0]")
+                .FirstOrDefaultAsync(
                     x => x.CompetitionName == fathCompName);
 
             if (foundFatComp != null)

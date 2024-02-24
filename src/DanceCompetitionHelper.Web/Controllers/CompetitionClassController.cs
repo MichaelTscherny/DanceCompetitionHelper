@@ -31,8 +31,9 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(serviceProvider));
         }
 
-        public IActionResult Index(
-            Guid id)
+        public async Task<IActionResult> Index(
+            Guid id,
+            CancellationToken cancellationToken)
         {
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
@@ -42,18 +43,20 @@ namespace DanceCompetitionHelper.Web.Controllers
             return View(
                 new CompetitionClassOverviewViewModel()
                 {
-                    Competition = _danceCompHelper.GetCompetition(
+                    Competition = _danceCompHelper.GetCompetitionAsync(
                         foundCompId),
-                    OverviewItems = _danceCompHelper
-                        .GetCompetitionClasses(
+                    OverviewItems = await _danceCompHelper
+                        .GetCompetitionClassesAsync(
                             foundCompId,
+                            cancellationToken,
                             true)
-                        .ToList(),
+                        .ToListAsync(),
                 });
         }
 
-        public IActionResult DetailedView(
-            Guid id)
+        public async Task<IActionResult> DetailedView(
+            Guid id,
+            CancellationToken cancellationToken)
         {
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
@@ -64,20 +67,22 @@ namespace DanceCompetitionHelper.Web.Controllers
                 nameof(Index),
                 new CompetitionClassOverviewViewModel()
                 {
-                    Competition = _danceCompHelper.GetCompetition(
+                    Competition = _danceCompHelper.GetCompetitionAsync(
                         foundCompId),
-                    OverviewItems = _danceCompHelper
-                        .GetCompetitionClasses(
+                    OverviewItems = await _danceCompHelper
+                        .GetCompetitionClassesAsync(
                             foundCompId,
+                            cancellationToken,
                             true,
                             true)
-                        .ToList(),
+                        .ToListAsync(),
                     DetailedView = true,
                 });
         }
 
-        public IActionResult ShowCreateEdit(
-            Guid id)
+        public async Task<IActionResult> ShowCreateEdit(
+            Guid id,
+            CancellationToken cancellationToken)
         {
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
@@ -98,42 +103,53 @@ namespace DanceCompetitionHelper.Web.Controllers
                 new CompetitionClassViewModel()
                 {
                     CompetitionId = foundCompId.Value,
-                    AdjudicatorPanels = _danceCompHelper
+                    AdjudicatorPanels = await _danceCompHelper
                         .GetAdjudicatorPanels(
                             foundCompId)
-                        .ToSelectListItem(
-                            lastCreatedAdjudicatorPanelId),
-                    FollowUpCompetitionClasses = _danceCompHelper
-                        .GetCompetitionClasses(
-                            foundCompId.Value)
-                        .ToSelectListItem(
+                        // TODO: to be changed
+                        .ToAsyncEnumerable()
+                        .ToSelectListItemAsync(
+                            lastCreatedAdjudicatorPanelId)
+                        .ToListAsync(),
+                    FollowUpCompetitionClasses = await _danceCompHelper
+                        .GetCompetitionClassesAsync(
+                            foundCompId.Value,
+                            cancellationToken)
+                        .ToSelectListItemAsync(
                             addEmpty: true)
+                        .ToListAsync()
                 });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateNew(
-            CompetitionClassViewModel createCompetition)
+        public async Task<IActionResult> CreateNew(
+            CompetitionClassViewModel createCompetition,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
                 createCompetition.Errors = ModelState.GetErrorMessages();
 
                 createCompetition.FollowUpCompetitionClassId = createCompetition.FollowUpCompetitionClassId;
-                createCompetition.FollowUpCompetitionClasses = _danceCompHelper
-                    .GetCompetitionClasses(
-                        createCompetition.CompetitionId)
-                    .ToSelectListItem(
+                createCompetition.FollowUpCompetitionClasses = await _danceCompHelper
+                    .GetCompetitionClassesAsync(
+                        createCompetition.CompetitionId,
+                        cancellationToken)
+                    .ToSelectListItemAsync(
                         createCompetition.FollowUpCompetitionClassId,
-                        addEmpty: true);
+                        addEmpty: true)
+                    .ToListAsync();
 
                 createCompetition.AdjudicatorPanelId = createCompetition.AdjudicatorPanelId;
-                createCompetition.AdjudicatorPanels = _danceCompHelper
+                createCompetition.AdjudicatorPanels = await _danceCompHelper
                     .GetAdjudicatorPanels(
                         createCompetition.CompetitionId)
-                    .ToSelectListItem(
-                        createCompetition.AdjudicatorPanelId);
+                    // TODO: to be changed
+                    .ToAsyncEnumerable()
+                    .ToSelectListItemAsync(
+                        createCompetition.AdjudicatorPanelId)
+                    .ToListAsync();
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -178,19 +194,24 @@ namespace DanceCompetitionHelper.Web.Controllers
                 createCompetition.Errors = exc.InnerException?.Message ?? exc.Message;
 
                 createCompetition.FollowUpCompetitionClassId = createCompetition.FollowUpCompetitionClassId;
-                createCompetition.FollowUpCompetitionClasses = _danceCompHelper
-                    .GetCompetitionClasses(
-                        createCompetition.CompetitionId)
-                    .ToSelectListItem(
+                createCompetition.FollowUpCompetitionClasses = await _danceCompHelper
+                    .GetCompetitionClassesAsync(
+                        createCompetition.CompetitionId,
+                        cancellationToken)
+                    .ToSelectListItemAsync(
                         createCompetition.FollowUpCompetitionClassId,
-                        addEmpty: true);
+                        addEmpty: true)
+                    .ToListAsync();
 
                 createCompetition.AdjudicatorPanelId = createCompetition.AdjudicatorPanelId;
-                createCompetition.AdjudicatorPanels = _danceCompHelper
+                createCompetition.AdjudicatorPanels = await _danceCompHelper
                     .GetAdjudicatorPanels(
                         createCompetition.CompetitionId)
-                    .ToSelectListItem(
-                        createCompetition.AdjudicatorPanelId);
+                    // TODO: to be changed
+                    .ToAsyncEnumerable()
+                    .ToSelectListItemAsync(
+                        createCompetition.AdjudicatorPanelId)
+                    .ToListAsync();
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -198,8 +219,9 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
         }
 
-        public IActionResult ShowEdit(
-            Guid id)
+        public async Task<IActionResult> ShowEdit(
+            Guid id,
+            CancellationToken cancellationToken)
         {
             var foundCompClass = _danceCompHelper.GetCompetitionClass(
                 id);
@@ -228,18 +250,23 @@ namespace DanceCompetitionHelper.Web.Controllers
                     CompetitionClassName = foundCompClass.CompetitionClassName,
 
                     FollowUpCompetitionClassId = foundCompClass.FollowUpCompetitionClassId,
-                    FollowUpCompetitionClasses = _danceCompHelper
-                        .GetCompetitionClasses(
-                            foundCompClass.CompetitionId)
-                        .ToSelectListItem(
+                    FollowUpCompetitionClasses = await _danceCompHelper
+                        .GetCompetitionClassesAsync(
+                            foundCompClass.CompetitionId,
+                            cancellationToken)
+                        .ToSelectListItemAsync(
                             foundCompClass.FollowUpCompetitionClassId,
-                            addEmpty: true),
+                            addEmpty: true)
+                        .ToListAsync(),
                     AdjudicatorPanelId = foundCompClass.AdjudicatorPanelId,
-                    AdjudicatorPanels = _danceCompHelper
+                    AdjudicatorPanels = await _danceCompHelper
                         .GetAdjudicatorPanels(
                             foundCompClass.CompetitionId)
-                        .ToSelectListItem(
-                            foundCompClass.AdjudicatorPanelId),
+                        // TODO: to be changed
+                        .ToAsyncEnumerable()
+                        .ToSelectListItemAsync(
+                            foundCompClass.AdjudicatorPanelId)
+                        .ToListAsync(),
                     OrgClassId = foundCompClass.OrgClassId,
                     Discipline = foundCompClass.Discipline,
                     AgeClass = foundCompClass.AgeClass,
@@ -257,18 +284,22 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditSave(
-            CompetitionClassViewModel editCompetitionClass)
+        public async Task<IActionResult> EditSave(
+            CompetitionClassViewModel editCompetitionClass,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
                 editCompetitionClass.Errors = ModelState.GetErrorMessages();
 
-                editCompetitionClass.AdjudicatorPanels = _danceCompHelper
+                editCompetitionClass.AdjudicatorPanels = await _danceCompHelper
                     .GetAdjudicatorPanels(
                         editCompetitionClass.CompetitionId)
-                    .ToSelectListItem(
-                        editCompetitionClass.AdjudicatorPanelId);
+                    // TODO: to be changed
+                    .ToAsyncEnumerable()
+                    .ToSelectListItemAsync(
+                        editCompetitionClass.AdjudicatorPanelId)
+                    .ToListAsync();
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -307,19 +338,24 @@ namespace DanceCompetitionHelper.Web.Controllers
                 editCompetitionClass.Errors = exc.InnerException?.Message ?? exc.Message;
 
                 editCompetitionClass.FollowUpCompetitionClassId = editCompetitionClass.FollowUpCompetitionClassId;
-                editCompetitionClass.FollowUpCompetitionClasses = _danceCompHelper
-                    .GetCompetitionClasses(
-                        editCompetitionClass.CompetitionId)
-                    .ToSelectListItem(
+                editCompetitionClass.FollowUpCompetitionClasses = await _danceCompHelper
+                    .GetCompetitionClassesAsync(
+                        editCompetitionClass.CompetitionId,
+                        cancellationToken)
+                    .ToSelectListItemAsync(
                         editCompetitionClass.FollowUpCompetitionClassId,
-                        addEmpty: true);
+                        addEmpty: true)
+                    .ToListAsync();
 
                 editCompetitionClass.AdjudicatorPanelId = editCompetitionClass.AdjudicatorPanelId;
-                editCompetitionClass.AdjudicatorPanels = _danceCompHelper
+                editCompetitionClass.AdjudicatorPanels = await _danceCompHelper
                     .GetAdjudicatorPanels(
                         editCompetitionClass.CompetitionId)
-                    .ToSelectListItem(
-                        editCompetitionClass.AdjudicatorPanelId);
+                    // TODO: to be changed
+                    .ToAsyncEnumerable()
+                    .ToSelectListItemAsync(
+                        editCompetitionClass.AdjudicatorPanelId)
+                    .ToListAsync();
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -355,7 +391,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return NotFound();
             }
 
-            var helpComp = _danceCompHelper.GetCompetition(
+            var helpComp = _danceCompHelper.GetCompetitionAsync(
                 foundCompId);
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
@@ -382,7 +418,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return NotFound();
             }
 
-            var helpComp = _danceCompHelper.GetCompetition(
+            var helpComp = _danceCompHelper.GetCompetitionAsync(
                 foundCompId);
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
@@ -392,7 +428,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 {
                     Competition = helpComp,
                     OverviewItems = _danceCompHelper
-                        .GetParticipants(
+                        .GetParticipantsAsync(
                             foundCompId.Value,
                             null,
                             true)

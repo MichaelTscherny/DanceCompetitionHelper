@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.OrgImpl.Oetsv;
+﻿using AutoMapper;
+using DanceCompetitionHelper.OrgImpl.Oetsv;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models;
 using DanceCompetitionHelper.Web.Models.CompetitionModels;
@@ -15,12 +16,14 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<CompetitionController> _logger;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IHostApplicationLifetime _appLifetime;
+        private readonly IMapper _mapper;
 
         public CompetitionController(
             IDanceCompetitionHelper danceCompHelper,
             ILogger<CompetitionController> logger,
-            IServiceProvider serviceProvider)
+            IHostApplicationLifetime appLifetime,
+            IMapper mapper)
         {
             _danceCompHelper = danceCompHelper
                 ?? throw new ArgumentNullException(
@@ -28,26 +31,31 @@ namespace DanceCompetitionHelper.Web.Controllers
             _logger = logger
                 ?? throw new ArgumentNullException(
                     nameof(logger));
-            _serviceProvider = serviceProvider
+            _appLifetime = appLifetime
                 ?? throw new ArgumentNullException(
-                    nameof(serviceProvider));
+                    nameof(appLifetime));
+            _mapper = mapper
+                ?? throw new ArgumentNullException(
+                    nameof(mapper));
 
             if (_initialMigrationDone == false)
             {
-                danceCompHelper.Migrate();
-                danceCompHelper.CheckMandatoryConfiguration();
-                danceCompHelper.AddTestData();
+                danceCompHelper.MigrateAsync();
+                danceCompHelper.CheckMandatoryConfigurationAsync();
+                danceCompHelper.AddTestDataAsync();
                 _initialMigrationDone = true;
             }
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(
+            CancellationToken cancellationToken)
         {
             return View(
-                _danceCompHelper
-                    .GetCompetitions(
+                await _danceCompHelper
+                    .GetCompetitionsAsync(
+                        cancellationToken,
                         true)
-                    .ToList());
+                    .ToListAsync());
         }
 
         public IActionResult ShowCreateEdit()
@@ -96,7 +104,7 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult ShowEdit(
             Guid id)
         {
-            var foundComp = _danceCompHelper.GetCompetition(
+            var foundComp = _danceCompHelper.GetCompetitionAsync(
                 id);
 
             if (foundComp == null)
@@ -170,12 +178,12 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult CreateTableHistory(
             Guid id)
         {
-            var foundComp = _danceCompHelper.GetCompetition(
+            var foundComp = _danceCompHelper.GetCompetitionAsync(
                 id);
 
             if (foundComp != null)
             {
-                _danceCompHelper.CreateTableHistory(
+                _danceCompHelper.CreateTableHistoryAsync(
                     foundComp.CompetitionId);
             }
 

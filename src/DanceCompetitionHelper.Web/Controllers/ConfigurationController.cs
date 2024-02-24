@@ -2,7 +2,7 @@
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Extensions;
 using DanceCompetitionHelper.Web.Extensions;
-using DanceCompetitionHelper.Web.Models.Configuration;
+using DanceCompetitionHelper.Web.Models.ConfigurationModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -34,15 +34,18 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
 
-        public IActionResult Index(
-            Guid id)
+        public Task<IActionResult> Index(
+            Guid id,
+            CancellationToken cancellationToken)
         {
             return ShowConfig(
-                id);
+                id,
+                cancellationToken);
         }
 
-        private IActionResult ShowConfig(
+        private async Task<IActionResult> ShowConfig(
              Guid? id,
+             CancellationToken cancellationToken,
              ConfigurationViewModel? showConfiguration = null,
              string? errorsAdd = null,
              string? errorsChange = null)
@@ -68,51 +71,75 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             if (foundComp == null)
             {
-                availOrgs = EnumExtensions
+                availOrgs = await EnumExtensions
                     .GetValues<OrganizationEnum>()
-                    .ToSelectListItem(
+                    .ToAsyncEnumerable()
+                    .ToSelectListItemAsync(
                         anyError
                             ? showConfiguration?.Organization
-                            : null);
-                availComps = useComps
-                    ?.ToSelectListItem(
-                        anyError
-                            ? showConfiguration?.CompetitionId
-                            : null,
-                        addEmpty: true);
+                            : null)
+                    .ToListAsync();
+
+                if (useComps != null)
+                {
+                    availComps = await useComps
+                        .ToAsyncEnumerable()
+                        .ToSelectListItemAsync(
+                            anyError
+                                ? showConfiguration?.CompetitionId
+                                : null,
+                            addEmpty: true)
+                        .ToListAsync();
+                }
             }
             else
             {
-                availOrgs = new[]
+                availOrgs = await new[]
                     {
                         foundComp.Organization
                     }
-                    .ToSelectListItem(
+                    .ToAsyncEnumerable()
+                    .ToSelectListItemAsync(
                         anyError
                             ? showConfiguration?.Organization ?? foundComp.Organization
                             : foundComp.Organization,
-                        addEmpty: false);
-                availComps = new[]
+                        addEmpty: false)
+                    .ToListAsync();
+                availComps = await new[]
                     {
                         foundComp
                     }
-                    .ToSelectListItem(
+                    .ToAsyncEnumerable()
+                    .ToSelectListItemAsync(
                         anyError
                             ? showConfiguration?.CompetitionId ?? foundComp.CompetitionId
                             : foundComp.CompetitionId,
-                        addEmpty: false);
-                availCompClasses = useCompClasses
-                    ?.ToSelectListItem(
-                        anyError
-                            ? showConfiguration?.CompetitionClassId
-                            : null,
-                        addEmpty: true);
-                availCompVenues = useCompVenues
-                    ?.ToSelectListItem(
-                        anyError
-                            ? showConfiguration?.CompetitionVenueId
-                            : null,
-                        addEmpty: true);
+                        addEmpty: false)
+                    .ToListAsync();
+
+                if (useCompClasses != null)
+                {
+                    availCompClasses = await useCompClasses
+                        .ToAsyncEnumerable()
+                        .ToSelectListItemAsync(
+                            anyError
+                                ? showConfiguration?.CompetitionClassId
+                                : null,
+                            addEmpty: true)
+                        .ToListAsync();
+                }
+
+                if (useCompVenues != null)
+                {
+                    availCompVenues = await useCompVenues
+                        .ToAsyncEnumerable()
+                        .ToSelectListItemAsync(
+                            anyError
+                                ? showConfiguration?.CompetitionVenueId
+                                : null,
+                            addEmpty: true)
+                        .ToListAsync();
+                }
             }
 
             var useCfgViewModel = showConfiguration ?? new ConfigurationViewModel()
@@ -147,13 +174,15 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateNew(
-            ConfigurationViewModel createConfiguration)
+        public async Task<IActionResult> CreateNew(
+            ConfigurationViewModel createConfiguration,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
-                return ShowConfig(
+                return await ShowConfig(
                     createConfiguration.OriginCompetitionId,
+                    cancellationToken,
                     createConfiguration,
                     ModelState.GetErrorMessages());
             }
@@ -173,8 +202,9 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
             catch (Exception exc)
             {
-                return ShowConfig(
+                return await ShowConfig(
                     createConfiguration.OriginCompetitionId,
+                    cancellationToken,
                     createConfiguration,
                     errorsAdd: exc.InnerException?.Message ?? exc.Message);
             }
@@ -189,13 +219,15 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(
-            ConfigurationViewModel editConfiguration)
+        public async Task<IActionResult> Edit(
+            ConfigurationViewModel editConfiguration,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
-                return ShowConfig(
+                return await ShowConfig(
                     editConfiguration.OriginCompetitionId,
+                    cancellationToken,
                     editConfiguration,
                     errorsChange: ModelState.GetErrorMessages());
             }
@@ -215,8 +247,9 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
             catch (Exception exc)
             {
-                return ShowConfig(
+                return await ShowConfig(
                     editConfiguration.OriginCompetitionId,
+                    cancellationToken,
                     editConfiguration,
                     errorsChange: exc.InnerException?.Message ?? exc.Message);
             }
@@ -231,13 +264,15 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(
-            ConfigurationViewModel deleteConfiguration)
+        public async Task<IActionResult> Delete(
+            ConfigurationViewModel deleteConfiguration,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
-                return ShowConfig(
+                return await ShowConfig(
                     deleteConfiguration.OriginCompetitionId,
+                    cancellationToken,
                     deleteConfiguration,
                     errorsChange: ModelState.GetErrorMessages());
             }
@@ -255,8 +290,9 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
             catch (Exception exc)
             {
-                return ShowConfig(
+                return await ShowConfig(
                     deleteConfiguration.OriginCompetitionId,
+                    cancellationToken,
                     deleteConfiguration,
                     errorsChange: exc.InnerException?.Message ?? exc.Message);
             }

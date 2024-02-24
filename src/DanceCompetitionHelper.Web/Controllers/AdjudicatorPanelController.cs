@@ -41,7 +41,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             return View(
                 new AdjudicatorPanelOverviewViewModel()
                 {
-                    Competition = _danceCompHelper.GetCompetition(
+                    Competition = _danceCompHelper.GetCompetitionAsync(
                         foundCompId),
                     OverviewItems = _danceCompHelper
                         .GetAdjudicatorPanels(
@@ -62,7 +62,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return NotFound();
             }
 
-            var foundComp = _danceCompHelper.GetCompetition(
+            var foundComp = _danceCompHelper.GetCompetitionAsync(
                 foundCompId);
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
@@ -129,7 +129,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index));
             }
 
-            var foundComp = _danceCompHelper.GetCompetition(
+            var foundComp = _danceCompHelper.GetCompetitionAsync(
                 foundAdjPanel.CompetitionId);
 
             ViewData["Use" + nameof(CompetitionClass)] = foundAdjPanel.CompetitionId;

@@ -14,21 +14,21 @@ namespace DanceCompetitionHelper.Database
         public IDbConfig SqLiteDbConfig { get; }
         public static string User { get; set; } = Environment.UserName;
 
-        public virtual DbSet<Competition> Competitions { get; set; }
-        public virtual DbSet<CompetitionClass> CompetitionClasses { get; set; }
-        public virtual DbSet<CompetitionClassHistory> CompetitionClassesHistory { get; set; }
-        public virtual DbSet<Participant> Participants { get; set; }
-        public virtual DbSet<ParticipantHistory> ParticipantsHistory { get; set; }
+        public virtual DbSet<Competition> Competitions { get; set; } = null!;
+        public virtual DbSet<CompetitionClass> CompetitionClasses { get; set; } = null!;
+        public virtual DbSet<CompetitionClassHistory> CompetitionClassesHistory { get; set; } = null!;
+        public virtual DbSet<Participant> Participants { get; set; } = null!;
+        public virtual DbSet<ParticipantHistory> ParticipantsHistory { get; set; } = null!;
 
-        public virtual DbSet<AdjudicatorPanel> AdjudicatorPanels { get; set; }
-        public virtual DbSet<AdjudicatorPanelHistory> AdjudicatorPanelsHistroy { get; set; }
-        public virtual DbSet<Adjudicator> Adjudicators { get; set; }
-        public virtual DbSet<AdjudicatorHistory> AdjudicatorsHistory { get; set; }
+        public virtual DbSet<AdjudicatorPanel> AdjudicatorPanels { get; set; } = null!;
+        public virtual DbSet<AdjudicatorPanelHistory> AdjudicatorPanelsHistroy { get; set; } = null!;
+        public virtual DbSet<Adjudicator> Adjudicators { get; set; } = null!;
+        public virtual DbSet<AdjudicatorHistory> AdjudicatorsHistory { get; set; } = null!;
 
-        public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; }
-        public virtual DbSet<ConfigurationValue> Configurations { get; set; }
+        public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; } = null!;
+        public virtual DbSet<ConfigurationValue> Configurations { get; set; } = null!;
 
-        public virtual DbSet<CompetitionVenue> CompetitionVenues { get; set; }
+        public virtual DbSet<CompetitionVenue> CompetitionVenues { get; set; } = null!;
 
         public DanceCompetitionHelperDbContext(
             IDbConfig sqLiteDbConfig,
@@ -114,13 +114,20 @@ namespace DanceCompetitionHelper.Database
 
         #region Usefull methods
 
-        public void Migrate()
-            => Database.Migrate();
+        public Task MigrateAsync()
+            => Database.MigrateAsync();
 
+        [Obsolete("use 'BeginTransactionAsync'")]
         public IDbContextTransaction? BeginTransaction(
             bool useTransaction = true)
             => useTransaction
                 ? Database.CurrentTransaction ?? Database.BeginTransaction()
+                : null;
+
+        public async Task<IDbContextTransaction?> BeginTransactionAsync(
+            bool useTransaction = true)
+            => useTransaction
+                ? Database.CurrentTransaction ?? await Database.BeginTransactionAsync()
                 : null;
 
         #endregion Usefull methods

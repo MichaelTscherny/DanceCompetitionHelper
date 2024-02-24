@@ -1,7 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.Tables;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace DanceCompetitionHelper.Web.Models.Configuration
+namespace DanceCompetitionHelper.Web.Models.ConfigurationModels
 {
     public class ConfigurationOverviewViewModel : OverviewModelBase<ConfigurationValue>
     {

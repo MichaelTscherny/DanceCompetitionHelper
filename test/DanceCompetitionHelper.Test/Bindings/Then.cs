@@ -899,7 +899,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 foreach (var chkCmp in checkComps)
                 {
-                    var foundComp = useDanceCompHelper.GetCompetition(
+                    var foundComp = useDanceCompHelper.GetCompetitionAsync(
                         useDanceCompHelper.GetCompetition(
                             chkCmp.CompetitionName));
 
@@ -969,7 +969,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"following Classes exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingClassesExistsInCompetitionsOfDanceCompetitionHelper(
+        public Task ThenFollowingClassesExistsInCompetitionsOfDanceCompetitionHelper(
             string danceCompHelper,
             Table table)
         {
@@ -979,7 +979,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var compClassesByCompId = new Dictionary<Guid, List<CompetitionClass>>();
 
-            Assert.Multiple(() =>
+            return Assert.MultipleAsync(async () =>
             {
                 foreach (var chkCompClass in checkCompClass)
                 {
@@ -1005,11 +1005,12 @@ namespace DanceCompetitionHelper.Test.Bindings
                         useCompId,
                         out var foundCompClasses) == false)
                     {
-                        foundCompClasses = useDanceCompHelper
-                            .GetCompetitionClasses(
+                        foundCompClasses = await useDanceCompHelper
+                            .GetCompetitionClassesAsync(
                                 useCompId,
+                                CancellationToken.None,
                                 true)
-                            .ToList();
+                            .ToListAsync();
                         compClassesByCompId[useCompId] = foundCompClasses;
                     }
 
@@ -1207,7 +1208,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     }
 
                     var useCompVenue = useDanceCompHelper
-                        .GetCompetitionVenues(
+                        .GetCompetitionVenuesAsync(
                             useComp)
                         .FirstOrDefault(
                             x => x.Name == curChk.Name);
@@ -1240,7 +1241,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"following Counts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingCountsExistsInDanceCompetitionsOfCompetitionHelper(
+        public async Task ThenFollowingCountsExistsInDanceCompetitionsOfCompetitionHelper(
             string danceCompHelper,
             Table table)
         {
@@ -1266,14 +1267,15 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.True,
                             $"Nothign found for '{nameof(curChk.CompetitionName)}' '{curChk.CompetitionName}' (1)");
 
-                        Assert.That(
-                            useDanceCompHelper.GetCompetitionClasses(
-                                compId)
-                                .Count(),
+                        Assert.ThatAsync(
+                            async () => await useDanceCompHelper.GetCompetitionClassesAsync(
+                                compId,
+                                CancellationToken.None)
+                                .CountAsync(),
                             Is.EqualTo(curChk.CountClasses),
                             "Count CompClasses");
                         Assert.That(
-                            useDanceCompHelper.GetParticipants(
+                            useDanceCompHelper.GetParticipantsAsync(
                                 compId,
                                 null)
                                 .Count(),
@@ -1449,7 +1451,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         out var foundParticipants) == false)
                     {
                         foundParticipants = useDanceCompHelper
-                            .GetParticipants(
+                            .GetParticipantsAsync(
                                 useCompId,
                                 null,
                                 true)
@@ -1535,7 +1537,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"following Configuration Values exists in DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingConfigurationValuesExistsInDanceCompetitionHelper(
+        public async Task ThenFollowingConfigurationValuesExistsInDanceCompetitionHelper(
             string danceCompHelper,
             Table table)
         {
@@ -1543,7 +1545,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDanceCompHelper = GetDanceCompetitionHelper(
                 danceCompHelper);
 
-            Assert.Multiple(() =>
+            await Task.Delay(0);
+            await Assert.MultipleAsync(async () =>
             {
                 foreach (var curCfgVal in checkCfgValues)
                 {
@@ -1559,7 +1562,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         curCfgVal.CompetitionName) == false)
                     {
                         useComp = useDanceCompHelper
-                            .GetCompetition(
+                            .GetCompetitionAsync(
                                 useDanceCompHelper.GetCompetition(
                                     curCfgVal.CompetitionName ?? string.Empty));
 
@@ -1580,10 +1583,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                         var useCompetitionClassId = useDanceCompHelper.GetCompetitionClass(
                             curCfgVal.CompetitionClassName);
 
-                        useCompClass = useDanceCompHelper
-                            .GetCompetitionClasses(
-                                useComp?.CompetitionId ?? Guid.Empty)
-                            ?.FirstOrDefault(
+                        useCompClass = await useDanceCompHelper
+                            .GetCompetitionClassesAsync(
+                                useComp?.CompetitionId ?? Guid.Empty,
+                                CancellationToken.None)
+                            .FirstOrDefaultAsync(
                                 x => x.CompetitionClassId == useCompetitionClassId);
 
                         Assert.That(
@@ -1607,7 +1611,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         curCfgVal.CompetitionVenueName) == false)
                     {
                         useCompVenue = useDanceCompHelper
-                            .GetCompetitionVenues(
+                            .GetCompetitionVenuesAsync(
                                 useComp?.CompetitionId ?? Guid.Empty)
                             .FirstOrDefault(
                                 x => x.Name == curCfgVal.CompetitionVenueName);

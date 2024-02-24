@@ -1,7 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Web.Extensions;
-using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
+using DanceCompetitionHelper.Web.Models.CompetitionVenueModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
@@ -41,10 +41,10 @@ namespace DanceCompetitionHelper.Web.Controllers
             return View(
                 new CompetitionVenueOverviewViewModel()
                 {
-                    Competition = _danceCompHelper.GetCompetition(
+                    Competition = _danceCompHelper.GetCompetitionAsync(
                         foundCompId),
                     OverviewItems = _danceCompHelper
-                        .GetCompetitionVenues(
+                        .GetCompetitionVenuesAsync(
                             foundCompId)
                         .ToList(),
                 });
@@ -61,7 +61,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return NotFound();
             }
 
-            var foundComp = _danceCompHelper.GetCompetition(
+            var foundComp = _danceCompHelper.GetCompetitionAsync(
                 foundCompId);
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;

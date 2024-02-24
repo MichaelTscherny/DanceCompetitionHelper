@@ -13,9 +13,12 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
         public void ExtractData_CompetitionImport01()
         {
             var fakeLogger = new Mock<ILogger<OetsvCompetitionImporter>>();
+            var fakeHttpClientFactory = new Mock<IHttpClientFactory>();
+
             var testImporter = new OetsvCompetitionImporter(
                 fakeLogger.Object,
-                new ImporterSettings());
+                new ImporterSettings(),
+                fakeHttpClientFactory.Object);
 
             var rootPath = AssemblyExtensions.GetAssemblyPath() ?? string.Empty;
 
@@ -360,9 +363,12 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
         public void ImportOrUpdateByUrl_1508()
         {
             var fakeLogger = new Mock<ILogger<OetsvCompetitionImporter>>();
+            var fakeHttpClientFactory = new Mock<IHttpClientFactory>();
+
             var testImporter = new OetsvCompetitionImporter(
                 fakeLogger.Object,
-                new ImporterSettings());
+                new ImporterSettings(),
+                fakeHttpClientFactory.Object);
 
             testImporter.ImportOrUpdateByUrl(
                 "1508",

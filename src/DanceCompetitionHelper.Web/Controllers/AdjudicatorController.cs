@@ -42,7 +42,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             return View(
                 new AdjudicatorOverviewViewModel()
                 {
-                    Competition = _danceCompHelper.GetCompetition(
+                    Competition = _danceCompHelper.GetCompetitionAsync(
                         foundCompId),
                     OverviewItems = _danceCompHelper
                         .GetAdjudicators(
@@ -52,7 +52,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 });
         }
 
-        public IActionResult ShowCreateEdit(
+        public async Task<IActionResult> ShowCreateEdit(
             Guid id)
         {
             var foundCompId = _danceCompHelper.FindCompetition(
@@ -63,7 +63,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return NotFound();
             }
 
-            var foundComp = _danceCompHelper.GetCompetition(
+            var foundComp = _danceCompHelper.GetCompetitionAsync(
                 foundCompId);
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
@@ -80,28 +80,34 @@ namespace DanceCompetitionHelper.Web.Controllers
                 {
                     CompetitionId = foundCompId.Value,
                     CompetitionName = foundComp.GetCompetitionName(),
-                    AdjudicatorPanels = _danceCompHelper
+                    AdjudicatorPanels = await _danceCompHelper
                         .GetAdjudicatorPanels(
                             foundCompId)
-                        .ToSelectListItem(
-                            lastCreatedAdjudicatorPanelId),
+                        // TODO: to be chagned
+                        .ToAsyncEnumerable()
+                        .ToSelectListItemAsync(
+                            lastCreatedAdjudicatorPanelId)
+                        .ToListAsync(),
                 });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateNew(
+        public async Task<IActionResult> CreateNew(
             AdjudicatorViewModel createAdjudicator)
         {
             if (ModelState.IsValid == false)
             {
                 createAdjudicator.Errors = ModelState.GetErrorMessages();
 
-                createAdjudicator.AdjudicatorPanels = _danceCompHelper
+                createAdjudicator.AdjudicatorPanels = await _danceCompHelper
                     .GetAdjudicatorPanels(
                         createAdjudicator.CompetitionId)
-                    .ToSelectListItem(
-                        createAdjudicator.AdjudicatorPanelId);
+                    // TODO: to be changed
+                    .ToAsyncEnumerable()
+                    .ToSelectListItemAsync(
+                        createAdjudicator.AdjudicatorPanelId)
+                    .ToListAsync();
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -133,11 +139,14 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 createAdjudicator.Errors = exc.InnerException?.Message ?? exc.Message;
 
-                createAdjudicator.AdjudicatorPanels = _danceCompHelper
+                createAdjudicator.AdjudicatorPanels = await _danceCompHelper
                     .GetAdjudicatorPanels(
                         createAdjudicator.CompetitionId)
-                    .ToSelectListItem(
-                        createAdjudicator.AdjudicatorPanelId);
+                    // TODO: to be changed
+                    .ToAsyncEnumerable()
+                    .ToSelectListItemAsync(
+                        createAdjudicator.AdjudicatorPanelId)
+                    .ToListAsync();
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -145,7 +154,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
         }
 
-        public IActionResult ShowEdit(
+        public async Task<IActionResult> ShowEdit(
             Guid id)
         {
             var foundAdjucator = _danceCompHelper.GetAdjudicator(
@@ -157,7 +166,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index));
             }
 
-            var foundComp = _danceCompHelper.GetCompetition(
+            var foundComp = _danceCompHelper.GetCompetitionAsync(
                 foundAdjucator.AdjudicatorPanel.CompetitionId);
 
             if (foundComp == null)
@@ -176,11 +185,14 @@ namespace DanceCompetitionHelper.Web.Controllers
                     CompetitionName = foundComp.GetCompetitionName(),
                     AdjudicatorId = foundAdjucator.AdjudicatorId,
                     AdjudicatorPanelId = foundAdjucator.AdjudicatorPanelId,
-                    AdjudicatorPanels = _danceCompHelper
+                    AdjudicatorPanels = await _danceCompHelper
                         .GetAdjudicatorPanels(
                             foundComp.CompetitionId)
-                        .ToSelectListItem(
-                            foundAdjucator.AdjudicatorPanelId),
+                        // TODO: to be changed
+                        .ToAsyncEnumerable()
+                        .ToSelectListItemAsync(
+                            foundAdjucator.AdjudicatorPanelId)
+                        .ToListAsync(),
                     Abbreviation = foundAdjucator.Abbreviation,
                     Name = foundAdjucator.Name,
                     Comment = foundAdjucator.Comment,

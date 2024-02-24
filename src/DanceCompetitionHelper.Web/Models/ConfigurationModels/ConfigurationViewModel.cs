@@ -4,7 +4,7 @@ using DanceCompetitionHelper.Database.Tables;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
-namespace DanceCompetitionHelper.Web.Models.Configuration
+namespace DanceCompetitionHelper.Web.Models.ConfigurationModels
 {
     public class ConfigurationViewModel
     {

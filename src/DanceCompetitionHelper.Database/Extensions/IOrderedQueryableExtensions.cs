@@ -31,5 +31,33 @@ namespace DanceCompetitionHelper.Database.Extensions
                 .ThenBy(
                     x => x.StartNumber);
         }
+
+        // TODO: how to harmonize?..
+        public static IOrderedAsyncEnumerable<Participant> ThenByDefault(
+            this IOrderedAsyncEnumerable<Participant> byOrderBy)
+        {
+            if (byOrderBy == null)
+            {
+                // just in case...
+                return AsyncEnumerable.Empty<Participant>()
+                    .OrderBy(x => x.NamePartA);
+            }
+
+            return byOrderBy
+                .ThenBy(
+                    x => x.NamePartA)
+                .ThenBy(
+                    x => x.OrgIdPartA)
+                .ThenBy(
+                    x => x.NamePartB)
+                .ThenBy(
+                    x => x.OrgIdPartB)
+                .ThenBy(
+                    x => x.ClubName)
+                .ThenBy(
+                    x => x.OrgIdClub)
+                .ThenBy(
+                    x => x.StartNumber);
+        }
     }
 }
