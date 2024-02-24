@@ -116,19 +116,17 @@
                 </label>
             </div>
         </div>
-        <div class="row d-flex justify-content-center py-1">
-            <div class="col">
-                <input type="submit" 
-                       value="@(isCreate ? "Create" : "Save")" 
-                       class="btn btn-primary px-lg-4" />
-                &nbsp;
-                <a asp-controller="@AdjudicatorController.RefName" 
-                   asp-action="@nameof(AdjudicatorController.Index)"
-                   asp-route-id="@Model.CompetitionId"
-                   class="btn btn-secondary px-lg-4">
-                    Cancel
-                </a>
-            </div>
+        <div class="hstack gap-2 justify-content-center">
+            <input type="submit" 
+                   value="@(isCreate ? "Create" : "Save")" 
+                   class="btn btn-primary px-lg-4" />
+            <a asp-controller="@AdjudicatorController.RefName" 
+                asp-action="@nameof(AdjudicatorController.Index)"
+                asp-route-id="@Model.CompetitionId"
+                class="btn btn-secondary px-lg-4">
+                Cancel
+            </a>
         </div>
+        <br />
     </form>
 </div>

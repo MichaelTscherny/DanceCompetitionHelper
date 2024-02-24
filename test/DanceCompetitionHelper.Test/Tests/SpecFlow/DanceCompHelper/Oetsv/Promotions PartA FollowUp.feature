@@ -5,8 +5,8 @@ A short summary of the feature
 Scenario: No Multiple Start - None
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -23,6 +23,9 @@ Scenario: No Multiple Start - None
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   
@@ -57,8 +60,8 @@ Scenario: No Multiple Start - None
 Scenario: No Multiple Start - No Promotion - Too less starts - #10
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -75,6 +78,9 @@ Scenario: No Multiple Start - No Promotion - Too less starts - #10
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   
@@ -108,8 +114,8 @@ Scenario: No Multiple Start - No Promotion - Too less starts - #10
 Scenario: No Multiple Start - No Promotion - Too less points - #10
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -126,6 +132,9 @@ Scenario: No Multiple Start - No Promotion - Too less points - #10
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   
@@ -159,8 +168,8 @@ Scenario: No Multiple Start - No Promotion - Too less points - #10
 Scenario: No Multiple Start - Promotion - #10 - First Class
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -177,6 +186,9 @@ Scenario: No Multiple Start - Promotion - #10 - First Class
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   
@@ -191,15 +203,15 @@ Scenario: No Multiple Start - Promotion - #10 - First Class
         | CompetitionName |
         | Test-Comp-01    |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
-        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo              |
+        | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | MultipleStarts | PossiblePromotionA | PossiblePromotionAInfo             |
         #                                                                                  
-        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | true               | [A] 800/9 + 200/2 = 1000/11 -> True |
+        | Test-Comp-01    | Allg Sta D           | 10          | Dancer 10-A | false          | true               | [A] 800/9 + 100/1 = 900/10 -> True |
         #                                                                               
-        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False    |
+        | Test-Comp-01    | Allg Sta C           | 11          | Dancer 11-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False   |
         #                                                        
-        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 200/2 = 200/2 -> False    |
+        | Test-Comp-01    | Allg La D            | 20          | Dancer 20-A | false          | false              | [A] 0/0 + 200/2 = 200/2 -> False   |
         #                                                        
-        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False    |
+        | Test-Comp-01    | Allg La C            | 21          | Dancer 21-A | false          | false              | [A] 0/0 + 100/1 = 100/1 -> False   |
     And following Classes exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName | CompetitionClassName | FollowUpCompetitionClassName | OrgClassId | CountParticipants | ExtraPartByWinning | ExtraPartByWinningInfo | ExtraPartByPromotion | ExtraPartByPromotionInfo | ExtraManualStarter |
         | Test-Comp-01    | Allg Sta D           | Allg Sta C                   | Class-01   | 1                 | 0                  |                        | 0                    |                          | 0                  |
@@ -210,8 +222,8 @@ Scenario: No Multiple Start - Promotion - #10 - First Class
 Scenario: No Multiple Start - Promotion - #10 - Second Class
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -228,6 +240,9 @@ Scenario: No Multiple Start - Promotion - #10 - Second Class
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Allg Sta C           |                              | Sta        | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Allg La D            | Allg La C                    | La         | Allg     | 0        | D     | 10                    | 900                   | 100            | 10            |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Allg La C            |                              | La         | Allg     | 0        | C     | 10                    | 1200                  | 100            | 10            |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | ClubName     | OrgIdClub | OrgPointsPartA | OrgStartsPartA |
         #                                                                                   

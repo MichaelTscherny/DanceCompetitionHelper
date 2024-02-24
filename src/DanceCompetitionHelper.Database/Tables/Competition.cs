@@ -8,10 +8,10 @@ namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("A Competition 'root'")]
     [Index(nameof(Organization), nameof(OrgCompetitionId), IsUnique = true)]
+    [PrimaryKey(nameof(CompetitionId))]
     public class Competition : TableBase
     {
         [Required]
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid CompetitionId { get; set; }
 

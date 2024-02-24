@@ -17,6 +17,9 @@ Scenario: Import 01
         | Hans-Rueff-Gedächtnispokal | Allg.Kl. La B        | Allg.Kl. La A                | 003        | La         | Allg     | 0        | B     | 1300                  | 10                    | 100            | 0                 | 0                  |                        |
         | Hans-Rueff-Gedächtnispokal | Allg.Kl. Sta B       |                              | 004        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 100            | 0                 | 1                  | Allg.Kl. Sta C (002)   |
         | Hans-Rueff-Gedächtnispokal | Allg.Kl. La A        |                              | 005        | La         | Allg     | 0        | A     | 1600                  | 10                    | 100            | 0                 | 0                  |                        |
+    And following Competition Venues exists in DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName            | Name       | Comment                             |
+        | Hans-Rueff-Gedächtnispokal | Main Floor | Created by OetsvCompetitionImporter |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName            | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionAInfo               |
         #                                                                                  
@@ -42,11 +45,14 @@ Scenario: Import 02
         | Small Tournament | Allg.Kl. Sta B       | Allg.Kl. Sta A               | 003        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta C (002)   | 0                    |                          |
         | Small Tournament | Allg.Kl. Sta A       | Allg.Kl. Sta S               | 004        | Sta        | Allg     | 0        | A     | 1600                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta B (003)   | 0                    |                          |
         | Small Tournament | Allg.Kl. Sta S       |                              | 005        | Sta        | Allg     | 0        | S     | 999999999             | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta A (004)   | 0                    |                          |
+    And following Competition Venues exists in DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName  | Name       | Comment                             |
+        | Small Tournament | Main Floor | Created by OetsvCompetitionImporter |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionA | PossiblePromotionAInfo                 |
         #                                                                                  
         | Small Tournament | Allg.Kl. Sta D       | 101         | Dancer-A 01 | Dancer-B 01 | False              | [A] 152/4 + 750/5 = 902/9 -> False     |
-        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 500/11 + 750/5 = 1250/16 -> True   |
+        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 500/11 + 450/3 = 950/14 -> True    |
         #                                                                               
         | Small Tournament | Allg.Kl. Sta C       | 201         | Dancer-A 03 | Dancer-B 03 | False              | [A] 333/3 + 600/4 = 933/7 -> False     |
         | Small Tournament | Allg.Kl. Sta C       | 202         | Dancer-A 04 | Dancer-B 04 | False              | [A] 666/6 + 600/4 = 1266/10 -> False   |

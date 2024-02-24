@@ -1,0 +1,151 @@
+﻿@using DanceCompetitionHelper.Database.Enum
+@using DanceCompetitionHelper.Database.Tables
+@using DanceCompetitionHelper.Database.Extensions
+@using DanceCompetitionHelper.Web.Controllers
+@using DanceCompetitionHelper.Web.Models.Configuration
+
+@model ConfigurationValue 
+
+@{
+    var cfgVal = Model; //.ConfigurationValue;
+    var useOriginCompetitionId = (ViewData["OriginCompetitionId"] as Guid?);
+
+    var compsById = (ViewData["CompetitionsById"] as Dictionary<Guid, Competition>) ?? new Dictionary<Guid, Competition>();
+    var compClassesById = (ViewData["CompetitionClassesById"] as Dictionary<Guid, CompetitionClass>) ?? new Dictionary<Guid, CompetitionClass>();
+    var compVenuesById = (ViewData["CompetitionVenuesById"] as Dictionary<Guid, CompetitionVenue>) ?? new Dictionary<Guid, CompetitionVenue>();
+
+    if(cfgVal == null)
+    {
+        <div class="text-danger">INVALID VALUE!</div>
+        return;
+    }
+}
+
+<div role="group">
+    <form asp-action="@nameof(ConfigurationController.Edit)" method="post">
+        <input id="@nameof(ConfigurationViewModel.OriginCompetitionId)"
+               name="@nameof(ConfigurationViewModel.OriginCompetitionId)"
+               type="hidden"
+               value="@useOriginCompetitionId" />
+        <input id="@nameof(ConfigurationViewModel.Organization)"
+               name="@nameof(ConfigurationViewModel.Organization)"
+               type="hidden"
+               value="@cfgVal.Organization" />
+        <input id="@nameof(ConfigurationViewModel.CompetitionId)"
+               name="@nameof(ConfigurationViewModel.CompetitionId)"
+               type="hidden"
+               value="@cfgVal.CompetitionId" />
+        <input id="@nameof(ConfigurationViewModel.CompetitionClassId)"
+               name="@nameof(ConfigurationViewModel.CompetitionClassId)"
+               type="hidden"
+               value="@cfgVal.CompetitionClassId" />
+        <input id="@nameof(ConfigurationViewModel.CompetitionVenueId)"
+               name="@nameof(ConfigurationViewModel.CompetitionVenueId)"
+               type="hidden"
+               value="@cfgVal.CompetitionVenueId" />
+        <input id="@nameof(ConfigurationViewModel.Key)"
+               name="@nameof(ConfigurationViewModel.Key)"
+               type="hidden"
+               value="@cfgVal.Key" />
+
+        @{
+            var extraInfo = string.Empty;
+            var extraInfos = new List<string>();
+
+            if (cfgVal.Organization != null
+                && cfgVal.Organization != OrganizationEnum.Any)
+            {
+                extraInfos.Add(
+                    cfgVal.Organization.Value.ToString());
+            }
+
+            if (cfgVal.CompetitionId != null)
+            {
+                if (compsById?.TryGetValue(
+                        cfgVal.CompetitionId.Value,
+                    out var foundComp) == true)
+                {                        
+                    extraInfos.Add(
+                        foundComp.GetCompetitionName());
+                }
+                else
+                {
+                    extraInfos.Add(
+                        cfgVal.CompetitionId.Value.ToString());
+                }
+            }
+
+            if (cfgVal.CompetitionClassId != null)
+            {
+                if (compClassesById?.TryGetValue(
+                    cfgVal.CompetitionClassId.Value,
+                    out var foundCompClass) == true)
+                {                        
+                    extraInfos.Add(
+                        foundCompClass.GetCompetitionClassName());
+                }
+                else
+                {
+                    extraInfos.Add(
+                        cfgVal.CompetitionClassId.Value.ToString());
+                }
+            }
+            else
+            {
+                extraInfos.Add(
+                    ConfigurationController.ForAll);
+            }
+
+            if (cfgVal.CompetitionVenueId != null)
+            {
+                if (compVenuesById?.TryGetValue(
+                    cfgVal.CompetitionVenueId.Value,
+                    out var foundVenues) == true)
+                {                        
+                    extraInfos.Add(
+                        foundVenues.Name);
+                }
+                else
+                {
+                    extraInfos.Add(
+                        cfgVal.CompetitionVenueId.Value.ToString());
+                }
+            }
+
+            extraInfos.Add(
+                cfgVal.Key);
+
+            extraInfo = string.Join(
+                // "<br/>",
+                "/",
+                extraInfos);
+
+            if(string.IsNullOrEmpty(
+                extraInfo))
+            {
+                extraInfo = "-";
+            }
+        }
+
+        <div class="input-group">
+            <input id="@nameof(ConfigurationViewModel.Value)"
+                   name="@nameof(ConfigurationViewModel.Value)"
+                   value="@cfgVal.Value"
+                   placeholder="Use Value"
+                   class="form-control"
+                   data-bs-toggle="tooltip"
+                   data-bs-custom-class="custom-tooltip"
+                   data-bs-title="@(extraInfo)" />
+            <button type="submit"
+                    value="edit"
+                    asp-action="@nameof(ConfigurationController.Edit)"
+                    class="btn btn-outline-success bi bi-floppy">
+            </button>
+            <button type="submit"
+                    value="delete"
+                    asp-action="@nameof(ConfigurationController.Delete)"
+                    class="btn btn-outline-danger bi bi-trash">
+            </button>
+        </div>
+    </form>
+</div>

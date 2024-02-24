@@ -116,6 +116,16 @@ namespace DanceCompetitionHelper.Database.Extensions
                     Comment = "a comment",
                 });
             // ----
+            var newCompVanues0101 = dbCtx.CompetitionVenues.Add(
+                new Tables.CompetitionVenue()
+                {
+                    Competition = newComp01.Entity,
+                    Name = "Main Floor",
+                    LengthInMeter = 10,
+                    WidthInMeter = 8,
+                    Comment = "nice floor",
+                });
+            // ----
             dbCtx.Participants.Add(
                 new Tables.Participant()
                 {
@@ -256,6 +266,16 @@ namespace DanceCompetitionHelper.Database.Extensions
                     PointsForFirst = 150,
                     ExtraManualStarter = 0,
                     Comment = "no comment",
+                });
+            // ----
+            var newCompVanues0201 = dbCtx.CompetitionVenues.Add(
+                new Tables.CompetitionVenue()
+                {
+                    Competition = newComp02.Entity,
+                    Name = "Main Floor",
+                    LengthInMeter = 15,
+                    WidthInMeter = 10,
+                    Comment = "'house' floor",
                 });
             // ----
             dbCtx.Participants.Add(

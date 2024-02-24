@@ -26,6 +26,9 @@ namespace DanceCompetitionHelper.Database
         public virtual DbSet<AdjudicatorHistory> AdjudicatorsHistory { get; set; }
 
         public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; }
+        public virtual DbSet<ConfigurationValue> Configurations { get; set; }
+
+        public virtual DbSet<CompetitionVenue> CompetitionVenues { get; set; }
 
         public DanceCompetitionHelperDbContext(
             IDbConfig sqLiteDbConfig,
@@ -35,7 +38,7 @@ namespace DanceCompetitionHelper.Database
             SqLiteDbConfig = sqLiteDbConfig;
             _logger = logger
                 ?? throw new ArgumentNullException(
-                    nameof(logger)); ;
+                    nameof(logger));
 
             if (SqLiteDbConfig == null
                 || string.IsNullOrEmpty(SqLiteDbConfig.SqLiteDbFile)

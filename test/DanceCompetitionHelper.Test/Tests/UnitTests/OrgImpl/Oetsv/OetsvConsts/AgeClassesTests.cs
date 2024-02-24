@@ -52,6 +52,12 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase("formation", AgeClasses.Formation)]
         [TestCase("FORMATION", AgeClasses.Formation)]
         // -------------
+        [TestCase(AgeClasses.Open, AgeClasses.Open)]
+        [TestCase("open", AgeClasses.Open)]
+        // -------------
+        [TestCase(AgeClasses.Under16, AgeClasses.Under16)]
+        [TestCase("u16", AgeClasses.Under16)]
+        // -------------
         [TestCase(null, null)]
         [TestCase("", null)]
         [TestCase("dummy", null)]

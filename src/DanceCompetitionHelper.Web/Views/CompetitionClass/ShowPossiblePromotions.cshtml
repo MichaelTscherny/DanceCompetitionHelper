@@ -142,6 +142,7 @@
 
                         @{
                             displayedColumns = 0;
+                            var useStartNumber = -1;
                         }
                         @foreach (var curClassId in displayInfoCompClassesIds)
                         {
@@ -149,8 +150,6 @@
                                 curClassId,
                                 out var curClass))
                             {
-                                var useStartNumber = -1;
-
                                 if (partInfoByCompetitionClass.TryGetValue(
                                     curPossPromotion.ParticipantId,
                                     out var compClassesByPartId))
@@ -172,9 +171,17 @@
 
                                 displayedColumns++;
 
+                                var curClassPointsInfo = "-";
+                                if (curClass.CompetitionClassId == curPossPromotion.CompetitionClassId)
+                                {
+                                    curClassPointsInfo = string.Format(
+                                        "{0} / {1}",
+                                        curClass.MinPointsForPromotion,
+                                        curClass.MinStartsForPromotion);
+                                }
+                                
                                 <td>
-                                    @curClass.MinPointsForPromotion
-                                    / @curClass.MinStartsForPromotion<br>
+                                    @curClassPointsInfo<br>
                                     #@useStartNumber
                                     : +@curClass.PointsForFirst / +1
                                 </td>

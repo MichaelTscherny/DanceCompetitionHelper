@@ -5,8 +5,8 @@ A short summary of the feature
 Scenario: None
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -23,6 +23,9 @@ Scenario: None
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #                                                                                                              
@@ -49,8 +52,8 @@ Scenario: None
 Scenario: One in Sen Sta D
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -67,6 +70,9 @@ Scenario: One in Sen Sta D
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #
@@ -95,8 +101,8 @@ Scenario: One in Sen Sta D
 Scenario: One in Sen Sta D and C
     Given following DanceCompetitionHelper "DanceCompHelper"
     And following Competitions in "DanceCompHelper-db"
-        | CompetitionName | Origanization | OrgCompetitionId | CompetitionInfo |
-        | Test-Comp-01    | Oetsv         | ÖTSV-01          | Just a test     |
+        | CompetitionName | Organization | OrgCompetitionId | CompetitionInfo |
+        | Test-Comp-01    | Oetsv        | ÖTSV-01          | Just a test     |
     And following Adjudicator Panels in "DanceCompHelper-db"
         | CompetitionName | Name     | Comment        |
         | Test-Comp-01    | Panel 01 | Just one Panel |
@@ -113,6 +119,9 @@ Scenario: One in Sen Sta D and C
         | Test-Comp-01    | Panel 01             | 1       | Class-02   | Sen 2 Sta D          | Sen 2 Sta C                  | Sta        | Sen      | 2        | D     | 10                    | 1200                  |
         | Test-Comp-01    | Panel 01             | 1       | Class-03   | Sen 1 Sta C          |                              | Sta        | Sen      | 1        | C     | 10                    | 900                   |
         | Test-Comp-01    | Panel 01             | 1       | Class-04   | Sen 2 Sta C          |                              | Sta        | Sen      | 2        | C     | 10                    | 1200                  |
+    And following Competition Venues in "DanceCompHelper-db"
+        | CompetitionName | Name     | Comment    |
+        | Test-Comp-01    | Venue-01 | Main Floor |
     And following Participants in "DanceCompHelper-db"
         | CompetitionName | CompetitionClassName | StartNumber | NamePartA   | OrgIdPartA | NamePartB   | OrgIdPartB | ClubName     | OrgIdClub |
         #

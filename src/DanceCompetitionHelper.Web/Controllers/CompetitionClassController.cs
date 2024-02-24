@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Web.Extensions;
+﻿using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace DanceCompetitionHelper.Web.Controllers
     {
         public const string RefName = "CompetitionClass";
         public const string CompetitionClassLastCreatedAdjudicatorPanelId = nameof(CompetitionClassLastCreatedAdjudicatorPanelId);
+        public const string DefaultCompetitionColor = "#ffffff";
 
         private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<CompetitionController> _logger;
@@ -35,11 +37,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
 
-            ViewData["Show" + ParticipantController.RefName] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
-            ViewData["Show" + AdjudicatorController.RefName] = foundCompId;
-            ViewData["Show" + AdjudicatorPanelController.RefName] = foundCompId;
+            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             return View(
                 new CompetitionClassOverviewViewModel()
@@ -60,11 +58,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             var foundCompId = _danceCompHelper.FindCompetition(
                 id);
 
-            ViewData["Show" + ParticipantController.RefName] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
-            ViewData["Show" + AdjudicatorController.RefName] = foundCompId;
-            ViewData["Show" + AdjudicatorPanelController.RefName] = foundCompId;
+            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             return View(
                 nameof(Index),
@@ -93,8 +87,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return NotFound();
             }
 
-            ViewData["Show" + ParticipantController.RefName] = foundCompId;
-            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
+            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             _ = Guid.TryParse(
                 HttpContext.Session.GetString(
@@ -224,8 +217,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     });
             }
 
-            ViewData["Show" + ParticipantController.RefName] = foundCompClass.CompetitionId;
-            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompClass.CompetitionId;
+            ViewData["Use" + nameof(CompetitionClass)] = foundCompClass.CompetitionId;
 
             return View(
                 nameof(ShowCreateEdit),
@@ -259,7 +251,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     ExtraManualStarter = foundCompClass.ExtraManualStarter,
                     Comment = foundCompClass.Comment,
                     Ignore = foundCompClass.Ignore,
-                    CompetitionColor = foundCompClass.CompetitionColor,
+                    CompetitionColor = foundCompClass.CompetitionColor ?? DefaultCompetitionColor,
                 });
         }
 
@@ -366,10 +358,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             var helpComp = _danceCompHelper.GetCompetition(
                 foundCompId);
 
-            ViewData["Show" + ParticipantController.RefName] = foundCompId;
-            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowPossiblePromotions)] = foundCompId;
-            ViewData["Show" + AdjudicatorController.RefName] = foundCompId;
+            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             return View(
                 new ShowMultipleStartersOverviewViewModel()
@@ -396,9 +385,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             var helpComp = _danceCompHelper.GetCompetition(
                 foundCompId);
 
-            ViewData["Show" + ParticipantController.RefName] = foundCompId;
-            ViewData["BackTo" + CompetitionClassController.RefName] = foundCompId;
-            ViewData[nameof(CompetitionClassController.ShowMultipleStarters)] = foundCompId;
+            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             return View(
                 new ShowPossiblePromotionsViewModel()

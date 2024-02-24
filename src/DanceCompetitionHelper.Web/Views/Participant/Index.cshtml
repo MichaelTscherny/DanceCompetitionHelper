@@ -101,7 +101,7 @@
                     }
 
                     <tr class="@extraTrClass">
-                        <td class="text-nowrap">
+                        <td class="text-nowrap" style="background-color: @item.CompetitionClass.CompetitionColor">
                             @item.CompetitionClass.CompetitionClassName
                             [@(item.CompetitionClass.Comment)]
                         </td>
@@ -296,40 +296,38 @@
         </table>
     </div>
 
-    <div class="row d-flex justify-content-center py-1">
-        <div class="col">
+    <div class="hstack gap-2 justify-content-center">
+        <a asp-controller="@ParticipantController.RefName"
+           asp-action="@nameof(ParticipantController.ShowCreateEdit)"
+           asp-route-id="@Model.Competition?.CompetitionId"
+           class="btn btn-primary px-lg-4">
+           Create new
+        </a>
+        <a asp-controller="@CompetitionClassController.RefName"
+           asp-action="@nameof(CompetitionClassController.Index)"
+           asp-route-id="@Model.Competition?.CompetitionId"
+           class="btn btn-secondary px-lg-4">
+           Back
+        </a>
+        <div class="vr"></div>
+        @if(Model.DetailedView)
+        {
             <a asp-controller="@ParticipantController.RefName"
-               asp-action="@nameof(ParticipantController.ShowCreateEdit)"
-               asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-primary px-lg-4">
-               Create new
-            </a>
-            &nbsp;
-            <a asp-controller="@CompetitionClassController.RefName"
-               asp-action="@nameof(CompetitionClassController.Index)"
-               asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-secondary px-lg-4">
-                Back
-            </a>
-            |
-            @if(Model.DetailedView)
-            {
-                <a asp-controller="@ParticipantController.RefName"
                asp-action="@nameof(ParticipantController.Index)"
                asp-route-id="@Model.Competition?.CompetitionId"
                class="btn btn-primary px-lg-4">
-                    Normal View
-                </a>
-            }
-            else 
-            {
-                <a asp-controller="@ParticipantController.RefName"
-                   asp-action="@nameof(ParticipantController.DetailedView)"
-                   asp-route-id="@Model.Competition?.CompetitionId"
-                   class="btn btn-primary px-lg-4">
-                    Detailed View
-                </a>
-            }
-        </div>
+               Normal View
+            </a>
+        }
+        else 
+        {
+            <a asp-controller="@ParticipantController.RefName"
+               asp-action="@nameof(ParticipantController.DetailedView)"
+               asp-route-id="@Model.Competition?.CompetitionId"
+               class="btn btn-primary px-lg-4">
+               Detailed View
+            </a>
+        }
     </div>
+    <br />
 </div>

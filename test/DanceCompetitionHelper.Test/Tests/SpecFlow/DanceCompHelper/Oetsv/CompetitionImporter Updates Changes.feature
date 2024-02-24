@@ -18,11 +18,14 @@ Scenario: Update 03 - Changed Points and Starts
         | Small Tournament | Allg.Kl. Sta B       | Allg.Kl. Sta A               | 003        | Sta        | Allg     | 0        | B     | 1300                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta C (002)   | 0                    |                          |
         | Small Tournament | Allg.Kl. Sta A       | Allg.Kl. Sta S               | 004        | Sta        | Allg     | 0        | A     | 1600                  | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta B (003)   | 0                    |                          |
         | Small Tournament | Allg.Kl. Sta S       |                              | 005        | Sta        | Allg     | 0        | S     | 999999999             | 10                    | 150            | 2                 | 1                  | Allg.Kl. Sta A (004)   | 0                    |                          |
+    And following Competition Venues exists in DanceCompetitionHelper "DanceCompHelper"
+        | CompetitionName  | Name       | Comment                             |
+        | Small Tournament | Main Floor | Created by OetsvCompetitionImporter |
     And following Participants exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionA | PossiblePromotionAInfo                 |
         #                                                                                  
         | Small Tournament | Allg.Kl. Sta D       | 101         | Dancer-A 01 | Dancer-B 01 | False              | [A] 152/4 + 750/5 = 902/9 -> False     |
-        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 500/11 + 750/5 = 1250/16 -> True   |
+        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 500/11 + 450/3 = 950/14 -> True    |
         #                                                                               
         | Small Tournament | Allg.Kl. Sta C       | 201         | Dancer-A 03 | Dancer-B 03 | False              | [A] 333/3 + 600/4 = 933/7 -> False     |
         | Small Tournament | Allg.Kl. Sta C       | 202         | Dancer-A 04 | Dancer-B 04 | False              | [A] 666/6 + 600/4 = 1266/10 -> False   |
@@ -56,7 +59,7 @@ Scenario: Update 03 - Changed Points and Starts
         | CompetitionName  | CompetitionClassName | StartNumber | NamePartA   | NamePartB   | PossiblePromotionA | PossiblePromotionAInfo                 |
         #                                                                                  
         | Small Tournament | Allg.Kl. Sta D       | 101         | Dancer-A 01 | Dancer-B 01 | True               | [A] 300/5 + 750/5 = 1050/10 -> True    |
-        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 600/12 + 750/5 = 1350/17 -> True   |
+        | Small Tournament | Allg.Kl. Sta D       | 102         | Dancer-A 02 | Dancer-B 02 | True               | [A] 600/12 + 300/2 = 900/14 -> True    |
         #                                                                               
         | Small Tournament | Allg.Kl. Sta C       | 201         | Dancer-A 03 | Dancer-B 03 | False              | [A] 444/4 + 600/4 = 1044/8 -> False    |
         | Small Tournament | Allg.Kl. Sta C       | 202         | Dancer-A 04 | Dancer-B 04 | False              | [A] 777/7 + 600/4 = 1377/11 -> False   |

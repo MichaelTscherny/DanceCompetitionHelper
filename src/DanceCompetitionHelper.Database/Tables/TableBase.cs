@@ -4,6 +4,7 @@
     using System.ComponentModel.DataAnnotations;
 
     [Index(nameof(Created), IsUnique = false)]
+    // TODO: [Index(nameof(LastModified), IsUnique = false)]
     public abstract class TableBase
     {
         [Required]

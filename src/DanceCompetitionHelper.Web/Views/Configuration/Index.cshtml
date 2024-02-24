@@ -1,0 +1,262 @@
+﻿@using DanceCompetitionHelper.Database.Enum
+@using DanceCompetitionHelper.Database.Extensions;
+@using DanceCompetitionHelper.Database.Tables
+@using DanceCompetitionHelper.Extensions
+@using DanceCompetitionHelper.Web.Controllers
+@using DanceCompetitionHelper.Web.Helper.Configuration
+@using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+@using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models.Configuration;
+
+@model ConfigurationOverviewViewModel
+
+@{
+    var compInfo = Model.Competition;
+    var compInfoStr = compInfo?.GetCompetitionName() ?? "Global";
+    var competitionClassesCount = Model.OverviewItems?.Count() ?? 0;
+
+    ViewData["Title"] = string.Format(
+        compInfo != null
+            ? "Configuration of Class {0}"
+            : "{0} Configuration",
+        compInfoStr);
+
+    var allOrgs = new List<OrganizationEnum>(
+        EnumExtensions
+            .GetValues<OrganizationEnum>()
+            .Except(
+                new [] 
+                {
+                    OrganizationEnum.Any,
+                })
+            .OrderBy(
+                x => (int)x));
+
+    var allConfigKeysBy = new CompetitionVenueDisplayHelper(
+        Model.OverviewItems);
+    var compsById = Model.Competitions?.ToDictionary(
+        x => x.CompetitionId,
+        x => x)
+        ?? new Dictionary<Guid, Competition>();
+    var allCompIds = (Model.Competitions
+        ?.Select(
+            x => x.CompetitionId)
+        ?? Enumerable.Empty<Guid>())
+        .ToList();
+    var compClassesById = Model.CompetitionClasses?.ToDictionary(
+        x => x.CompetitionClassId,
+        x => x)
+        ?? new Dictionary<Guid, CompetitionClass>();
+    var allCompClassIds = new Guid[]
+        {
+            Guid.Empty,
+        }.Union(
+            Model.CompetitionClasses
+                ?.Select(
+                    x => x.CompetitionClassId)
+                ?? Enumerable.Empty<Guid>())
+        .ToList();
+    var compVenuesById = (Model.CompetitionVenues?.ToDictionary(
+        x => x.CompetitionVenueId,
+        x => x))
+        ?? new Dictionary<Guid, CompetitionVenue>();
+    var allCompVenueIds = new Guid[]
+        {
+            Guid.Empty,
+        }.Union(
+            Model.CompetitionVenues
+                ?.Select(
+                    x => x.CompetitionVenueId)
+                ?? Enumerable.Empty<Guid>())
+        .ToList();
+}
+
+<div class="text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    @if (string.IsNullOrEmpty(Model.ErrorsChange) == false)
+    {
+        <div class="text-danger">
+            @Model.ErrorsChange
+        </div>
+    }
+
+    <div class="table-responsive-xxl">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr role="rowheader">
+                    <th>
+                        Key
+                    </th>
+                    <th>
+                        @ConfigurationScopeEnum.Global
+                    </th>
+                    <th>
+                        Specific
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var curKey in allConfigKeysBy.Keys)
+                {
+                    if (allConfigKeysBy.AllConfigKeysBy.TryGetValue(
+                        curKey,
+                        out var byKey) == false) 
+                    {
+                        continue;
+                    }
+
+                    <tr role="row" data-test="mark-01"> <!-- data-test="mark-01" start -->
+                        <td class="text-nowrap align-middle"> <!-- Mark 01-01 start -->
+                            @Html.DisplayFor(modelItem => curKey)
+                        </td> <!-- Mark 01-01 end -->
+
+                        <td class="text-nowrap align-bottom"> <!-- Mark 01-02 start -->
+                            @{
+                                var curItem = allConfigKeysBy.Get(
+                                    curKey);
+
+                                if(curItem != null)
+                                {
+                                    @Html.EditorFor(
+                                        m => curItem,
+                                        new
+                                        {
+                                            OriginCompetitionId = Model.ConfigurationViewModel?.OriginCompetitionId,
+                                            CompetitionsById = compsById,
+                                            CompetitionClassesById = compClassesById,
+                                            CompetitionVenuesById = compVenuesById,
+                                        })
+                                }
+                            }
+                        </td> <!-- Mark 01-02 end -->
+                        <td class="align-bottom p-0"> <!-- Mark 01-03 start -->
+                            @await Html.PartialAsync(
+                                "SubByOrg",
+                                byKey,
+                                new ViewDataDictionary(
+                                    ViewData)
+                                {
+                                    { "originCompetitionId", Model.ConfigurationViewModel?.OriginCompetitionId },
+                                    { "curKey", curKey },
+                                    // 0
+                                    { "byKey", byKey },
+                                    // 2
+                                    { "allConfigKeysBy", allConfigKeysBy },
+                                    { "allOrgs", allOrgs },
+                                    // 4
+                                    { "compsById", compsById },
+                                    { "allCompIds", allCompIds },
+                                    // 6
+                                    { "compClassesById", compClassesById },
+                                    { "allCompClassIds", allCompClassIds },
+                                    // 8
+                                    { "compVenuesById", compVenuesById },
+                                    { "allCompVenueIds", allCompVenueIds },
+                                })
+                        </td> <!-- Mark 01-03 end -->
+                    </tr> <!-- data-test="mark-01" end -->                
+                }
+            </tbody>
+            <thead>
+                <tr role="rowheader">
+                    <th>
+                        Key
+                    </th>
+                    <th>
+                        @ConfigurationScopeEnum.Global
+                    </th>
+                    <th>
+                        Specific
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div class="container text-center" role="group">
+    <form asp-action="@nameof(ConfigurationController.CreateNew)" method="post">
+        <input id="@nameof(ConfigurationViewModel.OriginCompetitionId)"
+               name="@nameof(ConfigurationViewModel.OriginCompetitionId)"
+               type="hidden" 
+               value="@compInfo?.CompetitionId"/>
+
+        <div class="mb-3 text-start">
+            <label for="@nameof(ConfigurationViewModel.Key)" 
+                   class="form-label">New Configuration Value
+            </label>
+            <div class="input-group">
+                <span class="input-group-text">Key</span>
+                <input asp-for="Dummy" 
+                       id="@nameof(ConfigurationViewModel.Key)"
+                       name="@nameof(ConfigurationViewModel.Key)"
+                       placeholder="For Key"
+                       class="form-control" 
+                       value="@(string.IsNullOrEmpty(Model.ErrorsAdd) ? string.Empty : Model.ConfigurationViewModel?.Key)"/>
+                <span class="input-group-text">Org</span>
+                @{
+                    var isDisabled = (Model.AvailableOrganizations?.Count ?? 0) <= 1;
+                }
+                <select asp-for="Dummy"
+                        id="@nameof(ConfigurationViewModel.Organization)"
+                        name="@nameof(ConfigurationViewModel.Organization)"                        
+                        asp-items="Model.AvailableOrganizations" 
+                        class="form-select"
+                        readonly="@isDisabled">
+                </select>
+                <span class="input-group-text">Comp</span>
+                @{
+                    isDisabled = (Model.AvailableCompetitions?.Count ?? 0) <= 1;
+                }
+                <select asp-for="Dummy"
+                        id="@nameof(ConfigurationViewModel.CompetitionId)"
+                        name="@nameof(ConfigurationViewModel.CompetitionId)"
+                        asp-items="Model.AvailableCompetitions" 
+                        class="form-select"
+                        readonly="@isDisabled">
+                </select>
+                <span class="input-group-text">Class</span>
+                @{
+                    isDisabled = (Model.AvailableCompetitionClasses?.Count ?? 0) <= 1;
+                }
+                <select asp-for="Dummy"
+                        id="@nameof(ConfigurationViewModel.CompetitionClassId)"
+                        name="@nameof(ConfigurationViewModel.CompetitionClassId)"
+                        asp-items="Model.AvailableCompetitionClasses" 
+                        class="form-select"
+                        readonly="@isDisabled">
+                </select>
+                <span class="input-group-text">Venues</span>
+                @{
+                    isDisabled = (Model.AvailableCompetitionVenues?.Count ?? 0) <= 1;
+                }
+                <select asp-for="Dummy"
+                        id="@nameof(ConfigurationViewModel.CompetitionVenueId)"
+                        name="@nameof(ConfigurationViewModel.CompetitionVenueId)"
+                        asp-items="Model.AvailableCompetitionVenues" 
+                        class="form-select"
+                        readonly="@isDisabled">
+                </select>
+                <span class="input-group-text">Value</span>
+                <input asp-for="Dummy"
+                       id="@nameof(ConfigurationViewModel.Value)"
+                       name="@nameof(ConfigurationViewModel.Value)"
+                       placeholder="Use Value"
+                       class="form-control" 
+                       value="@(string.IsNullOrEmpty(Model.ErrorsAdd) ? string.Empty : Model.ConfigurationViewModel?.Value)"/>
+                <button type="submit"
+                       value="Create"
+                       class="btn btn-outline-success bi bi-floppy">
+                </button>
+            </div>
+            @if (string.IsNullOrEmpty(Model.ErrorsAdd) == false)
+            {
+                <div class="text-danger">
+                    @Model.ErrorsAdd
+                </div>
+            }
+        </div>
+    </form>
+    <br />
+</div>

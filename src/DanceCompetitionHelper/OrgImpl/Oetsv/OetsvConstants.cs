@@ -84,6 +84,8 @@
             public const string La = "La";
             public const string Combination = "Kombi";
             public const string Freestyle = "Kuer";
+            public const string SoloSta = "SscSta";
+            public const string SoloLa = "SscLa";
 
             public static string? ToDisciplines(
                 string? useString)
@@ -124,6 +126,16 @@
                     case "kuer":
                     case "KUER":
                         return Freestyle;
+
+                    case SoloSta:
+                    case "sscsta":
+                    case "SSCSTA":
+                        return SoloSta;
+
+                    case SoloLa:
+                    case "sscla":
+                    case "SSCLA":
+                        return SoloLa;
                 }
 
                 return null;
@@ -142,6 +154,7 @@
             public const string Senior = "Sen";
             public const string Formation = "For";
             public const string Open = "Offen";
+            public const string Under16 = "U16";
 
             public static string? ToAgeClasses(
                 string? useString)
@@ -210,7 +223,13 @@
                     case "off":
                     case "OF":
                     case "of":
+                    case "open":
+                    case "Open":
                         return Open;
+
+                    case Under16:
+                    case "u16":
+                        return Under16;
                 }
 
                 return null;
@@ -275,6 +294,8 @@
             public const string A = "A";
             public const string S = "S";
             public const string GirlsOnly = "G";
+            public const string SoloStarter = "SE";
+            public const string SoloAdvanced = "SF";
 
             public const int NoPromotionPossible = 999_999_999;
 
@@ -310,9 +331,24 @@
 
                     case GirlsOnly:
                     case "g":
+                    case "go":
+                    case "GO":
+                    case "Go":
                     case "Girls":
                     case "girls":
                         return GirlsOnly;
+
+                    case SoloStarter:
+                    case "se":
+                    case "Se":
+                    case "sE":
+                        return SoloStarter;
+
+                    case SoloAdvanced:
+                    case "sf":
+                    case "Sf":
+                    case "sF":
+                        return SoloAdvanced;
                 }
 
                 return null;
@@ -492,6 +528,9 @@
 
                             case Classes.S:
                                 return NoPromotionPossible;
+
+                            case Classes.SoloStarter:
+                                return 1_000;
                         }
                         break;
 
@@ -630,6 +669,14 @@
 
                             case Classes.S:
                                 return NoPromotionPossible;
+                        }
+                        break;
+
+                    case AgeClasses.Under16:
+                        switch (useClasses)
+                        {
+                            case Classes.SoloStarter:
+                                return 1_000;
                         }
                         break;
                 }

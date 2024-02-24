@@ -1,0 +1,126 @@
+﻿@using DanceCompetitionHelper.Database.Enum;
+@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
+@using DanceCompetitionHelper.Web.Models.ParticipantModels;
+
+@model CompetitionVenueViewModel
+
+@{
+    var isCreate = Model.CompetitionVenueId.HasValue == false;
+
+    ViewData["Title"] = string.Format(
+        "{0} Venue for {1}",
+        isCreate
+            ? "Create new"
+            : "Edit ",
+        Model.CompetitionName);
+
+    var formAction = isCreate
+        ? nameof(CompetitionVenueController.CreateNew)
+        : nameof(CompetitionVenueController.EditSave);
+}
+
+<div class="container text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    @if (string.IsNullOrEmpty(Model.Errors) == false)
+    {
+        <div class="row py-2 text-danger">
+            <div class="col-md">
+                @Model.Errors
+            </div>
+        </div>
+    }
+
+    <form asp-action="@formAction" method="post">
+        <input asp-for="CompetitionId" />
+        <input asp-for="CompetitionVenueId" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Abbreviation
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Name"
+                       class="form-control"
+                       placeholder="Name (e.g. A)"
+                       style="width: 100%" />
+                <span asp-validation-for="Name"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Name"
+                       class="control-label">
+                    Venue name
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Dimensions
+            </div>
+            <div class="col-md-4">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Length:</span>
+                    <input asp-for="LengthInMeter"
+                           class="form-control"
+                           placeholder="Name"
+                           style="width: 100%" />
+                    <span asp-validation-for="LengthInMeter"
+                          class="text-danger"></span>
+                    <span class="input-group-text">Width:</span>
+                    <input asp-for="WidthInMeter"
+                           class="form-control"
+                           placeholder="Name"
+                           style="width: 100%" />
+                    <span asp-validation-for="WidthInMeter"
+                          class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="LengthInMeter"
+                       class="control-label">
+                    Length In Meter
+                </label>
+                <label asp-for="WidthInMeter"
+                       class="control-label">
+                    Width In Meter
+                </label>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+                Comment
+            </div>
+            <div class="col-md-4">
+                <input asp-for="Comment"
+                       class="form-control"
+                       placeholder="Comment"
+                       style="width: 100%" />
+                <span asp-validation-for="Comment"
+                      class="text-danger"></span>
+            </div>
+            <div class="col-md text-start">
+                <label asp-for="Comment"
+                       class="control-label">
+                    Comment
+                </label>
+            </div>
+        </div>
+        <div class="hstack gap-2 justify-content-center">
+            <input type="submit" 
+                   value="@(isCreate ? "Create" : "Save")" 
+                   class="btn btn-primary px-lg-4" />
+            <a asp-controller="@CompetitionVenueController.RefName"
+               asp-action="@nameof(CompetitionVenueController.Index)"
+               asp-route-id="@Model.CompetitionId"
+               class="btn btn-secondary px-lg-4">
+               Cancel
+            </a>
+        </div>
+        <br />
+    </form>
+</div>

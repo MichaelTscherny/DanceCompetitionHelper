@@ -1,4 +1,5 @@
 ﻿@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Database.Extensions;
 @using DanceCompetitionHelper.Extensions
 @using DanceCompetitionHelper.OrgImpl.Oetsv
 @using DanceCompetitionHelper.Web.Controllers;
@@ -68,8 +69,7 @@
                             <a asp-controller="@CompetitionClassController.RefName"
                                asp-action="@nameof(CompetitionClassController.Index)"
                                asp-route-id="@item.CompetitionId">
-                                @Html.DisplayFor(modelItem => item.CompetitionName)
-                                (@Html.DisplayFor(modelItem => item.OrgCompetitionId))
+                                @item.GetCompetitionName()
                             </a>
                         </td>
                         <td>
@@ -164,12 +164,11 @@
         </table>
     </div>
 
-    <div class="row d-flex justify-content-center py-1">
-        <div class="col">
-            <a asp-action="@nameof(CompetitionController.ShowCreateEdit)"
-               class="btn btn-primary px-lg-4">Create new</a>&nbsp;
-            <a asp-action="@nameof(CompetitionController.ShowImport)" 
-               class="btn btn-primary px-lg-4">Import new/update</a>
-        </div>
+    <div class="hstack gap-2 justify-content-center">
+        <a asp-action="@nameof(CompetitionController.ShowCreateEdit)"
+            class="btn btn-primary px-lg-4">Create new</a>&nbsp;
+        <a asp-action="@nameof(CompetitionController.ShowImport)" 
+            class="btn btn-primary px-lg-4">Import new/update</a>
     </div>
+    <br />
 </div>
