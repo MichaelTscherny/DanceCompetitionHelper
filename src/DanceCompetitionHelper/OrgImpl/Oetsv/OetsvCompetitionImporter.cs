@@ -104,7 +104,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         public const string ExpectedDownloadContentType = "text/csv";
 
-        #endregion // Constants...
+        #endregion Constants...
 
         static OetsvCompetitionImporter()
         {

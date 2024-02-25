@@ -86,7 +86,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Given(@"following Competitions in ""([^""]*)""")]
-        public void GivenFollowingCompetitionsIn(
+        public async Task GivenFollowingCompetitionsIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -94,7 +94,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -116,7 +117,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             CompetitionDate = newComp.CompetitionDate ?? UseNow,
                         });
 
-                    useDb.SaveChanges();
+                    await useDb.SaveChangesAsync();
                 }
                 catch (Exception exc)
                 {
@@ -130,11 +131,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
             }
 
-            dbTrans.Commit();
+            await dbTrans.CommitAsync();
         }
 
         [Given(@"following Adjudicator Panels in ""([^""]*)""")]
-        public void GivenFollowingAdjudicatorPanelsIn(
+        public async Task GivenFollowingAdjudicatorPanelsIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -142,7 +143,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -167,7 +169,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Comment = newAdjPanel.Comment,
                         });
 
-                    useDb.SaveChanges();
+                    await useDb.SaveChangesAsync();
                 }
                 catch (Exception exc)
                 {
@@ -181,11 +183,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
             }
 
-            dbTrans.Commit();
+            await dbTrans.CommitAsync();
         }
 
         [Given(@"following Adjudicators in ""([^""]*)""")]
-        public void GivenFollowingAdjudicatorsIn(
+        public async Task GivenFollowingAdjudicatorsIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -193,7 +195,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -234,7 +237,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
                 catch (Exception exc)
                 {
-                    dbTrans.Rollback();
+                    await dbTrans.RollbackAsync();
 
                     Console.WriteLine(
                         "Error during add of '{0}': {1}",
@@ -244,11 +247,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
             }
 
-            dbTrans.Commit();
+            await dbTrans.CommitAsync();
         }
 
         [Given(@"following Competition Classes in ""([^""]*)""")]
-        public void GivenFollowingCompetitionClassesIn(
+        public async Task GivenFollowingCompetitionClassesIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -260,7 +263,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -322,11 +326,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Comment = newCompClass.Comment,
                         });
 
-                    useDb.SaveChanges();
+                    await useDb.SaveChangesAsync();
                 }
                 catch (Exception exc)
                 {
-                    dbTrans.Rollback();
+                    await dbTrans.RollbackAsync();
 
                     Console.WriteLine(
                         "Error during add of '{0}': {1}",
@@ -336,11 +340,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
             }
 
-            dbTrans.Commit();
+            await dbTrans.CommitAsync();
         }
 
         [Given(@"following Competition Classes History in ""([^""]*)""")]
-        public void GivenFollowingCompetitionClassesHistoryIn(
+        public async Task GivenFollowingCompetitionClassesHistoryIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -349,7 +353,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -385,11 +390,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Comment = newCompClassHist.Comment,
                         });
 
-                    useDb.SaveChanges();
+                    await useDb.SaveChangesAsync();
                 }
                 catch (Exception exc)
                 {
-                    dbTrans.Rollback();
+                    await dbTrans.RollbackAsync();
 
                     Console.WriteLine(
                         "Error during add of '{0}': {1}",
@@ -399,11 +404,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
             }
 
-            dbTrans.Commit();
+            await dbTrans.CommitAsync();
         }
 
         [Given(@"following Competition Venues in ""([^""]*)""")]
-        public void GivenFollowingCompetitionVenuesIn(
+        public async Task GivenFollowingCompetitionVenuesIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -411,7 +416,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -436,11 +442,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Comment = newCompVenue.Comment,
                         });
 
-                    useDb.SaveChanges();
+                    await useDb.SaveChangesAsync();
                 }
                 catch (Exception exc)
                 {
-                    dbTrans.Rollback();
+                    await dbTrans.RollbackAsync();
 
                     Console.WriteLine(
                         "Error during add of '{0}': {1}",
@@ -450,11 +456,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
             }
 
-            dbTrans.Commit();
+            await dbTrans.CommitAsync();
         }
 
         [Given(@"following Participants in ""([^""]*)""")]
-        public void GivenFollowingParticipantsIn(
+        public async Task GivenFollowingParticipantsIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -462,7 +468,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -506,7 +513,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             OrgPointsPartB = newPart.OrgPointsPartB,
                         });
 
-                    useDb.SaveChanges();
+                    await useDb.SaveChangesAsync();
                 }
                 catch (Exception exc)
                 {
@@ -520,11 +527,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
             }
 
-            dbTrans.Commit();
+            await dbTrans.CommitAsync();
         }
 
         [Given(@"following Participants History in ""([^""]*)""")]
-        public void GivenFollowingParticipantsHistoryIn(
+        public async Task GivenFollowingParticipantsHistoryIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -533,7 +540,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -577,11 +585,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             OrgPointsPartB = newPartHist.OrgPointsPartB,
                         });
 
-                    useDb.SaveChanges();
+                    await useDb.SaveChangesAsync();
                 }
                 catch (Exception exc)
                 {
-                    dbTrans.Rollback();
+                    await dbTrans.RollbackAsync();
 
                     Console.WriteLine(
                         "Error during add of '{0}': {1}",
@@ -591,11 +599,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
             }
 
-            dbTrans.Commit();
+            await dbTrans.CommitAsync();
         }
 
         [Given(@"following Configuration Values in ""([^""]*)""")]
-        public void GivenFollowingConfigurationExistsIn(
+        public async Task GivenFollowingConfigurationExistsIn(
             string danceCompHelperDb,
             Table table)
         {
@@ -606,7 +614,8 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -695,11 +704,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Value = newCfg.Value,
                         });
 
-                    useDb.SaveChanges();
+                    await useDb.SaveChangesAsync();
                 }
                 catch (Exception exc)
                 {
-                    dbTrans.Rollback();
+                    await dbTrans.RollbackAsync();
 
                     Console.WriteLine(
                         "Error during add of '{0}': {1}",
@@ -709,7 +718,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 }
             }
 
-            dbTrans.Commit();
+            await dbTrans.CommitAsync();
         }
 
 
@@ -718,7 +727,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         #region Dance Competition Helper 
 
         [Given(@"following DanceCompetitionHelper ""([^""]*)""")]
-        public void GivenFollowingDanceCompetitionHelper(
+        public async Task GivenFollowingDanceCompetitionHelper(
             string danceCompHelper)
         {
             GivenFollowingDanceCompDb(
@@ -728,8 +737,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var newDanceCompHelper = _useHost.Services
                 .GetRequiredService<IDanceCompetitionHelper>();
-            newDanceCompHelper.MigrateAsync();
-            newDanceCompHelper.CheckMandatoryConfigurationAsync();
+            await newDanceCompHelper.MigrateAsync();
+            await newDanceCompHelper.CheckMandatoryConfigurationAsync(
+                CancellationToken.None);
 
             _scenarioContext.AddToScenarioContext(
                 SpecFlowConstants.DanceCompetitionHelper,
@@ -741,7 +751,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Given(@"following data are imported by DanceCompetitionHelper ""([^""]*)""")]
-        public void GivenFollowingDataAreImportedByDanceCompetitionHelper(
+        public async Task GivenFollowingDataAreImportedByDanceCompetitionHelper(
             string danceCompHelper,
             Table table)
         {
@@ -762,10 +772,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                         "true");
                 }
 
-                useDanceCompHelper.ImportOrUpdateCompetition(
+                await useDanceCompHelper.ImportOrUpdateCompetitionAsync(
                     toImport.Organization,
                     toImport.OrgCompetitionId,
                     Database.Enum.ImportTypeEnum.Excel,
+                    CancellationToken.None,
                     new[] {
                         Path.Combine(
                             rootPath,

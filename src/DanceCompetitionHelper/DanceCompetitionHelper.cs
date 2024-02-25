@@ -9,6 +9,7 @@ using DanceCompetitionHelper.Helper;
 using DanceCompetitionHelper.OrgImpl;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
@@ -71,13 +72,15 @@ namespace DanceCompetitionHelper
             return _danceCompHelperDb;
         }
 
-        public Task AddTestDataAsync()
+        public Task AddTestDataAsync(
+            CancellationToken cancellationToken)
         {
             _logger.LogDebug(
                 "Do '{Method}'",
                 nameof(AddTestDataAsync));
 
-            return _danceCompHelperDb.AddTestData();
+            return _danceCompHelperDb.AddTestData(
+                cancellationToken);
         }
 
         public Task MigrateAsync()
@@ -89,13 +92,15 @@ namespace DanceCompetitionHelper
             return _danceCompHelperDb.MigrateAsync();
         }
 
-        public async Task CheckMandatoryConfigurationAsync()
+        public async Task CheckMandatoryConfigurationAsync(
+            CancellationToken cancellationToken)
         {
             _logger.LogDebug(
                 "Do '{Method}'",
                 nameof(CheckMandatoryConfigurationAsync));
 
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                    cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -103,8 +108,9 @@ namespace DanceCompetitionHelper
             {
                 foreach (var mandConfig in MandatoryConfigurationValues)
                 {
-                    var retConfig = GetConfiguration(
+                    var retConfig = await GetConfigurationAsync(
                         mandConfig,
+                        cancellationToken,
                         false);
 
                     if (retConfig == null)
@@ -136,6 +142,7 @@ namespace DanceCompetitionHelper
             bool useTransaction = true)
         {
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
@@ -184,12 +191,11 @@ namespace DanceCompetitionHelper
                     nameof(CreateTableHistoryAsync),
                     exc.Message);
 
-                await (dbTrans?.RollbackAsync(
-                    cancellationToken) ?? Task.CompletedTask);
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        #endregion // Administration stuff
+        #endregion Administration stuff
 
         public async Task<Competition?> GetCompetitionAsync(
             Guid? competitionId,
@@ -202,6 +208,7 @@ namespace DanceCompetitionHelper
             }
 
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
@@ -215,8 +222,7 @@ namespace DanceCompetitionHelper
             }
             finally
             {
-                await (dbTrans?.RollbackAsync(
-                    cancellationToken) ?? Task.CompletedTask);
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
@@ -225,131 +231,139 @@ namespace DanceCompetitionHelper
             bool includeInfos = false,
             bool useTransaction = true)
         {
+            /*
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
+            */
 
             var countsOfCompClasses = new Dictionary<Guid, int>();
             var countsOfParticipants = new Dictionary<Guid, int>();
 
+            /*
             try
             {
+            */
+            if (includeInfos)
+            {
+                countsOfCompClasses = await _danceCompHelperDb.CompetitionClasses
+                    .TagWith(
+                        nameof(GetCompetitionsAsync) + "(bool?)[0]")
+                    .Include(
+                        x => x.AdjudicatorPanel)
+                    .Where(
+                        x => x.Ignore == false)
+                    .GroupBy(
+                        x => x.CompetitionId,
+                        (compId, items) => new
+                        {
+                            CompetitionId = compId,
+                            Count = items.Count(),
+                        })
+                    .ToDictionaryAsync(
+                        x => x.CompetitionId,
+                        x => x.Count,
+                        cancellationToken);
+
+                countsOfParticipants = await _danceCompHelperDb.Participants
+                    .TagWith(
+                        nameof(GetCompetitionsAsync) + "(bool?)[1]")
+                    .Where(
+                        x => x.Ignore == false)
+                    .GroupBy(
+                        x => x.CompetitionId,
+                        (compId, items) => new
+                        {
+                            CompetitionId = compId,
+                            Count = items.Count(),
+                        })
+                    .ToDictionaryAsync(
+                        x => x.CompetitionId,
+                        x => x.Count,
+                        cancellationToken);
+            }
+
+            await foreach (var curComp in _danceCompHelperDb.Competitions
+                .TagWith(
+                    nameof(GetCompetitionsAsync) + "(bool?)[2]")
+                .OrderByDescending(
+                    x => x.CompetitionDate)
+                .ThenBy(
+                    x => x.OrgCompetitionId)
+                .AsAsyncEnumerable())
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    yield break;
+                }
+
                 if (includeInfos)
                 {
-                    countsOfCompClasses = await _danceCompHelperDb.CompetitionClasses
-                        .TagWith(
-                            nameof(GetCompetitionsAsync) + "(bool?)[0]")
-                        .Include(
-                            x => x.AdjudicatorPanel)
-                        .Where(
-                            x => x.Ignore == false)
-                        .GroupBy(
-                            x => x.CompetitionId,
-                            (compId, items) => new
-                            {
-                                CompetitionId = compId,
-                                Count = items.Count(),
-                            })
-                        .ToDictionaryAsync(
-                            x => x.CompetitionId,
-                            x => x.Count,
-                            cancellationToken);
+                    // CAUTION: EF is caching, if we dont want wrong values
+                    // we need to recreate this!..
+                    curComp.DisplayInfo = new CompetitionDisplayInfo();
 
-                    countsOfParticipants = await _danceCompHelperDb.Participants
-                        .TagWith(
-                            nameof(GetCompetitionsAsync) + "(bool?)[1]")
-                        .Where(
-                            x => x.Ignore == false)
-                        .GroupBy(
-                            x => x.CompetitionId,
-                            (compId, items) => new
-                            {
-                                CompetitionId = compId,
-                                Count = items.Count(),
-                            })
-                        .ToDictionaryAsync(
-                            x => x.CompetitionId,
-                            x => x.Count,
-                            cancellationToken);
-                }
+                    var useDisplayInfo = curComp.DisplayInfo;
 
-                await foreach (var curComp in _danceCompHelperDb.Competitions
-                    .TagWith(
-                        nameof(GetCompetitionsAsync) + "(bool?)[2]")
-                    .OrderByDescending(
-                        x => x.CompetitionDate)
-                    .ThenBy(
-                        x => x.OrgCompetitionId)
-                    .AsAsyncEnumerable())
-                {
-                    if (cancellationToken.IsCancellationRequested)
+                    if (countsOfCompClasses.TryGetValue(
+                        curComp.CompetitionId,
+                        out var countCompClasses))
                     {
-                        yield break;
+                        useDisplayInfo.CountCompetitionClasses = countCompClasses;
                     }
 
-                    if (includeInfos)
+                    if (countsOfParticipants.TryGetValue(
+                        curComp.CompetitionId,
+                        out var countParticipants))
                     {
-                        // CAUTION: EF is caching, if we dont want wrong values
-                        // we need to recreate this!..
-                        curComp.DisplayInfo = new CompetitionDisplayInfo();
-
-                        var useDisplayInfo = curComp.DisplayInfo;
-
-                        if (countsOfCompClasses.TryGetValue(
-                            curComp.CompetitionId,
-                            out var countCompClasses))
-                        {
-                            useDisplayInfo.CountCompetitionClasses = countCompClasses;
-                        }
-
-                        if (countsOfParticipants.TryGetValue(
-                            curComp.CompetitionId,
-                            out var countParticipants))
-                        {
-                            useDisplayInfo.CountParticipants = countParticipants;
-                        }
-
-                        useDisplayInfo.CountMultipleStarters = GetMultipleStarter(
-                            curComp.CompetitionId,
-                            false)
-                            .Count();
-                        useDisplayInfo.CountAdjudicatorPanels = await _danceCompHelperDb.AdjudicatorPanels
-                            .TagWith(
-                                nameof(GetCompetitionsAsync) + " " + nameof(Adjudicator) + ".Count")
-                            .CountAsync(
-                                x => x.CompetitionId == curComp.CompetitionId,
-                                cancellationToken);
-
-                        var helpAllItems = await _danceCompHelperDb.TableVersionInfos
-                            .TagWith(
-                                nameof(GetCompetitionsAsync) + " " + nameof(TableVersionInfo) + ".Count")
-                            .Where(
-                                x => x.CompetitionId == curComp.CompetitionId)
-                            .Select(
-                                x => x.CurrentVersion)
-                            .ToListAsync(
-                                cancellationToken);
-
-                        if (helpAllItems.Count >= 1)
-                        {
-                            useDisplayInfo.CountVersions = helpAllItems.Max();
-                        }
+                        useDisplayInfo.CountParticipants = countParticipants;
                     }
 
-                    yield return curComp;
+                    useDisplayInfo.CountMultipleStarters = await GetMultipleStarterAsync(
+                        curComp.CompetitionId,
+                        cancellationToken,
+                        false)
+                        .CountAsync();
+                    useDisplayInfo.CountAdjudicatorPanels = await _danceCompHelperDb.AdjudicatorPanels
+                        .TagWith(
+                            nameof(GetCompetitionsAsync) + " " + nameof(Adjudicator) + ".Count")
+                        .CountAsync(
+                            x => x.CompetitionId == curComp.CompetitionId,
+                            cancellationToken);
+
+                    var helpAllItems = await _danceCompHelperDb.TableVersionInfos
+                        .TagWith(
+                            nameof(GetCompetitionsAsync) + " " + nameof(TableVersionInfo) + ".Count")
+                        .Where(
+                            x => x.CompetitionId == curComp.CompetitionId)
+                        .Select(
+                            x => x.CurrentVersion)
+                        .ToListAsync(
+                            cancellationToken);
+
+                    if (helpAllItems.Count >= 1)
+                    {
+                        useDisplayInfo.CountVersions = helpAllItems.Max();
+                    }
                 }
+
+                yield return curComp;
+            }
+            /*
             }
             finally
             {
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
+            */
         }
 
         public async IAsyncEnumerable<CompetitionClass> GetCompetitionClassesAsync(
-            Guid? competitionId,
-            [EnumeratorCancellation] CancellationToken cancellationToken,
-            bool includeInfos = false,
-            bool showAll = false,
-            bool useTransaction = true)
+        Guid? competitionId,
+        [EnumeratorCancellation] CancellationToken cancellationToken,
+        bool includeInfos = false,
+        bool showAll = false,
+        bool useTransaction = true)
         {
             if (competitionId == null)
             {
@@ -357,6 +371,7 @@ namespace DanceCompetitionHelper
             }
 
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
@@ -454,10 +469,12 @@ namespace DanceCompetitionHelper
                         }
                     }
 
-                    var multipleStarters = GetMultipleStarter(
+                    var multipleStarters = await GetMultipleStarterAsync(
                         competitionId.Value,
+                        cancellationToken,
                         false)
-                        .ToList();
+                        .ToListAsync(
+                            cancellationToken);
 
                     foreach (var curMultiStart in multipleStarters)
                     {
@@ -490,10 +507,11 @@ namespace DanceCompetitionHelper
                         var useCompClassId = curCompClass.CompetitionClassId;
 
                         useDisplayInfo.MaxCouplesPerHeat = Convert.ToInt16(
-                            GetConfiguration(
+                            (await GetConfigurationAsync(
                                 GlobalConfigurationConstants.MaxCouplesPerHeat,
                                 curCompClass,
-                                false)
+                                cancellationToken,
+                                false))
                             ?.ValueParser
                             ?.AsDecimal()
                             ?? 1);
@@ -559,8 +577,7 @@ namespace DanceCompetitionHelper
             }
             finally
             {
-                await (dbTrans?.RollbackAsync(
-                    cancellationToken) ?? Task.CompletedTask);
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
@@ -575,6 +592,7 @@ namespace DanceCompetitionHelper
             }
 
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
@@ -609,8 +627,7 @@ namespace DanceCompetitionHelper
             }
             finally
             {
-                await (dbTrans?.RollbackAsync(
-                    cancellationToken) ?? Task.CompletedTask);
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
@@ -628,6 +645,7 @@ namespace DanceCompetitionHelper
             }
 
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
@@ -666,9 +684,11 @@ namespace DanceCompetitionHelper
                                 x => x.CompetitionId == competitionId));
 
                     multiStarter.AddRange(
-                        GetMultipleStarter(
+                        await GetMultipleStarterAsync(
                             foundComp.CompetitionId,
-                            false));
+                            cancellationToken,
+                            false)
+                        .ToListAsync());
 
                     multiStarterByParticipantsId =
                         multiStarter.SelectMany(
@@ -756,13 +776,13 @@ namespace DanceCompetitionHelper
             }
             finally
             {
-                await (dbTrans?.RollbackAsync(
-                    cancellationToken) ?? Task.CompletedTask);
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public IEnumerable<AdjudicatorPanel> GetAdjudicatorPanels(
+        public async IAsyncEnumerable<AdjudicatorPanel> GetAdjudicatorPanelsAsync(
             Guid? competitionId,
+            [EnumeratorCancellation] CancellationToken cancellationToken,
             bool includeInfos = false,
             bool useTransaction = true)
         {
@@ -771,13 +791,15 @@ namespace DanceCompetitionHelper
                 yield break;
             }
 
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                var foundComp = GetCompetitionAsync(
+                var foundComp = await GetCompetitionAsync(
                     competitionId,
+                    cancellationToken,
                     false);
 
                 if (foundComp == null)
@@ -785,21 +807,22 @@ namespace DanceCompetitionHelper
                     yield break;
                 }
 
-                foreach (var curAdjPanel in _danceCompHelperDb.AdjudicatorPanels
+                await foreach (var curAdjPanel in _danceCompHelperDb.AdjudicatorPanels
                     .TagWith(
-                        nameof(GetAdjudicatorPanels) + "(Guid?, bool)[0]")
+                        nameof(GetAdjudicatorPanelsAsync) + "(Guid?, bool)[0]")
                     .Where(
-                        x => x.CompetitionId == foundComp.CompetitionId))
+                        x => x.CompetitionId == foundComp.CompetitionId)
+                    .AsAsyncEnumerable())
                 {
                     if (includeInfos)
                     {
                         curAdjPanel.DisplayInfo = new AdjudicatorPanelDisplayInfos();
                         var useDisplayInfo = curAdjPanel.DisplayInfo;
 
-                        useDisplayInfo.CountAdjudicators = _danceCompHelperDb.Adjudicators
+                        useDisplayInfo.CountAdjudicators = await _danceCompHelperDb.Adjudicators
                             .TagWith(
-                                nameof(GetAdjudicatorPanels) + "(Guid?, bool)[1]")
-                            .Count(
+                                nameof(GetAdjudicatorPanelsAsync) + "(Guid?, bool)[1]")
+                            .CountAsync(
                                 x => x.AdjudicatorPanelId == curAdjPanel.AdjudicatorPanelId);
                     }
 
@@ -808,13 +831,14 @@ namespace DanceCompetitionHelper
             }
             finally
             {
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public IEnumerable<Adjudicator> GetAdjudicators(
+        public async IAsyncEnumerable<Adjudicator> GetAdjudicatorsAsync(
             Guid? competitionId,
             Guid? adjudicatorPanelId,
+            [EnumeratorCancellation] CancellationToken cancellationToken,
             bool includeInfos = false,
             bool useTransaction = true)
         {
@@ -823,13 +847,15 @@ namespace DanceCompetitionHelper
                 yield break;
             }
 
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                var foundComp = GetCompetitionAsync(
+                var foundComp = await GetCompetitionAsync(
                     competitionId,
+                    cancellationToken,
                     false);
 
                 if (foundComp == null)
@@ -842,23 +868,26 @@ namespace DanceCompetitionHelper
                 if (adjudicatorPanelId == null)
                 {
                     useAdjPanels.AddRange(
-                        _danceCompHelperDb.AdjudicatorPanels
+                        await _danceCompHelperDb.AdjudicatorPanels
                             .TagWith(
-                                nameof(GetAdjudicators) + "(Guid?, Guid?)[1]")
+                                nameof(GetAdjudicatorsAsync) + "(Guid?, Guid?)[1]")
                             .Where(
                                 x => x.CompetitionId == foundComp.CompetitionId)
                             .OrderBy(
                                 x => x.Name)
                             .Select(
-                                x => x.AdjudicatorPanelId));
+                                x => x.AdjudicatorPanelId)
+                            .ToListAsync(
+                                cancellationToken));
                 }
                 else
                 {
-                    var foundAdjPanel = _danceCompHelperDb.AdjudicatorPanels
+                    var foundAdjPanel = await _danceCompHelperDb.AdjudicatorPanels
                         .TagWith(
-                            nameof(GetAdjudicators) + "(Guid?, Guid?)[3]")
-                        .FirstOrDefault(
-                            x => x.CompetitionId == foundComp.CompetitionId);
+                            nameof(GetAdjudicatorsAsync) + "(Guid?, Guid?)[3]")
+                        .FirstOrDefaultAsync(
+                            x => x.CompetitionId == foundComp.CompetitionId,
+                            cancellationToken);
 
                     if (foundAdjPanel == null)
                     {
@@ -871,15 +900,21 @@ namespace DanceCompetitionHelper
 
                 foreach (var curAdjPanelId in useAdjPanels.Distinct())
                 {
-                    foreach (var curRetAdj in _danceCompHelperDb.Adjudicators
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        yield break;
+                    }
+
+                    await foreach (var curRetAdj in _danceCompHelperDb.Adjudicators
                         .TagWith(
-                            nameof(GetAdjudicators) + "(Guid?, Guid?)[4]")
+                            nameof(GetAdjudicatorsAsync) + "(Guid?, Guid?)[4]")
                         .Include(
                             x => x.AdjudicatorPanel)
                         .Where(
                             x => x.AdjudicatorPanelId == curAdjPanelId)
                         .OrderBy(
-                            x => x.Abbreviation))
+                            x => x.Abbreviation)
+                        .AsAsyncEnumerable())
                     {
                         yield return curRetAdj;
                     }
@@ -887,21 +922,24 @@ namespace DanceCompetitionHelper
             }
             finally
             {
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public IEnumerable<MultipleStarter> GetMultipleStarter(
+        public async IAsyncEnumerable<MultipleStarter> GetMultipleStarterAsync(
             Guid competitionId,
+            [EnumeratorCancellation] CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                var foundComp = GetCompetitionAsync(
+                var foundComp = await GetCompetitionAsync(
                     competitionId,
+                    cancellationToken,
                     false);
 
                 if (foundComp == null)
@@ -911,7 +949,7 @@ namespace DanceCompetitionHelper
 
                 var multipleStarterGouping = _danceCompHelperDb.Participants
                     .TagWith(
-                        nameof(GetMultipleStarter) + "(Guid)[0]")
+                        nameof(GetMultipleStarterAsync) + "(Guid)[0]")
                     .Where(
                         x => x.CompetitionId == foundComp.CompetitionId
                         && x.Ignore == false)
@@ -930,11 +968,17 @@ namespace DanceCompetitionHelper
                     .Select(
                         x => x.Key);
 
-                foreach (var curMultiStart in multipleStarterGouping)
+                await foreach (var curMultiStart in multipleStarterGouping
+                    .AsAsyncEnumerable())
                 {
-                    var allPartInfo = _danceCompHelperDb.Participants
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        yield break;
+                    }
+
+                    var allPartInfo = await _danceCompHelperDb.Participants
                         .TagWith(
-                            nameof(GetMultipleStarter) + "(Guid)[1]")
+                            nameof(GetMultipleStarterAsync) + "(Guid)[1]")
                         .Include(
                             x => x.CompetitionClass)
                         .Where(
@@ -946,7 +990,8 @@ namespace DanceCompetitionHelper
                             && x.ClubName == curMultiStart.ClubName
                             && x.OrgIdClub == curMultiStart.OrgIdClub
                             && x.Ignore == false)
-                        .ToList();
+                        .ToListAsync(
+                            cancellationToken);
 
                     yield return new MultipleStarter(
                         allPartInfo);
@@ -956,9 +1001,9 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(GetMultipleStarter));
+                    nameof(GetMultipleStarterAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
@@ -1002,38 +1047,42 @@ namespace DanceCompetitionHelper
             return null;
         }
 
-        #endregion // Get helper
+        #endregion Get helper
 
         #region Conversions/Lookups
 
-        public Guid? GetCompetition(
+        public async Task<Guid?> GetCompetitionAsync(
             string byName,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                return _danceCompHelperDb.Competitions
+                return (await _danceCompHelperDb.Competitions
                     .TagWith(
-                        nameof(GetCompetition) + "(string)[0]")
-                    .FirstOrDefault(
-                        x => x.CompetitionName == byName)
+                        nameof(GetCompetitionAsync) + "(string)[0]")
+                    .FirstOrDefaultAsync(
+                        x => x.CompetitionName == byName,
+                        cancellationToken))
                     ?.CompetitionId;
             }
             finally
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(GetCompetition));
+                    nameof(GetCompetitionAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public Guid? FindCompetition(
+        public async Task<Guid?> FindCompetitionAsync(
             Guid? byAnyId,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
             if (byAnyId.HasValue == false)
@@ -1041,76 +1090,84 @@ namespace DanceCompetitionHelper
                 return null;
             }
 
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                var foundCompId = _danceCompHelperDb.CompetitionClasses
+                var foundCompId = (await _danceCompHelperDb.CompetitionClasses
                     .TagWith(
-                        nameof(FindCompetition) + "(Guid)[0]")
-                    .FirstOrDefault(
+                        nameof(FindCompetitionAsync) + "(Guid)[0]")
+                    .FirstOrDefaultAsync(
                         x => x.CompetitionId == byAnyId
                         || x.CompetitionClassId == byAnyId
-                        || x.AdjudicatorPanelId == byAnyId)
+                        || x.AdjudicatorPanelId == byAnyId,
+                        cancellationToken))
                     ?.CompetitionId;
 
                 if (foundCompId == null)
                 {
-                    foundCompId = _danceCompHelperDb.Competitions
+                    foundCompId = (await _danceCompHelperDb.Competitions
                         .TagWith(
-                            nameof(FindCompetition) + "(Guid)[1]")
-                        .FirstOrDefault(
-                            x => x.CompetitionId == byAnyId)
+                            nameof(FindCompetitionAsync) + "(Guid)[1]")
+                        .FirstOrDefaultAsync(
+                            x => x.CompetitionId == byAnyId,
+                            cancellationToken))
                         ?.CompetitionId;
                 }
 
                 if (foundCompId == null)
                 {
-                    foundCompId = _danceCompHelperDb.Participants
+                    foundCompId = (await _danceCompHelperDb.Participants
                         .TagWith(
-                            nameof(FindCompetition) + "(Guid)[2]")
-                        .FirstOrDefault(
-                            x => x.ParticipantId == byAnyId)
+                            nameof(FindCompetitionAsync) + "(Guid)[2]")
+                        .FirstOrDefaultAsync(
+                            x => x.ParticipantId == byAnyId,
+                            cancellationToken))
                         ?.CompetitionId;
                 }
 
                 if (foundCompId == null)
                 {
-                    var foundAdj = _danceCompHelperDb.Adjudicators
+                    var foundAdj = await _danceCompHelperDb.Adjudicators
                         .TagWith(
-                            nameof(FindCompetition) + "(Guid)[4]")
-                        .FirstOrDefault(
-                            x => x.AdjudicatorId == byAnyId);
+                            nameof(FindCompetitionAsync) + "(Guid)[4]")
+                        .FirstOrDefaultAsync(
+                            x => x.AdjudicatorId == byAnyId,
+                            cancellationToken);
 
                     if (foundAdj != null)
                     {
-                        foundCompId = _danceCompHelperDb.AdjudicatorPanels
+                        foundCompId = (await _danceCompHelperDb.AdjudicatorPanels
                             .TagWith(
-                                nameof(FindCompetition) + "(Guid)[5]")
-                            .FirstOrDefault(
-                                x => x.AdjudicatorPanelId == foundAdj.AdjudicatorPanelId)
+                                nameof(FindCompetitionAsync) + "(Guid)[5]")
+                            .FirstOrDefaultAsync(
+                                x => x.AdjudicatorPanelId == foundAdj.AdjudicatorPanelId,
+                                cancellationToken))
                             ?.CompetitionId;
                     }
                 }
 
                 if (foundCompId == null)
                 {
-                    foundCompId = _danceCompHelperDb.AdjudicatorPanels
+                    foundCompId = (await _danceCompHelperDb.AdjudicatorPanels
                         .TagWith(
-                            nameof(FindCompetition) + "(Guid)[6]")
-                        .FirstOrDefault(
-                            x => x.AdjudicatorPanelId == byAnyId)
+                            nameof(FindCompetitionAsync) + "(Guid)[6]")
+                        .FirstOrDefaultAsync(
+                            x => x.AdjudicatorPanelId == byAnyId,
+                            cancellationToken))
                         ?.CompetitionId;
                 }
 
                 if (foundCompId == null)
                 {
-                    foundCompId = _danceCompHelperDb.CompetitionVenues
+                    foundCompId = (await _danceCompHelperDb.CompetitionVenues
                         .TagWith(
-                            nameof(FindCompetition) + "(Guid)[7]")
-                        .FirstOrDefault(
-                            x => x.CompetitionVenueId == byAnyId)
+                            nameof(FindCompetitionAsync) + "(Guid)[7]")
+                        .FirstOrDefaultAsync(
+                            x => x.CompetitionVenueId == byAnyId,
+                            cancellationToken))
                         ?.CompetitionId;
                 }
 
@@ -1120,14 +1177,15 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(FindCompetition));
+                    nameof(FindCompetitionAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public Guid? FindCompetitionClass(
+        public async Task<Guid?> FindCompetitionClassAsync(
             Guid? byAnyId,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
             if (byAnyId.HasValue == false)
@@ -1135,27 +1193,30 @@ namespace DanceCompetitionHelper
                 return null;
             }
 
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                var foundCompClassId = _danceCompHelperDb.CompetitionClasses
+                var foundCompClassId = (await _danceCompHelperDb.CompetitionClasses
                     .TagWith(
-                        nameof(FindCompetitionClass) + "(Guid)[0]")
-                    .FirstOrDefault(
+                        nameof(FindCompetitionClassAsync) + "(Guid)[0]")
+                    .FirstOrDefaultAsync(
                         x => x.CompetitionId == byAnyId
                         || x.CompetitionClassId == byAnyId
-                        || x.AdjudicatorPanelId == byAnyId)
+                        || x.AdjudicatorPanelId == byAnyId,
+                        cancellationToken))
                     ?.CompetitionClassId;
 
                 if (foundCompClassId == null)
                 {
-                    foundCompClassId = _danceCompHelperDb.Participants
+                    foundCompClassId = (await _danceCompHelperDb.Participants
                         .TagWith(
-                            nameof(FindCompetitionClass) + "(Guid)[1]")
-                        .FirstOrDefault(
-                            x => x.ParticipantId == byAnyId)
+                            nameof(FindCompetitionClassAsync) + "(Guid)[1]")
+                        .FirstOrDefaultAsync(
+                            x => x.ParticipantId == byAnyId,
+                            cancellationToken))
                         ?.CompetitionClassId;
                 }
 
@@ -1165,181 +1226,201 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(FindCompetitionClass));
+                    nameof(FindCompetitionClassAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public Guid? GetCompetitionClass(
+        public async Task<Guid?> GetCompetitionClassAsync(
             string byName,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                return _danceCompHelperDb.CompetitionClasses
+                return (await _danceCompHelperDb.CompetitionClasses
                     .TagWith(
-                        nameof(GetCompetitionClass) + "(string)[0]")
-                    .FirstOrDefault(
+                        nameof(GetCompetitionClassAsync) + "(string)[0]")
+                    .FirstOrDefaultAsync(
                         x => x.CompetitionClassName == byName
                         /* TODO: really need ignore?.. */
-                        && x.Ignore == false)
+                        && x.Ignore == false,
+                        cancellationToken))
                     ?.CompetitionClassId;
             }
             finally
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(GetCompetitionClass));
+                    nameof(GetCompetitionClassAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public CompetitionClass? GetCompetitionClass(
+        public async Task<CompetitionClass?> GetCompetitionClassAsync(
             Guid competitionClassId,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                return _danceCompHelperDb.CompetitionClasses
+                return await _danceCompHelperDb.CompetitionClasses
                     .TagWith(
-                        nameof(GetCompetitionClass) + "(Guid)[0]")
-                    .FirstOrDefault(
-                        x => x.CompetitionClassId == competitionClassId);
+                        nameof(GetCompetitionClassAsync) + "(Guid)[0]")
+                    .FirstOrDefaultAsync(
+                        x => x.CompetitionClassId == competitionClassId,
+                        cancellationToken);
             }
             finally
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(GetCompetitionClass));
+                    nameof(GetCompetitionClassAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public CompetitionVenue? GetCompetitionVenue(
+        public async Task<CompetitionVenue?> GetCompetitionVenueAsync(
             Guid? competitionVenueId,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                return _danceCompHelperDb.CompetitionVenues
+                return await _danceCompHelperDb.CompetitionVenues
                     .TagWith(
-                        nameof(GetCompetitionVenue) + "(Guid)[0]")
+                        nameof(GetCompetitionVenueAsync) + "(Guid)[0]")
                     .Include(x => x.Competition)
-                    .FirstOrDefault(
-                        x => x.CompetitionVenueId == competitionVenueId);
+                    .FirstOrDefaultAsync(
+                        x => x.CompetitionVenueId == competitionVenueId,
+                        cancellationToken);
             }
             finally
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(GetCompetitionClass));
+                    nameof(GetCompetitionClassAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public Participant? GetParticipant(
+        public async Task<Participant?> GetParticipantAsync(
             Guid participantId,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                return _danceCompHelperDb.Participants
+                return await _danceCompHelperDb.Participants
                     .TagWith(
-                        nameof(GetParticipant) + "(Guid)[0]")
-                    .FirstOrDefault(
-                        x => x.ParticipantId == participantId);
+                        nameof(GetParticipantAsync) + "(Guid)[0]")
+                    .FirstOrDefaultAsync(
+                        x => x.ParticipantId == participantId,
+                        cancellationToken);
             }
             finally
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(GetParticipant));
+                    nameof(GetParticipantAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public AdjudicatorPanel? GetAdjudicatorPanel(
+        public async Task<AdjudicatorPanel?> GetAdjudicatorPanelAsync(
             Guid adjudicatorPanelId,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                return _danceCompHelperDb.AdjudicatorPanels
+                return await _danceCompHelperDb.AdjudicatorPanels
                     .TagWith(
-                        nameof(GetAdjudicatorPanel) + "(Guid)[0]")
-                    .FirstOrDefault(
-                        x => x.AdjudicatorPanelId == adjudicatorPanelId);
+                        nameof(GetAdjudicatorPanelAsync) + "(Guid)[0]")
+                    .FirstOrDefaultAsync(
+                        x => x.AdjudicatorPanelId == adjudicatorPanelId,
+                        cancellationToken);
             }
             finally
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(GetAdjudicatorPanel));
+                    nameof(GetAdjudicatorPanelAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public Adjudicator? GetAdjudicator(
+        public async Task<Adjudicator?> GetAdjudicatorAsync(
             Guid adjudicatorId,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                return _danceCompHelperDb.Adjudicators
+                return await _danceCompHelperDb.Adjudicators
                     .TagWith(
-                        nameof(GetAdjudicator) + "(Guid)[0]")
+                        nameof(GetAdjudicatorAsync) + "(Guid)[0]")
                     .Include(
                          x => x.AdjudicatorPanel)
-                    .FirstOrDefault(
-                        x => x.AdjudicatorId == adjudicatorId);
+                    .FirstOrDefaultAsync(
+                        x => x.AdjudicatorId == adjudicatorId,
+                        cancellationToken);
             }
             finally
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(GetAdjudicator));
+                    nameof(GetAdjudicatorAsync));
 
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        #endregion // Conversions/Lookups
+        #endregion Conversions/Lookups
 
         #region Competition Crud
 
-        public void CreateCompetition(
+        public async Task CreateCompetitionAsync(
             string competitionName,
             OrganizationEnum organization,
             string orgCompetitionId,
             string? competitionInfo,
             DateTime competitionDate,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -1356,18 +1437,20 @@ namespace DanceCompetitionHelper
                         Comment = comment,
                     });
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(CreateCompetition),
+                    nameof(CreateCompetitionAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1375,27 +1458,30 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(CreateCompetition));
+                    nameof(CreateCompetitionAsync));
             }
         }
 
-        public void EditCompetition(
+        public async Task EditCompetitionAsync(
             Guid competitionId,
             string competitionName,
             OrganizationEnum organization,
             string orgCompetitionId,
             string? competitionInfo,
             DateTime competitionDate,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundComp = GetCompetitionAsync(
+                var foundComp = await GetCompetitionAsync(
                     competitionId,
+                    cancellationToken,
                     false);
 
                 if (foundComp == null)
@@ -1414,18 +1500,20 @@ namespace DanceCompetitionHelper
                 foundComp.CompetitionDate = competitionDate;
                 foundComp.Comment = comment;
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(EditCompetition),
+                    nameof(EditCompetitionAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1433,21 +1521,24 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(EditCompetition));
+                    nameof(EditCompetitionAsync));
             }
         }
 
-        public void RemoveCompetition(
-            Guid competitionId)
+        public async Task RemoveCompetitionAsync(
+            Guid competitionId,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundComp = GetCompetitionAsync(
+                var foundComp = await GetCompetitionAsync(
                     competitionId,
+                    cancellationToken,
                     false);
 
                 if (foundComp == null)
@@ -1474,18 +1565,20 @@ namespace DanceCompetitionHelper
                 _danceCompHelperDb.Competitions.Remove(
                     foundComp);
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(RemoveCompetition),
+                    nameof(RemoveCompetitionAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1493,27 +1586,30 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(RemoveCompetition));
+                    nameof(RemoveCompetitionAsync));
             }
         }
 
-        #endregion //  Competition Crud
+        #endregion Competition Crud
 
         #region AdjudicatorPanel Crud
 
-        public void CreateAdjudicatorPanel(
+        public async Task CreateAdjudicatorPanelAsync(
             Guid competitionId,
             string name,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundComp = GetCompetitionAsync(
+                var foundComp = await GetCompetitionAsync(
                     competitionId,
+                    cancellationToken,
                     false);
 
                 if (foundComp == null)
@@ -1533,18 +1629,20 @@ namespace DanceCompetitionHelper
                         Comment = comment,
                     });
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(CreateAdjudicatorPanel),
+                    nameof(CreateAdjudicatorPanelAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1552,27 +1650,30 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(CreateAdjudicatorPanel));
+                    nameof(CreateAdjudicatorPanelAsync));
             }
         }
 
-        public void EditAdjudicatorPanel(
+        public async Task EditAdjudicatorPanelAsync(
             Guid adjudicatorPanelId,
             Guid competitionId,
             string name,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundAdjPanel = _danceCompHelperDb.AdjudicatorPanels
+                var foundAdjPanel = await _danceCompHelperDb.AdjudicatorPanels
                     .TagWith(
-                        nameof(EditAdjudicatorPanel) + "(Guid, ...)[0]")
-                    .FirstOrDefault(
-                        x => x.AdjudicatorPanelId == adjudicatorPanelId);
+                        nameof(EditAdjudicatorPanelAsync) + "(Guid, ...)[0]")
+                    .FirstOrDefaultAsync(
+                        x => x.AdjudicatorPanelId == adjudicatorPanelId,
+                        cancellationToken);
 
                 if (foundAdjPanel == null)
                 {
@@ -1587,18 +1688,20 @@ namespace DanceCompetitionHelper
                 foundAdjPanel.Name = name;
                 foundAdjPanel.Comment = comment;
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(EditAdjudicatorPanel),
+                    nameof(EditAdjudicatorPanelAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1606,24 +1709,27 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(EditAdjudicatorPanel));
+                    nameof(EditAdjudicatorPanelAsync));
             }
         }
 
-        public void RemoveAdjudicatorPanel(
-            Guid adjudicatorPanelId)
+        public async Task RemoveAdjudicatorPanelAsync(
+            Guid adjudicatorPanelId,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundAdjPanel = _danceCompHelperDb.AdjudicatorPanels
+                var foundAdjPanel = await _danceCompHelperDb.AdjudicatorPanels
                     .TagWith(
-                        nameof(RemoveAdjudicatorPanel) + "(Guid)")
-                    .FirstOrDefault(
-                        x => x.AdjudicatorPanelId == adjudicatorPanelId);
+                        nameof(RemoveAdjudicatorPanelAsync) + "(Guid)")
+                    .FirstOrDefaultAsync(
+                        x => x.AdjudicatorPanelId == adjudicatorPanelId,
+                        cancellationToken);
 
                 if (foundAdjPanel == null)
                 {
@@ -1637,18 +1743,20 @@ namespace DanceCompetitionHelper
                 _danceCompHelperDb.AdjudicatorPanels.Remove(
                     foundAdjPanel);
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(RemoveAdjudicatorPanel),
+                    nameof(RemoveAdjudicatorPanelAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1656,21 +1764,23 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(RemoveAdjudicatorPanel));
+                    nameof(RemoveAdjudicatorPanelAsync));
             }
         }
 
-        #endregion //  AdjudicatorPanel Crud
+        #endregion AdjudicatorPanel Crud
 
         #region Adjudicator Crud
 
-        public void CreateAdjudicator(
+        public async Task CreateAdjudicatorAsync(
             Guid adjudicatorPanelId,
             string abbreviation,
             string name,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -1685,18 +1795,20 @@ namespace DanceCompetitionHelper
                         Comment = comment,
                     });
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(CreateAdjudicator),
+                    nameof(CreateAdjudicatorAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1704,25 +1816,28 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(CreateAdjudicator));
+                    nameof(CreateAdjudicatorAsync));
             }
         }
 
-        public void EditAdjudicator(
+        public async Task EditAdjudicatorAsync(
             Guid adjudicatorId,
             Guid adjudicatorPanelId,
             string abbreviation,
             string name,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundAdj = GetAdjudicator(
+                var foundAdj = await GetAdjudicatorAsync(
                     adjudicatorId,
+                    cancellationToken,
                     false);
 
                 if (foundAdj == null)
@@ -1739,18 +1854,20 @@ namespace DanceCompetitionHelper
                 foundAdj.Name = name;
                 foundAdj.Comment = comment;
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(EditAdjudicator),
+                    nameof(EditAdjudicatorAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1758,21 +1875,24 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(EditAdjudicator));
+                    nameof(EditAdjudicatorAsync));
             }
         }
 
-        public void RemoveAdjudicator(
-            Guid adjudicatorId)
+        public async Task RemoveAdjudicatorAsync(
+            Guid adjudicatorId,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundAdj = GetAdjudicator(
+                var foundAdj = await GetAdjudicatorAsync(
                     adjudicatorId,
+                    cancellationToken,
                     false);
 
                 if (foundAdj == null)
@@ -1787,18 +1907,20 @@ namespace DanceCompetitionHelper
                 _danceCompHelperDb.Adjudicators.Remove(
                     foundAdj);
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(RemoveAdjudicator),
+                    nameof(RemoveAdjudicatorAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1806,15 +1928,15 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(RemoveAdjudicator));
+                    nameof(RemoveAdjudicatorAsync));
             }
         }
 
-        #endregion //  Adjudicator Crud
+        #endregion Adjudicator Crud
 
         #region CompetitionClass Crud
 
-        public void CreateCompetitionClass(
+        public async Task CreateCompetitionClassAsync(
             Guid competitionId,
             string competitionClassName,
             Guid? followUpCompetitionClassId,
@@ -1830,16 +1952,19 @@ namespace DanceCompetitionHelper
             int extraManualStarter,
             string? comment,
             bool ignore,
-            string? competitionColor)
+            string? competitionColor,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundCompId = GetCompetitionAsync(
+                var foundCompId = await GetCompetitionAsync(
                     competitionId,
+                    cancellationToken,
                     false);
 
                 if (foundCompId == null)
@@ -1874,18 +1999,20 @@ namespace DanceCompetitionHelper
                         CompetitionColor = competitionColor,
                     });
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(CreateCompetitionClass),
+                    nameof(CreateCompetitionClassAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1893,11 +2020,11 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(CreateCompetitionClass));
+                    nameof(CreateCompetitionClassAsync));
             }
         }
 
-        public void EditCompetitionClass(
+        public async Task EditCompetitionClassAsync(
             Guid competitionClassId,
             string competitionClassName,
             Guid? followUpCompetitionClassId,
@@ -1913,16 +2040,19 @@ namespace DanceCompetitionHelper
             int extraManualStarter,
             string? comment,
             bool ignore,
-            string? competitionColor)
+            string? competitionColor,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundCompClass = GetCompetitionClass(
+                var foundCompClass = await GetCompetitionClassAsync(
                     competitionClassId,
+                    cancellationToken,
                     false);
 
                 if (foundCompClass == null)
@@ -1952,18 +2082,20 @@ namespace DanceCompetitionHelper
                 foundCompClass.Ignore = ignore;
                 foundCompClass.CompetitionColor = competitionColor;
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(EditCompetitionClass),
+                    nameof(EditCompetitionClassAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1971,21 +2103,24 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(EditCompetitionClass));
+                    nameof(EditCompetitionClassAsync));
             }
         }
 
-        public void RemoveCompetitionClass(
-            Guid competitionClassId)
+        public async Task RemoveCompetitionClassAsync(
+            Guid competitionClassId,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundCompClass = GetCompetitionClass(
+                var foundCompClass = await GetCompetitionClassAsync(
                     competitionClassId,
+                    cancellationToken,
                     false);
 
                 if (foundCompClass == null)
@@ -2000,18 +2135,20 @@ namespace DanceCompetitionHelper
                 _danceCompHelperDb.CompetitionClasses.Remove(
                     foundCompClass);
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(RemoveCompetitionClass),
+                    nameof(RemoveCompetitionClassAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -2019,22 +2156,24 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(RemoveCompetitionClass));
+                    nameof(RemoveCompetitionClassAsync));
             }
         }
 
-        #endregion //  CompetitionClass Crud
+        #endregion CompetitionClass Crud
 
         #region CompetitionVanue Crud
 
-        public void CreateCompetitionVenue(
+        public async Task CreateCompetitionVenueAsync(
             Guid competitionId,
             string name,
             int lengthInMeter,
             int widthInMeter,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -2050,18 +2189,20 @@ namespace DanceCompetitionHelper
                         Comment = comment,
                     });
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(CreateCompetitionVenue),
+                    nameof(CreateCompetitionVenueAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -2069,25 +2210,28 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(CreateCompetitionVenue));
+                    nameof(CreateCompetitionVenueAsync));
             }
         }
 
-        public void EditCompetitionVenue(
+        public async Task EditCompetitionVenueAsync(
             Guid competitionVenueId,
             string name,
             int lengthInMeter,
             int widthInMeter,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundCompVenue = GetCompetitionVenue(
+                var foundCompVenue = await GetCompetitionVenueAsync(
                     competitionVenueId,
+                    cancellationToken,
                     false);
 
                 if (foundCompVenue == null)
@@ -2104,18 +2248,20 @@ namespace DanceCompetitionHelper
                 foundCompVenue.WidthInMeter = widthInMeter;
                 foundCompVenue.Comment = comment;
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(EditCompetitionVenue),
+                    nameof(EditCompetitionVenueAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -2123,21 +2269,24 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(EditCompetitionVenue));
+                    nameof(EditCompetitionVenueAsync));
             }
         }
 
-        public void RemoveCompetitionVenue(
-            Guid competitionVenueId)
+        public async Task RemoveCompetitionVenueAsync(
+            Guid competitionVenueId,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundCompVenue = GetCompetitionVenue(
+                var foundCompVenue = await GetCompetitionVenueAsync(
                     competitionVenueId,
+                    cancellationToken,
                     false);
 
                 if (foundCompVenue == null)
@@ -2152,18 +2301,20 @@ namespace DanceCompetitionHelper
                 _danceCompHelperDb.CompetitionVenues.Remove(
                     foundCompVenue);
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(RemoveCompetitionVenue),
+                    nameof(RemoveCompetitionVenueAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -2171,15 +2322,15 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(RemoveCompetitionVenue));
+                    nameof(RemoveCompetitionVenueAsync));
             }
         }
 
-        #endregion //  CompetitionVanue Crud
+        #endregion CompetitionVanue Crud
 
         #region Participant Crud
 
-        public void CreateParticipant(
+        public async Task CreateParticipantAsync(
             Guid competitionId,
             Guid competitionClassId,
             int startNumber,
@@ -2204,16 +2355,19 @@ namespace DanceCompetitionHelper
             bool? orgAlreadyPromotedPartB,
             string? orgAlreadyPromotedInfoPartB,
             string? comment,
-            bool ignore)
+            bool ignore,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundCompId = GetCompetitionAsync(
+                var foundCompId = await GetCompetitionAsync(
                     competitionId,
+                    cancellationToken,
                     false);
 
                 if (foundCompId == null)
@@ -2225,8 +2379,9 @@ namespace DanceCompetitionHelper
                             competitionId));
                 }
 
-                var foundCompClassId = GetCompetitionClass(
+                var foundCompClassId = await GetCompetitionClassAsync(
                     competitionClassId,
+                    cancellationToken,
                     false);
 
                 if (foundCompClassId == null)
@@ -2266,18 +2421,20 @@ namespace DanceCompetitionHelper
                         Ignore = ignore,
                     });
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(CreateParticipant),
+                    nameof(CreateParticipantAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -2285,11 +2442,11 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(CreateParticipant));
+                    nameof(CreateParticipantAsync));
             }
         }
 
-        public void EditParticipant(
+        public async Task EditParticipantAsync(
             Guid participantId,
             Guid competitionClassId,
             int startNumber,
@@ -2314,16 +2471,19 @@ namespace DanceCompetitionHelper
             bool? orgAlreadyPromotedPartB,
             string? orgAlreadyPromotedInfoPartB,
             string? comment,
-            bool ignore)
+            bool ignore,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundCompClassId = GetCompetitionClass(
+                var foundCompClassId = await GetCompetitionClassAsync(
                     competitionClassId,
+                    cancellationToken,
                     false);
 
                 if (foundCompClassId == null)
@@ -2337,7 +2497,7 @@ namespace DanceCompetitionHelper
 
                 var foundParticipant = _danceCompHelperDb.Participants
                     .TagWith(
-                        nameof(EditParticipant) + "(Guid,...)[1]")
+                        nameof(EditParticipantAsync) + "(Guid,...)[1]")
                     .FirstOrDefault(
                         x => x.ParticipantId == participantId);
 
@@ -2373,18 +2533,20 @@ namespace DanceCompetitionHelper
                 foundParticipant.Comment = comment;
                 foundParticipant.Ignore = ignore;
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(EditParticipant),
+                    nameof(EditParticipantAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -2392,24 +2554,27 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(EditParticipant));
+                    nameof(EditParticipantAsync));
             }
         }
 
-        public void RemoveParticipant(
-            Guid participantId)
+        public async Task RemoveParticipantAsync(
+            Guid participantId,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var foundParticipant = _danceCompHelperDb.Participants
+                var foundParticipant = await _danceCompHelperDb.Participants
                     .TagWith(
-                        nameof(RemoveParticipant) + "(Guid)[0]")
-                    .FirstOrDefault(
-                        x => x.ParticipantId == participantId);
+                        nameof(RemoveParticipantAsync) + "(Guid)[0]")
+                    .FirstOrDefaultAsync(
+                        x => x.ParticipantId == participantId,
+                        cancellationToken);
 
                 if (foundParticipant == null)
                 {
@@ -2423,18 +2588,20 @@ namespace DanceCompetitionHelper
                 _danceCompHelperDb.Participants.Remove(
                     foundParticipant);
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {Method}: {Message}",
-                    nameof(RemoveParticipant),
+                    nameof(RemoveParticipantAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -2442,50 +2609,57 @@ namespace DanceCompetitionHelper
             {
                 _logger.LogTrace(
                     "{Method}() done",
-                    nameof(RemoveParticipant));
+                    nameof(RemoveParticipantAsync));
             }
         }
 
-        #endregion // Participant Crud
+        #endregion Participant Crud
 
         #region Configuration
 
-        public (IEnumerable<ConfigurationValue>? ConfigurationValues,
+        public async Task<(IEnumerable<ConfigurationValue>? ConfigurationValues,
             Competition? Competition,
             IEnumerable<Competition>? Competitions,
             IEnumerable<CompetitionClass>? CompetitionClasses,
-            IEnumerable<CompetitionVenue>? CompetitionVenues)
-            GetConfigurations(
+            IEnumerable<CompetitionVenue>? CompetitionVenues)>
+            GetConfigurationsAsync(
                 Guid? competitionId,
+                CancellationToken cancellationToken,
                 bool useTransaction = true)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
-            IEnumerable<ConfigurationValue>? retConfValues;
+            IAsyncEnumerable<ConfigurationValue> retConfValues = AsyncEnumerable.Empty<ConfigurationValue>();
             Competition? retComp;
-            IEnumerable<Competition>? retComps = null;
-            IEnumerable<CompetitionClass>? retCompClasses = null;
-            IEnumerable<CompetitionVenue>? retCompVenues = null;
+            IAsyncEnumerable<Competition> retComps = AsyncEnumerable.Empty<Competition>();
+            IAsyncEnumerable<CompetitionClass> retCompClasses = AsyncEnumerable.Empty<CompetitionClass>();
+            IAsyncEnumerable<CompetitionVenue> retCompVenues = AsyncEnumerable.Empty<CompetitionVenue>();
 
             try
             {
-                retComp = GetCompetitionAsync(
+                retComp = await GetCompetitionAsync(
                     competitionId,
+                    cancellationToken,
                     false);
 
                 retConfValues = _danceCompHelperDb.Configurations
                     .TagWith(
-                        nameof(GetConfigurations) + "[0]");
+                        nameof(GetConfigurationsAsync) + "[0]")
+                    .ToAsyncEnumerable();
                 retComps = _danceCompHelperDb.Competitions
                     .TagWith(
-                        nameof(GetConfigurations) + "[1]");
+                        nameof(GetConfigurationsAsync) + "[1]")
+                    .ToAsyncEnumerable();
                 retCompClasses = _danceCompHelperDb.CompetitionClasses
                     .TagWith(
-                        nameof(GetConfigurations) + "[2]");
+                        nameof(GetConfigurationsAsync) + "[2]")
+                    .ToAsyncEnumerable();
                 retCompVenues = _danceCompHelperDb.CompetitionVenues
                     .TagWith(
-                        nameof(GetConfigurations) + "[3]");
+                        nameof(GetConfigurationsAsync) + "[3]")
+                    .ToAsyncEnumerable();
 
                 if (retComp != null)
                 {
@@ -2535,62 +2709,79 @@ namespace DanceCompetitionHelper
                     .OrderBy(
                         x => x.Name);
 
+                var retConfValuesTask = retConfValues.ToListAsync().AsTask();
+                var retCompsTask = retComps.ToListAsync().AsTask();
+                var retCompClassesTask = retCompClasses.ToListAsync().AsTask();
+                var retCompVenuesTask = retCompVenues.ToListAsync().AsTask();
+
+                await Task.WhenAll(
+                    retConfValuesTask,
+                    retCompsTask,
+                    retCompClassesTask,
+                    retCompVenuesTask);
+
                 return (
-                    retConfValues?.ToList(),
+                    await retConfValuesTask,
                     retComp,
-                    retComps?.ToList(),
-                    retCompClasses?.ToList(),
-                    retCompVenues?.ToList());
+                    await retCompsTask,
+                    await retCompClassesTask,
+                    await retCompVenuesTask);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {GetConfigurations}(): {Message}",
-                    nameof(RemoveParticipant),
+                    nameof(RemoveParticipantAsync),
                     exc.Message);
 
                 throw;
             }
             finally
             {
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public ConfigurationValue? GetConfiguration(
+        public Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            return GetConfiguration(
+            return GetConfigurationAsync(
                 new ConfigurationValue()
                 {
                     Key = key
                 },
+                cancellationToken,
                 useTransaction);
         }
 
-        public ConfigurationValue? GetConfiguration(
+        public async Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             OrganizationEnum organization,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
-            return GetConfiguration(
+            return await GetConfigurationAsync(
                 new ConfigurationValue()
                 {
                     Organization = organization,
                     Key = key,
                 },
+                cancellationToken,
                 useTransaction)
                 // fallback up...
-                ?? GetConfiguration(
+                ?? await GetConfigurationAsync(
                     key,
+                    cancellationToken,
                     useTransaction);
         }
 
-        public ConfigurationValue? GetConfiguration(
+        public async Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             Competition? competition,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
             if (competition == null)
@@ -2598,24 +2789,27 @@ namespace DanceCompetitionHelper
                 return null;
             }
 
-            return GetConfiguration(
+            return await GetConfigurationAsync(
                 new ConfigurationValue()
                 {
                     Organization = competition.Organization,
                     CompetitionId = competition.CompetitionId,
                     Key = key,
                 },
+                cancellationToken,
                 useTransaction)
                 // fallback up...
-                ?? GetConfiguration(
+                ?? await GetConfigurationAsync(
                     key,
                     competition.Organization,
+                    cancellationToken,
                     useTransaction);
         }
 
-        public ConfigurationValue? GetConfiguration(
+        public async Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             CompetitionClass? competitionClass,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
             if (competitionClass == null)
@@ -2625,7 +2819,7 @@ namespace DanceCompetitionHelper
 
             var useCompetition = competitionClass.Competition;
 
-            return GetConfiguration(
+            return await GetConfigurationAsync(
                 new ConfigurationValue()
                 {
                     Organization = useCompetition.Organization,
@@ -2633,20 +2827,23 @@ namespace DanceCompetitionHelper
                     CompetitionClassId = competitionClass.CompetitionClassId,
                     Key = key,
                 },
+                cancellationToken,
                 useTransaction)
                 // fallback up...
-                ?? GetConfiguration(
+                ?? await GetConfigurationAsync(
                     key,
                     useCompetition,
+                    cancellationToken,
                     useTransaction);
         }
 
         [Obsolete("really needed except from tests?..")]
         // TODO: really needed except from tests?..
-        public ConfigurationValue? GetConfiguration(
+        public async Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             Competition? competition,
             CompetitionVenue? competitionVenue,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
             if (competition == null
@@ -2662,7 +2859,7 @@ namespace DanceCompetitionHelper
 
             var useCompetition = competitionVenue.Competition;
 
-            return GetConfiguration(
+            return await GetConfigurationAsync(
                 new ConfigurationValue()
                 {
                     Organization = useCompetition.Organization,
@@ -2671,22 +2868,26 @@ namespace DanceCompetitionHelper
                     CompetitionVenueId = competitionVenue.CompetitionVenueId,
                     Key = key,
                 },
+                cancellationToken,
                 useTransaction)
                 // fallback up...
-                ?? GetConfiguration(
+                ?? await GetConfigurationAsync(
                     key,
                     competition,
+                    cancellationToken,
                     useTransaction)
-                ?? GetConfiguration(
+                ?? await GetConfigurationAsync(
                     key,
                     competitionVenue.Competition,
+                    cancellationToken,
                     useTransaction);
         }
 
-        public ConfigurationValue? GetConfiguration(
+        public async Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             CompetitionClass? competitionClass,
             CompetitionVenue? competitionVenue,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
             if (competitionClass == null
@@ -2703,7 +2904,7 @@ namespace DanceCompetitionHelper
             var useCompetition = competitionVenue.Competition;
             var usecompetitionClassId = competitionClass?.CompetitionClassId ?? Guid.Empty;
 
-            return GetConfiguration(
+            return await GetConfigurationAsync(
                 new ConfigurationValue()
                 {
                     Organization = useCompetition.Organization,
@@ -2712,8 +2913,9 @@ namespace DanceCompetitionHelper
                     CompetitionVenueId = competitionVenue.CompetitionVenueId,
                     Key = key,
                 },
+                cancellationToken,
                 useTransaction)
-                ?? GetConfiguration(
+                ?? await GetConfigurationAsync(
                     new ConfigurationValue()
                     {
                         Organization = useCompetition.Organization,
@@ -2722,20 +2924,24 @@ namespace DanceCompetitionHelper
                         CompetitionVenueId = competitionVenue.CompetitionVenueId,
                         Key = key,
                     },
+                    cancellationToken,
                     useTransaction)
                 // fallback up...
-                ?? GetConfiguration(
+                ?? await GetConfigurationAsync(
                     key,
                     competitionClass,
+                    cancellationToken,
                     useTransaction)
-                ?? GetConfiguration(
+                ?? await GetConfigurationAsync(
                     key,
                     competitionVenue.Competition,
+                    cancellationToken,
                     useTransaction);
         }
 
-        public ConfigurationValue? GetConfiguration(
+        public async Task<ConfigurationValue?> GetConfigurationAsync(
             ConfigurationValue? cfgValue,
+            CancellationToken cancellationToken,
             bool useTransaction = true)
         {
             if (cfgValue == null)
@@ -2743,27 +2949,29 @@ namespace DanceCompetitionHelper
                 return null;
             }
 
-            using var dbTrans = _danceCompHelperDb.BeginTransaction(
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken,
                 useTransaction);
 
             try
             {
-                return _danceCompHelperDb.Configurations
+                return await _danceCompHelperDb.Configurations
                     .TagWith(
-                        nameof(GetConfiguration) + "(ConfigurationValue)")
-                    .FirstOrDefault(
+                        nameof(GetConfigurationAsync) + "(ConfigurationValue)")
+                    .FirstOrDefaultAsync(
                         x => x.Organization == cfgValue.Organization
                         && x.CompetitionId == cfgValue.CompetitionId
                         && x.CompetitionClassId == cfgValue.CompetitionClassId
                         && x.CompetitionVenueId == cfgValue.CompetitionVenueId
-                        && x.Key == cfgValue.Key);
+                        && x.Key == cfgValue.Key,
+                        cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {GetConfiguration}({ConfigurationValue}): {Message}",
-                    nameof(RemoveParticipant),
+                    nameof(RemoveParticipantAsync),
                     nameof(ConfigurationValue),
                     exc.Message);
 
@@ -2771,20 +2979,22 @@ namespace DanceCompetitionHelper
             }
             finally
             {
-                dbTrans?.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
             }
         }
 
-        public void CreateConfiguration(
+        public async Task CreateConfigurationAsync(
             OrganizationEnum? organization,
             Guid? competitionId,
             Guid? competitionClassId,
             Guid? competitionVenueId,
             string key,
             string? value,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -2799,8 +3009,9 @@ namespace DanceCompetitionHelper
                 Competition? chkComp = null;
                 if (competitionId != null)
                 {
-                    chkComp = GetCompetitionAsync(
+                    chkComp = await GetCompetitionAsync(
                         competitionId,
+                        cancellationToken,
                         false);
 
                     if (chkComp != null
@@ -2820,8 +3031,9 @@ namespace DanceCompetitionHelper
                 CompetitionClass? chkCompClass = null;
                 if (competitionClassId != null)
                 {
-                    chkCompClass = GetCompetitionClass(
+                    chkCompClass = await GetCompetitionClassAsync(
                         competitionClassId.Value,
+                        cancellationToken,
                         false);
 
                     if (chkCompClass == null
@@ -2851,46 +3063,52 @@ namespace DanceCompetitionHelper
                             Comment = comment,
                         });
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {AddConfiguration}(): {Message}",
-                    nameof(CreateConfiguration),
+                    nameof(CreateConfigurationAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
+
                 throw;
             }
         }
 
-        public void EditConfiguration(
+        public async Task EditConfigurationAsync(
             OrganizationEnum? organization,
             Guid? competitionId,
             Guid? competitionClassId,
             Guid? competitionVenueId,
             string key,
             string? value,
-            string? comment)
+            string? comment,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var toEdit = _danceCompHelperDb.Configurations
+                var toEdit = await _danceCompHelperDb.Configurations
                     .TagWith(
-                        nameof(EditConfiguration))
-                    .FirstOrDefault(
+                        nameof(EditConfigurationAsync))
+                    .FirstOrDefaultAsync(
                         x => x.Organization == organization
                             && x.CompetitionId == competitionId
                             && x.CompetitionClassId == competitionClassId
                             && x.CompetitionVenueId == competitionVenueId
-                            && x.Key == key);
+                            && x.Key == key,
+                        cancellationToken);
 
                 if (toEdit != null)
                 {
@@ -2898,44 +3116,49 @@ namespace DanceCompetitionHelper
                     toEdit.Comment = comment;
                 }
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {EditConfiguration}(): {Message}",
-                    nameof(EditConfiguration),
+                    nameof(EditConfigurationAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
                 throw;
             }
         }
 
-        public void RemoveConfiguration(
+        public async Task RemoveConfigurationAsync(
             OrganizationEnum? organization,
             Guid? competitionId,
             Guid? competitionClassId,
             Guid? competitionVenueId,
-            string key)
+            string key,
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = _danceCompHelperDb.BeginTransaction()
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
-                var toRemove = _danceCompHelperDb.Configurations
+                var toRemove = await _danceCompHelperDb.Configurations
                         .TagWith(
-                            nameof(RemoveConfiguration))
-                        .FirstOrDefault(
+                            nameof(RemoveConfigurationAsync))
+                        .FirstOrDefaultAsync(
                             x => x.Organization == organization
                                 && x.CompetitionId == competitionId
                                 && x.CompetitionClassId == competitionClassId
                                 && x.CompetitionVenueId == competitionVenueId
-                                && x.Key == key);
+                                && x.Key == key,
+                            cancellationToken);
 
                 if (toRemove != null)
                 {
@@ -2943,18 +3166,20 @@ namespace DanceCompetitionHelper
                         toRemove);
                 }
 
-                _danceCompHelperDb.SaveChanges();
-                dbTrans.Commit();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 _logger.LogError(
                     exc,
                     "Error during {RemoveConfiguration}(): {Message}",
-                    nameof(RemoveConfiguration),
+                    nameof(RemoveConfigurationAsync),
                     exc.Message);
 
-                dbTrans.Rollback();
+                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
                 throw;
             }
         }
@@ -2979,15 +3204,16 @@ namespace DanceCompetitionHelper
             GC.SuppressFinalize(this);
         }
 
-        #endregion // IDisposable
+        #endregion IDisposable
 
 
         #region Importer
 
-        public ImportOrUpdateCompetitionStatus ImportOrUpdateCompetition(
+        public async Task<ImportOrUpdateCompetitionStatus> ImportOrUpdateCompetitionAsync(
             OrganizationEnum organization,
             string? orgCompetitionId,
             ImportTypeEnum importType,
+            CancellationToken cancellationToken,
             IEnumerable<string>? filePaths,
             Dictionary<string, string>? parameters = null)
         {
@@ -3066,7 +3292,8 @@ namespace DanceCompetitionHelper
                                         importType));
                         }
 
-                        using (var dbTrans = _danceCompHelperDb.BeginTransaction()
+                        using (var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                            cancellationToken)
                             ?? throw new ArgumentNullException(
                                 "dbTrans"))
                         {
@@ -3074,14 +3301,15 @@ namespace DanceCompetitionHelper
                             {
                                 var checkComp = _danceCompHelperDb.Competitions
                                     .TagWith(
-                                        nameof(ImportOrUpdateCompetition) + "[01]")
+                                        nameof(ImportOrUpdateCompetitionAsync) + "[01]")
                                     .FirstOrDefault(
                                         x => x.OrgCompetitionId == orgCompetitionId);
 
                                 if (checkComp != null)
                                 {
-                                    CreateTableHistoryAsync(
+                                    await CreateTableHistoryAsync(
                                         checkComp.CompetitionId,
+                                        cancellationToken,
                                         useTransaction: false);
                                 }
 
@@ -3092,11 +3320,12 @@ namespace DanceCompetitionHelper
                                 dbTrans.Commit();
 
                                 // read back infos
-                                checkComp = _danceCompHelperDb.Competitions
+                                checkComp = await _danceCompHelperDb.Competitions
                                     .TagWith(
-                                        nameof(ImportOrUpdateCompetition) + "[02]")
-                                    .FirstOrDefault(
-                                        x => x.OrgCompetitionId == orgCompetitionId);
+                                        nameof(ImportOrUpdateCompetitionAsync) + "[02]")
+                                    .FirstOrDefaultAsync(
+                                        x => x.OrgCompetitionId == orgCompetitionId,
+                                        cancellationToken);
 
                                 if (checkComp != null)
                                 {
@@ -3117,7 +3346,7 @@ namespace DanceCompetitionHelper
                                 retWorkStatus.WorkInfo.Add(
                                     exc.Message);
 
-                                dbTrans.Rollback();
+                                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
                             }
                         }
                         break;
@@ -3128,7 +3357,7 @@ namespace DanceCompetitionHelper
                 _logger.LogError(
                     exc,
                     "{Method} error: {ErrorMessage}",
-                    nameof(ImportOrUpdateCompetition),
+                    nameof(ImportOrUpdateCompetitionAsync),
                     exc.Message);
 
                 retWorkStatus.Errors.Add(
@@ -3140,7 +3369,115 @@ namespace DanceCompetitionHelper
             return retWorkStatus;
         }
 
-        #endregion // Importer
+        #endregion Importer
+
+        #region Transaction Helper
+
+        public async Task<T?> RunInReadonlyTransaction<T>(
+            Func<IDanceCompetitionHelper, DanceCompetitionHelperDbContext, IDbContextTransaction, CancellationToken, Task<T>> func,
+            CancellationToken cancellationToken = default,
+            bool rethrowException = true,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (func == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(func));
+            }
+
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            try
+            {
+                return await func(
+                    this,
+                    _danceCompHelperDb,
+                    dbTrans,
+                    cancellationToken);
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {MemberName}(): {Message}",
+                    memberName,
+                    exc.Message);
+
+                if (rethrowException)
+                {
+                    throw;
+                }
+
+                return default;
+            }
+            finally
+            {
+                await dbTrans.RollbackAsync();
+            }
+        }
+
+        public async Task<T?> RunInTransactionWithSaveChangesAndCommit<T>(
+            Func<IDanceCompetitionHelper, DanceCompetitionHelperDbContext, IDbContextTransaction, CancellationToken, Task> func,
+            Func<CancellationToken, T> onSuccess,
+            Func<Exception, CancellationToken, T> onException,
+            CancellationToken cancellationToken = default,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (func == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(func));
+            }
+
+            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
+                cancellationToken)
+                ?? throw new ArgumentNullException(
+                    "dbTrans");
+
+            try
+            {
+                await func(
+                    this,
+                    _danceCompHelperDb,
+                    dbTrans,
+                    cancellationToken);
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
+
+                return onSuccess(
+                    cancellationToken);
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {MemberName}(): {Message}",
+                    memberName,
+                    exc.Message);
+
+                await dbTrans.RollbackAsync();
+
+                if (onException != null)
+                {
+                    return onException(
+                        exc,
+                        cancellationToken);
+                }
+
+                return default;
+            }
+        }
+
+        #endregion Transaction Helper
 
     }
 }

@@ -4,9 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DanceCompetitionHelper.Web.Models.CompetitionModels
 {
-    public class DoImportViewModel
+    public class DoImportViewModel : ViewModelBase
     {
-        public List<string> Errors { get; set; } = new List<string>();
         public List<string> WorkInfo { get; set; } = new List<string>();
 
         [FromForm]

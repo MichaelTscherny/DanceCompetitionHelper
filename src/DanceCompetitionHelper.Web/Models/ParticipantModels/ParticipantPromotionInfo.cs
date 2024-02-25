@@ -3,7 +3,7 @@ using DanceCompetitionHelper.Database.Tables;
 
 namespace DanceCompetitionHelper.Web.Models.ParticipantModels
 {
-    public class ParticipantPromotionInfo
+    public class ParticipantPromotionInfo : ViewModelBase
     {
         private readonly HashSet<Participant> _sameParticipants = new HashSet<Participant>();
         private readonly HashSet<Guid> _sameParticipantIds = new HashSet<Guid>();
@@ -73,7 +73,7 @@ namespace DanceCompetitionHelper.Web.Models.ParticipantModels
                 .GetNames();
         }
 
-        #endregion // Participants
+        #endregion Participants
 
         #region CompetitionClasses
 
@@ -110,7 +110,7 @@ namespace DanceCompetitionHelper.Web.Models.ParticipantModels
                 competitionClassId);
         }
 
-        #endregion // CompetitionClasses
+        #endregion CompetitionClasses
 
         public IEnumerable<CompetitionClass> GetCompetitionClass()
         {

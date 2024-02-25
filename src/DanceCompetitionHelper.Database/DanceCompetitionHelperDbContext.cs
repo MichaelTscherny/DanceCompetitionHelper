@@ -117,17 +117,12 @@ namespace DanceCompetitionHelper.Database
         public Task MigrateAsync()
             => Database.MigrateAsync();
 
-        [Obsolete("use 'BeginTransactionAsync'")]
-        public IDbContextTransaction? BeginTransaction(
-            bool useTransaction = true)
-            => useTransaction
-                ? Database.CurrentTransaction ?? Database.BeginTransaction()
-                : null;
-
         public async Task<IDbContextTransaction?> BeginTransactionAsync(
+            CancellationToken cancellationToken,
             bool useTransaction = true)
             => useTransaction
-                ? Database.CurrentTransaction ?? await Database.BeginTransactionAsync()
+                ? Database.CurrentTransaction ?? await Database.BeginTransactionAsync(
+                    cancellationToken)
                 : null;
 
         #endregion Usefull methods
@@ -182,6 +177,6 @@ namespace DanceCompetitionHelper.Database
             }
         }
 
-        #endregion // Helpers
+        #endregion Helpers
     }
 }

@@ -1,14 +1,11 @@
 ﻿using AutoMapper;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
-using DanceCompetitionHelper.Web.Extensions;
-using DanceCompetitionHelper.Web.Models;
 using DanceCompetitionHelper.Web.Models.CompetitionModels;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
-    public class CompetitionController : Controller
+    public class CompetitionController : ControllerBase
     {
         public const string RefName = "Competition";
 
@@ -37,12 +34,19 @@ namespace DanceCompetitionHelper.Web.Controllers
             _mapper = mapper
                 ?? throw new ArgumentNullException(
                     nameof(mapper));
+        }
 
+        private async Task CheckInitialMigrationDone(
+            IDanceCompetitionHelper danceCompHelper,
+            CancellationToken cancellationToken)
+        {
             if (_initialMigrationDone == false)
             {
-                danceCompHelper.MigrateAsync();
-                danceCompHelper.CheckMandatoryConfigurationAsync();
-                danceCompHelper.AddTestDataAsync();
+                await danceCompHelper.MigrateAsync();
+                await danceCompHelper.CheckMandatoryConfigurationAsync(
+                    cancellationToken);
+                await danceCompHelper.AddTestDataAsync(
+                    cancellationToken);
                 _initialMigrationDone = true;
             }
         }
@@ -50,12 +54,21 @@ namespace DanceCompetitionHelper.Web.Controllers
         public async Task<IActionResult> Index(
             CancellationToken cancellationToken)
         {
-            return View(
-                await _danceCompHelper
-                    .GetCompetitionsAsync(
-                        cancellationToken,
-                        true)
-                    .ToListAsync());
+            await CheckInitialMigrationDone(
+                _danceCompHelper,
+                CancellationToken.None);
+
+            return (await _danceCompHelper.RunInReadonlyTransaction(
+                async (dcH, dbCtx, dbTrans, cToken) =>
+                {
+                    return View(
+                        await dcH
+                            .GetCompetitionsAsync(
+                                cToken)
+                            .ToListAsync());
+                },
+                cancellationToken))
+                ?? Error("Read failed!");
         }
 
         public IActionResult ShowCreateEdit()
@@ -66,46 +79,55 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateNew(
-            CompetitionViewModel createCompetition)
+        public async Task<IActionResult> CreateNew(
+            CompetitionViewModel createCompetition,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
-                createCompetition.Errors = ModelState.GetErrorMessages();
+                createCompetition.AddErrors(
+                    ModelState);
 
                 return View(
                     nameof(ShowCreateEdit),
                     createCompetition);
             }
 
-            try
-            {
-                _danceCompHelper.CreateCompetition(
-                    createCompetition.CompetitionName,
-                    createCompetition.Organization,
-                    createCompetition.OrgCompetitionId,
-                    createCompetition.CompetitionInfo,
-                    createCompetition.CompetitionDate ?? DateTime.Now,
-                    createCompetition.Comment);
+            return (await _danceCompHelper.RunInTransactionWithSaveChangesAndCommit<IActionResult>(
+                async (dcH, dbCtx, dbTrans, cToken) =>
+                {
+                    await dcH.CreateCompetitionAsync(
+                        createCompetition.CompetitionName,
+                        createCompetition.Organization,
+                        createCompetition.OrgCompetitionId,
+                        createCompetition.CompetitionInfo,
+                        createCompetition.CompetitionDate ?? DateTime.Now,
+                        createCompetition.Comment,
+                        cToken);
+                },
+                (cToken) => RedirectToAction(
+                    nameof(Index)),
+                (exc, cToken) =>
+                {
+                    createCompetition.AddErrors(
+                        exc);
 
-                return RedirectToAction(
-                    nameof(Index));
-            }
-            catch (Exception exc)
-            {
-                createCompetition.Errors = exc.InnerException?.Message ?? exc.Message;
-
-                return View(
-                    nameof(ShowCreateEdit),
-                    createCompetition);
-            }
+                    return View(
+                        nameof(ShowCreateEdit),
+                        createCompetition);
+                },
+                cancellationToken))
+                ?? Error(
+                    "Save failed");
         }
 
-        public IActionResult ShowEdit(
-            Guid id)
+        public async Task<IActionResult> ShowEdit(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundComp = _danceCompHelper.GetCompetitionAsync(
-                id);
+            var foundComp = await _danceCompHelper.GetCompetitionAsync(
+                id,
+                cancellationToken);
 
             if (foundComp == null)
             {
@@ -129,12 +151,14 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditSave(
-            CompetitionViewModel editCompetition)
+        public async Task<IActionResult> EditSave(
+            CompetitionViewModel editCompetition,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
-                editCompetition.Errors = ModelState.GetErrorMessages();
+                editCompetition.AddErrors(
+                    ModelState);
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -143,21 +167,23 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             try
             {
-                _danceCompHelper.EditCompetition(
+                await _danceCompHelper.EditCompetitionAsync(
                     editCompetition.CompetitionId ?? Guid.Empty,
                     editCompetition.CompetitionName,
                     editCompetition.Organization,
                     editCompetition.OrgCompetitionId,
                     editCompetition.CompetitionInfo,
                     editCompetition.CompetitionDate ?? DateTime.Now,
-                    editCompetition.Comment);
+                    editCompetition.Comment,
+                    cancellationToken);
 
                 return RedirectToAction(
                     nameof(Index));
             }
             catch (Exception exc)
             {
-                editCompetition.Errors = exc.InnerException?.Message ?? exc.Message;
+                editCompetition.AddErrors(
+                    exc);
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -165,26 +191,31 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
         }
 
-        public IActionResult Delete(
-            Guid id)
+        public async Task<IActionResult> Delete(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            _danceCompHelper.RemoveCompetition(
-                id);
+            await _danceCompHelper.RemoveCompetitionAsync(
+                id,
+                cancellationToken);
 
             return RedirectToAction(
                 nameof(Index));
         }
 
-        public IActionResult CreateTableHistory(
-            Guid id)
+        public async Task<IActionResult> CreateTableHistory(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundComp = _danceCompHelper.GetCompetitionAsync(
-                id);
+            var foundComp = await _danceCompHelper.GetCompetitionAsync(
+                id,
+                cancellationToken);
 
             if (foundComp != null)
             {
-                _danceCompHelper.CreateTableHistoryAsync(
-                    foundComp.CompetitionId);
+                await _danceCompHelper.CreateTableHistoryAsync(
+                    foundComp.CompetitionId,
+                    cancellationToken);
             }
 
             return RedirectToAction(
@@ -200,16 +231,14 @@ namespace DanceCompetitionHelper.Web.Controllers
                 });
         }
 
-        public IActionResult DoImport(
-            DoImportViewModel doImportView)
+        public async Task<IActionResult> DoImport(
+            DoImportViewModel doImportView,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
-                doImportView.Errors.AddRange(
-                    ModelState.GetErrorMessages()
-                    .Split(
-                        new[] { "\r\n" },
-                        StringSplitOptions.RemoveEmptyEntries));
+                doImportView.AddErrors(
+                    ModelState); ;
 
                 return View(
                     nameof(ShowImport),
@@ -235,10 +264,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 };
 
                 // TODO: implement more options/file-uploads/etc...
-                var workStatus = _danceCompHelper.ImportOrUpdateCompetition(
+                var workStatus = await _danceCompHelper.ImportOrUpdateCompetitionAsync(
                     doImportView.Organization,
                     doImportView.OrgCompetitionId,
                     doImportView.ImportType,
+                    cancellationToken,
                     null,
                     useParams);
 
@@ -262,16 +292,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(
-                new ErrorViewModel
-                {
-                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
-                });
         }
     }
 }

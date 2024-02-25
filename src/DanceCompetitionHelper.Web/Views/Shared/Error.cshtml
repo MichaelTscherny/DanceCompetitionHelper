@@ -13,37 +13,63 @@
     </p>
 }
 
-<h2 class ="text-danger">Model Errors</h2>
+@if(Model.ModelErrors.Count >= 1) 
+{
+    <h2 class ="text-danger">Model Errors</h2>
+    <div class="table-responsive-xxl">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        Value
+                    </th>
+                    <th>
+                        Errors
+                    </th>
+                    <th>
+                        Raw value
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var curModelError in Model.ModelErrors)
+                {
+                    <tr>
+                        <td>
+                            @curModelError.ValidationState
+                        </td>
+                        <td>
+                            @string.Join(
+                                "; ",
+                                curModelError.Errors
+                                    .Select(x => x.ErrorMessage));
+                        </td>
+                        <td>
+                            @curModelError.RawValue
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<h2 class ="text-danger">Other Errors</h2>
 <div class="table-responsive-xxl">
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>
-                    Value
-                </th>
-                <th>
                     Errors
-                </th>
-                <th>
-                    Raw value
                 </th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var curModelError in Model.ModelErrors)
+            @foreach (var curError in Model.Errors)
             {
                 <tr>
                     <td>
-                        @curModelError.ValidationState
-                    </td>
-                    <td>
-                        @string.Join(
-                            "; ",
-                            curModelError.Errors
-                                .Select(x => x.ErrorMessage));
-                    </td>
-                    <td>
-                        @curModelError.RawValue
+                        @curError;
                     </td>
                 </tr>
             }

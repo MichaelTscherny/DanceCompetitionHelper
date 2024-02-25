@@ -1,12 +1,11 @@
 ﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
-using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.AdjudicatorPanelModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
-    public class AdjudicatorPanelController : Controller
+    public class AdjudicatorPanelController : ControllerBase
     {
         public const string RefName = "AdjudicatorPanel";
 
@@ -30,40 +29,48 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(serviceProvider));
         }
 
-        public IActionResult Index(
-            Guid id)
+        public async Task<IActionResult> Index(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
+            var foundCompId = await _danceCompHelper.FindCompetitionAsync(
+                id,
+                cancellationToken);
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             return View(
                 new AdjudicatorPanelOverviewViewModel()
                 {
-                    Competition = _danceCompHelper.GetCompetitionAsync(
-                        foundCompId),
-                    OverviewItems = _danceCompHelper
-                        .GetAdjudicatorPanels(
+                    Competition = await _danceCompHelper.GetCompetitionAsync(
+                        foundCompId,
+                        cancellationToken),
+                    OverviewItems = await _danceCompHelper
+                        .GetAdjudicatorPanelsAsync(
                             foundCompId,
+                            cancellationToken,
                             true)
-                        .ToList(),
+                        .ToListAsync(
+                            cancellationToken),
                 });
         }
 
-        public IActionResult ShowCreateEdit(
-            Guid id)
+        public async Task<IActionResult> ShowCreateEdit(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
+            var foundCompId = await _danceCompHelper.FindCompetitionAsync(
+                id,
+                cancellationToken);
 
             if (foundCompId == null)
             {
                 return NotFound();
             }
 
-            var foundComp = _danceCompHelper.GetCompetitionAsync(
-                foundCompId);
+            var foundComp = await _danceCompHelper.GetCompetitionAsync(
+                foundCompId,
+                cancellationToken);
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
@@ -79,12 +86,14 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateNew(
-            AdjudicatorPanelViewModel createAdjudicatorPanel)
+        public async Task<IActionResult> CreateNew(
+            AdjudicatorPanelViewModel createAdjudicatorPanel,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
-                createAdjudicatorPanel.Errors = ModelState.GetErrorMessages();
+                createAdjudicatorPanel.AddErrors(
+                    ModelState);
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -95,10 +104,11 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 var useCompetitionId = createAdjudicatorPanel.CompetitionId;
 
-                _danceCompHelper.CreateAdjudicatorPanel(
+                await _danceCompHelper.CreateAdjudicatorPanelAsync(
                      createAdjudicatorPanel.CompetitionId,
                      createAdjudicatorPanel.Name,
-                     createAdjudicatorPanel.Comment);
+                     createAdjudicatorPanel.Comment,
+                     cancellationToken);
 
                 return RedirectToAction(
                     nameof(Index),
@@ -109,7 +119,8 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
             catch (Exception exc)
             {
-                createAdjudicatorPanel.Errors = exc.InnerException?.Message ?? exc.Message;
+                createAdjudicatorPanel.AddErrors(
+                    exc);
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -117,11 +128,13 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
         }
 
-        public IActionResult ShowEdit(
-            Guid id)
+        public async Task<IActionResult> ShowEdit(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundAdjPanel = _danceCompHelper.GetAdjudicatorPanel(
-                id);
+            var foundAdjPanel = await _danceCompHelper.GetAdjudicatorPanelAsync(
+                id,
+                cancellationToken);
 
             if (foundAdjPanel == null)
             {
@@ -129,8 +142,9 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index));
             }
 
-            var foundComp = _danceCompHelper.GetCompetitionAsync(
-                foundAdjPanel.CompetitionId);
+            var foundComp = await _danceCompHelper.GetCompetitionAsync(
+                foundAdjPanel.CompetitionId,
+                cancellationToken);
 
             ViewData["Use" + nameof(CompetitionClass)] = foundAdjPanel.CompetitionId;
 
@@ -148,12 +162,14 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditSave(
-            AdjudicatorPanelViewModel editParticipant)
+        public async Task<IActionResult> EditSave(
+            AdjudicatorPanelViewModel editParticipant,
+            CancellationToken cancellationToken)
         {
             if (ModelState.IsValid == false)
             {
-                editParticipant.Errors = ModelState.GetErrorMessages();
+                editParticipant.AddErrors(
+                    ModelState);
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -164,11 +180,12 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 var useCompetitionId = editParticipant.CompetitionId;
 
-                _danceCompHelper.EditAdjudicatorPanel(
+                await _danceCompHelper.EditAdjudicatorPanelAsync(
                     editParticipant.AdjudicatorPanelId ?? Guid.Empty,
                     useCompetitionId,
                     editParticipant.Name,
-                    editParticipant.Comment);
+                    editParticipant.Comment,
+                    cancellationToken);
 
                 return RedirectToAction(
                     nameof(Index),
@@ -179,7 +196,8 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
             catch (Exception exc)
             {
-                editParticipant.Errors = exc.InnerException?.Message ?? exc.Message;
+                editParticipant.AddErrors(
+                    exc);
 
                 return View(
                     nameof(ShowCreateEdit),
@@ -187,14 +205,17 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
         }
 
-        public IActionResult Delete(
-            Guid id)
+        public async Task<IActionResult> Delete(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var helpCompId = _danceCompHelper.FindCompetition(
-                id);
+            var helpCompId = await _danceCompHelper.FindCompetitionAsync(
+                id,
+                cancellationToken);
 
-            _danceCompHelper.RemoveAdjudicatorPanel(
-                id);
+            await _danceCompHelper.RemoveAdjudicatorPanelAsync(
+                id,
+                cancellationToken);
 
             return RedirectToAction(
                 nameof(Index),

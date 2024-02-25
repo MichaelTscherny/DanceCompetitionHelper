@@ -89,10 +89,11 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
         }
 
         [Test]
-        public void SimpleCreate()
+        public async Task SimpleCreate()
         {
             using var dbCtx = GetDanceCompetitionHelperDbContext();
-            using var dbTrans = dbCtx.BeginTransaction()
+            using var dbTrans = await dbCtx.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -107,8 +108,8 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                         CompetitionInfo = "Just an info",
                     });
 
-                dbCtx.SaveChanges();
-                dbTrans.Commit();
+                await dbCtx.SaveChangesAsync();
+                await dbTrans.CommitAsync();
 
                 foreach (var curComp in dbCtx.Competitions)
                 {
@@ -122,7 +123,7 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             }
             catch
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
 
                 throw;
             }

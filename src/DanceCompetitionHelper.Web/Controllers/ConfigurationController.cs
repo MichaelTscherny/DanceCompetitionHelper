@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
-    public class ConfigurationController : Controller
+    public class ConfigurationController : ControllerBase
     {
         public const string RefName = "Configuration";
         public const string ForAll = "FOR ALL";
@@ -50,8 +50,9 @@ namespace DanceCompetitionHelper.Web.Controllers
              string? errorsAdd = null,
              string? errorsChange = null)
         {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
+            var foundCompId = await _danceCompHelper.FindCompetitionAsync(
+                id,
+                cancellationToken);
             var anyError = string.IsNullOrEmpty(errorsAdd) == false
                 || string.IsNullOrEmpty(errorsChange) == false;
 
@@ -60,9 +61,10 @@ namespace DanceCompetitionHelper.Web.Controllers
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             var (showConfig, foundComp, useComps, useCompClasses, useCompVenues) =
-                _danceCompHelper
-                    .GetConfigurations(
-                        foundCompId);
+                await _danceCompHelper
+                    .GetConfigurationsAsync(
+                        foundCompId,
+                        cancellationToken);
 
             List<SelectListItem>? availOrgs = null;
             List<SelectListItem>? availComps = null;
@@ -191,14 +193,15 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 createConfiguration.SanityCheck();
 
-                _danceCompHelper.CreateConfiguration(
+                await _danceCompHelper.CreateConfigurationAsync(
                     createConfiguration.Organization,
                     createConfiguration.CompetitionId,
                     createConfiguration.CompetitionClassId,
                     createConfiguration.CompetitionVenueId,
                     createConfiguration.Key,
                     createConfiguration.Value,
-                    createConfiguration.Comment);
+                    createConfiguration.Comment,
+                    cancellationToken);
             }
             catch (Exception exc)
             {
@@ -236,14 +239,15 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 editConfiguration.SanityCheck();
 
-                _danceCompHelper.EditConfiguration(
+                await _danceCompHelper.EditConfigurationAsync(
                     editConfiguration.Organization,
                     editConfiguration.CompetitionId,
                     editConfiguration.CompetitionClassId,
                     editConfiguration.CompetitionVenueId,
                     editConfiguration.Key,
                     editConfiguration.Value,
-                    editConfiguration.Comment);
+                    editConfiguration.Comment,
+                    cancellationToken);
             }
             catch (Exception exc)
             {
@@ -281,12 +285,13 @@ namespace DanceCompetitionHelper.Web.Controllers
             {
                 deleteConfiguration.SanityCheck();
 
-                _danceCompHelper.RemoveConfiguration(
+                await _danceCompHelper.RemoveConfigurationAsync(
                     deleteConfiguration.Organization,
                     deleteConfiguration.CompetitionId,
                     deleteConfiguration.CompetitionClassId,
                     deleteConfiguration.CompetitionVenueId,
-                    deleteConfiguration.Key);
+                    deleteConfiguration.Key,
+                    cancellationToken);
             }
             catch (Exception exc)
             {

@@ -58,9 +58,67 @@ namespace DanceCompetitionHelper.Database.Diagnostic
             }
             */
 
-            if (value.Key == RelationalEventId.CommandExecuted.Name)
+            if (RelationalEventId.TransactionStarted.Name == value.Key)
             {
-                var payload = (CommandExecutedEventData)value.Value;
+                if (_sqLiteDbConfig.LogAllSqls == false)
+                {
+                    return;
+                }
+
+                var payload = value.Value as TransactionEndEventData;
+                if (payload == null)
+                {
+                    return;
+                }
+
+                _logger.LogInformation(
+                    payload.ToString());
+            }
+
+            if (RelationalEventId.TransactionCommitted.Name == value.Key)
+            {
+                if (_sqLiteDbConfig.LogAllSqls == false)
+                {
+                    return;
+                }
+
+                var payload = value.Value as TransactionEndEventData;
+                if (payload == null)
+                {
+                    return;
+                }
+
+                _logger.LogInformation(
+                    payload.ToString());
+            }
+
+            if (RelationalEventId.TransactionRolledBack.Name == value.Key)
+            {
+                if (_sqLiteDbConfig.LogAllSqls == false)
+                {
+                    return;
+                }
+
+                var payload = value.Value as TransactionEndEventData;
+                if (payload == null)
+                {
+                    return;
+                }
+
+                _logger.LogInformation(
+                    payload.ToString());
+            }
+
+            if (RelationalEventId.CommandExecuted.Name == value.Key)
+            {
+                var payload = value.Value as CommandExecutedEventData;
+                if (payload == null)
+                {
+                    _logger.LogError(
+                        "Got invalid Payload: {Payload}",
+                        value.Value);
+                    return;
+                }
 
                 var useLogLevel = LogLevel.None;
 

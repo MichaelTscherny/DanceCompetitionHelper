@@ -5,38 +5,47 @@ namespace DanceCompetitionHelper.Database.Extensions
     public static class TestDataExtensions
     {
         public static async Task AddTestData(
-            this DanceCompetitionHelperDbContext dbCtx)
+            this DanceCompetitionHelperDbContext dbCtx,
+            CancellationToken cancellationToken)
         {
-            var useTrans = await dbCtx.BeginTransactionAsync()
+            var useTrans = await dbCtx.BeginTransactionAsync(
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
             try
             {
                 await AddSmallCompetitionsAsync(
-                    dbCtx);
+                    dbCtx,
+                    cancellationToken);
                 await AddFathCompetitionAsync(
-                    dbCtx);
+                    dbCtx,
+                    cancellationToken);
 
-                await dbCtx.SaveChangesAsync();
-                await useTrans.CommitAsync();
+                await dbCtx.SaveChangesAsync(
+                    cancellationToken);
+                await useTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
                 Console.WriteLine(
                     exc);
-                useTrans?.Rollback();
+                await (useTrans?.RollbackAsync(
+                    cancellationToken) ?? Task.CompletedTask);
             }
         }
 
         private static async Task AddSmallCompetitionsAsync(
-            DanceCompetitionHelperDbContext dbCtx)
+            DanceCompetitionHelperDbContext dbCtx,
+            CancellationToken cancellationToken)
         {
             // we only add data if we do not have any...
             if (await dbCtx.Competitions
                 .TagWith(
                     nameof(AddSmallCompetitionsAsync) + "(db)[0]")
-                .CountAsync() >= 1)
+                .CountAsync(
+                    cancellationToken) >= 1)
             {
                 return;
             }
@@ -426,7 +435,8 @@ namespace DanceCompetitionHelper.Database.Extensions
         }
 
         private static async Task AddFathCompetitionAsync(
-            DanceCompetitionHelperDbContext dbCtx)
+            DanceCompetitionHelperDbContext dbCtx,
+            CancellationToken cancellationToken)
         {
             const string fathCompName = "Big-Fat-Competition";
 
@@ -434,7 +444,8 @@ namespace DanceCompetitionHelper.Database.Extensions
                 .TagWith(
                     nameof(AddFathCompetitionAsync) + "(db)[0]")
                 .FirstOrDefaultAsync(
-                    x => x.CompetitionName == fathCompName);
+                    x => x.CompetitionName == fathCompName,
+                    cancellationToken);
 
             if (foundFatComp != null)
             {
