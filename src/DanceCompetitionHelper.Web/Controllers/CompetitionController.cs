@@ -58,17 +58,33 @@ namespace DanceCompetitionHelper.Web.Controllers
                 _danceCompHelper,
                 CancellationToken.None);
 
+            return await DefaultIndex(
+                _danceCompHelper,
+                async (dcH, dbCtx, dbTrans, cToken) =>
+                {
+                    return await dcH
+                        .GetCompetitionsAsync(
+                            cToken,
+                            true)
+                        .ToListAsync();
+                },
+                nameof(Index),
+                cancellationToken);
+
+            /*
             return (await _danceCompHelper.RunInReadonlyTransaction(
                 async (dcH, dbCtx, dbTrans, cToken) =>
                 {
                     return View(
                         await dcH
                             .GetCompetitionsAsync(
-                                cToken)
+                                cToken,
+                                true)
                             .ToListAsync());
                 },
                 cancellationToken))
                 ?? Error("Read failed!");
+            */
         }
 
         public IActionResult ShowCreateEdit()
@@ -79,10 +95,31 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateNew(
+        public Task<IActionResult> CreateNew(
             CompetitionViewModel createCompetition,
             CancellationToken cancellationToken)
         {
+            return DefaultCreateNew(
+                _danceCompHelper,
+                createCompetition,
+                null,
+                nameof(ShowCreateEdit),
+                async (dcH, dbCtx, dbTrans, cToken) =>
+                {
+                    await dcH.CreateCompetitionAsync(
+                        createCompetition.CompetitionName,
+                        createCompetition.Organization,
+                        createCompetition.OrgCompetitionId,
+                        createCompetition.CompetitionInfo,
+                        createCompetition.CompetitionDate ?? DateTime.Now,
+                        createCompetition.Comment,
+                        cToken);
+                },
+                nameof(Index),
+                nameof(ShowCreateEdit),
+                cancellationToken);
+
+            /*
             if (ModelState.IsValid == false)
             {
                 createCompetition.AddErrors(
@@ -119,6 +156,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 cancellationToken))
                 ?? Error(
                     "Save failed");
+            */
         }
 
         public async Task<IActionResult> ShowEdit(

@@ -1410,6 +1410,7 @@ namespace DanceCompetitionHelper
 
         #region Competition Crud
 
+        // TODO: rework do "AddCompetition"
         public async Task CreateCompetitionAsync(
             string competitionName,
             OrganizationEnum organization,
@@ -1419,6 +1420,7 @@ namespace DanceCompetitionHelper
             string? comment,
             CancellationToken cancellationToken)
         {
+            /*
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
                 cancellationToken)
                 ?? throw new ArgumentNullException(
@@ -1426,17 +1428,19 @@ namespace DanceCompetitionHelper
 
             try
             {
-                _danceCompHelperDb.Competitions.Add(
-                    new Competition()
-                    {
-                        CompetitionName = competitionName,
-                        Organization = organization,
-                        OrgCompetitionId = orgCompetitionId,
-                        CompetitionInfo = competitionInfo,
-                        CompetitionDate = competitionDate,
-                        Comment = comment,
-                    });
+            */
+            _danceCompHelperDb.Competitions.Add(
+                new Competition()
+                {
+                    CompetitionName = competitionName,
+                    Organization = organization,
+                    OrgCompetitionId = orgCompetitionId,
+                    CompetitionInfo = competitionInfo,
+                    CompetitionDate = competitionDate,
+                    Comment = comment,
+                });
 
+            /*
                 await _danceCompHelperDb.SaveChangesAsync(
                     cancellationToken);
                 await dbTrans.CommitAsync(
@@ -1460,6 +1464,7 @@ namespace DanceCompetitionHelper
                     "{Method}() done",
                     nameof(CreateCompetitionAsync));
             }
+            */
         }
 
         public async Task EditCompetitionAsync(
