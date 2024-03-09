@@ -1,43 +1,42 @@
-﻿using DanceCompetitionHelper.Database.Extensions;
+﻿using AutoMapper;
+using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
-    public class AdjudicatorController : ControllerBase
+    public class AdjudicatorController : ControllerBase<AdjudicatorController>
     {
         public const string RefName = "Adjudicator";
         public const string ParticipantLastCreatedAdjudicatorPanelId = nameof(ParticipantLastCreatedAdjudicatorPanelId);
 
-        private readonly IDanceCompetitionHelper _danceCompHelper;
-        private readonly ILogger<AdjudicatorController> _logger;
-        private readonly IServiceProvider _serviceProvider;
-
         public AdjudicatorController(
             IDanceCompetitionHelper danceCompHelper,
             ILogger<AdjudicatorController> logger,
-            IServiceProvider serviceProvider)
+            IMapper mapper)
+            : base(
+                danceCompHelper,
+                logger,
+                mapper)
         {
-            _danceCompHelper = danceCompHelper
-                ?? throw new ArgumentNullException(
-                    nameof(danceCompHelper));
-            _logger = logger
-                ?? throw new ArgumentNullException(
-                    nameof(logger));
-            _serviceProvider = serviceProvider
-                ?? throw new ArgumentNullException(
-                    nameof(serviceProvider));
         }
 
         public async Task<IActionResult> Index(
             Guid id,
             CancellationToken cancellationToken)
         {
-            var foundCompId = await _danceCompHelper.FindCompetitionAsync(
+            var foundCompId = (await _danceCompHelper.FindCompetitionAsync(
                 id,
-                cancellationToken);
+                cancellationToken))
+                ?.CompetitionId
+                ?? throw new NoDataFoundException(
+                    string.Format(
+                        "{0} with id '{1}' not found!",
+                        nameof(Competition),
+                        id));
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
@@ -61,19 +60,16 @@ namespace DanceCompetitionHelper.Web.Controllers
             Guid id,
             CancellationToken cancellationToken)
         {
-            var foundCompId = await _danceCompHelper.FindCompetitionAsync(
+            var foundComp = await _danceCompHelper.FindCompetitionAsync(
                 id,
                 cancellationToken);
 
-            if (foundCompId == null)
+            if (foundComp == null)
             {
                 return NotFound();
             }
 
-            var foundComp = await _danceCompHelper.GetCompetitionAsync(
-                foundCompId,
-                cancellationToken);
-
+            var foundCompId = foundComp.CompetitionId;
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             var helpCompName = string.Empty;
@@ -86,7 +82,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             return View(
                 new AdjudicatorViewModel()
                 {
-                    CompetitionId = foundCompId.Value,
+                    CompetitionId = foundCompId,
                     CompetitionName = foundComp.GetCompetitionName(),
                     AdjudicatorPanels = await _danceCompHelper
                         .GetAdjudicatorPanelsAsync(
@@ -261,7 +257,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             Guid id,
             CancellationToken cancellationToken)
         {
-            var helpCompId = await _danceCompHelper.FindCompetitionAsync(
+            var helpComp = await _danceCompHelper.FindCompetitionAsync(
                 id,
                 cancellationToken);
 
@@ -273,7 +269,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 nameof(Index),
                 new
                 {
-                    Id = helpCompId ?? Guid.Empty
+                    Id = helpComp?.CompetitionId ?? Guid.Empty
                 });
         }
     }

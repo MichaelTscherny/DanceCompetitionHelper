@@ -177,10 +177,17 @@
                 Already Promoted Part-A
             </div>
             <div class="col-md-4">
-                <input asp-for="OrgAlreadyPromotedPartA"
-                       class="form-control"
-                       placeholder=""
-                       style="width: 100%" />
+                @{
+                    var useChecked = (Model.OrgAlreadyPromotedPartA ?? false)
+                        ? "checked"
+                        : "";
+                }
+                <input id="OrgAlreadyPromotedPartA"
+                       name="OrgAlreadyPromotedPartA"
+                       class="form-check"
+                       type="checkbox" 
+                       value="true"
+                       @Html.Raw(useChecked) />
                 <span asp-validation-for="OrgAlreadyPromotedPartA"
                       class="text-danger"></span>
             </div>
@@ -308,13 +315,21 @@
         </div>        
         <div class="row row-cols-3 py-1 bg-warning bg-opacity-10">
             <div class="col-md text-end">
-                Starts Part-B
+                Already Promoted Part-B
             </div>
             <div class="col-md-4">
-                <input asp-for="OrgAlreadyPromotedPartB"
-                       class="form-control"
-                       placeholder="" 
-                       style="width: 100%" />
+                @{
+                    useChecked = (Model.OrgAlreadyPromotedPartB ?? false)
+                        ? "checked"
+                        : "";
+                }
+
+                <input id="OrgAlreadyPromotedPartB"
+                       name="OrgAlreadyPromotedPartB"
+                       class="form-check"
+                       type="checkbox"
+                       value="true"
+                       @Html.Raw(useChecked) />
                 <span asp-validation-for="OrgAlreadyPromotedPartB"
                       class="text-danger"></span>
             </div>

@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database.Enum;
+﻿using AutoMapper;
+using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Extensions;
 using DanceCompetitionHelper.Web.Extensions;
@@ -8,29 +9,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
-    public class ConfigurationController : ControllerBase
+    public class ConfigurationController : ControllerBase<ConfigurationController>
     {
         public const string RefName = "Configuration";
         public const string ForAll = "FOR ALL";
 
-        private readonly IDanceCompetitionHelper _danceCompHelper;
-        private readonly ILogger<CompetitionController> _logger;
-        private readonly IServiceProvider _serviceProvider;
-
         public ConfigurationController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<CompetitionController> logger,
-            IServiceProvider serviceProvider)
+            ILogger<ConfigurationController> logger,
+            IMapper mapper)
+            : base(
+                danceCompHelper,
+                logger,
+                mapper)
         {
-            _danceCompHelper = danceCompHelper
-                ?? throw new ArgumentNullException(
-                    nameof(danceCompHelper));
-            _logger = logger
-                ?? throw new ArgumentNullException(
-                    nameof(logger));
-            _serviceProvider = serviceProvider
-                ?? throw new ArgumentNullException(
-                    nameof(serviceProvider));
         }
 
 
@@ -50,9 +42,16 @@ namespace DanceCompetitionHelper.Web.Controllers
              string? errorsAdd = null,
              string? errorsChange = null)
         {
-            var foundCompId = await _danceCompHelper.FindCompetitionAsync(
+            var foundComp = await _danceCompHelper.FindCompetitionAsync(
                 id,
                 cancellationToken);
+
+            if (foundComp == null)
+            {
+                return NotFound();
+            }
+
+            var foundCompId = foundComp.CompetitionId;
             var anyError = string.IsNullOrEmpty(errorsAdd) == false
                 || string.IsNullOrEmpty(errorsChange) == false;
 
@@ -60,7 +59,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
-            var (showConfig, foundComp, useComps, useCompClasses, useCompVenues) =
+            var (showConfig, _, useComps, useCompClasses, useCompVenues) =
                 await _danceCompHelper
                     .GetConfigurationsAsync(
                         foundCompId,

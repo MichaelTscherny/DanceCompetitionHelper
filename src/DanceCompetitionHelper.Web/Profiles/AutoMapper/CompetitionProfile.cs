@@ -8,10 +8,8 @@ namespace DanceCompetitionHelper.Web.Profiles.AutoMapper
     {
         public CompetitionProfile()
         {
-            CreateMap<CompetitionViewModel, Tables.Competition>()
-                .ForMember(
-                    x => x.CompetitionDate,
-                    opt => opt.NullSubstitute(DateTime.Now));
+            CreateMap<CompetitionViewModel, Tables.Competition>();
+            CreateMap<Tables.Competition, CompetitionViewModel>();
         }
     }
 }

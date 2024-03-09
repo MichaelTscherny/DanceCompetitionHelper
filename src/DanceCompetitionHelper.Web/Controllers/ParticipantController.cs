@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database.Extensions;
+﻿using AutoMapper;
+using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.ParticipantModels;
@@ -6,47 +7,42 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
-    public class ParticipantController : ControllerBase
+    public class ParticipantController : ControllerBase<ParticipantController>
     {
         public const string RefName = "Participant";
         public const string ParticipantLastCreatedCompetitionClassId = nameof(ParticipantLastCreatedCompetitionClassId);
 
-        private readonly IDanceCompetitionHelper _danceCompHelper;
-        private readonly ILogger<CompetitionController> _logger;
-        private readonly IServiceProvider _serviceProvider;
-
         public ParticipantController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<CompetitionController> logger,
-            IServiceProvider serviceProvider)
+            ILogger<ParticipantController> logger,
+            IMapper mapper)
+            : base(
+                danceCompHelper,
+                logger,
+                mapper)
         {
-            _danceCompHelper = danceCompHelper
-                ?? throw new ArgumentNullException(
-                    nameof(danceCompHelper));
-            _logger = logger
-                ?? throw new ArgumentNullException(
-                    nameof(logger));
-            _serviceProvider = serviceProvider
-                ?? throw new ArgumentNullException(
-                    nameof(serviceProvider));
         }
 
         public async Task<IActionResult> Index(
             Guid id,
             CancellationToken cancellationToken)
         {
-            var foundCompId = await _danceCompHelper.FindCompetitionAsync(
+            var foundComp = await _danceCompHelper.FindCompetitionAsync(
                 id,
                 cancellationToken);
 
+            if (foundComp == null)
+            {
+                return NotFound();
+            }
+
+            var foundCompId = foundComp.CompetitionId;
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             return View(
                 new ParticipantOverviewViewModel()
                 {
-                    Competition = await _danceCompHelper.GetCompetitionAsync(
-                        foundCompId,
-                        cancellationToken),
+                    Competition = foundComp,
                     OverviewItems = await _danceCompHelper
                         .GetParticipantsAsync(
                             foundCompId,
@@ -62,19 +58,23 @@ namespace DanceCompetitionHelper.Web.Controllers
             Guid id,
             CancellationToken cancellationToken)
         {
-            var foundCompId = await _danceCompHelper.FindCompetitionAsync(
+            var foundComp = await _danceCompHelper.FindCompetitionAsync(
                 id,
                 cancellationToken);
 
+            if (foundComp == null)
+            {
+                return NotFound();
+            }
+
+            var foundCompId = foundComp.CompetitionId;
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             return View(
                 nameof(Index),
                 new ParticipantOverviewViewModel()
                 {
-                    Competition = await _danceCompHelper.GetCompetitionAsync(
-                        foundCompId,
-                        cancellationToken),
+                    Competition = foundComp,
                     OverviewItems = await _danceCompHelper
                         .GetParticipantsAsync(
                             foundCompId,
@@ -92,19 +92,16 @@ namespace DanceCompetitionHelper.Web.Controllers
             Guid id,
             CancellationToken cancellationToken)
         {
-            var foundCompId = await _danceCompHelper.FindCompetitionAsync(
+            var foundComp = await _danceCompHelper.FindCompetitionAsync(
                 id,
                 cancellationToken);
 
-            if (foundCompId == null)
+            if (foundComp == null)
             {
                 return NotFound();
             }
 
-            var foundComp = await _danceCompHelper.GetCompetitionAsync(
-                foundCompId,
-                cancellationToken);
-
+            var foundCompId = foundComp.CompetitionId;
             ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
             var helpCompName = string.Empty;
@@ -117,7 +114,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             return View(
                 new ParticipantViewModel()
                 {
-                    CompetitionId = foundCompId.Value,
+                    CompetitionId = foundCompId,
                     CompetitionName = foundComp.GetCompetitionName(),
                     CompetitionClasses = await _danceCompHelper
                         .GetCompetitionClassesAsync(
@@ -350,7 +347,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             Guid id,
             CancellationToken cancellationToken)
         {
-            var helpCompClassId = await _danceCompHelper.FindCompetitionClassAsync(
+            var helpCompClass = await _danceCompHelper.FindCompetitionClassAsync(
                 id,
                 cancellationToken);
 
@@ -362,7 +359,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 nameof(Index),
                 new
                 {
-                    Id = helpCompClassId ?? Guid.Empty
+                    Id = helpCompClass?.CompetitionClassId ?? Guid.Empty
                 });
         }
     }

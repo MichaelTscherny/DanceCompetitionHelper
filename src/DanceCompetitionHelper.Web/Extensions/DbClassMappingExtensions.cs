@@ -81,7 +81,7 @@ namespace DanceCompetitionHelper.Web.Extensions
                 yield return new SelectListItem()
                 {
                     Value = curItem.CompetitionClassId.ToString(),
-                    Text = curItem.CompetitionClassName,
+                    Text = curItem.GetCompetitionClassName(),
                     Selected = curItem.CompetitionClassId == selectedItem
                 };
             }
