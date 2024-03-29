@@ -159,22 +159,7 @@ namespace DanceCompetitionHelper
         #region CompetitionClass Crud
 
         Task CreateCompetitionClassAsync(
-            Guid competitionId,
-            string competitionClassName,
-            Guid? followUpCompetitionClassId,
-            Guid adjudicatorPanelId,
-            string orgClassId,
-            string? discipline,
-            string? ageClass,
-            string? ageGroup,
-            string? className,
-            int minStartsForPromotion,
-            double minPointsForPromotion,
-            double pointsForFirts,
-            int extraManualStarter,
-            string? comment,
-            bool ignore,
-            string? competitionColor,
+            CompetitionClass createCompetitionClass,
             CancellationToken cancellationToken);
 
         Task EditCompetitionClassAsync(
@@ -197,7 +182,7 @@ namespace DanceCompetitionHelper
             CancellationToken cancellationToken);
 
         Task RemoveCompetitionClassAsync(
-            Guid competitionClassId,
+            CompetitionClass removeCompetitionClass,
             CancellationToken cancellationToken);
 
         #endregion CompetitionClass Crud 
@@ -382,19 +367,19 @@ namespace DanceCompetitionHelper
 
         #region Transaction Helper
 
-        Task<T?> RunInReadonlyTransaction<T>(
-            Func<IDanceCompetitionHelper, DanceCompetitionHelperDbContext, IDbContextTransaction, CancellationToken, Task<T>> func,
+        Task<TModel?> RunInReadonlyTransaction<TModel>(
+            Func<IDanceCompetitionHelper, DanceCompetitionHelperDbContext, IDbContextTransaction, CancellationToken, Task<TModel>> func,
             CancellationToken cancellationToken = default,
             bool rethrowException = true,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0);
 
-        Task<T?> RunInTransactionWithSaveChangesAndCommit<T>(
-            Func<IDanceCompetitionHelper, DanceCompetitionHelperDbContext, IDbContextTransaction, CancellationToken, Task> func,
-            Func<CancellationToken, T> onSuccess,
-            Func<CancellationToken, T>? onNoData,
-            Func<Exception, CancellationToken, T>? onException,
+        Task<TModel?> RunInTransactionWithSaveChangesAndCommit<TModel>(
+            Func<IDanceCompetitionHelper, DanceCompetitionHelperDbContext, IDbContextTransaction, CancellationToken, Task<object?>> func,
+            Func<object?, CancellationToken, TModel> onSuccess,
+            Func<object?, CancellationToken, TModel>? onNoData,
+            Func<Exception, object?, CancellationToken, TModel>? onException,
             CancellationToken cancellationToken = default,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",

@@ -46,7 +46,6 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
         [StringLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]
         public string? Discipline { get; set; } = default!;
 
-        [Required]
         [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]
         [StringLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]

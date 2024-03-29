@@ -30,8 +30,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(mapper));
         }
 
-        public async Task<IActionResult> DefaultIndexAndShow<T>(
-            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<T>> funcIndex,
+        public async Task<IActionResult> DefaultIndexAndShow<TModel>(
+            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<TModel>> funcIndex,
             string viewNameSuccess,
             string viewNameOnNoData,
             CancellationToken cancellationToken,
@@ -76,19 +76,19 @@ namespace DanceCompetitionHelper.Web.Controllers
                     $"Read for {viewNameSuccess} failed!");
         }
 
-        public async Task<IActionResult> DefaultCreateNew<TVm, TEntity>(
-            TVm movelView,
+        public async Task<IActionResult> DefaultCreateNew<TModel, TEntity>(
+            TModel movelView,
             TEntity newEntity,
             Func<IDanceCompetitionHelper, CancellationToken, Task>? funcOnModelStateInvalid,
             string viewNameModelStateInvalid,
-            Func<IDanceCompetitionHelper, TEntity, IMapper, CancellationToken, Task> funcCreateNew,
+            Func<IDanceCompetitionHelper, TEntity, IMapper, CancellationToken, Task<object?>> funcCreateNew,
             string viewNameSuccess,
             string viewNameOnError,
             CancellationToken cancellationToken,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
-            where TVm : ViewModelBase
+            where TModel : ViewModelBase
             where TEntity : TableBase
         {
             if (ModelState.IsValid == false)
@@ -114,10 +114,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                     newEntity,
                     _mapper,
                     cToken),
-                (cToken) => RedirectToAction(
-                    viewNameSuccess),
+                (routeObjects, cToken) => RedirectToAction(
+                    viewNameSuccess,
+                    routeObjects),
                 null,
-                (exc, cToken) =>
+                (exc, routeObjects, cToken) =>
                 {
                     movelView.AddErrors(
                         exc);
@@ -131,11 +132,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                     "Creation failed");
         }
 
-        public async Task<IActionResult> DefaultEdit<TVm>(
-            TVm movelView,
+        public async Task<IActionResult> DefaultEdit<TModel>(
+            TModel movelView,
             Func<IDanceCompetitionHelper, CancellationToken, Task>? funcOnModelStateInvalid,
             string viewNameModelStateInvalid,
-            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task> funcEdit,
+            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<object?>> funcEdit,
             string viewNameSuccess,
             string viewNameOnNoData,
             string viewNameOnError,
@@ -143,7 +144,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
-            where TVm : ViewModelBase
+            where TModel : ViewModelBase
         {
             if (ModelState.IsValid == false)
             {
@@ -167,11 +168,13 @@ namespace DanceCompetitionHelper.Web.Controllers
                     dcH,
                     _mapper,
                     cToken),
-                (cToken) => RedirectToAction(
-                    viewNameSuccess),
-                (cToken) => RedirectToAction(
-                    viewNameOnNoData),
-                (exc, cToken) =>
+                (routeObjects, cToken) => RedirectToAction(
+                    viewNameSuccess,
+                    routeObjects),
+                (routeObjects, cToken) => RedirectToAction(
+                    viewNameOnNoData,
+                    routeObjects),
+                (exc, routeObjects, cToken) =>
                 {
                     movelView.AddErrors(
                         exc);
@@ -187,7 +190,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public async Task<IActionResult> DefaultDelete<TDeleteId>(
             TDeleteId deleteId,
-            Func<IDanceCompetitionHelper, TDeleteId, CancellationToken, Task> funcDelete,
+            Func<IDanceCompetitionHelper, TDeleteId, CancellationToken, Task<object?>> funcDelete,
             string viewNameSuccess,
             string viewNameOnNoData,
             string viewNameOnError,
@@ -201,12 +204,15 @@ namespace DanceCompetitionHelper.Web.Controllers
                     dcH,
                     deleteId,
                     cToken),
-                (cToken) => RedirectToAction(
-                    viewNameSuccess),
-                (cToken) => RedirectToAction(
-                    viewNameOnNoData),
-                (exc, cToken) => RedirectToAction(
-                    viewNameOnError),
+                (routeObjects, cToken) => RedirectToAction(
+                    viewNameSuccess,
+                    routeObjects),
+                (routeObjects, cToken) => RedirectToAction(
+                    viewNameOnNoData,
+                    routeObjects),
+                (exc, routeObjects, cToken) => RedirectToAction(
+                    viewNameOnError,
+                    routeObjects),
                 cancellationToken))
                 ?? Error(
                     "Delete failed");

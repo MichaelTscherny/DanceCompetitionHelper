@@ -2,6 +2,8 @@
 {
     public class NoDataFoundException : Exception
     {
+        public object? RouteObjects { get; set; }
+
         public NoDataFoundException()
         {
         }

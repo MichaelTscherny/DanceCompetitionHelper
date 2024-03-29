@@ -93,6 +93,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     await dcH.CreateCompetitionAsync(
                         newEntity,
                         cToken);
+
+                    return null;
                 },
                 // --
                 nameof(Index),
@@ -145,14 +147,17 @@ namespace DanceCompetitionHelper.Web.Controllers
                         editCompetition.CompetitionId,
                         cToken)
                         ?? throw new NoDataFoundException(
-                        string.Format(
-                            "{0} with id '{1}' not found!",
-                            nameof(Competition),
-                            editCompetition.CompetitionId));
+                            string.Format(
+                                "{0} with id '{1}' not found!",
+                                nameof(Competition),
+                                editCompetition.CompetitionId));
 
+                    // override the values...
                     mapper.Map(
                         editCompetition,
                         foundComp);
+
+                    return null;
                 },
                 // --
                 nameof(Index),
@@ -183,6 +188,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     await _danceCompHelper.RemoveCompetitionAsync(
                         foundComp,
                         cToken);
+
+                    return null;
                 },
                 // --
                 nameof(Index),
@@ -211,14 +218,19 @@ namespace DanceCompetitionHelper.Web.Controllers
                     await _danceCompHelper.CreateTableHistoryAsync(
                         foundComp.CompetitionId,
                         cancellationToken);
+
+                    return null;
                 },
                 // --                
-                (cToken) => RedirectToAction(
-                    nameof(Index)),
-                (cToken) => RedirectToAction(
-                    nameof(Index)),
-                (exc, cToken) => RedirectToAction(
-                    nameof(Index)),
+                (routeObjects, cToken) => RedirectToAction(
+                    nameof(Index),
+                    routeObjects),
+                (routeObjects, cToken) => RedirectToAction(
+                    nameof(Index),
+                    routeObjects),
+                (exc, routeObjects, cToken) => RedirectToAction(
+                    nameof(Index),
+                    routeObjects),
                 cancellationToken)
                 ?? Error(
                     "Create History failed");

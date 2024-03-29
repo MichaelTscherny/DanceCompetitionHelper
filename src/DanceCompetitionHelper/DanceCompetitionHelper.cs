@@ -324,11 +324,11 @@ namespace DanceCompetitionHelper
         }
 
         public async IAsyncEnumerable<CompetitionClass> GetCompetitionClassesAsync(
-        Guid? competitionId,
-        [EnumeratorCancellation] CancellationToken cancellationToken,
-        bool includeInfos = false,
-        bool showAll = false,
-        bool useTransaction = true)
+            Guid? competitionId,
+            [EnumeratorCancellation] CancellationToken cancellationToken,
+            bool includeInfos = false,
+            bool showAll = false,
+            bool useTransaction = true)
         {
             if (competitionId == null)
             {
@@ -1676,72 +1676,24 @@ namespace DanceCompetitionHelper
 
         #region CompetitionClass Crud
 
+        // TODO: rework to "AddCompetitionClassAsync"
         public async Task CreateCompetitionClassAsync(
-            Guid competitionId,
-            string competitionClassName,
-            Guid? followUpCompetitionClassId,
-            Guid adjudicatorPanelId,
-            string orgClassId,
-            string? discipline,
-            string? ageClass,
-            string? ageGroup,
-            string? className,
-            int minStartsForPromotion,
-            double minPointsForPromotion,
-            double pointsForFirst,
-            int extraManualStarter,
-            string? comment,
-            bool ignore,
-            string? competitionColor,
+            CompetitionClass createCompetitionClass,
             CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken)
-                ?? throw new ArgumentNullException(
-                    "dbTrans");
-
             try
             {
                 var foundCompId = await GetCompetitionAsync(
-                    competitionId,
-                    cancellationToken);
-
-                if (foundCompId == null)
-                {
-                    throw new ArgumentException(
+                    createCompetitionClass.CompetitionId,
+                    cancellationToken)
+                    ?? throw new ArgumentException(
                         string.Format(
                             "{0} with id '{1}' not found!",
                             nameof(Competition),
-                            competitionId));
-                }
+                            createCompetitionClass.CompetitionId));
 
                 _danceCompHelperDb.CompetitionClasses.Add(
-                    new CompetitionClass()
-                    {
-                        Competition = foundCompId,
-                        OrgClassId = orgClassId,
-                        CompetitionClassName = competitionClassName,
-                        FollowUpCompetitionClassId = followUpCompetitionClassId == Guid.Empty
-                            ? null
-                            : followUpCompetitionClassId,
-                        AdjudicatorPanelId = adjudicatorPanelId,
-                        Discipline = discipline,
-                        AgeClass = ageClass,
-                        AgeGroup = ageGroup,
-                        Class = className,
-                        MinStartsForPromotion = minStartsForPromotion,
-                        MinPointsForPromotion = minPointsForPromotion,
-                        PointsForFirst = pointsForFirst,
-                        ExtraManualStarter = extraManualStarter,
-                        Comment = comment,
-                        Ignore = ignore,
-                        CompetitionColor = competitionColor,
-                    });
-
-                await _danceCompHelperDb.SaveChangesAsync(
-                    cancellationToken);
-                await dbTrans.CommitAsync(
-                    cancellationToken);
+                    createCompetitionClass);
             }
             catch (Exception exc)
             {
@@ -1750,8 +1702,6 @@ namespace DanceCompetitionHelper
                     "Error during {Method}: {Message}",
                     nameof(CreateCompetitionClassAsync),
                     exc.Message);
-
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
 
                 throw;
             }
@@ -1845,56 +1795,14 @@ namespace DanceCompetitionHelper
             }
         }
 
-        public async Task RemoveCompetitionClassAsync(
-            Guid competitionClassId,
+        public Task RemoveCompetitionClassAsync(
+            CompetitionClass removeCompetitionClass,
             CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken)
-                ?? throw new ArgumentNullException(
-                    "dbTrans");
+            _danceCompHelperDb.CompetitionClasses.Remove(
+                removeCompetitionClass);
 
-            try
-            {
-                var foundCompClass = await GetCompetitionClassAsync(
-                    competitionClassId,
-                    cancellationToken);
-
-                if (foundCompClass == null)
-                {
-                    _logger.LogWarning(
-                        "{CompetitionClass} with id '{CompetitionClassId}' not found!",
-                        nameof(CompetitionClass),
-                        competitionClassId);
-                    return;
-                }
-
-                _danceCompHelperDb.CompetitionClasses.Remove(
-                    foundCompClass);
-
-                await _danceCompHelperDb.SaveChangesAsync(
-                    cancellationToken);
-                await dbTrans.CommitAsync(
-                    cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                _logger.LogError(
-                    exc,
-                    "Error during {Method}: {Message}",
-                    nameof(RemoveCompetitionClassAsync),
-                    exc.Message);
-
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-
-                throw;
-            }
-            finally
-            {
-                _logger.LogTrace(
-                    "{Method}() done",
-                    nameof(RemoveCompetitionClassAsync));
-            }
+            return Task.CompletedTask;
         }
 
         #endregion CompetitionClass Crud
@@ -3152,10 +3060,10 @@ namespace DanceCompetitionHelper
         }
 
         public async Task<T?> RunInTransactionWithSaveChangesAndCommit<T>(
-            Func<IDanceCompetitionHelper, DanceCompetitionHelperDbContext, IDbContextTransaction, CancellationToken, Task> func,
-            Func<CancellationToken, T> onSuccess,
-            Func<CancellationToken, T>? onNoData,
-            Func<Exception, CancellationToken, T>? onException,
+            Func<IDanceCompetitionHelper, DanceCompetitionHelperDbContext, IDbContextTransaction, CancellationToken, Task<object?>> func,
+            Func<object?, CancellationToken, T> onSuccess,
+            Func<object?, CancellationToken, T>? onNoData,
+            Func<Exception, object?, CancellationToken, T>? onException,
             CancellationToken cancellationToken = default,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
@@ -3172,9 +3080,11 @@ namespace DanceCompetitionHelper
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
+            object? routeObjects = null;
+
             try
             {
-                await func(
+                routeObjects = await func(
                     this,
                     _danceCompHelperDb,
                     dbTrans,
@@ -3186,6 +3096,7 @@ namespace DanceCompetitionHelper
                     cancellationToken);
 
                 return onSuccess(
+                    routeObjects,
                     cancellationToken);
             }
             catch (NoDataFoundException noDataExc)
@@ -3201,6 +3112,7 @@ namespace DanceCompetitionHelper
                 if (onNoData != null)
                 {
                     return onNoData(
+                        routeObjects ?? noDataExc.RouteObjects,
                         cancellationToken);
                 }
 
@@ -3221,6 +3133,7 @@ namespace DanceCompetitionHelper
                 {
                     return onException(
                         exc,
+                        routeObjects,
                         cancellationToken);
                 }
 
