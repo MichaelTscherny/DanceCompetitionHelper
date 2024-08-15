@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Models.CompetitionVenueModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,199 +22,249 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
         }
 
-        public async Task<IActionResult> Index(
+        public Task<IActionResult> Index(
             Guid id,
             CancellationToken cancellationToken)
         {
-            var foundComp = await _danceCompHelper.FindCompetitionAsync(
-                id,
-                cancellationToken);
-
-            if (foundComp == null)
-            {
-                return NotFound();
-            }
-
-            var foundCompId = foundComp.CompetitionId;
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
-            return View(
-                new CompetitionVenueOverviewViewModel()
+            return DefaultIndexAndShow(
+                async (dcH, mapper, cToken) =>
                 {
-                    Competition = foundComp,
-                    OverviewItems = await _danceCompHelper
+                    var foundComp = await _danceCompHelper
+                        .FindCompetitionAsync(
+                            id,
+                            cToken);
+
+                    if (foundComp == null)
+                    {
+                        return null;
+                    }
+
+                    var foundCompId = foundComp.CompetitionId;
+                    ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+
+                    return new CompetitionVenueOverviewViewModel()
+                    {
+                        Competition = foundComp,
+                        OverviewItems = await _danceCompHelper
                         .GetCompetitionVenuesAsync(
                             foundCompId,
-                            cancellationToken)
-                        .ToListAsync(
-                            cancellationToken),
-                });
+                            cToken)
+                        .ToListAsync(),
+                    };
+                },
+                // --
+                nameof(Index),
+                nameof(Index),
+                // --
+                cancellationToken);
         }
 
-        public async Task<IActionResult> ShowCreateEdit(
+        public Task<IActionResult> ShowCreateEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
-            var foundComp = await _danceCompHelper.FindCompetitionAsync(
-                id,
-                cancellationToken);
+            return DefaultIndexAndShow(
+               async (dcH, mapper, cToken) =>
+               {
+                   var foundComp = await _danceCompHelper
+                       .FindCompetitionAsync(
+                           id,
+                           cToken);
 
-            if (foundComp == null)
-            {
-                return NotFound();
-            }
+                   if (foundComp == null)
+                   {
+                       return null;
+                   }
 
-            var foundCompId = foundComp.CompetitionId;
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                   var foundCompId = foundComp.CompetitionId;
+                   ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
-            return View(
-                new CompetitionVenueViewModel()
-                {
-                    CompetitionId = foundCompId,
-                    CompetitionName = foundComp.GetCompetitionName(),
-                });
+                   return new CompetitionVenueViewModel()
+                   {
+                       CompetitionId = foundCompId,
+                       CompetitionName = foundComp.GetCompetitionName(),
+                   };
+               },
+               // --
+               nameof(ShowCreateEdit),
+               nameof(ShowCreateEdit),
+               // --
+               cancellationToken);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateNew(
+        public Task<IActionResult> CreateNew(
             CompetitionVenueViewModel createCompetitionVenue,
             CancellationToken cancellationToken)
         {
-            if (ModelState.IsValid == false)
-            {
-                createCompetitionVenue.AddErrors(
-                    ModelState);
+            return DefaultCreateNew(
+                createCompetitionVenue,
+                _mapper.Map<CompetitionVenue>(
+                    createCompetitionVenue),
+                // --
+                async (dcH, cToken) =>
+                {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        createCompetitionVenue.CompetitionVenueId,
+                        cToken);
+                },
+                nameof(ShowCreateEdit),
+                // --
+                async (dcH, newEntity, mapper, cToken) =>
+                {
+                    await dcH.CreateCompetitionVenueAsync(
+                        newEntity,
+                        cToken);
 
-                return View(
-                    nameof(ShowCreateEdit),
-                    createCompetitionVenue);
-            }
-
-            try
-            {
-                var useCompetitionId = createCompetitionVenue.CompetitionId;
-
-                await _danceCompHelper.CreateCompetitionVenueAsync(
-                    useCompetitionId,
-                    createCompetitionVenue.Name,
-                    createCompetitionVenue.LengthInMeter,
-                    createCompetitionVenue.WidthInMeter,
-                    createCompetitionVenue.Comment,
-                    cancellationToken);
-
-                return RedirectToAction(
-                    nameof(Index),
-                    new
+                    return new
                     {
-                        Id = useCompetitionId,
-                    });
-            }
-            catch (Exception exc)
-            {
-                createCompetitionVenue.AddErrors(
-                    exc);
-
-                return View(
-                    nameof(ShowCreateEdit),
-                    createCompetitionVenue);
-            }
+                        Id = newEntity.CompetitionId,
+                    };
+                },
+                // -- on success
+                nameof(Index),
+                // -- on error
+                async (dcH, model, cToken) =>
+                {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        model.CompetitionId,
+                        cToken);
+                },
+                nameof(ShowCreateEdit),
+                // --
+                cancellationToken);
         }
 
-        public async Task<IActionResult> ShowEdit(
+        public Task<IActionResult> ShowEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
-            var foundCompVenue = await _danceCompHelper.GetCompetitionVenueAsync(
-                id,
-                cancellationToken);
-
-            if (foundCompVenue == null)
-            {
-                return RedirectToAction(
-                    nameof(Index));
-            }
-
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompVenue.CompetitionId;
-
-            return View(
-                nameof(ShowCreateEdit),
-                new CompetitionVenueViewModel()
+            return DefaultIndexAndShow(
+                async (dcH, mapper, cToken) =>
                 {
-                    CompetitionVenueId = foundCompVenue.CompetitionVenueId,
+                    var foundCompVenue = await _danceCompHelper.GetCompetitionVenueAsync(
+                        id,
+                        cancellationToken,
+                        true);
 
-                    CompetitionId = foundCompVenue.CompetitionId,
-                    CompetitionName = foundCompVenue.Competition.GetCompetitionName(),
+                    if (foundCompVenue == null)
+                    {
+                        return null;
+                    }
 
-                    Name = foundCompVenue.Name,
-                    LengthInMeter = foundCompVenue.LengthInMeter,
-                    WidthInMeter = foundCompVenue.WidthInMeter,
-                    Comment = foundCompVenue.Comment,
-                });
+                    ViewData["Use" + nameof(CompetitionClass)] = foundCompVenue.CompetitionId;
+
+                    return new CompetitionVenueViewModel()
+                    {
+                        CompetitionVenueId = foundCompVenue.CompetitionVenueId,
+
+                        CompetitionId = foundCompVenue.CompetitionId,
+                        CompetitionName = foundCompVenue.Competition.GetCompetitionName(),
+
+                        Name = foundCompVenue.Name,
+                        LengthInMeter = foundCompVenue.LengthInMeter,
+                        WidthInMeter = foundCompVenue.WidthInMeter,
+                        Comment = foundCompVenue.Comment,
+                    };
+                },
+                // --
+                nameof(ShowCreateEdit),
+                nameof(Index),
+                // --
+                cancellationToken);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditSave(
+        public Task<IActionResult> EditSave(
             CompetitionVenueViewModel editCompetitionVenue,
             CancellationToken cancellationToken)
         {
-            if (ModelState.IsValid == false)
-            {
-                editCompetitionVenue.AddErrors(
-                    ModelState);
+            return DefaultEdit(
+                editCompetitionVenue,
+                // --
+                async (dcH, cToken) =>
+                {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        editCompetitionVenue.CompetitionId,
+                        cToken);
+                },
+                nameof(ShowCreateEdit),
+                // -- on success
+                async (dcH, mapper, cToken) =>
+                {
+                    var foundAdjPanel = await dcH.GetCompetitionVenueAsync(
+                        editCompetitionVenue.CompetitionVenueId ?? Guid.Empty,
+                        cToken)
+                        ?? throw new NoDataFoundException(
+                            string.Format(
+                                "{0} with id '{1}' not found!",
+                                nameof(CompetitionVenue),
+                                editCompetitionVenue.CompetitionVenueId));
 
-                return View(
-                    nameof(ShowCreateEdit),
-                    editCompetitionVenue);
-            }
+                    // override the values...
+                    mapper.Map(
+                        editCompetitionVenue,
+                        foundAdjPanel);
 
-            try
-            {
-                await _danceCompHelper.EditCompetitionVenueAsync(
-                    editCompetitionVenue.CompetitionVenueId ?? Guid.Empty,
-                    editCompetitionVenue.Name,
-                    editCompetitionVenue.LengthInMeter,
-                    editCompetitionVenue.WidthInMeter,
-                    editCompetitionVenue.Comment,
-                    cancellationToken);
-
-                return RedirectToAction(
-                    nameof(Index),
-                    new
+                    return new
                     {
-                        Id = editCompetitionVenue.CompetitionId,
-                    });
-            }
-            catch (Exception exc)
-            {
-                editCompetitionVenue.AddErrors(
-                    exc);
-
-                return View(
-                    nameof(ShowCreateEdit),
-                    editCompetitionVenue);
-            }
+                        Id = foundAdjPanel.CompetitionId,
+                    };
+                },
+                nameof(Index),
+                // -- on no data
+                nameof(Index),
+                // -- on error
+                async (dcH, model, cToken) =>
+                {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        model.CompetitionId,
+                        cToken);
+                },
+                nameof(ShowCreateEdit),
+                // --
+                cancellationToken);
         }
 
-        public async Task<IActionResult> Delete(
+        public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
         {
-            var helpComp = await _danceCompHelper.FindCompetitionAsync(
+            return DefaultDelete(
                 id,
-                cancellationToken);
-
-            await _danceCompHelper.RemoveCompetitionVenueAsync(
-                id,
-                cancellationToken);
-
-            return RedirectToAction(
-                nameof(Index),
-                new
+                // --
+                async (dcH, delId, cToken) =>
                 {
-                    Id = helpComp?.CompetitionId ?? Guid.Empty
-                });
+                    var foundCompVenue = await dcH.GetCompetitionVenueAsync(
+                        delId,
+                        cToken)
+                        ?? throw new NoDataFoundException(
+                            string.Format(
+                                "{0} with id '{1}' not found!",
+                                nameof(CompetitionVenue),
+                                delId));
+
+                    await _danceCompHelper.RemoveCompetitionVenueAsync(
+                        foundCompVenue,
+                        cToken);
+
+                    return new
+                    {
+                        Id = foundCompVenue.CompetitionId,
+                    };
+                },
+                // --
+                nameof(Index),
+                nameof(Index),
+                nameof(Index),
+                // --
+                cancellationToken);
         }
     }
 }

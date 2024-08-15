@@ -158,6 +158,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 // --
                 async (dcH, cToken) =>
                 {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        createCompetitionClass.CompetitionId,
+                        cToken);
+
                     await FillCompetitionClassViewModel(
                         dcH,
                         createCompetitionClass.CompetitionId,
@@ -184,7 +189,19 @@ namespace DanceCompetitionHelper.Web.Controllers
                 // -- on success
                 nameof(Index),
                 // -- on error
-                null,
+                async (dcH, model, cToken) =>
+                {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        model.CompetitionId,
+                        cToken);
+
+                    await FillCompetitionClassViewModel(
+                        dcH,
+                        model.CompetitionId,
+                        model,
+                        cToken);
+                },
                 nameof(ShowCreateEdit),
                 // --
                 cancellationToken);
@@ -235,6 +252,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 // --
                 async (dcH, cToken) =>
                 {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        editCompetitionClass.CompetitionId,
+                        cToken);
+
                     await FillCompetitionClassViewModel(
                         dcH,
                         editCompetitionClass.CompetitionId,
@@ -271,20 +293,14 @@ namespace DanceCompetitionHelper.Web.Controllers
                 // -- on error
                 async (dcH, model, cToken) =>
                 {
-                    var foundCompClass = await dcH.GetCompetitionAsync(
+                    var foundComp = await DefaultGetCompetitionAndSetViewData(
+                        dcH,
                         model.CompetitionId,
                         cToken);
 
-                    if (foundCompClass == null)
-                    {
-                        return;
-                    }
-
-                    ViewData["Use" + nameof(CompetitionClass)] = foundCompClass.CompetitionId;
-
                     await FillCompetitionClassViewModel(
                         dcH,
-                        foundCompClass.CompetitionId,
+                        foundComp,
                         model,
                         cToken);
                 },
@@ -424,7 +440,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public Task<CompetitionClassViewModel> FillCompetitionClassViewModel(
             IDanceCompetitionHelper dcH,
-            Competition foundComp,
+            Competition? foundComp,
             CompetitionClassViewModel useModel,
             CancellationToken cancellationToken)
         {

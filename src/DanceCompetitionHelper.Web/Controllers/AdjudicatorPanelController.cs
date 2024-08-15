@@ -104,7 +104,13 @@ namespace DanceCompetitionHelper.Web.Controllers
                 _mapper.Map<AdjudicatorPanel>(
                     createAdjudicatorPanel),
                 // --
-                null,
+                async (dcH, cToken) =>
+                {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        createAdjudicatorPanel.CompetitionId,
+                        cToken);
+                },
                 nameof(ShowCreateEdit),
                 // --
                 async (dcH, newEntity, mapper, cToken) =>
@@ -121,7 +127,13 @@ namespace DanceCompetitionHelper.Web.Controllers
                 // -- on success
                 nameof(Index),
                 // -- on error
-                null,
+                async (dcH, model, cToken) =>
+                {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        model.CompetitionId,
+                        cToken);
+                },
                 nameof(ShowCreateEdit),
                 // --
                 cancellationToken);
@@ -171,7 +183,13 @@ namespace DanceCompetitionHelper.Web.Controllers
             return DefaultEdit(
                 editAdjudicatorPanel,
                 // --
-                null,
+                async (dcH, cToken) =>
+                {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        editAdjudicatorPanel.CompetitionId,
+                        cToken);
+                },
                 nameof(ShowCreateEdit),
                 // -- on success
                 async (dcH, mapper, cToken) =>
@@ -201,16 +219,10 @@ namespace DanceCompetitionHelper.Web.Controllers
                 // -- on error
                 async (dcH, model, cToken) =>
                 {
-                    var foundAdjPanel = await dcH.GetAdjudicatorPanelAsync(
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
                         model.CompetitionId,
                         cToken);
-
-                    if (foundAdjPanel == null)
-                    {
-                        return;
-                    }
-
-                    ViewData["Use" + nameof(CompetitionClass)] = foundAdjPanel.CompetitionId;
                 },
                 nameof(ShowCreateEdit),
                 // --

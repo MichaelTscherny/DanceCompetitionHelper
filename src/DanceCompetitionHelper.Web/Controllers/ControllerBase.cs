@@ -242,6 +242,25 @@ namespace DanceCompetitionHelper.Web.Controllers
                     "Delete failed");
         }
 
+        public async Task<Competition?> DefaultGetCompetitionAndSetViewData(
+            IDanceCompetitionHelper danceCompetitionHelper,
+            Guid? competitionId,
+            CancellationToken cancellationToken)
+        {
+            var foundComp = await danceCompetitionHelper.FindCompetitionAsync(
+                competitionId ?? Guid.Empty,
+                cancellationToken);
+
+            if (foundComp == null)
+            {
+                return null;
+            }
+
+            ViewData["Use" + nameof(CompetitionClass)] = foundComp.CompetitionId;
+
+            return foundComp;
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error(

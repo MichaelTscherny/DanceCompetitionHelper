@@ -37,8 +37,7 @@ namespace DanceCompetitionHelper
             bool useTransaction = true);
         IAsyncEnumerable<CompetitionVenue> GetCompetitionVenuesAsync(
             Guid? competitionId,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
         IAsyncEnumerable<Participant> GetParticipantsAsync(
             Guid? competitionId,
             Guid? competitionClassId,
@@ -80,7 +79,7 @@ namespace DanceCompetitionHelper
         Task<CompetitionVenue?> GetCompetitionVenueAsync(
             Guid? competitionVenueId,
             CancellationToken cancellationToken,
-            bool useTransaction = true);
+            bool includeCompetition = false);
         Task<Participant?> GetParticipantAsync(
             Guid participantId,
             CancellationToken cancellationToken,
@@ -169,23 +168,11 @@ namespace DanceCompetitionHelper
         #region CompetitionVanue Crud
 
         Task CreateCompetitionVenueAsync(
-            Guid competitionId,
-            string name,
-            int lengthInMeter,
-            int widthInMeter,
-            string? comment,
-            CancellationToken cancellationToken);
-
-        Task EditCompetitionVenueAsync(
-            Guid competitionVenueId,
-            string name,
-            int lengthInMeter,
-            int widthInMeter,
-            string? comment,
+            CompetitionVenue newCompetitionVenue,
             CancellationToken cancellationToken);
 
         Task RemoveCompetitionVenueAsync(
-            Guid competitionVenueId,
+            CompetitionVenue removeCompetitionVenue,
             CancellationToken cancellationToken);
 
         #endregion CompetitionVanue Crud

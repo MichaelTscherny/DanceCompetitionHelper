@@ -114,6 +114,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 // --
                 async (dcH, cToken) =>
                 {
+                    await DefaultGetCompetitionAndSetViewData(
+                        dcH,
+                        createAdjudicator.CompetitionId,
+                        cToken);
+
                     await FillAdjudicatorViewModel(
                         dcH,
                         createAdjudicator.CompetitionId,
@@ -144,17 +149,10 @@ namespace DanceCompetitionHelper.Web.Controllers
                 //
                 async (dcH, model, cToken) =>
                 {
-                    var foundComp = await _danceCompHelper.FindCompetitionAsync(
+                    var foundComp = await DefaultGetCompetitionAndSetViewData(
+                        dcH,
                         model.CompetitionId,
-                        cancellationToken);
-
-                    if (foundComp == null)
-                    {
-                        return;
-                    }
-
-                    var foundCompId = foundComp.CompetitionId;
-                    ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        cToken);
 
                     await FillAdjudicatorViewModel(
                         dcH,
@@ -255,20 +253,14 @@ namespace DanceCompetitionHelper.Web.Controllers
                 // -- on error
                 async (dcH, model, cToken) =>
                 {
-                    var foundCompClass = await dcH.GetCompetitionAsync(
+                    var foundComp = await DefaultGetCompetitionAndSetViewData(
+                        dcH,
                         model.CompetitionId,
                         cToken);
 
-                    if (foundCompClass == null)
-                    {
-                        return;
-                    }
-
-                    ViewData["Use" + nameof(CompetitionClass)] = foundCompClass.CompetitionId;
-
                     await FillAdjudicatorViewModel(
                         dcH,
-                        foundCompClass.CompetitionId,
+                        foundComp,
                         model,
                         cToken);
                 },
@@ -319,7 +311,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public Task<AdjudicatorViewModel> FillAdjudicatorViewModel(
             IDanceCompetitionHelper dcH,
-            Competition foundComp,
+            Competition? foundComp,
             AdjudicatorViewModel useModel,
             CancellationToken cancellationToken)
         {
