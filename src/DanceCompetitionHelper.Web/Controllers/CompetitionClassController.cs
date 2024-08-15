@@ -24,11 +24,11 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
         }
 
-        public async Task<IActionResult> Index(
+        public Task<IActionResult> Index(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await DefaultIndexAndShow(
+            return DefaultIndexAndShow(
                 async (dcH, mapper, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
@@ -63,11 +63,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 cancellationToken);
         }
 
-        public async Task<IActionResult> DetailedView(
+        public Task<IActionResult> DetailedView(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await DefaultIndexAndShow(
+            return DefaultIndexAndShow(
                 async (dcH, mapper, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
@@ -104,12 +104,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                 cancellationToken);
         }
 
-        public async Task<IActionResult> ShowCreateEdit(
+        public Task<IActionResult> ShowCreateEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
             /* */
-            return await DefaultIndexAndShow(
+            return DefaultIndexAndShow(
                 async (dcH, mapper, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
@@ -147,11 +147,11 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateNew(
+        public Task<IActionResult> CreateNew(
             CompetitionClassViewModel createCompetitionClass,
             CancellationToken cancellationToken)
         {
-            return await DefaultCreateNew(
+            return DefaultCreateNew(
                 createCompetitionClass,
                 _mapper.Map<CompetitionClass>(
                     createCompetitionClass),
@@ -189,11 +189,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 cancellationToken);
         }
 
-        public async Task<IActionResult> ShowEdit(
+        public Task<IActionResult> ShowEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await DefaultIndexAndShow(
+            return DefaultIndexAndShow(
                 async (dcH, mapper, cToken) =>
                 {
                     var foundCompClass = await dcH.GetCompetitionClassAsync(
@@ -225,11 +225,11 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditSave(
+        public Task<IActionResult> EditSave(
             CompetitionClassViewModel editCompetitionClass,
             CancellationToken cancellationToken)
         {
-            return await DefaultEdit(
+            return DefaultEdit(
                 editCompetitionClass,
                 // --
                 async (dcH, cToken) =>
@@ -271,11 +271,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 cancellationToken);
         }
 
-        public async Task<IActionResult> Delete(
+        public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await DefaultDelete(
+            return DefaultDelete(
                 id,
                 // --
                 async (dcH, delId, cToken) =>
@@ -306,11 +306,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 cancellationToken);
         }
 
-        public async Task<IActionResult> ShowMultipleStarters(
+        public Task<IActionResult> ShowMultipleStarters(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await DefaultIndexAndShow(
+            return DefaultIndexAndShow(
                 async (dcH, mapper, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
@@ -343,11 +343,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 cancellationToken);
         }
 
-        public async Task<IActionResult> ShowPossiblePromotions(
+        public Task<IActionResult> ShowPossiblePromotions(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await DefaultIndexAndShow(
+            return DefaultIndexAndShow(
                async (dcH, mapper, cToken) =>
                {
                    var foundComp = await dcH.FindCompetitionAsync(

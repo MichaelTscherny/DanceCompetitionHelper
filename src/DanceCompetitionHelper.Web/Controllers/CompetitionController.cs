@@ -103,11 +103,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 cancellationToken);
         }
 
-        public async Task<IActionResult> ShowEdit(
+        public Task<IActionResult> ShowEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await DefaultIndexAndShow(
+            return DefaultIndexAndShow(
                 async (dcH, mapper, cToken) =>
                 {
                     var foundComp = await dcH.GetCompetitionAsync(
@@ -131,11 +131,11 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditSave(
+        public Task<IActionResult> EditSave(
             CompetitionViewModel editCompetition,
             CancellationToken cancellationToken)
         {
-            return await DefaultEdit(
+            return DefaultEdit(
                 editCompetition,
                 // --
                 null,
@@ -167,11 +167,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 cancellationToken);
         }
 
-        public async Task<IActionResult> Delete(
+        public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await DefaultDelete(
+            return DefaultDelete(
                 id,
                 // --
                 async (dcH, delId, cToken) =>

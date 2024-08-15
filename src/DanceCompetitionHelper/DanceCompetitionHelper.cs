@@ -1010,11 +1010,11 @@ namespace DanceCompetitionHelper
 
         #region Conversions/Lookups
 
-        public async Task<Competition?> GetCompetitionAsync(
+        public Task<Competition?> GetCompetitionAsync(
             string byName,
             CancellationToken cancellationToken)
         {
-            return await _danceCompHelperDb.Competitions
+            return _danceCompHelperDb.Competitions
                 .TagWith(
                     nameof(GetCompetitionAsync) + "(string)[0]")
                 .FirstOrDefaultAsync(
@@ -1158,25 +1158,26 @@ namespace DanceCompetitionHelper
             return foundCompClass;
         }
 
-        public async Task<CompetitionClass?> GetCompetitionClassAsync(
+        public Task<CompetitionClass?> GetCompetitionClassAsync(
             string byName,
             CancellationToken cancellationToken)
         {
-            return await _danceCompHelperDb.CompetitionClasses
+            return _danceCompHelperDb.CompetitionClasses
                 .TagWith(
                     nameof(GetCompetitionClassAsync) + "(string)[0]")
                 .FirstOrDefaultAsync(
-                    x => x.CompetitionClassName == byName
-                    /* TODO: really need ignore?.. */
+                    x => x.CompetitionClassName == byName,
+                    /* TODO: really need ignore?.. *
                     && x.Ignore == false,
+                    */
                     cancellationToken);
         }
 
-        public async Task<CompetitionClass?> GetCompetitionClassAsync(
+        public Task<CompetitionClass?> GetCompetitionClassAsync(
             Guid competitionClassId,
             CancellationToken cancellationToken)
         {
-            return await _danceCompHelperDb.CompetitionClasses
+            return _danceCompHelperDb.CompetitionClasses
                 .TagWith(
                     nameof(GetCompetitionClassAsync) + "(Guid)[0]")
                 .FirstOrDefaultAsync(
