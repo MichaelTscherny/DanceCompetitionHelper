@@ -50,8 +50,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                             .GetCompetitionClassesAsync(
                                 foundCompId,
                                 cToken,
-                                true,
-                                useTransaction: false)
+                                true)
                             .ToListAsync(
                                 cToken),
                     };
@@ -90,10 +89,9 @@ namespace DanceCompetitionHelper.Web.Controllers
                             foundCompId,
                             cToken,
                             true,
-                            true,
-                            useTransaction: false)
+                            true)
                         .ToListAsync(
-                            cToken),
+                            cancellationToken),
                         DetailedView = true,
                     };
                 },
@@ -108,7 +106,6 @@ namespace DanceCompetitionHelper.Web.Controllers
             Guid id,
             CancellationToken cancellationToken)
         {
-            /* */
             return DefaultIndexAndShow(
                 async (dcH, mapper, cToken) =>
                 {
@@ -371,7 +368,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                 foundCompId,
                                 cToken,
                                 useTransaction: false)
-                            .ToListAsync(),
+                            .ToListAsync(
+                                cToken),
                     };
                 },
                 // --
@@ -408,8 +406,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                                 foundCompId,
                                 null,
                                 cToken,
-                                true,
-                                useTransaction: false)
+                                true)
                             .Where(
                                 x => x.DisplayInfo != null
                                 && x.DisplayInfo.PromotionInfo != null
@@ -474,8 +471,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             useModel.FollowUpCompetitionClasses = await dcH
                 .GetCompetitionClassesAsync(
                     foundCompId,
-                    cancellationToken,
-                    useTransaction: false)
+                    cancellationToken)
                 .ToSelectListItemAsync(
                     addEmpty: true)
                 .ToListAsync(

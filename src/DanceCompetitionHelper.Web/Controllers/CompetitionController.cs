@@ -59,7 +59,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                         .GetCompetitionsAsync(
                             cToken,
                             true)
-                        .ToListAsync();
+                        .ToListAsync(
+                            cToken);
                 },
                 // --
                 nameof(Index),

@@ -310,221 +310,208 @@ namespace DanceCompetitionHelper
             Guid? competitionId,
             [EnumeratorCancellation] CancellationToken cancellationToken,
             bool includeInfos = false,
-            bool showAll = false,
-            bool useTransaction = true)
+            bool showAll = false)
         {
             if (competitionId == null)
             {
                 yield break;
             }
 
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken,
-                useTransaction);
+            var foundComp = await GetCompetitionAsync(
+                competitionId,
+                cancellationToken);
 
-            try
+            if (foundComp == null)
             {
-                var foundComp = await GetCompetitionAsync(
-                    competitionId,
+                yield break;
+            }
+
+            var partsByCompClass = new Dictionary<Guid, List<Participant>>();
+            var multiStartsByCompClass = new Dictionary<Guid, List<Participant>>();
+
+            ICompetitonClassChecker? compClassChecker = GetCompetitonClassChecker(
+                foundComp);
+            var higherClassificationsByLowerCompClassId = new Dictionary<Guid, CompetitionClass>();
+            var foundPromotionFromCompClass = new Dictionary<Guid, List<Participant>>();
+
+            var getAllCompClasses = _danceCompHelperDb.CompetitionClasses
+                .TagWith(
+                    nameof(GetCompetitionClassesAsync) + "(Guid?)[2]")
+                .Include(
+                    x => x.AdjudicatorPanel)
+                .Where(
+                    x => x.CompetitionId == foundComp.CompetitionId)
+                .OrderBy(
+                    x => x.OrgClassId)
+                .ThenBy(
+                    x => x.CompetitionClassName);
+
+            var allCompetitionClasses = await (showAll
+                ? getAllCompClasses
+                : getAllCompClasses
+                    .Where(
+                        x => x.Ignore == false))
+                .ToListAsync(
                     cancellationToken);
 
-                if (foundComp == null)
+            // cleanup "PreviousCompetitionClass"
+            foreach (var curCompClass in allCompetitionClasses)
+            {
+                curCompClass.PreviousCompetitionClass = null;
+            }
+
+            // collect "higher classes"...
+            foreach (var curCompClass in allCompetitionClasses)
+            {
+                var useFollowUpComp = curCompClass.FollowUpCompetitionClass;
+                if (useFollowUpComp == null)
                 {
-                    yield break;
+                    continue;
                 }
 
-                var partsByCompClass = new Dictionary<Guid, List<Participant>>();
-                var multiStartsByCompClass = new Dictionary<Guid, List<Participant>>();
+                useFollowUpComp.PreviousCompetitionClass = curCompClass;
 
-                ICompetitonClassChecker? compClassChecker = GetCompetitonClassChecker(
-                    foundComp);
-                var higherClassificationsByLowerCompClassId = new Dictionary<Guid, CompetitionClass>();
-                var foundPromotionFromCompClass = new Dictionary<Guid, List<Participant>>();
+                higherClassificationsByLowerCompClassId[curCompClass.CompetitionClassId]
+                    = useFollowUpComp;
+            }
 
-                var getAllCompClasses = _danceCompHelperDb.CompetitionClasses
-                    .TagWith(
-                        nameof(GetCompetitionClassesAsync) + "(Guid?)[2]")
-                    .Include(
-                        x => x.AdjudicatorPanel)
-                    .Where(
-                        x => x.CompetitionId == foundComp.CompetitionId)
+            if (includeInfos)
+            {
+                await foreach (var curPart in GetParticipantsAsync(
+                    foundComp.CompetitionId,
+                    null,
+                    cancellationToken,
+                    true)
                     .OrderBy(
-                        x => x.OrgClassId)
-                    .ThenBy(
-                        x => x.CompetitionClassName);
+                        x => x.CompetitionId)
+                    .ThenByDefault())
+                {
+                    partsByCompClass.AddToBucket(
+                        curPart.CompetitionClassId,
+                        curPart);
 
-                var allCompetitionClasses = await (showAll
-                    ? getAllCompClasses
-                    : getAllCompClasses
-                        .Where(
-                            x => x.Ignore == false))
+                    var usePromotionInfo = curPart.DisplayInfo?.PromotionInfo;
+                    if (usePromotionInfo != null)
+                    {
+                        if (usePromotionInfo.PossiblePromotionA
+                            || (usePromotionInfo.PossiblePromotionB ?? false))
+                        {
+                            if (higherClassificationsByLowerCompClassId.TryGetValue(
+                                curPart.CompetitionClassId,
+                                out var foundHigherClasses))
+                            {
+                                foundPromotionFromCompClass.AddToBucket(
+                                    foundHigherClasses.CompetitionClassId,
+                                    curPart);
+                            }
+                        }
+                    }
+                }
+
+                var multipleStarters = await GetMultipleStarterAsync(
+                    competitionId.Value,
+                    cancellationToken,
+                    false)
                     .ToListAsync(
                         cancellationToken);
 
-                // cleanup "PreviousCompetitionClass"
-                foreach (var curCompClass in allCompetitionClasses)
+                foreach (var curMultiStart in multipleStarters)
                 {
-                    curCompClass.PreviousCompetitionClass = null;
-                }
-
-                // collect "higher classes"...
-                foreach (var curCompClass in allCompetitionClasses)
-                {
-                    var useFollowUpComp = curCompClass.FollowUpCompetitionClass;
-                    if (useFollowUpComp == null)
+                    foreach (var multiCompClasss in curMultiStart.CompetitionClasses)
                     {
-                        continue;
-                    }
-
-                    useFollowUpComp.PreviousCompetitionClass = curCompClass;
-
-                    higherClassificationsByLowerCompClassId[curCompClass.CompetitionClassId]
-                        = useFollowUpComp;
-                }
-
-                if (includeInfos)
-                {
-                    await foreach (var curPart in GetParticipantsAsync(
-                            foundComp.CompetitionId,
-                            null,
-                            cancellationToken,
-                            true,
-                            useTransaction: false)
-                        .OrderBy(
-                            x => x.CompetitionId)
-                        .ThenByDefault())
-                    {
-                        partsByCompClass.AddToBucket(
-                            curPart.CompetitionClassId,
-                            curPart);
-
-                        var usePromotionInfo = curPart.DisplayInfo?.PromotionInfo;
-                        if (usePromotionInfo != null)
+                        foreach (var multiPart in curMultiStart.Participants
+                            .Where(
+                                x => x.CompetitionClassId == multiCompClasss.CompetitionClassId))
                         {
-                            if (usePromotionInfo.PossiblePromotionA
-                                || (usePromotionInfo.PossiblePromotionB ?? false))
-                            {
-                                if (higherClassificationsByLowerCompClassId.TryGetValue(
-                                    curPart.CompetitionClassId,
-                                    out var foundHigherClasses))
-                                {
-                                    foundPromotionFromCompClass.AddToBucket(
-                                        foundHigherClasses.CompetitionClassId,
-                                        curPart);
-                                }
-                            }
+                            multiStartsByCompClass.AddToBucket(
+                                multiCompClasss.CompetitionClassId,
+                                multiPart,
+                                true);
                         }
                     }
-
-                    var multipleStarters = await GetMultipleStarterAsync(
-                        competitionId.Value,
-                        cancellationToken,
-                        false)
-                        .ToListAsync(
-                            cancellationToken);
-
-                    foreach (var curMultiStart in multipleStarters)
-                    {
-                        foreach (var multiCompClasss in curMultiStart.CompetitionClasses)
-                        {
-                            foreach (var multiPart in curMultiStart.Participants
-                                .Where(
-                                    x => x.CompetitionClassId == multiCompClasss.CompetitionClassId))
-                            {
-                                multiStartsByCompClass.AddToBucket(
-                                    multiCompClasss.CompetitionClassId,
-                                    multiPart,
-                                    true);
-                            }
-                        }
-                    }
-                }
-
-                // fill "displayInfo"...
-                foreach (var curCompClass in allCompetitionClasses)
-                {
-                    if (includeInfos)
-                    {
-                        // CAUTION: EF is caching, if we dont want wrong values
-                        // we need to re-create this!..
-                        curCompClass.DisplayInfo = new CompetitionClassDisplayInfo();
-
-                        var useDisplayInfo = curCompClass.DisplayInfo;
-                        var useExtraPart = useDisplayInfo.ExtraParticipants;
-                        var useCompClassId = curCompClass.CompetitionClassId;
-
-                        useDisplayInfo.MaxCouplesPerHeat = Convert.ToInt16(
-                            (await GetConfigurationAsync(
-                                GlobalConfigurationConstants.MaxCouplesPerHeat,
-                                curCompClass,
-                                cancellationToken,
-                                false))
-                            ?.ValueParser
-                            ?.AsDecimal()
-                            ?? 1);
-
-                        if (partsByCompClass.TryGetValue(
-                            useCompClassId,
-                            out var participants))
-                        {
-                            curCompClass.DisplayInfo.Participants.AddRange(
-                                participants);
-                        }
-
-                        multiStartsByCompClass.TryGetValue(
-                            useCompClassId,
-                            out var curCntMultiStarter);
-                        useDisplayInfo.CountMultipleStarters = curCntMultiStarter?.Count ?? 0;
-                        useDisplayInfo.CountMultipleStartersInfo = curCntMultiStarter.GetStartNumber();
-                    }
-                }
-
-                // fill "Extra Part"...
-                foreach (var curCompClass in allCompetitionClasses)
-                {
-                    var useDisplayInfo = curCompClass.DisplayInfo;
-
-                    if (useDisplayInfo != null
-                        && includeInfos)
-                    {
-                        var useExtraPart = useDisplayInfo.ExtraParticipants;
-                        var useCompClassId = curCompClass.CompetitionClassId;
-                        var validClasses = new List<CompetitionClass>();
-
-                        var usePrevCompClass = curCompClass.PreviousCompetitionClass;
-                        if (usePrevCompClass != null
-                            /* TODO: filter her?..
-                            && usePrevCompClass.Ignore == false
-                            */)
-                        {
-                            // --- BY WINNING ---
-                            // TODO: filter her?.. ?? only if we got a "running comp"...
-                            if (usePrevCompClass.DisplayInfo?.Participants.Count >= 1)
-                            {
-                                validClasses.Add(
-                                    usePrevCompClass);
-                            }
-
-                            useExtraPart.ByWinning += validClasses.Count;
-                            useExtraPart.ByWinningInfo += validClasses.GetCompetitionClasseNames();
-
-                            // --- BY PROMOTION ---
-                            if (foundPromotionFromCompClass.TryGetValue(
-                                useCompClassId,
-                                out var possiblePromotions))
-                            {
-                                useExtraPart.ByPromotion += possiblePromotions.Count;
-                                useExtraPart.ByPromotionInfo += possiblePromotions.GetStartNumber();
-                            }
-                        }
-                    }
-
-                    yield return curCompClass;
                 }
             }
-            finally
+
+            // fill "displayInfo"...
+            foreach (var curCompClass in allCompetitionClasses)
             {
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
+                if (includeInfos)
+                {
+                    // CAUTION: EF is caching, if we dont want wrong values
+                    // we need to re-create this!..
+                    curCompClass.DisplayInfo = new CompetitionClassDisplayInfo();
+
+                    var useDisplayInfo = curCompClass.DisplayInfo;
+                    var useExtraPart = useDisplayInfo.ExtraParticipants;
+                    var useCompClassId = curCompClass.CompetitionClassId;
+
+                    useDisplayInfo.MaxCouplesPerHeat = Convert.ToInt16(
+                        (await GetConfigurationAsync(
+                            GlobalConfigurationConstants.MaxCouplesPerHeat,
+                            curCompClass,
+                            cancellationToken,
+                            false))
+                        ?.ValueParser
+                        ?.AsDecimal()
+                        ?? 1);
+
+                    if (partsByCompClass.TryGetValue(
+                        useCompClassId,
+                        out var participants))
+                    {
+                        curCompClass.DisplayInfo.Participants.AddRange(
+                            participants);
+                    }
+
+                    multiStartsByCompClass.TryGetValue(
+                        useCompClassId,
+                        out var curCntMultiStarter);
+                    useDisplayInfo.CountMultipleStarters = curCntMultiStarter?.Count ?? 0;
+                    useDisplayInfo.CountMultipleStartersInfo = curCntMultiStarter.GetStartNumber();
+                }
+            }
+
+            // fill "Extra Part"...
+            foreach (var curCompClass in allCompetitionClasses)
+            {
+                var useDisplayInfo = curCompClass.DisplayInfo;
+
+                if (useDisplayInfo != null
+                    && includeInfos)
+                {
+                    var useExtraPart = useDisplayInfo.ExtraParticipants;
+                    var useCompClassId = curCompClass.CompetitionClassId;
+                    var validClasses = new List<CompetitionClass>();
+
+                    var usePrevCompClass = curCompClass.PreviousCompetitionClass;
+                    if (usePrevCompClass != null
+                        /* TODO: filter her?..
+                        && usePrevCompClass.Ignore == false
+                        */)
+                    {
+                        // --- BY WINNING ---
+                        // TODO: filter her?.. ?? only if we got a "running comp"...
+                        if (usePrevCompClass.DisplayInfo?.Participants.Count >= 1)
+                        {
+                            validClasses.Add(
+                                usePrevCompClass);
+                        }
+
+                        useExtraPart.ByWinning += validClasses.Count;
+                        useExtraPart.ByWinningInfo += validClasses.GetCompetitionClasseNames();
+
+                        // --- BY PROMOTION ---
+                        if (foundPromotionFromCompClass.TryGetValue(
+                            useCompClassId,
+                            out var possiblePromotions))
+                        {
+                            useExtraPart.ByPromotion += possiblePromotions.Count;
+                            useExtraPart.ByPromotionInfo += possiblePromotions.GetStartNumber();
+                        }
+                    }
+                }
+
+                yield return curCompClass;
             }
         }
 
@@ -571,146 +558,135 @@ namespace DanceCompetitionHelper
             Guid? competitionClassId,
             [EnumeratorCancellation] CancellationToken cancellationToken,
             bool includeInfos = false,
-            bool showAll = false,
-            bool useTransaction = true)
+            bool showAll = false)
         {
             if (competitionId == null)
             {
                 yield break;
             }
 
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken,
-                useTransaction);
+            var foundComp = await GetCompetitionAsync(
+                competitionId,
+                cancellationToken);
 
-            try
+            if (foundComp == null)
             {
-                var foundComp = await GetCompetitionAsync(
-                    competitionId,
-                    cancellationToken);
+                yield break;
+            }
 
-                if (foundComp == null)
+            // we do only basic info..
+            var foundCompClass = await _danceCompHelperDb.CompetitionClasses
+                .TagWith(
+                    nameof(GetParticipantsAsync) + "(Guid?, Guid?, bool)[1]")
+                .FirstOrDefaultAsync(
+                    x => x.CompetitionId == competitionId
+                    && x.CompetitionClassId == competitionClassId);
+
+            var multiStarter = new List<MultipleStarter>();
+            var multiStarterByParticipantsId = new Dictionary<Guid, List<CompetitionClass>>();
+            var allCompClasses = new List<CompetitionClass>();
+            IParticipantChecker? participantChecker = null;
+
+            if (includeInfos)
+            {
+                allCompClasses.AddRange(
+                    // we only need basic infos here...
+                    _danceCompHelperDb.CompetitionClasses
+                        .TagWith(
+                            nameof(GetParticipantsAsync) + "(Guid?, Guid?, bool)[1]")
+                        .Where(
+                            x => x.CompetitionId == competitionId));
+
+                multiStarter.AddRange(
+                    await GetMultipleStarterAsync(
+                        foundComp.CompetitionId,
+                        cancellationToken,
+                        false)
+                    .ToListAsync(
+                        cancellationToken));
+
+                multiStarterByParticipantsId =
+                    multiStarter.SelectMany(
+                        x => x.GetCompetitionClassesOfParticipants())
+                    .ToDictionary(
+                        x => x.ParticipantId,
+                        x => x.CompetitionClass);
+
+                participantChecker = GetParticipantChecker(
+                    foundComp);
+
+                if (participantChecker != null)
+                {
+                    participantChecker.SetCompetitionClasses(
+                        allCompClasses);
+                    participantChecker.SetMultipleStarter(
+                        multiStarter);
+                }
+            }
+
+            var qryParticipants = _danceCompHelperDb.Participants
+                .TagWith(
+                    nameof(GetParticipantsAsync) + "(Guid?, Guid?, bool)[2]")
+                .Include(
+                    x => x.CompetitionClass)
+                .Where(
+                    // "Ignore" is checked below!
+                    x => x.CompetitionId == foundComp.CompetitionId);
+
+            if (showAll == false)
+            {
+                qryParticipants = qryParticipants.Where(
+                    x => x.Ignore == false);
+            }
+
+            if (foundCompClass != null)
+            {
+                qryParticipants = qryParticipants.Where(
+                    x => x.CompetitionClassId == foundCompClass.CompetitionClassId);
+            }
+
+            await foreach (var curPart in qryParticipants
+                .OrderBy(
+                    x => x.CompetitionClass.OrgClassId)
+                .ThenBy(
+                    x => x.CompetitionClass.CompetitionClassName)
+                .ThenByDefault()
+                .AsAsyncEnumerable())
+            {
+                if (cancellationToken.IsCancellationRequested)
                 {
                     yield break;
                 }
 
-                // we do only basic info..
-                var foundCompClass = await _danceCompHelperDb.CompetitionClasses
-                    .TagWith(
-                        nameof(GetParticipantsAsync) + "(Guid?, Guid?, bool)[1]")
-                    .FirstOrDefaultAsync(
-                        x => x.CompetitionId == competitionId
-                        && x.CompetitionClassId == competitionClassId);
-
-                var multiStarter = new List<MultipleStarter>();
-                var multiStarterByParticipantsId = new Dictionary<Guid, List<CompetitionClass>>();
-                var allCompClasses = new List<CompetitionClass>();
-                IParticipantChecker? participantChecker = null;
-
                 if (includeInfos)
                 {
-                    allCompClasses.AddRange(
-                        // we only need basic infos here...
-                        _danceCompHelperDb.CompetitionClasses
-                            .TagWith(
-                                nameof(GetParticipantsAsync) + "(Guid?, Guid?, bool)[1]")
-                            .Where(
-                                x => x.CompetitionId == competitionId));
+                    // CAUTION: EF is caching, if we dont want wrong values
+                    // we need to recreate this!..
+                    curPart.DisplayInfo = new ParticipantDisplayInfo();
 
-                    multiStarter.AddRange(
-                        await GetMultipleStarterAsync(
-                            foundComp.CompetitionId,
-                            cancellationToken,
-                            false)
-                        .ToListAsync());
+                    var useDisplayInfo = curPart.DisplayInfo;
+                    useDisplayInfo.MultipleStartInfo = new CheckMultipleStartInfo();
 
-                    multiStarterByParticipantsId =
-                        multiStarter.SelectMany(
-                            x => x.GetCompetitionClassesOfParticipants())
-                        .ToDictionary(
-                            x => x.ParticipantId,
-                            x => x.CompetitionClass);
-
-                    participantChecker = GetParticipantChecker(
-                        foundComp);
+                    if (multiStarterByParticipantsId.TryGetValue(
+                        curPart.ParticipantId,
+                        out var curClassInfos))
+                    {
+                        var useMultiStartInfo = useDisplayInfo.MultipleStartInfo;
+                        useMultiStartInfo.MultipleStarts = true;
+                        useMultiStartInfo.MultipleStartsInfo =
+                            curClassInfos.GetCompetitionClasseNames();
+                        useMultiStartInfo.IncludedCompetitionClasses.AddRange(
+                            curClassInfos);
+                    }
 
                     if (participantChecker != null)
                     {
-                        participantChecker.SetCompetitionClasses(
-                            allCompClasses);
-                        participantChecker.SetMultipleStarter(
-                            multiStarter);
+                        useDisplayInfo.PromotionInfo = participantChecker.CheckParticipantPromotion(
+                            curPart);
                     }
                 }
 
-                var qryParticipants = _danceCompHelperDb.Participants
-                    .TagWith(
-                        nameof(GetParticipantsAsync) + "(Guid?, Guid?, bool)[2]")
-                    .Include(
-                        x => x.CompetitionClass)
-                    .Where(
-                        // "Ignore" is checked below!
-                        x => x.CompetitionId == foundComp.CompetitionId);
-
-                if (showAll == false)
-                {
-                    qryParticipants = qryParticipants.Where(
-                        x => x.Ignore == false);
-                }
-
-                if (foundCompClass != null)
-                {
-                    qryParticipants = qryParticipants.Where(
-                        x => x.CompetitionClassId == foundCompClass.CompetitionClassId);
-                }
-
-                await foreach (var curPart in qryParticipants
-                    .OrderBy(
-                        x => x.CompetitionClass.OrgClassId)
-                    .ThenBy(
-                        x => x.CompetitionClass.CompetitionClassName)
-                    .ThenByDefault()
-                    .AsAsyncEnumerable())
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        yield break;
-                    }
-
-                    if (includeInfos)
-                    {
-                        // CAUTION: EF is caching, if we dont want wrong values
-                        // we need to recreate this!..
-                        curPart.DisplayInfo = new ParticipantDisplayInfo();
-
-                        var useDisplayInfo = curPart.DisplayInfo;
-                        useDisplayInfo.MultipleStartInfo = new CheckMultipleStartInfo();
-
-                        if (multiStarterByParticipantsId.TryGetValue(
-                            curPart.ParticipantId,
-                            out var curClassInfos))
-                        {
-                            var useMultiStartInfo = useDisplayInfo.MultipleStartInfo;
-                            useMultiStartInfo.MultipleStarts = true;
-                            useMultiStartInfo.MultipleStartsInfo =
-                                curClassInfos.GetCompetitionClasseNames();
-                            useMultiStartInfo.IncludedCompetitionClasses.AddRange(
-                                curClassInfos);
-                        }
-
-                        if (participantChecker != null)
-                        {
-                            useDisplayInfo.PromotionInfo = participantChecker.CheckParticipantPromotion(
-                                curPart);
-                        }
-                    }
-
-                    yield return curPart;
-                }
-            }
-            finally
-            {
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
+                yield return curPart;
             }
         }
 
@@ -1836,10 +1812,10 @@ namespace DanceCompetitionHelper
                     .OrderBy(
                         x => x.Name);
 
-                var retConfValuesTask = retConfValues.ToListAsync().AsTask();
-                var retCompsTask = retComps.ToListAsync().AsTask();
-                var retCompClassesTask = retCompClasses.ToListAsync().AsTask();
-                var retCompVenuesTask = retCompVenues.ToListAsync().AsTask();
+                var retConfValuesTask = retConfValues.ToListAsync(cancellationToken).AsTask();
+                var retCompsTask = retComps.ToListAsync(cancellationToken).AsTask();
+                var retCompClassesTask = retCompClasses.ToListAsync(cancellationToken).AsTask();
+                var retCompVenuesTask = retCompVenues.ToListAsync(cancellationToken).AsTask();
 
                 await Task.WhenAll(
                     retConfValuesTask,

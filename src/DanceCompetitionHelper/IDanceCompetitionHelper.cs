@@ -33,8 +33,7 @@ namespace DanceCompetitionHelper
             Guid? competitionId,
             CancellationToken cancellationToken,
             bool includeInfos = false,
-            bool showAll = false,
-            bool useTransaction = true);
+            bool showAll = false);
         IAsyncEnumerable<CompetitionVenue> GetCompetitionVenuesAsync(
             Guid? competitionId,
             CancellationToken cancellationToken);
@@ -43,8 +42,7 @@ namespace DanceCompetitionHelper
             Guid? competitionClassId,
             CancellationToken cancellationToken,
             bool includeInfos = false,
-            bool showAll = false,
-            bool useTransaction = true);
+            bool showAll = false);
         IAsyncEnumerable<AdjudicatorPanel> GetAdjudicatorPanelsAsync(
             Guid? competitionId,
             CancellationToken cancellationToken,

@@ -50,7 +50,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                 foundCompId,
                                 cToken,
                                 true)
-                            .ToListAsync(),
+                            .ToListAsync(
+                                cToken),
                     };
                 },
                 // --

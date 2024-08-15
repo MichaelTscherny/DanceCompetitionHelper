@@ -55,7 +55,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     foundCompId,
                                     null,
                                     cToken)
-                                .ToListAsync(),
+                                .ToListAsync(
+                                    cToken),
                         };
                 },
                 // --
@@ -339,7 +340,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken)
                 .ToSelectListItemAsync(
                     lastCreatedAdjudicatorPanelId)
-                .ToListAsync();
+                .ToListAsync(
+                    cancellationToken);
 
             return useModel;
         }

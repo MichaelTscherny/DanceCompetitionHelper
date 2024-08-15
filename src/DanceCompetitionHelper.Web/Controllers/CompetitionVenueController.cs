@@ -49,7 +49,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                         .GetCompetitionVenuesAsync(
                             foundCompId,
                             cToken)
-                        .ToListAsync(),
+                        .ToListAsync(
+                            cToken),
                     };
                 },
                 // --

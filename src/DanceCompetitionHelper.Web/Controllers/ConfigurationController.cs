@@ -79,7 +79,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                         anyError
                             ? showConfiguration?.Organization
                             : null)
-                    .ToListAsync();
+                    .ToListAsync(
+                        cancellationToken);
 
                 if (useComps != null)
                 {
@@ -90,7 +91,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                 ? showConfiguration?.CompetitionId
                                 : null,
                             addEmpty: true)
-                        .ToListAsync();
+                        .ToListAsync(
+                            cancellationToken);
                 }
             }
             else
@@ -105,7 +107,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                             ? showConfiguration?.Organization ?? foundComp.Organization
                             : foundComp.Organization,
                         addEmpty: false)
-                    .ToListAsync();
+                    .ToListAsync(
+                        cancellationToken);
                 availComps = await new[]
                     {
                         foundComp
@@ -116,7 +119,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                             ? showConfiguration?.CompetitionId ?? foundComp.CompetitionId
                             : foundComp.CompetitionId,
                         addEmpty: false)
-                    .ToListAsync();
+                    .ToListAsync(
+                        cancellationToken);
 
                 if (useCompClasses != null)
                 {
@@ -127,7 +131,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                 ? showConfiguration?.CompetitionClassId
                                 : null,
                             addEmpty: true)
-                        .ToListAsync();
+                        .ToListAsync(
+                            cancellationToken);
                 }
 
                 if (useCompVenues != null)
@@ -139,7 +144,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                 ? showConfiguration?.CompetitionVenueId
                                 : null,
                             addEmpty: true)
-                        .ToListAsync();
+                        .ToListAsync(
+                            cancellationToken);
                 }
             }
 
