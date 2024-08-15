@@ -83,6 +83,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             string viewNameModelStateInvalid,
             Func<IDanceCompetitionHelper, TEntity, IMapper, CancellationToken, Task<object?>> funcCreateNew,
             string viewNameSuccess,
+            Func<IDanceCompetitionHelper, TModel, CancellationToken, Task>? funcOnError,
             string viewNameOnError,
             CancellationToken cancellationToken,
             [CallerMemberName] string memberName = "",
@@ -114,14 +115,23 @@ namespace DanceCompetitionHelper.Web.Controllers
                     newEntity,
                     _mapper,
                     cToken),
-                (routeObjects, cToken) => RedirectToAction(
-                    viewNameSuccess,
-                    routeObjects),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        viewNameSuccess,
+                        routeObjects)),
                 null,
-                (exc, routeObjects, cToken) =>
+                async (exc, routeObjects, cToken) =>
                 {
                     movelView.AddErrors(
                         exc);
+
+                    if (funcOnError != null)
+                    {
+                        await funcOnError.Invoke(
+                            _danceCompHelper,
+                            movelView,
+                            cToken);
+                    }
 
                     return View(
                         viewNameOnError,
@@ -139,6 +149,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<object?>> funcEdit,
             string viewNameSuccess,
             string viewNameOnNoData,
+            Func<IDanceCompetitionHelper, TModel, CancellationToken, Task>? funcOnError,
             string viewNameOnError,
             CancellationToken cancellationToken,
             [CallerMemberName] string memberName = "",
@@ -168,16 +179,26 @@ namespace DanceCompetitionHelper.Web.Controllers
                     dcH,
                     _mapper,
                     cToken),
-                (routeObjects, cToken) => RedirectToAction(
-                    viewNameSuccess,
-                    routeObjects),
-                (routeObjects, cToken) => RedirectToAction(
-                    viewNameOnNoData,
-                    routeObjects),
-                (exc, routeObjects, cToken) =>
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        viewNameSuccess,
+                        routeObjects)),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        viewNameOnNoData,
+                        routeObjects)),
+                async (exc, routeObjects, cToken) =>
                 {
                     movelView.AddErrors(
                         exc);
+
+                    if (funcOnError != null)
+                    {
+                        await funcOnError.Invoke(
+                            _danceCompHelper,
+                            movelView,
+                            cToken);
+                    }
 
                     return View(
                         viewNameOnError,
@@ -204,15 +225,18 @@ namespace DanceCompetitionHelper.Web.Controllers
                     dcH,
                     deleteId,
                     cToken),
-                (routeObjects, cToken) => RedirectToAction(
-                    viewNameSuccess,
-                    routeObjects),
-                (routeObjects, cToken) => RedirectToAction(
-                    viewNameOnNoData,
-                    routeObjects),
-                (exc, routeObjects, cToken) => RedirectToAction(
-                    viewNameOnError,
-                    routeObjects),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        viewNameSuccess,
+                        routeObjects)),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        viewNameOnNoData,
+                        routeObjects)),
+                (exc, routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        viewNameOnError,
+                        routeObjects)),
                 cancellationToken))
                 ?? Error(
                     "Delete failed");

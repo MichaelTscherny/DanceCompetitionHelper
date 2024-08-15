@@ -123,7 +123,7 @@ namespace DanceCompetitionHelper.Web.Extensions
                 {
                     Value = curItem.AdjudicatorPanelId.ToString(),
                     Text = curItem.Name,
-                    Selected = curItem.AdjudicatorPanelId == selectedItem
+                    Selected = curItem.AdjudicatorPanelId == selectedItem,
                 };
             }
         }
@@ -143,7 +143,7 @@ namespace DanceCompetitionHelper.Web.Extensions
                         {
                             Value = x.AdjudicatorId.ToString(),
                             Text = x.Name,
-                            Selected = x.AdjudicatorId == selectedItem
+                            Selected = x.AdjudicatorId == selectedItem,
                         }));
             }
 

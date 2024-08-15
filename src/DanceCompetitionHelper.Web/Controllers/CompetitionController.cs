@@ -96,8 +96,10 @@ namespace DanceCompetitionHelper.Web.Controllers
 
                     return null;
                 },
-                // --
+                // -- on success
                 nameof(Index),
+                // -- on error
+                null,
                 nameof(ShowCreateEdit),
                 // --
                 cancellationToken);
@@ -159,9 +161,24 @@ namespace DanceCompetitionHelper.Web.Controllers
 
                     return null;
                 },
-                // --
+                // -- on success
                 nameof(Index),
+                // -- on no data
                 nameof(Index),
+                // -- on error,
+                async (dcH, model, cToken) =>
+                {
+                    var foundAdjPanel = await dcH.GetAdjudicatorPanelAsync(
+                        model.CompetitionId ?? Guid.Empty,
+                        cToken);
+
+                    if (foundAdjPanel == null)
+                    {
+                        return;
+                    }
+
+                    ViewData["Use" + nameof(CompetitionClass)] = foundAdjPanel.CompetitionId;
+                },
                 nameof(ShowCreateEdit),
                 // --
                 cancellationToken);
@@ -222,15 +239,18 @@ namespace DanceCompetitionHelper.Web.Controllers
                     return null;
                 },
                 // --                
-                (routeObjects, cToken) => RedirectToAction(
-                    nameof(Index),
-                    routeObjects),
-                (routeObjects, cToken) => RedirectToAction(
-                    nameof(Index),
-                    routeObjects),
-                (exc, routeObjects, cToken) => RedirectToAction(
-                    nameof(Index),
-                    routeObjects),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        nameof(Index),
+                        routeObjects)),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        nameof(Index),
+                        routeObjects)),
+                (exc, routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        nameof(Index),
+                        routeObjects)),
                 cancellationToken)
                 ?? Error(
                     "Create History failed");

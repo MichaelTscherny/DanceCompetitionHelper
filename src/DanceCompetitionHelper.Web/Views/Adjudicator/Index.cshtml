@@ -36,6 +36,9 @@
                     <th>
                         Name
                     </th>
+                    <th>
+                        Comment
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -55,6 +58,9 @@
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Comment)
                         </td>
                         <td class="text-nowrap">
                             <a asp-controller="@AdjudicatorController.RefName"

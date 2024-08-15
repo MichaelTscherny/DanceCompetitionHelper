@@ -89,11 +89,10 @@ namespace DanceCompetitionHelper
         Task<AdjudicatorPanel?> GetAdjudicatorPanelAsync(
             Guid adjudicatorPanelId,
             CancellationToken cancellationToken,
-            bool useTransaction = true);
+            bool includeCompetition = false);
         Task<Adjudicator?> GetAdjudicatorAsync(
             Guid adjudicatorId,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         IAsyncEnumerable<MultipleStarter> GetMultipleStarterAsync(
             Guid competitionId,
@@ -115,20 +114,11 @@ namespace DanceCompetitionHelper
         #region AdjudicatorPanel Crud
 
         Task CreateAdjudicatorPanelAsync(
-            Guid competitionId,
-            string name,
-            string? comment,
-            CancellationToken cancellationToken);
-
-        Task EditAdjudicatorPanelAsync(
-            Guid adjudicatorPanelId,
-            Guid competitionId,
-            string name,
-            string? comment,
+            AdjudicatorPanel newAdjudicatorPanel,
             CancellationToken cancellationToken);
 
         Task RemoveAdjudicatorPanelAsync(
-            Guid adjudicatorPanelId,
+            AdjudicatorPanel removeAdjudicatorPanel,
             CancellationToken cancellationToken);
 
         #endregion AdjudicatorPanel Crud
@@ -136,22 +126,11 @@ namespace DanceCompetitionHelper
         #region Adjudicator Crud
 
         Task CreateAdjudicatorAsync(
-            Guid adjudicatorPanelId,
-            string abbreviation,
-            string name,
-            string? comment,
-            CancellationToken cancellationToken);
-
-        Task EditAdjudicatorAsync(
-            Guid adjudicatorId,
-            Guid adjudicatorPanelId,
-            string abbreviation,
-            string name,
-            string? comment,
+            Adjudicator newAdjudicator,
             CancellationToken cancellationToken);
 
         Task RemoveAdjudicatorAsync(
-            Guid adjudicatorId,
+            Adjudicator removeAdjudicator,
             CancellationToken cancellationToken);
 
         #endregion Adjudicator Crud
@@ -377,9 +356,9 @@ namespace DanceCompetitionHelper
 
         Task<TModel?> RunInTransactionWithSaveChangesAndCommit<TModel>(
             Func<IDanceCompetitionHelper, DanceCompetitionHelperDbContext, IDbContextTransaction, CancellationToken, Task<object?>> func,
-            Func<object?, CancellationToken, TModel> onSuccess,
-            Func<object?, CancellationToken, TModel>? onNoData,
-            Func<Exception, object?, CancellationToken, TModel>? onException,
+            Func<object?, CancellationToken, Task<TModel>> onSuccess,
+            Func<object?, CancellationToken, Task<TModel>>? onNoData,
+            Func<Exception, object?, CancellationToken, Task<TModel>>? onException,
             CancellationToken cancellationToken = default,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",

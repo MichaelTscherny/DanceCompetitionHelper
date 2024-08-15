@@ -174,16 +174,17 @@ namespace DanceCompetitionHelper.Web.Controllers
 
                     HttpContext.Session.SetString(
                         CompetitionClassLastCreatedAdjudicatorPanelId,
-                        createCompetitionClass.AdjudicatorPanelId.ToString());
+                        newEntity.AdjudicatorPanelId.ToString());
 
                     return new
                     {
-                        Id = createCompetitionClass.CompetitionId
+                        Id = newEntity.CompetitionId,
                     };
                 },
-                // --
+                // -- on success
                 nameof(Index),
-                //
+                // -- on error
+                null,
                 nameof(ShowCreateEdit),
                 // --
                 cancellationToken);
@@ -241,7 +242,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                         cToken);
                 },
                 nameof(ShowCreateEdit),
-                // --
+                // -- 
                 async (dcH, mapper, cToken) =>
                 {
                     var foundCompClass = await dcH.GetCompetitionClassAsync(
@@ -263,9 +264,30 @@ namespace DanceCompetitionHelper.Web.Controllers
                         Id = editCompetitionClass.CompetitionId
                     };
                 },
-                // --
+                // -- on success
                 nameof(Index),
+                // -- on no data
                 nameof(Index),
+                // -- on error
+                async (dcH, model, cToken) =>
+                {
+                    var foundCompClass = await dcH.GetCompetitionAsync(
+                        model.CompetitionId,
+                        cToken);
+
+                    if (foundCompClass == null)
+                    {
+                        return;
+                    }
+
+                    ViewData["Use" + nameof(CompetitionClass)] = foundCompClass.CompetitionId;
+
+                    await FillCompetitionClassViewModel(
+                        dcH,
+                        foundCompClass.CompetitionId,
+                        model,
+                        cToken);
+                },
                 nameof(ShowCreateEdit),
                 // --
                 cancellationToken);
