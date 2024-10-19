@@ -52,21 +52,22 @@ namespace DanceCompetitionHelper.Web.Controllers
                 _danceCompHelper,
                 CancellationToken.None);
 
-            return await DefaultIndexAndShow(
-                async (dcH, mapper, cToken) =>
-                {
-                    return await dcH
-                        .GetCompetitionsAsync(
-                            cToken,
-                            true)
-                        .ToListAsync(
-                            cToken);
-                },
-                // --
-                nameof(Index),
-                nameof(Index),
-                // --
-                cancellationToken);
+            return await GetDefaultRequestHandler<Competition, CompetitionViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultIndexAsync(
+                    async (dcH, _, cToken) =>
+                    {
+                        return await dcH
+                            .GetCompetitionsAsync(
+                                cToken,
+                                true)
+                            .ToListAsync(
+                                cToken);
+                    },
+                    cancellationToken);
         }
 
         public IActionResult ShowCreateEdit()
@@ -81,67 +82,69 @@ namespace DanceCompetitionHelper.Web.Controllers
             CompetitionViewModel createCompetition,
             CancellationToken cancellationToken)
         {
-            return DefaultCreateNew(
-                createCompetition,
-                _mapper.Map<Competition>(
-                    createCompetition),
-                // --
-                async (dcH, cToken) =>
-                {
-                    await DefaultGetCompetitionAndSetViewData(
-                        dcH,
-                        createCompetition.CompetitionId,
-                        cToken);
-                },
-                nameof(ShowCreateEdit),
-                // --
-                async (dcH, newEntity, mapper, cToken) =>
-                {
-                    await dcH.CreateCompetitionAsync(
-                        newEntity,
-                        cToken);
+            return GetDefaultRequestHandler<Competition, CompetitionViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(ShowCreateEdit),
+                    async (model, dcH, _, cToken) =>
+                    {
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            cToken);
 
-                    return null;
-                },
-                // -- on success
-                nameof(Index),
-                // -- on error
-                async (dcH, model, cToken) =>
-                {
-                    await DefaultGetCompetitionAndSetViewData(
-                        dcH,
-                        model.CompetitionId,
-                        cToken);
-                },
-                nameof(ShowCreateEdit),
-                // --
-                cancellationToken);
+                        return null;
+                    })
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit),
+                    async (_, dcH, _, cToken) =>
+                    {
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            createCompetition.CompetitionId,
+                            cToken);
+
+                        return null;
+                    })
+                .DefaultCreateNewAsync(
+                    createCompetition,
+                    _mapper.Map<Competition>(
+                        createCompetition),
+                    // ----
+                    async (dcH, newEntity, _, cToken) =>
+                    {
+                        await dcH.CreateCompetitionAsync(
+                            newEntity,
+                            cToken);
+
+                        return null;
+                    },
+                    cancellationToken);
         }
 
         public Task<IActionResult> ShowEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return DefaultIndexAndShow(
-                async (dcH, mapper, cToken) =>
-                {
-                    var foundComp = await dcH.GetCompetitionAsync(
-                        id,
-                        cToken)
-                        ?? throw new NoDataFoundException(
-                        string.Format(
-                            "{0} with id '{1}' not found!",
-                            nameof(Competition),
-                            id));
-
-                    return mapper.Map<CompetitionViewModel>(
-                        foundComp);
-                },
-                // --
-                nameof(ShowCreateEdit),
-                nameof(Index),
-                // --
-                cancellationToken);
+            return GetDefaultRequestHandler<Competition, CompetitionViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowCreateEdit))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    async (dcH, _, cToken) =>
+                    {
+                        return await dcH.GetCompetitionAsync(
+                            id,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(Competition),
+                                    id));
+                    },
+                    cancellationToken);
         }
 
         [HttpPost]

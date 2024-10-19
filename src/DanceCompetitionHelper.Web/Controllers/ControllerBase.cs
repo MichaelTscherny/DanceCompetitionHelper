@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
+using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -29,6 +30,29 @@ namespace DanceCompetitionHelper.Web.Controllers
                 ?? throw new ArgumentNullException(
                     nameof(mapper));
         }
+
+        #region Chaining
+
+        public DefaultRequestHandler<TLogger, TType, TModel> GetDefaultRequestHandler<TType, TModel>(
+            // CancellationToken cancellationToken,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
+            where TType : TableBase
+            where TModel : ViewModelBase
+        {
+            return new DefaultRequestHandler<TLogger, TType, TModel>(
+                _danceCompHelper,
+                _logger,
+                _mapper);
+        }
+
+        #endregion Chaining
+
+
+
+
+
 
         public async Task<IActionResult> DefaultIndexAndShow<TModel>(
             Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<TModel>> funcIndex,
