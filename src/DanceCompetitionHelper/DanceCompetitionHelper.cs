@@ -100,6 +100,8 @@ namespace DanceCompetitionHelper
                 "Do '{Method}'",
                 nameof(CheckMandatoryConfigurationAsync));
 
+            // THIS "BeginTransactionAsync()" IS ON PURPOSE!..
+            // DO not remove!..
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
                     cancellationToken)
                 ?? throw new ArgumentNullException(
@@ -111,8 +113,7 @@ namespace DanceCompetitionHelper
                 {
                     var retConfig = await GetConfigurationAsync(
                         mandConfig,
-                        cancellationToken,
-                        false);
+                        cancellationToken);
 
                     if (retConfig == null)
                     {
@@ -193,8 +194,7 @@ namespace DanceCompetitionHelper
 
         public async IAsyncEnumerable<Competition> GetCompetitionsAsync(
             [EnumeratorCancellation] CancellationToken cancellationToken,
-            bool includeInfos = false,
-            bool useTransaction = true)
+            bool includeInfos = false)
         {
             var countsOfCompClasses = new Dictionary<Guid, int>();
             var countsOfParticipants = new Dictionary<Guid, int>();
@@ -276,8 +276,7 @@ namespace DanceCompetitionHelper
 
                     useDisplayInfo.CountMultipleStarters = await GetMultipleStarterAsync(
                         curComp.CompetitionId,
-                        cancellationToken,
-                        false)
+                        cancellationToken)
                         .CountAsync();
                     useDisplayInfo.CountAdjudicatorPanels = await _danceCompHelperDb.AdjudicatorPanels
                         .TagWith(
@@ -364,7 +363,9 @@ namespace DanceCompetitionHelper
             foreach (var curCompClass in allCompetitionClasses)
             {
                 var useFollowUpComp = curCompClass.FollowUpCompetitionClass;
-                if (useFollowUpComp == null)
+                if (useFollowUpComp == null
+                    // must not be "me"
+                    || curCompClass == useFollowUpComp)
                 {
                     continue;
                 }
@@ -410,8 +411,7 @@ namespace DanceCompetitionHelper
 
                 var multipleStarters = await GetMultipleStarterAsync(
                     competitionId.Value,
-                    cancellationToken,
-                    false)
+                    cancellationToken)
                     .ToListAsync(
                         cancellationToken);
 
@@ -449,8 +449,7 @@ namespace DanceCompetitionHelper
                         (await GetConfigurationAsync(
                             GlobalConfigurationConstants.MaxCouplesPerHeat,
                             curCompClass,
-                            cancellationToken,
-                            false))
+                            cancellationToken))
                         ?.ValueParser
                         ?.AsDecimal()
                         ?? 1);
@@ -485,6 +484,8 @@ namespace DanceCompetitionHelper
 
                     var usePrevCompClass = curCompClass.PreviousCompetitionClass;
                     if (usePrevCompClass != null
+                        // must no be me...
+                        && curCompClass != usePrevCompClass
                         /* TODO: filter her?..
                         && usePrevCompClass.Ignore == false
                         */)
@@ -600,8 +601,7 @@ namespace DanceCompetitionHelper
                 multiStarter.AddRange(
                     await GetMultipleStarterAsync(
                         foundComp.CompetitionId,
-                        cancellationToken,
-                        false)
+                        cancellationToken)
                     .ToListAsync(
                         cancellationToken));
 
@@ -693,8 +693,7 @@ namespace DanceCompetitionHelper
         public async IAsyncEnumerable<AdjudicatorPanel> GetAdjudicatorPanelsAsync(
             Guid? competitionId,
             [EnumeratorCancellation] CancellationToken cancellationToken,
-            bool includeInfos = false,
-            bool useTransaction = true)
+            bool includeInfos = false)
         {
             if (competitionId == null)
             {
@@ -737,8 +736,7 @@ namespace DanceCompetitionHelper
             Guid? competitionId,
             Guid? adjudicatorPanelId,
             [EnumeratorCancellation] CancellationToken cancellationToken,
-            bool includeInfos = false,
-            bool useTransaction = true)
+            bool includeInfos = false)
         {
             if (competitionId == null)
             {
@@ -814,81 +812,65 @@ namespace DanceCompetitionHelper
 
         public async IAsyncEnumerable<MultipleStarter> GetMultipleStarterAsync(
             Guid competitionId,
-            [EnumeratorCancellation] CancellationToken cancellationToken,
-            bool useTransaction = true)
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken,
-                useTransaction);
+            var foundComp = await GetCompetitionAsync(
+                competitionId,
+                cancellationToken);
 
-            try
+            if (foundComp == null)
             {
-                var foundComp = await GetCompetitionAsync(
-                    competitionId,
-                    cancellationToken);
+                yield break;
+            }
 
-                if (foundComp == null)
+            var multipleStarterGouping = _danceCompHelperDb.Participants
+                .TagWith(
+                    nameof(GetMultipleStarterAsync) + "(Guid)[0]")
+                .Where(
+                    x => x.CompetitionId == foundComp.CompetitionId
+                    && x.Ignore == false)
+                .GroupBy(
+                    x => new
+                    {
+                        x.NamePartA,
+                        x.OrgIdPartA,
+                        x.NamePartB,
+                        x.OrgIdPartB,
+                        x.ClubName,
+                        x.OrgIdClub,
+                    })
+                .Where(
+                    x => x.Count() >= 2)
+                .Select(
+                    x => x.Key);
+
+            await foreach (var curMultiStart in multipleStarterGouping
+                .AsAsyncEnumerable())
+            {
+                if (cancellationToken.IsCancellationRequested)
                 {
                     yield break;
                 }
 
-                var multipleStarterGouping = _danceCompHelperDb.Participants
+                var allPartInfo = await _danceCompHelperDb.Participants
                     .TagWith(
-                        nameof(GetMultipleStarterAsync) + "(Guid)[0]")
+                        nameof(GetMultipleStarterAsync) + "(Guid)[1]")
+                    .Include(
+                        x => x.CompetitionClass)
                     .Where(
                         x => x.CompetitionId == foundComp.CompetitionId
+                        && x.NamePartA == curMultiStart.NamePartA
+                        && x.OrgIdPartA == curMultiStart.OrgIdPartA
+                        && x.NamePartB == curMultiStart.NamePartB
+                        && x.OrgIdPartB == curMultiStart.OrgIdPartB
+                        && x.ClubName == curMultiStart.ClubName
+                        && x.OrgIdClub == curMultiStart.OrgIdClub
                         && x.Ignore == false)
-                    .GroupBy(
-                        x => new
-                        {
-                            x.NamePartA,
-                            x.OrgIdPartA,
-                            x.NamePartB,
-                            x.OrgIdPartB,
-                            x.ClubName,
-                            x.OrgIdClub,
-                        })
-                    .Where(
-                        x => x.Count() >= 2)
-                    .Select(
-                        x => x.Key);
+                    .ToListAsync(
+                        cancellationToken);
 
-                await foreach (var curMultiStart in multipleStarterGouping
-                    .AsAsyncEnumerable())
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        yield break;
-                    }
-
-                    var allPartInfo = await _danceCompHelperDb.Participants
-                        .TagWith(
-                            nameof(GetMultipleStarterAsync) + "(Guid)[1]")
-                        .Include(
-                            x => x.CompetitionClass)
-                        .Where(
-                            x => x.CompetitionId == foundComp.CompetitionId
-                            && x.NamePartA == curMultiStart.NamePartA
-                            && x.OrgIdPartA == curMultiStart.OrgIdPartA
-                            && x.NamePartB == curMultiStart.NamePartB
-                            && x.OrgIdPartB == curMultiStart.OrgIdPartB
-                            && x.ClubName == curMultiStart.ClubName
-                            && x.OrgIdClub == curMultiStart.OrgIdClub
-                            && x.Ignore == false)
-                        .ToListAsync(
-                            cancellationToken);
-
-                    yield return new MultipleStarter(
-                        allPartInfo);
-                }
-            }
-            finally
-            {
-                _logger.LogTrace(
-                    "{Method}() done",
-                    nameof(GetMultipleStarterAsync));
-
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
+                yield return new MultipleStarter(
+                    allPartInfo);
             }
         }
 
@@ -1133,30 +1115,14 @@ namespace DanceCompetitionHelper
 
         public async Task<Participant?> GetParticipantAsync(
             Guid participantId,
-            CancellationToken cancellationToken,
-            bool useTransaction = true)
+            CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken,
-                useTransaction);
-
-            try
-            {
-                return await _danceCompHelperDb.Participants
-                    .TagWith(
-                        nameof(GetParticipantAsync) + "(Guid)[0]")
-                    .FirstOrDefaultAsync(
-                        x => x.ParticipantId == participantId,
-                        cancellationToken);
-            }
-            finally
-            {
-                _logger.LogTrace(
-                    "{Method}() done",
-                    nameof(GetParticipantAsync));
-
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-            }
+            return await _danceCompHelperDb.Participants
+                .TagWith(
+                    nameof(GetParticipantAsync) + "(Guid)[0]")
+                .FirstOrDefaultAsync(
+                    x => x.ParticipantId == participantId,
+                    cancellationToken);
         }
 
         public Task<AdjudicatorPanel?> GetAdjudicatorPanelAsync(
@@ -1336,67 +1302,40 @@ namespace DanceCompetitionHelper
             string? competitionColor,
             CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken)
-                ?? throw new ArgumentNullException(
-                    "dbTrans");
+            var foundCompClass = await GetCompetitionClassAsync(
+                competitionClassId,
+                cancellationToken);
 
-            try
+            if (foundCompClass == null)
             {
-                var foundCompClass = await GetCompetitionClassAsync(
-                    competitionClassId,
-                    cancellationToken);
-
-                if (foundCompClass == null)
-                {
-                    throw new ArgumentException(
-                        string.Format(
-                            "{0} with id '{1}' not found!",
-                            nameof(CompetitionClass),
-                            competitionClassId));
-                }
-
-                foundCompClass.OrgClassId = orgClassId;
-                foundCompClass.CompetitionClassName = competitionClassName;
-                foundCompClass.FollowUpCompetitionClassId = followUpCompetitionClassId == Guid.Empty
-                    ? null
-                    : followUpCompetitionClassId;
-                foundCompClass.AdjudicatorPanelId = adjudicatorPanelId;
-                foundCompClass.Discipline = discipline;
-                foundCompClass.AgeClass = ageClass;
-                foundCompClass.AgeGroup = ageGroup;
-                foundCompClass.Class = className;
-                foundCompClass.MinStartsForPromotion = minStartsForPromotion;
-                foundCompClass.MinPointsForPromotion = minPointsForPromotion;
-                foundCompClass.PointsForFirst = pointsForFirst;
-                foundCompClass.ExtraManualStarter = extraManualStarter;
-                foundCompClass.Comment = comment;
-                foundCompClass.Ignore = ignore;
-                foundCompClass.CompetitionColor = competitionColor;
-
-                await _danceCompHelperDb.SaveChangesAsync(
-                    cancellationToken);
-                await dbTrans.CommitAsync(
-                    cancellationToken);
+                throw new ArgumentException(
+                    string.Format(
+                        "{0} with id '{1}' not found!",
+                        nameof(CompetitionClass),
+                        competitionClassId));
             }
-            catch (Exception exc)
-            {
-                _logger.LogError(
-                    exc,
-                    "Error during {Method}: {Message}",
-                    nameof(EditCompetitionClassAsync),
-                    exc.Message);
 
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
+            foundCompClass.OrgClassId = orgClassId;
+            foundCompClass.CompetitionClassName = competitionClassName;
+            foundCompClass.FollowUpCompetitionClassId = followUpCompetitionClassId == Guid.Empty
+                ? null
+                : followUpCompetitionClassId;
+            foundCompClass.AdjudicatorPanelId = adjudicatorPanelId;
+            foundCompClass.Discipline = discipline;
+            foundCompClass.AgeClass = ageClass;
+            foundCompClass.AgeGroup = ageGroup;
+            foundCompClass.Class = className;
+            foundCompClass.MinStartsForPromotion = minStartsForPromotion;
+            foundCompClass.MinPointsForPromotion = minPointsForPromotion;
+            foundCompClass.PointsForFirst = pointsForFirst;
+            foundCompClass.ExtraManualStarter = extraManualStarter;
+            foundCompClass.Comment = comment;
+            foundCompClass.Ignore = ignore;
+            foundCompClass.CompetitionColor = competitionColor;
 
-                throw;
-            }
-            finally
-            {
-                _logger.LogTrace(
-                    "{Method}() done",
-                    nameof(EditCompetitionClassAsync));
-            }
+            // TODO: needed?..
+            await _danceCompHelperDb.SaveChangesAsync(
+                cancellationToken);
         }
 
         public Task RemoveCompetitionClassAsync(
@@ -1465,90 +1404,63 @@ namespace DanceCompetitionHelper
             bool ignore,
             CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken)
-                ?? throw new ArgumentNullException(
-                    "dbTrans");
+            var foundCompId = await GetCompetitionAsync(
+                competitionId,
+                cancellationToken);
 
-            try
+            if (foundCompId == null)
             {
-                var foundCompId = await GetCompetitionAsync(
-                    competitionId,
-                    cancellationToken);
+                throw new ArgumentException(
+                    string.Format(
+                        "{0} with id '{1}' not found!",
+                        nameof(Competition),
+                        competitionId));
+            }
 
-                if (foundCompId == null)
+            var foundCompClassId = await GetCompetitionClassAsync(
+                competitionClassId,
+                cancellationToken);
+
+            if (foundCompClassId == null)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        "{0} with id '{1}' not found!",
+                        nameof(CompetitionClass),
+                        competitionClassId));
+            }
+
+            _danceCompHelperDb.Participants.Add(
+                new Participant()
                 {
-                    throw new ArgumentException(
-                        string.Format(
-                            "{0} with id '{1}' not found!",
-                            nameof(Competition),
-                            competitionId));
-                }
+                    CompetitionId = competitionId,
+                    CompetitionClassId = competitionClassId,
+                    StartNumber = startNumber,
+                    NamePartA = namePartA,
+                    OrgIdPartA = orgIdPartA,
+                    NamePartB = namePartB,
+                    OrgIdPartB = orgIdPartB,
+                    ClubName = clubName,
+                    OrgIdClub = orgIdClub,
+                    // A
+                    OrgPointsPartA = orgPointsPartA,
+                    OrgStartsPartA = orgStartsPartA,
+                    MinStartsForPromotionPartA = minStartsForPromotionPartA,
+                    OrgAlreadyPromotedPartA = orgAlreadyPromotedPartA,
+                    OrgAlreadyPromotedInfoPartA = orgAlreadyPromotedInfoPartA,
+                    // B
+                    OrgPointsPartB = orgPointsPartB,
+                    OrgStartsPartB = orgStartsPartB,
+                    MinStartsForPromotionPartB = minStartsForPromotionPartB,
+                    OrgAlreadyPromotedPartB = orgAlreadyPromotedPartB,
+                    OrgAlreadyPromotedInfoPartB = orgAlreadyPromotedInfoPartB,
+                    Comment = comment,
+                    Ignore = ignore,
+                });
 
-                var foundCompClassId = await GetCompetitionClassAsync(
-                    competitionClassId,
-                    cancellationToken);
-
-                if (foundCompClassId == null)
-                {
-                    throw new ArgumentException(
-                        string.Format(
-                            "{0} with id '{1}' not found!",
-                            nameof(CompetitionClass),
-                            competitionClassId));
-                }
-
-                _danceCompHelperDb.Participants.Add(
-                    new Participant()
-                    {
-                        CompetitionId = competitionId,
-                        CompetitionClassId = competitionClassId,
-                        StartNumber = startNumber,
-                        NamePartA = namePartA,
-                        OrgIdPartA = orgIdPartA,
-                        NamePartB = namePartB,
-                        OrgIdPartB = orgIdPartB,
-                        ClubName = clubName,
-                        OrgIdClub = orgIdClub,
-                        // A
-                        OrgPointsPartA = orgPointsPartA,
-                        OrgStartsPartA = orgStartsPartA,
-                        MinStartsForPromotionPartA = minStartsForPromotionPartA,
-                        OrgAlreadyPromotedPartA = orgAlreadyPromotedPartA,
-                        OrgAlreadyPromotedInfoPartA = orgAlreadyPromotedInfoPartA,
-                        // B
-                        OrgPointsPartB = orgPointsPartB,
-                        OrgStartsPartB = orgStartsPartB,
-                        MinStartsForPromotionPartB = minStartsForPromotionPartB,
-                        OrgAlreadyPromotedPartB = orgAlreadyPromotedPartB,
-                        OrgAlreadyPromotedInfoPartB = orgAlreadyPromotedInfoPartB,
-                        Comment = comment,
-                        Ignore = ignore,
-                    });
-
-                await _danceCompHelperDb.SaveChangesAsync(
-                    cancellationToken);
-                await dbTrans.CommitAsync(
-                    cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                _logger.LogError(
-                    exc,
-                    "Error during {Method}: {Message}",
-                    nameof(CreateParticipantAsync),
-                    exc.Message);
-
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-
-                throw;
-            }
-            finally
-            {
-                _logger.LogTrace(
-                    "{Method}() done",
-                    nameof(CreateParticipantAsync));
-            }
+            // TODO: needed?..
+            await _danceCompHelperDb.SaveChangesAsync(
+                cancellationToken);
         }
 
         public async Task EditParticipantAsync(
@@ -1579,142 +1491,88 @@ namespace DanceCompetitionHelper
             bool ignore,
             CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken)
-                ?? throw new ArgumentNullException(
-                    "dbTrans");
+            var foundCompClassId = await GetCompetitionClassAsync(
+                competitionClassId,
+                cancellationToken);
 
-            try
+            if (foundCompClassId == null)
             {
-                var foundCompClassId = await GetCompetitionClassAsync(
-                    competitionClassId,
-                    cancellationToken);
-
-                if (foundCompClassId == null)
-                {
-                    throw new ArgumentException(
-                        string.Format(
-                            "{0} with id '{1}' not found!",
-                            nameof(CompetitionClass),
-                            competitionClassId));
-                }
-
-                var foundParticipant = _danceCompHelperDb.Participants
-                    .TagWith(
-                        nameof(EditParticipantAsync) + "(Guid,...)[1]")
-                    .FirstOrDefault(
-                        x => x.ParticipantId == participantId);
-
-                if (foundParticipant == null)
-                {
-                    throw new ArgumentException(
-                        string.Format(
-                            "{0} with id '{1}' not found!",
-                            nameof(Participant),
-                            participantId));
-                }
-
-                foundParticipant.CompetitionClassId = competitionClassId;
-                foundParticipant.StartNumber = startNumber;
-                foundParticipant.NamePartA = namePartA;
-                foundParticipant.OrgIdPartA = orgIdPartA;
-                foundParticipant.NamePartB = namePartB;
-                foundParticipant.OrgIdPartB = orgIdPartB;
-                foundParticipant.ClubName = clubName;
-                foundParticipant.OrgIdClub = orgIdClub;
-                // A
-                foundParticipant.OrgPointsPartA = orgPointsPartA;
-                foundParticipant.OrgStartsPartA = orgStartsPartA;
-                foundParticipant.MinStartsForPromotionPartA = minStartsForPromotionPartA;
-                foundParticipant.OrgAlreadyPromotedPartA = orgAlreadyPromotedPartA;
-                foundParticipant.OrgAlreadyPromotedInfoPartA = orgAlreadyPromotedInfoPartA;
-                // B
-                foundParticipant.OrgPointsPartB = orgPointsPartB;
-                foundParticipant.OrgStartsPartB = orgStartsPartB;
-                foundParticipant.MinStartsForPromotionPartB = minStartsForPromotionPartB;
-                foundParticipant.OrgAlreadyPromotedPartB = orgAlreadyPromotedPartB;
-                foundParticipant.OrgAlreadyPromotedInfoPartB = orgAlreadyPromotedInfoPartB;
-                foundParticipant.Comment = comment;
-                foundParticipant.Ignore = ignore;
-
-                await _danceCompHelperDb.SaveChangesAsync(
-                    cancellationToken);
-                await dbTrans.CommitAsync(
-                    cancellationToken);
+                throw new ArgumentException(
+                    string.Format(
+                        "{0} with id '{1}' not found!",
+                        nameof(CompetitionClass),
+                        competitionClassId));
             }
-            catch (Exception exc)
+
+            var foundParticipant = _danceCompHelperDb.Participants
+                .TagWith(
+                    nameof(EditParticipantAsync) + "(Guid,...)[1]")
+                .FirstOrDefault(
+                    x => x.ParticipantId == participantId);
+
+            if (foundParticipant == null)
             {
-                _logger.LogError(
-                    exc,
-                    "Error during {Method}: {Message}",
-                    nameof(EditParticipantAsync),
-                    exc.Message);
-
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-
-                throw;
+                throw new ArgumentException(
+                    string.Format(
+                        "{0} with id '{1}' not found!",
+                        nameof(Participant),
+                        participantId));
             }
-            finally
-            {
-                _logger.LogTrace(
-                    "{Method}() done",
-                    nameof(EditParticipantAsync));
-            }
+
+            foundParticipant.CompetitionClassId = competitionClassId;
+            foundParticipant.StartNumber = startNumber;
+            foundParticipant.NamePartA = namePartA;
+            foundParticipant.OrgIdPartA = orgIdPartA;
+            foundParticipant.NamePartB = namePartB;
+            foundParticipant.OrgIdPartB = orgIdPartB;
+            foundParticipant.ClubName = clubName;
+            foundParticipant.OrgIdClub = orgIdClub;
+            // A
+            foundParticipant.OrgPointsPartA = orgPointsPartA;
+            foundParticipant.OrgStartsPartA = orgStartsPartA;
+            foundParticipant.MinStartsForPromotionPartA = minStartsForPromotionPartA;
+            foundParticipant.OrgAlreadyPromotedPartA = orgAlreadyPromotedPartA;
+            foundParticipant.OrgAlreadyPromotedInfoPartA = orgAlreadyPromotedInfoPartA;
+            // B
+            foundParticipant.OrgPointsPartB = orgPointsPartB;
+            foundParticipant.OrgStartsPartB = orgStartsPartB;
+            foundParticipant.MinStartsForPromotionPartB = minStartsForPromotionPartB;
+            foundParticipant.OrgAlreadyPromotedPartB = orgAlreadyPromotedPartB;
+            foundParticipant.OrgAlreadyPromotedInfoPartB = orgAlreadyPromotedInfoPartB;
+            foundParticipant.Comment = comment;
+            foundParticipant.Ignore = ignore;
+
+            // TODO: needed?..
+            await _danceCompHelperDb.SaveChangesAsync(
+                cancellationToken);
         }
 
         public async Task RemoveParticipantAsync(
             Guid participantId,
             CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken)
-                ?? throw new ArgumentNullException(
-                    "dbTrans");
-
-            try
-            {
-                var foundParticipant = await _danceCompHelperDb.Participants
-                    .TagWith(
-                        nameof(RemoveParticipantAsync) + "(Guid)[0]")
-                    .FirstOrDefaultAsync(
-                        x => x.ParticipantId == participantId,
-                        cancellationToken);
-
-                if (foundParticipant == null)
-                {
-                    _logger.LogWarning(
-                        "{Participant} with id '{ParticipantId}' not found!",
-                        nameof(Participant),
-                        participantId);
-                    return;
-                }
-
-                _danceCompHelperDb.Participants.Remove(
-                    foundParticipant);
-
-                await _danceCompHelperDb.SaveChangesAsync(
+            var foundParticipant = await _danceCompHelperDb.Participants
+                .TagWith(
+                    nameof(RemoveParticipantAsync) + "(Guid)[0]")
+                .FirstOrDefaultAsync(
+                    x => x.ParticipantId == participantId,
                     cancellationToken);
-                await dbTrans.CommitAsync(
-                    cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                _logger.LogError(
-                    exc,
-                    "Error during {Method}: {Message}",
-                    nameof(RemoveParticipantAsync),
-                    exc.Message);
 
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-
-                throw;
-            }
-            finally
+            if (foundParticipant == null)
             {
-                _logger.LogTrace(
-                    "{Method}() done",
-                    nameof(RemoveParticipantAsync));
+                _logger.LogWarning(
+                    "{Participant} with id '{ParticipantId}' not found!",
+                    nameof(Participant),
+                    participantId);
+                return;
             }
+
+            _danceCompHelperDb.Participants.Remove(
+                foundParticipant);
+
+            // TODO: needed?..
+            await _danceCompHelperDb.SaveChangesAsync(
+                cancellationToken);
         }
 
         #endregion Participant Crud
@@ -1728,143 +1586,118 @@ namespace DanceCompetitionHelper
             IEnumerable<CompetitionVenue>? CompetitionVenues)>
             GetConfigurationsAsync(
                 Guid? competitionId,
-                CancellationToken cancellationToken,
-                bool useTransaction = true)
+                CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken,
-                useTransaction);
-
             IAsyncEnumerable<ConfigurationValue> retConfValues = AsyncEnumerable.Empty<ConfigurationValue>();
             Competition? retComp;
             IAsyncEnumerable<Competition> retComps = AsyncEnumerable.Empty<Competition>();
             IAsyncEnumerable<CompetitionClass> retCompClasses = AsyncEnumerable.Empty<CompetitionClass>();
             IAsyncEnumerable<CompetitionVenue> retCompVenues = AsyncEnumerable.Empty<CompetitionVenue>();
 
-            try
+            retComp = await GetCompetitionAsync(
+                competitionId,
+                cancellationToken);
+
+            retConfValues = _danceCompHelperDb.Configurations
+                .TagWith(
+                    nameof(GetConfigurationsAsync) + "[0]")
+                .ToAsyncEnumerable();
+            retComps = _danceCompHelperDb.Competitions
+                .TagWith(
+                    nameof(GetConfigurationsAsync) + "[1]")
+                .ToAsyncEnumerable();
+            retCompClasses = _danceCompHelperDb.CompetitionClasses
+                .TagWith(
+                    nameof(GetConfigurationsAsync) + "[2]")
+                .ToAsyncEnumerable();
+            retCompVenues = _danceCompHelperDb.CompetitionVenues
+                .TagWith(
+                    nameof(GetConfigurationsAsync) + "[3]")
+                .ToAsyncEnumerable();
+
+            if (retComp != null)
             {
-                retComp = await GetCompetitionAsync(
-                    competitionId,
-                    cancellationToken);
-
-                retConfValues = _danceCompHelperDb.Configurations
-                    .TagWith(
-                        nameof(GetConfigurationsAsync) + "[0]")
-                    .ToAsyncEnumerable();
-                retComps = _danceCompHelperDb.Competitions
-                    .TagWith(
-                        nameof(GetConfigurationsAsync) + "[1]")
-                    .ToAsyncEnumerable();
-                retCompClasses = _danceCompHelperDb.CompetitionClasses
-                    .TagWith(
-                        nameof(GetConfigurationsAsync) + "[2]")
-                    .ToAsyncEnumerable();
-                retCompVenues = _danceCompHelperDb.CompetitionVenues
-                    .TagWith(
-                        nameof(GetConfigurationsAsync) + "[3]")
-                    .ToAsyncEnumerable();
-
-                if (retComp != null)
-                {
-                    var orgIds = new HashSet<OrganizationEnum?>()
+                var orgIds = new HashSet<OrganizationEnum?>()
                     {
                         null,
                         OrganizationEnum.Any,
                         retComp.Organization
                     };
-                    var compIds = new HashSet<Guid?>()
+                var compIds = new HashSet<Guid?>()
                     {
                         null,
                         retComp.CompetitionId,
                     };
 
-                    retConfValues = retConfValues
-                        .Where(
-                            x => orgIds.Contains(x.Organization)
-                            && compIds.Contains(x.CompetitionId));
-
-                    retComps = retComps
-                        .Where(
-                            x => x.CompetitionId == retComp.CompetitionId);
-
-                    retCompClasses = retCompClasses
-                        .Where(
-                            x => x.CompetitionId == retComp.CompetitionId);
-
-                    retCompVenues = retCompVenues
-                        .Where(
-                            x => x.CompetitionId == retComp.CompetitionId);
-                }
-
-                // sort...
                 retConfValues = retConfValues
-                    .OrderBy(
-                        x => x.Key);
+                    .Where(
+                        x => orgIds.Contains(x.Organization)
+                        && compIds.Contains(x.CompetitionId));
+
                 retComps = retComps
-                    .OrderBy(
-                        x => x.CompetitionName);
+                    .Where(
+                        x => x.CompetitionId == retComp.CompetitionId);
+
                 retCompClasses = retCompClasses
-                    .OrderBy(
-                        x => x.OrgClassId)
-                    .ThenBy(
-                        x => x.CompetitionClassName);
+                    .Where(
+                        x => x.CompetitionId == retComp.CompetitionId);
+
                 retCompVenues = retCompVenues
-                    .OrderBy(
-                        x => x.Name);
-
-                var retConfValuesTask = retConfValues.ToListAsync(cancellationToken).AsTask();
-                var retCompsTask = retComps.ToListAsync(cancellationToken).AsTask();
-                var retCompClassesTask = retCompClasses.ToListAsync(cancellationToken).AsTask();
-                var retCompVenuesTask = retCompVenues.ToListAsync(cancellationToken).AsTask();
-
-                await Task.WhenAll(
-                    retConfValuesTask,
-                    retCompsTask,
-                    retCompClassesTask,
-                    retCompVenuesTask);
-
-                return (
-                    await retConfValuesTask,
-                    retComp,
-                    await retCompsTask,
-                    await retCompClassesTask,
-                    await retCompVenuesTask);
+                    .Where(
+                        x => x.CompetitionId == retComp.CompetitionId);
             }
-            catch (Exception exc)
-            {
-                _logger.LogError(
-                    exc,
-                    "Error during {GetConfigurations}(): {Message}",
-                    nameof(RemoveParticipantAsync),
-                    exc.Message);
 
-                throw;
-            }
-            finally
-            {
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-            }
+            // sort...
+            retConfValues = retConfValues
+                .OrderBy(
+                    x => x.Key);
+            retComps = retComps
+                .OrderBy(
+                    x => x.CompetitionName);
+            retCompClasses = retCompClasses
+                .OrderBy(
+                    x => x.OrgClassId)
+                .ThenBy(
+                    x => x.CompetitionClassName);
+            retCompVenues = retCompVenues
+                .OrderBy(
+                    x => x.Name);
+
+            var retConfValuesTask = retConfValues.ToListAsync(cancellationToken).AsTask();
+            var retCompsTask = retComps.ToListAsync(cancellationToken).AsTask();
+            var retCompClassesTask = retCompClasses.ToListAsync(cancellationToken).AsTask();
+            var retCompVenuesTask = retCompVenues.ToListAsync(cancellationToken).AsTask();
+
+            await Task.WhenAll(
+                retConfValuesTask,
+                retCompsTask,
+                retCompClassesTask,
+                retCompVenuesTask);
+
+            return (
+                await retConfValuesTask,
+                retComp,
+                await retCompsTask,
+                await retCompClassesTask,
+                await retCompVenuesTask);
         }
 
         public Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
-            CancellationToken cancellationToken,
-            bool useTransaction = true)
+            CancellationToken cancellationToken)
         {
             return GetConfigurationAsync(
                 new ConfigurationValue()
                 {
                     Key = key
                 },
-                cancellationToken,
-                useTransaction);
+                cancellationToken);
         }
 
         public async Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             OrganizationEnum organization,
-            CancellationToken cancellationToken,
-            bool useTransaction = true)
+            CancellationToken cancellationToken)
         {
             return await GetConfigurationAsync(
                 new ConfigurationValue()
@@ -1872,20 +1705,17 @@ namespace DanceCompetitionHelper
                     Organization = organization,
                     Key = key,
                 },
-                cancellationToken,
-                useTransaction)
+                cancellationToken)
                 // fallback up...
                 ?? await GetConfigurationAsync(
                     key,
-                    cancellationToken,
-                    useTransaction);
+                    cancellationToken);
         }
 
         public async Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             Competition? competition,
-            CancellationToken cancellationToken,
-            bool useTransaction = true)
+            CancellationToken cancellationToken)
         {
             if (competition == null)
             {
@@ -1899,21 +1729,18 @@ namespace DanceCompetitionHelper
                     CompetitionId = competition.CompetitionId,
                     Key = key,
                 },
-                cancellationToken,
-                useTransaction)
+                cancellationToken)
                 // fallback up...
                 ?? await GetConfigurationAsync(
                     key,
                     competition.Organization,
-                    cancellationToken,
-                    useTransaction);
+                    cancellationToken);
         }
 
         public async Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             CompetitionClass? competitionClass,
-            CancellationToken cancellationToken,
-            bool useTransaction = true)
+            CancellationToken cancellationToken)
         {
             if (competitionClass == null)
             {
@@ -1930,14 +1757,12 @@ namespace DanceCompetitionHelper
                     CompetitionClassId = competitionClass.CompetitionClassId,
                     Key = key,
                 },
-                cancellationToken,
-                useTransaction)
+                cancellationToken)
                 // fallback up...
                 ?? await GetConfigurationAsync(
                     key,
                     useCompetition,
-                    cancellationToken,
-                    useTransaction);
+                    cancellationToken);
         }
 
         [Obsolete("really needed except from tests?..")]
@@ -1946,8 +1771,7 @@ namespace DanceCompetitionHelper
             string key,
             Competition? competition,
             CompetitionVenue? competitionVenue,
-            CancellationToken cancellationToken,
-            bool useTransaction = true)
+            CancellationToken cancellationToken)
         {
             if (competition == null
                 && competitionVenue == null)
@@ -1971,27 +1795,23 @@ namespace DanceCompetitionHelper
                     CompetitionVenueId = competitionVenue.CompetitionVenueId,
                     Key = key,
                 },
-                cancellationToken,
-                useTransaction)
+                cancellationToken)
                 // fallback up...
                 ?? await GetConfigurationAsync(
                     key,
                     competition,
-                    cancellationToken,
-                    useTransaction)
+                    cancellationToken)
                 ?? await GetConfigurationAsync(
                     key,
                     competitionVenue.Competition,
-                    cancellationToken,
-                    useTransaction);
+                    cancellationToken);
         }
 
         public async Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             CompetitionClass? competitionClass,
             CompetitionVenue? competitionVenue,
-            CancellationToken cancellationToken,
-            bool useTransaction = true)
+            CancellationToken cancellationToken)
         {
             if (competitionClass == null
                 && competitionVenue == null)
@@ -2016,8 +1836,7 @@ namespace DanceCompetitionHelper
                     CompetitionVenueId = competitionVenue.CompetitionVenueId,
                     Key = key,
                 },
-                cancellationToken,
-                useTransaction)
+                cancellationToken)
                 ?? await GetConfigurationAsync(
                     new ConfigurationValue()
                     {
@@ -2027,63 +1846,37 @@ namespace DanceCompetitionHelper
                         CompetitionVenueId = competitionVenue.CompetitionVenueId,
                         Key = key,
                     },
-                    cancellationToken,
-                    useTransaction)
+                    cancellationToken)
                 // fallback up...
                 ?? await GetConfigurationAsync(
                     key,
                     competitionClass,
-                    cancellationToken,
-                    useTransaction)
+                    cancellationToken)
                 ?? await GetConfigurationAsync(
                     key,
                     competitionVenue.Competition,
-                    cancellationToken,
-                    useTransaction);
+                    cancellationToken);
         }
 
         public async Task<ConfigurationValue?> GetConfigurationAsync(
             ConfigurationValue? cfgValue,
-            CancellationToken cancellationToken,
-            bool useTransaction = true)
+            CancellationToken cancellationToken)
         {
             if (cfgValue == null)
             {
                 return null;
             }
 
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken,
-                useTransaction);
-
-            try
-            {
-                return await _danceCompHelperDb.Configurations
-                    .TagWith(
-                        nameof(GetConfigurationAsync) + "(ConfigurationValue)")
-                    .FirstOrDefaultAsync(
-                        x => x.Organization == cfgValue.Organization
-                        && x.CompetitionId == cfgValue.CompetitionId
-                        && x.CompetitionClassId == cfgValue.CompetitionClassId
-                        && x.CompetitionVenueId == cfgValue.CompetitionVenueId
-                        && x.Key == cfgValue.Key,
-                        cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                _logger.LogError(
-                    exc,
-                    "Error during {GetConfiguration}({ConfigurationValue}): {Message}",
-                    nameof(RemoveParticipantAsync),
-                    nameof(ConfigurationValue),
-                    exc.Message);
-
-                return null;
-            }
-            finally
-            {
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-            }
+            return await _danceCompHelperDb.Configurations
+                .TagWith(
+                    nameof(GetConfigurationAsync) + "(ConfigurationValue)")
+                .FirstOrDefaultAsync(
+                    x => x.Organization == cfgValue.Organization
+                    && x.CompetitionId == cfgValue.CompetitionId
+                    && x.CompetitionClassId == cfgValue.CompetitionClassId
+                    && x.CompetitionVenueId == cfgValue.CompetitionVenueId
+                    && x.Key == cfgValue.Key,
+                    cancellationToken);
         }
 
         public async Task CreateConfigurationAsync(
@@ -2096,91 +1889,70 @@ namespace DanceCompetitionHelper
             string? comment,
             CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken)
-                ?? throw new ArgumentNullException(
-                    "dbTrans");
-
-            try
+            var useOrganization = organization;
+            if (useOrganization == OrganizationEnum.Any)
             {
-                var useOrganization = organization;
-                if (useOrganization == OrganizationEnum.Any)
-                {
-                    organization = null;
-                }
-
-                Competition? chkComp = null;
-                if (competitionId != null)
-                {
-                    chkComp = await GetCompetitionAsync(
-                        competitionId,
-                        cancellationToken);
-
-                    if (chkComp != null
-                        && chkComp.Organization != useOrganization)
-                    {
-                        throw new ArgumentOutOfRangeException(
-                            nameof(competitionClassId),
-                            string.Format(
-                                "{0} ({1}) does not match passed {2} ({3})",
-                                nameof(organization),
-                                organization,
-                                nameof(Competition),
-                                chkComp.Organization));
-                    }
-                }
-
-                CompetitionClass? chkCompClass = null;
-                if (competitionClassId != null)
-                {
-                    chkCompClass = await GetCompetitionClassAsync(
-                        competitionClassId.Value,
-                        cancellationToken);
-
-                    if (chkCompClass == null
-                        || chkCompClass.CompetitionId != chkComp?.CompetitionId)
-                    {
-                        throw new ArgumentOutOfRangeException(
-                            nameof(competitionClassId),
-                            string.Format(
-                                "{0} ({1}) does not match passed {2} ({3})",
-                                nameof(CompetitionClass),
-                                competitionClassId,
-                                nameof(Competition),
-                                competitionId));
-                    }
-                }
-
-                _danceCompHelperDb.Configurations
-                    .Add(
-                        new ConfigurationValue()
-                        {
-                            Organization = useOrganization,
-                            CompetitionId = competitionId,
-                            CompetitionClassId = competitionClassId,
-                            CompetitionVenueId = competitionVenueId,
-                            Key = key,
-                            Value = value,
-                            Comment = comment,
-                        });
-
-                await _danceCompHelperDb.SaveChangesAsync(
-                    cancellationToken);
-                await dbTrans.CommitAsync(
-                    cancellationToken);
+                organization = null;
             }
-            catch (Exception exc)
+
+            Competition? chkComp = null;
+            if (competitionId != null)
             {
-                _logger.LogError(
-                    exc,
-                    "Error during {AddConfiguration}(): {Message}",
-                    nameof(CreateConfigurationAsync),
-                    exc.Message);
+                chkComp = await GetCompetitionAsync(
+                    competitionId,
+                    cancellationToken);
 
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-
-                throw;
+                if (chkComp != null
+                    && chkComp.Organization != useOrganization)
+                {
+                    throw new ArgumentOutOfRangeException(
+                        nameof(competitionClassId),
+                        string.Format(
+                            "{0} ({1}) does not match passed {2} ({3})",
+                            nameof(organization),
+                            organization,
+                            nameof(Competition),
+                            chkComp.Organization));
+                }
             }
+
+            CompetitionClass? chkCompClass = null;
+            if (competitionClassId != null)
+            {
+                chkCompClass = await GetCompetitionClassAsync(
+                    competitionClassId.Value,
+                    cancellationToken);
+
+                if (chkCompClass == null
+                    || chkCompClass.CompetitionId != chkComp?.CompetitionId)
+                {
+                    throw new ArgumentOutOfRangeException(
+                        nameof(competitionClassId),
+                        string.Format(
+                            "{0} ({1}) does not match passed {2} ({3})",
+                            nameof(CompetitionClass),
+                            competitionClassId,
+                            nameof(Competition),
+                            competitionId));
+                }
+            }
+
+            _danceCompHelperDb.Configurations
+                .Add(
+                    new ConfigurationValue()
+                    {
+                        Organization = useOrganization,
+                        CompetitionId = competitionId,
+                        CompetitionClassId = competitionClassId,
+                        CompetitionVenueId = competitionVenueId,
+                        Key = key,
+                        Value = value,
+                        Comment = comment,
+                    });
+
+            // TODO: needed?..
+            await _danceCompHelperDb.SaveChangesAsync(
+                cancellationToken);
         }
 
         public async Task EditConfigurationAsync(
@@ -2193,46 +1965,26 @@ namespace DanceCompetitionHelper
             string? comment,
             CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken)
-                ?? throw new ArgumentNullException(
-                    "dbTrans");
-
-            try
-            {
-                var toEdit = await _danceCompHelperDb.Configurations
-                    .TagWith(
-                        nameof(EditConfigurationAsync))
-                    .FirstOrDefaultAsync(
-                        x => x.Organization == organization
-                            && x.CompetitionId == competitionId
-                            && x.CompetitionClassId == competitionClassId
-                            && x.CompetitionVenueId == competitionVenueId
-                            && x.Key == key,
-                        cancellationToken);
-
-                if (toEdit != null)
-                {
-                    toEdit.Value = value;
-                    toEdit.Comment = comment;
-                }
-
-                await _danceCompHelperDb.SaveChangesAsync(
+            var toEdit = await _danceCompHelperDb.Configurations
+                .TagWith(
+                    nameof(EditConfigurationAsync))
+                .FirstOrDefaultAsync(
+                    x => x.Organization == organization
+                        && x.CompetitionId == competitionId
+                        && x.CompetitionClassId == competitionClassId
+                        && x.CompetitionVenueId == competitionVenueId
+                        && x.Key == key,
                     cancellationToken);
-                await dbTrans.CommitAsync(
-                    cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                _logger.LogError(
-                    exc,
-                    "Error during {EditConfiguration}(): {Message}",
-                    nameof(EditConfigurationAsync),
-                    exc.Message);
 
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-                throw;
+            if (toEdit != null)
+            {
+                toEdit.Value = value;
+                toEdit.Comment = comment;
             }
+
+            // TODO: needed?..
+            await _danceCompHelperDb.SaveChangesAsync(
+                cancellationToken);
         }
 
         public async Task RemoveConfigurationAsync(
@@ -2243,46 +1995,25 @@ namespace DanceCompetitionHelper
             string key,
             CancellationToken cancellationToken)
         {
-            using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                cancellationToken)
-                ?? throw new ArgumentNullException(
-                    "dbTrans");
+            var toRemove = await _danceCompHelperDb.Configurations
+                    .TagWith(
+                        nameof(RemoveConfigurationAsync))
+                    .FirstOrDefaultAsync(
+                        x => x.Organization == organization
+                            && x.CompetitionId == competitionId
+                            && x.CompetitionClassId == competitionClassId
+                            && x.CompetitionVenueId == competitionVenueId
+                            && x.Key == key,
+                        cancellationToken);
 
-            try
+            if (toRemove != null)
             {
-                var toRemove = await _danceCompHelperDb.Configurations
-                        .TagWith(
-                            nameof(RemoveConfigurationAsync))
-                        .FirstOrDefaultAsync(
-                            x => x.Organization == organization
-                                && x.CompetitionId == competitionId
-                                && x.CompetitionClassId == competitionClassId
-                                && x.CompetitionVenueId == competitionVenueId
-                                && x.Key == key,
-                            cancellationToken);
-
-                if (toRemove != null)
-                {
-                    _danceCompHelperDb.Configurations.Remove(
-                        toRemove);
-                }
-
-                await _danceCompHelperDb.SaveChangesAsync(
-                    cancellationToken);
-                await dbTrans.CommitAsync(
-                    cancellationToken);
+                _danceCompHelperDb.Configurations.Remove(
+                    toRemove);
             }
-            catch (Exception exc)
-            {
-                _logger.LogError(
-                    exc,
-                    "Error during {RemoveConfiguration}(): {Message}",
-                    nameof(RemoveConfigurationAsync),
-                    exc.Message);
 
-                await (dbTrans?.RollbackAsync() ?? Task.CompletedTask);
-                throw;
-            }
+            await _danceCompHelperDb.SaveChangesAsync(
+                cancellationToken);
         }
 
         #endregion Configuration

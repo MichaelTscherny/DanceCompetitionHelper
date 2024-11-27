@@ -366,8 +366,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                         OverviewItems = await dcH
                             .GetMultipleStarterAsync(
                                 foundCompId,
-                                cToken,
-                                useTransaction: false)
+                                cToken)
                             .ToListAsync(
                                 cToken),
                     };
@@ -420,8 +419,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                        MultipleStarters = await dcH
                             .GetMultipleStarterAsync(
                                 foundCompId,
-                                cToken,
-                                useTransaction: false)
+                                cToken)
                             .ToListAsync(
                                 cToken),
                    };
@@ -462,8 +460,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             useModel.AdjudicatorPanels = await dcH
                 .GetAdjudicatorPanelsAsync(
                     foundCompId,
-                    cancellationToken,
-                    useTransaction: false)
+                    cancellationToken)
                 .ToSelectListItemAsync(
                     lastCreatedAdjudicatorPanelId)
                 .ToListAsync(

@@ -27,8 +27,7 @@ namespace DanceCompetitionHelper
 
         IAsyncEnumerable<Competition> GetCompetitionsAsync(
             CancellationToken cancellationToken,
-            bool includeInfos = false,
-            bool useTransaction = true);
+            bool includeInfos = false);
         IAsyncEnumerable<CompetitionClass> GetCompetitionClassesAsync(
             Guid? competitionId,
             CancellationToken cancellationToken,
@@ -46,14 +45,12 @@ namespace DanceCompetitionHelper
         IAsyncEnumerable<AdjudicatorPanel> GetAdjudicatorPanelsAsync(
             Guid? competitionId,
             CancellationToken cancellationToken,
-            bool includeInfos = false,
-            bool useTransaction = true);
+            bool includeInfos = false);
         IAsyncEnumerable<Adjudicator> GetAdjudicatorsAsync(
             Guid? competitionId,
             Guid? adjudicatorPanelId,
             CancellationToken cancellationToken,
-            bool includeInfos = false,
-            bool useTransaction = true);
+            bool includeInfos = false);
 
         Task<Competition?> GetCompetitionAsync(
             Guid? competitionId,
@@ -80,8 +77,7 @@ namespace DanceCompetitionHelper
             bool includeCompetition = false);
         Task<Participant?> GetParticipantAsync(
             Guid participantId,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         Task<AdjudicatorPanel?> GetAdjudicatorPanelAsync(
             Guid adjudicatorPanelId,
@@ -93,8 +89,7 @@ namespace DanceCompetitionHelper
 
         IAsyncEnumerable<MultipleStarter> GetMultipleStarterAsync(
             Guid competitionId,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         #region Competition Crud
 
@@ -240,31 +235,26 @@ namespace DanceCompetitionHelper
             IEnumerable<CompetitionVenue>? CompetitionVenues)>
             GetConfigurationsAsync(
                 Guid? competitionId,
-                CancellationToken cancellationToken,
-                bool useTransaction = true);
+                CancellationToken cancellationToken);
 
         Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             OrganizationEnum organization,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             Competition? competition,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             CompetitionClass? competitionClass,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         [Obsolete("really needed except from tests?..")]
         // TODO: really needed except from tests?..
@@ -272,20 +262,17 @@ namespace DanceCompetitionHelper
             string key,
             Competition? competition,
             CompetitionVenue? competitionVenue,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         Task<ConfigurationValue?> GetConfigurationAsync(
             string key,
             CompetitionClass? competitionClass,
             CompetitionVenue? competitionVenue,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         Task<ConfigurationValue?> GetConfigurationAsync(
             ConfigurationValue? cfgValue,
-            CancellationToken cancellationToken,
-            bool useTransaction = true);
+            CancellationToken cancellationToken);
 
         Task CreateConfigurationAsync(
             OrganizationEnum? organization,
