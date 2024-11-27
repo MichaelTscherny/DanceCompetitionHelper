@@ -1113,12 +1113,17 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 {
                     foreach (var curNewClass in allCreatedCompClasses)
                     {
-                        curNewClass.FollowUpCompetitionClass = (compClassChecker?
+                        var higherClass = (compClassChecker?
                             .GetHigherClassifications(
                                 curNewClass,
                                 allCompClasses.Values)
                                 ?? Enumerable.Empty<CompetitionClass>())
                             .FirstOrDefault();
+
+                        if (curNewClass != higherClass)
+                        {
+                            curNewClass.FollowUpCompetitionClass = higherClass;
+                        }
                     }
                 }
             }
