@@ -243,6 +243,10 @@
             public const string Group2 = "2";
             public const string Group3 = "3";
             public const string Group4 = "4";
+            // TODO: needed?..
+            public const string Group5 = "5";
+            // TODO: needed?..
+            public const string Group6 = "6";
 
             public static string? ToAgeGroup(
                 string? useString)
@@ -275,10 +279,24 @@
                         return Group3;
 
                     case Group4:
-                    case "05":
+                    case "04":
                     case "IV":
                     case "iv":
                         return Group4;
+
+                    // TODO: needed?..
+                    case Group5:
+                    case "05":
+                    case "V":
+                    case "v":
+                        return Group5;
+
+                    // TODO: needed?..
+                    case Group6:
+                    case "06":
+                    case "VI":
+                    case "vi":
+                        return Group6;
                 }
 
                 return null;
@@ -355,8 +373,8 @@
             }
 
             /// <summary>
-            /// See "5otsvto2023.pdf" (ÖTSV TURNIERORDNUNG): 
-            /// * § 9 - STARTKLASSEN, page 33
+            /// See "5otsvto2023.pdf" (ÖTSV TURNIERORDNUNG): <br/>
+            /// * § 9 - STARTKLASSEN, page 33<br/>
             /// * § 10 - STARTKLASSENÄNDERUNG, page 35
             /// </summary>
             /// <param name="forAgeClass"></param>
@@ -475,7 +493,7 @@
             }
 
             /// <summary>
-            /// See "5otsvto2023.pdf" (ÖTSV TURNIERORDNUNG): 
+            /// See "5otsvto2023.pdf" (ÖTSV TURNIERORDNUNG): <br/>
             /// * § 10 - STARTKLASSENÄNDERUNG, page 35
             /// </summary>
             /// <param name="forAgeClass"></param>
@@ -491,9 +509,10 @@
             }
 
             /// <summary>
-            /// See "5otsvto2023.pdf" (ÖTSV TURNIERORDNUNG): 
-            /// * § 9 - STARTKLASSEN, page 33
-            /// * § 10 - STARTKLASSENÄNDERUNG, page 35
+            /// See "5otsvto2023.pdf" (ÖTSV TURNIERORDNUNG): <br/>
+            /// * § 9 - STARTKLASSEN, page 33<br/>
+            /// * § 10 - STARTKLASSENÄNDERUNG, page 35<br/>
+            /// Last upadate: 04.12.2024 -> 1/2024
             /// </summary>
             /// <param name="forAgeClass"></param>
             /// <param name="forClass"></param>
@@ -632,6 +651,25 @@
                         break;
 
                     case AgeClasses.Juvenile:
+                        switch (useClasses)
+                        {
+                            case Classes.D:
+                                return 1_000;
+
+                            case Classes.C:
+                                return NoPromotionPossible;
+
+                            case Classes.B:
+                                return NoPromotionPossible;
+
+                            case Classes.A:
+                                return NoPromotionPossible;
+
+                            case Classes.S:
+                                return NoPromotionPossible;
+                        }
+                        break;
+
                     case AgeClasses.Junior:
                         switch (useClasses)
                         {

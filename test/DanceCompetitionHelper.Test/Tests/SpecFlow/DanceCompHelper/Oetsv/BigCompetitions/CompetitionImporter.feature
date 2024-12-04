@@ -14,10 +14,10 @@ Scenario: Import 01 - Competition only
         | CompetitionName | CompetitionClassName                   | FollowUpCompetitionClassName | OrgClassId | Discipline | AgeClass | AgeGroup | Class | MinPointsForPromotion | MinStartsForPromotion |
         | Gänserndorf Cup | Sch. Kombi BSP (LW, TG, CC, JI)        |                              | 001        | Ko         | Sch      | 1        | Bsp   | 999999999             | 10                    |
         | Gänserndorf Cup | Sch. Sta D                             | Sch. Sta C                   | 002        | Sta        | Sch      | 1        | D     | 1000                  | 10                    |
-        | Gänserndorf Cup | Sch. Sta C                             |                              | 003        | Sta        | Sch      | 1        | C     | 1800                  | 10                    |
+        | Gänserndorf Cup | Sch. Sta C                             |                              | 003        | Sta        | Sch      | 1        | C     | 999999999             | 10                    |
         #                                                            
         | Gänserndorf Cup | Sch. La D                              | Sch. La C                    | 005        | La         | Sch      | 1        | D     | 1000                  | 10                    |
-        | Gänserndorf Cup | Sch. La C                              |                              | 006        | La         | Sch      | 1        | C     | 1800                  | 10                    |
+        | Gänserndorf Cup | Sch. La C                              |                              | 006        | La         | Sch      | 1        | C     | 999999999             | 10                    |
         #
         | Gänserndorf Cup | Jun. I + II Kombi BSP (LW, TG, CC, JI) |                              | 008        | Ko         | Jun      | 2        | Bsp   | 999999999             | 10                    |
         | Gänserndorf Cup | Jun. I Sta D                           | Jun. I Sta C                 | 009        | Sta        | Jun      | 1        | D     | 1000                  | 10                    |
