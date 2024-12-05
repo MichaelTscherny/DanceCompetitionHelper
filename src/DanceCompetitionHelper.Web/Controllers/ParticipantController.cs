@@ -51,7 +51,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                 foundCompId,
                                 null,
                                 cancellationToken,
-                                true)
+                                true,
+                                detailedView)
                             .ToListAsync(
                                 cancellationToken),
                         DetailedView = detailedView,
