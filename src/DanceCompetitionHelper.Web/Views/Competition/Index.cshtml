@@ -3,11 +3,12 @@
 @using DanceCompetitionHelper.Extensions
 @using DanceCompetitionHelper.OrgImpl.Oetsv
 @using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Models.CompetitionModels;
 
-@model IEnumerable<Competition>
+@model CompetitionOverviewViewModel
 
 @{
-    var availableCompetitionsCount = Model?.Count();
+    var availableCompetitionsCount = Model?.OverviewItems?.Count();
 
     ViewData["Title"] = string.Format(
         "{0} Competitions",
@@ -22,19 +23,19 @@
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.CompetitionDate) (@availableCompetitionsCount)
+                        Competition Date (@availableCompetitionsCount)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Organization)
+                        Organization
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.CompetitionName)
+                        Competition Name
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.CompetitionInfo)
+                        Competition Info
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Comment)
+                        Comment
                     </th>
                     <th>
                         Competition Classes
@@ -55,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model ?? Enumerable.Empty<Competition>())
+                @foreach (var item in Model?.OverviewItems ?? Enumerable.Empty<Competition>())
                 {
                     <tr>
                         <td>
@@ -129,19 +130,19 @@
             <tfoot>
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.CompetitionDate) (@availableCompetitionsCount)
+                        Competition Date (@availableCompetitionsCount)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Organization)
+                        Organization
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.CompetitionName)
+                        Competition Name
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.CompetitionInfo)
+                        Competition Info
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Comment)
+                        Comment
                     </th>
                     <th>
                         Competition Classes

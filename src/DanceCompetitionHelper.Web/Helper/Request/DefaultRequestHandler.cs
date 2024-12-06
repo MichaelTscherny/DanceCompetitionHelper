@@ -87,7 +87,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
         #region Methods
 
         public async Task<IActionResult> DefaultIndexAsync(
-            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<IEnumerable<TEntity>>> funcIndex,
+            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<TModel?>> funcIndex,
             CancellationToken cancellationToken,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
@@ -153,7 +153,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
         }
 
         public async Task<IActionResult> DefaultShowAsync(
-            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<TEntity>> funcShow,
+            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<TModel?>> funcShow,
             CancellationToken cancellationToken,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",

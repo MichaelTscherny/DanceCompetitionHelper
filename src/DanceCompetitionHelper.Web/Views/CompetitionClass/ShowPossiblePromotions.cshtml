@@ -39,13 +39,14 @@
             curClasses);
     }
 
-    var displayInfoCompClasses = new List<(string ClassName, Guid ClassId)>(
+    var displayInfoCompClasses = new List<(string ClassName, Guid ClassId, bool Ignore)>(
         helpIncludedClasses
             .OrderBy(
                 x => x.OrgClassId)
             .Select(
                 x => (x.GetCompetitionClassName(),
-                    x.CompetitionClassId))
+                    x.CompetitionClassId,
+                    x.Ignore))
             .Distinct());
     var displayInfoCompClassesIds = new List<Guid>(
         displayInfoCompClasses.Select(
@@ -108,7 +109,16 @@
                             {
                                 displayedColumns++;
                                 <th style="width: @columnWith%">
-                                    @curClass.GetCompetitionClassName()
+                                    @{
+                                        var infoString = string.Empty;
+
+                                        if (curClass?.Ignore ?? false)
+                                        {
+                                        infoString = "[IGNORE!]";
+                                        }
+                                    }
+
+                                    @curClass.GetCompetitionClassName() @infoString
                                 </th>
                             }
                         }

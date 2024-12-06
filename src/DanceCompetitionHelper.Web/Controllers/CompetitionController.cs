@@ -52,7 +52,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 _danceCompHelper,
                 CancellationToken.None);
 
-            return await GetDefaultRequestHandler<Competition, CompetitionViewModel>()
+            return await GetDefaultRequestHandler<Competition, CompetitionOverviewViewModel>()
                 .SetOnSuccess(
                     nameof(Index))
                 .SetOnNoData(
@@ -60,12 +60,15 @@ namespace DanceCompetitionHelper.Web.Controllers
                 .DefaultIndexAsync(
                     async (dcH, _, cToken) =>
                     {
-                        return await dcH
-                            .GetCompetitionsAsync(
-                                cToken,
-                                true)
-                            .ToListAsync(
-                                cToken);
+                        return new CompetitionOverviewViewModel()
+                        {
+                            OverviewItems = await dcH
+                                .GetCompetitionsAsync(
+                                    cToken,
+                                    true)
+                                .ToListAsync(
+                                    cToken)
+                        };
                     },
                     cancellationToken);
         }
@@ -133,9 +136,9 @@ namespace DanceCompetitionHelper.Web.Controllers
                 .SetOnNoData(
                     nameof(Index))
                 .DefaultShowAsync(
-                    async (dcH, _, cToken) =>
+                    async (dcH, mapper, cToken) =>
                     {
-                        return await dcH.GetCompetitionAsync(
+                        var foundComp = await dcH.GetCompetitionAsync(
                             id,
                             cToken)
                             ?? throw new NoDataFoundException(
@@ -143,6 +146,9 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     "{0} with id '{1}' not found!",
                                     nameof(Competition),
                                     id));
+
+                        return mapper.Map<CompetitionViewModel>(
+                            foundComp);
                     },
                     cancellationToken);
         }
