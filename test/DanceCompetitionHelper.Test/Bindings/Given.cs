@@ -88,7 +88,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following Competitions in ""([^""]*)""")]
         public async Task GivenFollowingCompetitionsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var newComps = table.CreateSet<CompetitionPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -137,7 +137,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following Adjudicator Panels in ""([^""]*)""")]
         public async Task GivenFollowingAdjudicatorPanelsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var newAdjPanels = table.CreateSet<AdjudicatorPanelPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -189,7 +189,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following Adjudicators in ""([^""]*)""")]
         public async Task GivenFollowingAdjudicatorsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var newAdjs = table.CreateSet<AdjudicatorPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -253,7 +253,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following Competition Classes in ""([^""]*)""")]
         public async Task GivenFollowingCompetitionClassesIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             // CAUTION: special stuff... otherwise the creation will fail...
             var newCompClasses = SortForCreation(
@@ -346,7 +346,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following Competition Classes History in ""([^""]*)""")]
         public async Task GivenFollowingCompetitionClassesHistoryIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var newCompClassesHistory = table.CreateSet<CompetitionClassHistoryPoco>();
 
@@ -410,7 +410,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following Competition Venues in ""([^""]*)""")]
         public async Task GivenFollowingCompetitionVenuesIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var newCompVenues = table.CreateSet<CompetitionVenuePoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -462,7 +462,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following Participants in ""([^""]*)""")]
         public async Task GivenFollowingParticipantsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var newParticipants = table.CreateSet<ParticipantPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -533,7 +533,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following Participants History in ""([^""]*)""")]
         public async Task GivenFollowingParticipantsHistoryIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var newParticipantsHistory = table.CreateSet<ParticipantHistoryPoco>();
 
@@ -605,7 +605,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following Configuration Values in ""([^""]*)""")]
         public async Task GivenFollowingConfigurationExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             // CAUTION: special stuff... otherwise the creation will fail...
             var newConfigValues = table
@@ -753,7 +753,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Given(@"following data are imported by DanceCompetitionHelper ""([^""]*)""")]
         public async Task GivenFollowingDataAreImportedByDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var compsToImport = table.CreateSet<CompetitionImportPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(

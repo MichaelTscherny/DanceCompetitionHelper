@@ -22,7 +22,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Competitions exists in ""([^""]*)""")]
         public async Task ThenFollowingCompetitionsExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkComps = table.CreateSet<CompetitionPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -93,7 +93,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Competition Classes exists in ""([^""]*)""")]
         public async Task ThenFollowingCompetitionClassesExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkCompClasses = table.CreateSet<CompetitionClassPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -239,7 +239,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Adjudicator Panels exists in ""([^""]*)""")]
         public async Task ThenFollowingAdjudicatorPanelsExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkAdjPanels = table.CreateSet<AdjudicatorPanelPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -315,7 +315,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Adjudicators exists in ""([^""]*)""")]
         public async Task ThenFollowingAdjudicatorsExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkAdjs = table.CreateSet<AdjudicatorPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -410,7 +410,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Competition Classes Histroy exists in ""([^""]*)""")]
         public async Task ThenFollowingCompetitionClassesHistoryExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkCompClassesHist = table.CreateSet<CompetitionClassHistoryPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -521,7 +521,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Competition Venues exists in ""([^""]*)""")]
         public async Task ThenFollowingCompetitionVenuesExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkCompVanes = table.CreateSet<CompetitionVenuePoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -597,7 +597,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Participants exists in ""([^""]*)""")]
         public async Task ThenFollowingPartitipantsExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkParticipants = table.CreateSet<ParticipantPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -748,7 +748,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Participants History exists in ""([^""]*)""")]
         public async Task ThenFollowingPartitipantsHistoryExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkParticipantsHist = table.CreateSet<ParticipantHistoryPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
@@ -897,7 +897,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Competitions exists in DanceCompetitionHelper ""([^""]*)""")]
         public Task ThenFollowingCompetitionExistsInDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkComps = table.CreateSet<CompetitionPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -981,7 +981,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Classes exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
         public Task ThenFollowingClassesExistsInCompetitionsOfDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkCompClass = table.CreateSet<CompetitionClassPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -1186,7 +1186,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Competition Venues exists in DanceCompetitionHelper ""([^""]*)""")]
         public Task ThenFollowingCompetitionVenuesExistsInDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var chkCompVenues = table.CreateSet<CompetitionVenuePoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -1247,7 +1247,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Counts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
         public Task ThenFollowingCountsExistsInDanceCompetitionsOfCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkCounts = table.CreateSet<DanceCompHelperCountsPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -1296,7 +1296,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following multiple starts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
         public Task ThenFollowingMultipleStartsExistsInCompetitionsDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var multiStartParticipants = table.CreateSet<ParticipantPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -1377,7 +1377,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"none multiple starts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
         public Task ThenNoneMultipleStartsExistsInCompetitionDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var multiStartParticipants = table.CreateSet<ParticipantPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -1419,7 +1419,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Participants exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
         public Task ThenFollowingParticipantsExistsInCompetitionOfDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkParticipants = table.CreateSet<ParticipantPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -1540,7 +1540,7 @@ namespace DanceCompetitionHelper.Test.Bindings
         [Then(@"following Configuration Values exists in DanceCompetitionHelper ""([^""]*)""")]
         public Task ThenFollowingConfigurationValuesExistsInDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkCfgValues = table.CreateSet<ConfigurationValuePoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(

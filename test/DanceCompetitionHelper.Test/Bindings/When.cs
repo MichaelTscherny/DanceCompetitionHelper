@@ -1,6 +1,4 @@
-﻿using TechTalk.SpecFlow;
-
-namespace DanceCompetitionHelper.Test.Bindings
+﻿namespace DanceCompetitionHelper.Test.Bindings
 {
     [Binding]
     public sealed class When : BindingBase
