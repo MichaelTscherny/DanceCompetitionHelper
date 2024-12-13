@@ -2,6 +2,7 @@
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
+using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,10 +35,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 .SetOnNoData(
                     nameof(Index))
                 .DefaultIndexAsync(
-                    async (dcH, _, cToken) =>
+                    id,
+                    async (indexId, dcH, _, _viewData, cToken) =>
                     {
                         var foundComp = await dcH.FindCompetitionAsync(
-                            id,
+                            indexId,
                             cToken);
 
                         if (foundComp == null)
@@ -46,7 +48,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                         }
 
                         var foundCompId = foundComp.CompetitionId;
-                        ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
                         return new CompetitionClassOverviewViewModel()
                         {
@@ -72,11 +74,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .SetOnNoData(
                     nameof(Index))
-                .DefaultIndexAsync(
-                    async (dcH, _, cToken) =>
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, _, _viewData, cToken) =>
                     {
                         var foundComp = await dcH.FindCompetitionAsync(
-                            id,
+                            showId,
                             cToken);
 
                         if (foundComp == null)
@@ -86,6 +89,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
                         var foundCompId = foundComp.CompetitionId;
                         ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
                         return new CompetitionClassOverviewViewModel()
                         {
@@ -114,10 +118,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                 .SetOnNoData(
                     nameof(Index))
                 .DefaultShowAsync(
-                    async (dcH, mapper, cToken) =>
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
                     {
                         var foundComp = await dcH.FindCompetitionAsync(
-                            id,
+                            showId,
                             cToken);
 
                         if (foundComp == null)
@@ -127,6 +132,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
                         var foundCompId = foundComp.CompetitionId;
                         ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
                         _ = Guid.TryParse(
                             HttpContext.Session.GetString(
@@ -143,43 +149,6 @@ namespace DanceCompetitionHelper.Web.Controllers
                             cToken);
                     },
                     cancellationToken);
-
-            /*
-            return DefaultIndexAndShow(
-                async (dcH, mapper, cToken) =>
-                {
-                    var foundComp = await dcH.FindCompetitionAsync(
-                        id,
-                        cToken);
-
-                    if (foundComp == null)
-                    {
-                        return null;
-                    }
-
-                    var foundCompId = foundComp.CompetitionId;
-                    ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
-                    _ = Guid.TryParse(
-                        HttpContext.Session.GetString(
-                            CompetitionClassLastCreatedAdjudicatorPanelId),
-                        out var lastCreatedAdjudicatorPanelId);
-
-                    return await FillCompetitionClassViewModel(
-                        dcH,
-                        foundComp,
-                        new CompetitionClassViewModel()
-                        {
-                            CompetitionId = foundCompId,
-                        },
-                        cToken);
-                },
-                // --
-                nameof(ShowCreateEdit),
-                nameof(Index),
-                // --
-                cancellationToken);
-            */
         }
 
         [HttpPost]
@@ -188,94 +157,86 @@ namespace DanceCompetitionHelper.Web.Controllers
             CompetitionClassViewModel createCompetitionClass,
             CancellationToken cancellationToken)
         {
-            return DefaultCreateNew(
-                createCompetitionClass,
-                _mapper.Map<CompetitionClass>(
-                    createCompetitionClass),
-                // --
-                async (dcH, cToken) =>
-                {
-                    await DefaultGetCompetitionAndSetViewData(
-                        dcH,
-                        createCompetitionClass.CompetitionId,
-                        cToken);
-
-                    await FillCompetitionClassViewModel(
-                        dcH,
-                        createCompetitionClass.CompetitionId,
-                        createCompetitionClass,
-                        cToken);
-                },
-                nameof(ShowCreateEdit),
-                // --
-                async (dcH, newEntity, mapper, cToken) =>
-                {
-                    await dcH.CreateCompetitionClassAsync(
-                        newEntity,
-                        cToken);
-
-                    HttpContext.Session.SetString(
-                        CompetitionClassLastCreatedAdjudicatorPanelId,
-                        newEntity.AdjudicatorPanelId.ToString());
-
-                    return new
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _, cToken) =>
                     {
-                        Id = newEntity.CompetitionId,
-                    };
-                },
-                // -- on success
-                nameof(Index),
-                // -- on error
-                async (dcH, model, cToken) =>
-                {
-                    await DefaultGetCompetitionAndSetViewData(
-                        dcH,
-                        model.CompetitionId,
-                        cToken);
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            cToken);
 
-                    await FillCompetitionClassViewModel(
-                        dcH,
-                        model.CompetitionId,
-                        model,
-                        cToken);
-                },
-                nameof(ShowCreateEdit),
-                // --
-                cancellationToken);
+                        await FillCompetitionClassViewModel(
+                            dcH,
+                            model.CompetitionId,
+                            model,
+                            cToken);
+
+                        return null;
+                    })
+                .DefaultCreateNewAsync(
+                    createCompetitionClass,
+                    _mapper.Map<CompetitionClass>(
+                        createCompetitionClass),
+                    async (dcH, newEntity, _, _, cToken) =>
+                    {
+                        await dcH.CreateCompetitionClassAsync(
+                            newEntity,
+                            cToken);
+
+                        HttpContext.Session.SetString(
+                            CompetitionClassLastCreatedAdjudicatorPanelId,
+                            newEntity.AdjudicatorPanelId.ToString());
+
+                        return new
+                        {
+                            Id = newEntity.CompetitionId,
+                        };
+                    },
+                    cancellationToken);
         }
 
         public Task<IActionResult> ShowEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return DefaultIndexAndShow(
-                async (dcH, mapper, cToken) =>
-                {
-                    var foundCompClass = await dcH.GetCompetitionClassAsync(
-                        id,
-                        cToken);
-
-                    if (foundCompClass == null)
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowCreateEdit))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
                     {
-                        return null;
-                    }
+                        var foundCompClass = await dcH.GetCompetitionClassAsync(
+                            showId,
+                            cToken);
 
-                    ViewData["Use" + nameof(CompetitionClass)] = foundCompClass.CompetitionId;
+                        if (foundCompClass == null)
+                        {
+                            return null;
+                        }
 
-                    var ccVm = mapper.Map<CompetitionClassViewModel>(
-                        foundCompClass);
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompClass.CompetitionId;
 
-                    return await FillCompetitionClassViewModel(
-                        dcH,
-                        foundCompClass.CompetitionId,
-                        ccVm,
-                        cToken);
-                },
-                // --
-                nameof(ShowCreateEdit),
-                nameof(Index),
-                // --
-                cancellationToken);
+                        var ccVm = mapper.Map<CompetitionClassViewModel>(
+                            foundCompClass);
+
+                        return await FillCompetitionClassViewModel(
+                            dcH,
+                            foundCompClass.CompetitionId,
+                            ccVm,
+                            cToken);
+                    },
+                    cancellationToken);
         }
 
         [HttpPost]
@@ -284,197 +245,192 @@ namespace DanceCompetitionHelper.Web.Controllers
             CompetitionClassViewModel editCompetitionClass,
             CancellationToken cancellationToken)
         {
-            return DefaultEdit(
-                editCompetitionClass,
-                // --
-                async (dcH, cToken) =>
-                {
-                    await DefaultGetCompetitionAndSetViewData(
-                        dcH,
-                        editCompetitionClass.CompetitionId,
-                        cToken);
-
-                    await FillCompetitionClassViewModel(
-                        dcH,
-                        editCompetitionClass.CompetitionId,
-                        editCompetitionClass,
-                        cToken);
-                },
-                nameof(ShowCreateEdit),
-                // -- 
-                async (dcH, mapper, cToken) =>
-                {
-                    var foundCompClass = await dcH.GetCompetitionClassAsync(
-                        editCompetitionClass.CompetitionClassId ?? Guid.Empty,
-                        cToken)
-                        ?? throw new NoDataFoundException(
-                            string.Format(
-                                "{0} with id '{1}' not found!",
-                                nameof(CompetitionClass),
-                                editCompetitionClass.CompetitionClassId));
-
-                    // override the values...
-                    mapper.Map(
-                        editCompetitionClass,
-                        foundCompClass);
-
-                    // mitigate loops...
-                    if (foundCompClass.FollowUpCompetitionClassId == foundCompClass.CompetitionClassId)
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnError | SetOnEnum.OnModelStateInvalid,
+                    async (model, dcH, _, _, cToken) =>
                     {
-                        foundCompClass.FollowUpCompetitionClassId = null;
-                    }
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            cToken);
 
-                    return new
+                        await FillCompetitionClassViewModel(
+                            dcH,
+                            model.CompetitionId,
+                            model,
+                            cToken);
+
+                        return null;
+                    })
+                .DefaultEditSaveAsync(
+                    editCompetitionClass,
+                    async (model, dcH, mapper, _, cToken) =>
                     {
-                        Id = editCompetitionClass.CompetitionId
-                    };
-                },
-                // -- on success
-                nameof(Index),
-                // -- on no data
-                nameof(Index),
-                // -- on error
-                async (dcH, model, cToken) =>
-                {
-                    var foundComp = await DefaultGetCompetitionAndSetViewData(
-                        dcH,
-                        model.CompetitionId,
-                        cToken);
+                        var foundCompClass = await dcH.GetCompetitionClassAsync(
+                            model.CompetitionClassId ?? Guid.Empty,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(CompetitionClass),
+                                    model.CompetitionClassId));
 
-                    await FillCompetitionClassViewModel(
-                        dcH,
-                        foundComp,
-                        model,
-                        cToken);
-                },
-                nameof(ShowCreateEdit),
-                // --
-                cancellationToken);
+                        // override the values...
+                        mapper.Map(
+                            model,
+                            foundCompClass);
+
+                        // mitigate loops...
+                        if (foundCompClass.FollowUpCompetitionClassId == foundCompClass.CompetitionClassId)
+                        {
+                            foundCompClass.FollowUpCompetitionClassId = null;
+                        }
+
+                        return new
+                        {
+                            Id = model.CompetitionId
+                        };
+                    },
+                    cancellationToken);
         }
 
         public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return DefaultDelete(
-                id,
-                // --
-                async (dcH, delId, cToken) =>
-                {
-                    var foundCompClass = await dcH.GetCompetitionClassAsync(
-                        id,
-                        cToken)
-                        ?? throw new NoDataFoundException(
-                            string.Format(
-                                "{0} with id '{1}' not found!",
-                                nameof(CompetitionClass),
-                                delId));
-
-                    await dcH.RemoveCompetitionClassAsync(
-                        foundCompClass,
-                        cToken);
-
-                    return new
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(Index))
+                .DefaultDeleteAsync(
+                    id,
+                    async (delId, dcH, _, _, cToken) =>
                     {
-                        Id = foundCompClass.CompetitionId,
-                    };
-                },
-                // --
-                nameof(Index),
-                nameof(Index),
-                nameof(Index),
-                // --
-                cancellationToken);
+                        var foundCompClass = await dcH.GetCompetitionClassAsync(
+                            delId,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(CompetitionClass),
+                                    delId));
+
+                        await dcH.RemoveCompetitionClassAsync(
+                            foundCompClass,
+                            cToken);
+
+                        return new
+                        {
+                            Id = foundCompClass.CompetitionId,
+                        };
+                    },
+                    cancellationToken);
         }
 
         public Task<IActionResult> ShowMultipleStarters(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return DefaultIndexAndShow(
-                async (dcH, mapper, cToken) =>
-                {
-                    var foundComp = await dcH.FindCompetitionAsync(
-                        id,
-                        cToken);
-
-                    if (foundComp == null)
+            return GetDefaultRequestHandler<CompetitionClass, ShowMultipleStartersOverviewViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowMultipleStarters))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
                     {
-                        return null;
-                    }
+                        var foundComp = await dcH.FindCompetitionAsync(
+                            showId,
+                            cToken);
 
-                    var foundCompId = foundComp.CompetitionId;
-                    ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
 
-                    return new ShowMultipleStartersOverviewViewModel()
-                    {
-                        Competition = foundComp,
-                        OverviewItems = await dcH
-                            .GetMultipleStarterAsync(
-                                foundCompId,
-                                cToken)
-                            .ToListAsync(
-                                cToken),
-                    };
-                },
-                // --
-                nameof(ShowMultipleStarters),
-                nameof(Index),
-                // --
-                cancellationToken);
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
+
+                        return new ShowMultipleStartersOverviewViewModel()
+                        {
+                            Competition = foundComp,
+                            OverviewItems = await dcH
+                                .GetMultipleStarterAsync(
+                                    foundCompId,
+                                    cToken)
+                                .ToListAsync(
+                                    cToken),
+                        };
+                    },
+                    cancellationToken);
         }
 
         public Task<IActionResult> ShowPossiblePromotions(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return DefaultIndexAndShow(
-               async (dcH, mapper, cToken) =>
-               {
-                   var foundComp = await dcH.FindCompetitionAsync(
-                       id,
-                       cancellationToken);
+            return GetDefaultRequestHandler<CompetitionClass, ShowPossiblePromotionsViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowPossiblePromotions))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    {
+                        var foundComp = await dcH.FindCompetitionAsync(
+                            showId,
+                            cancellationToken);
 
-                   if (foundComp == null)
-                   {
-                       return null;
-                   }
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
 
-                   var foundCompId = foundComp.CompetitionId;
-                   ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
-                   return new ShowPossiblePromotionsViewModel()
-                   {
-                       Competition = foundComp,
-                       OverviewItems = await dcH
-                            .GetParticipantsAsync(
-                                foundCompId,
-                                null,
-                                cToken,
-                                true)
-                            .Where(
-                                x => x.DisplayInfo != null
-                                && x.DisplayInfo.PromotionInfo != null
-                                && x.DisplayInfo.PromotionInfo.PossiblePromotion)
-                            .OrderBy(
-                                x => x.NamePartA)
-                            .ThenBy(
-                                x => x.NamePartB)
-                            .ToListAsync(
-                                cToken),
-                       MultipleStarters = await dcH
-                            .GetMultipleStarterAsync(
-                                foundCompId,
-                                cToken)
-                            .ToListAsync(
-                                cToken),
-                   };
-               },
-               // --
-               nameof(ShowPossiblePromotions),
-               nameof(Index),
-               // --
-               cancellationToken);
+                        return new ShowPossiblePromotionsViewModel()
+                        {
+                            Competition = foundComp,
+                            OverviewItems = await dcH
+                                 .GetParticipantsAsync(
+                                     foundCompId,
+                                     null,
+                                     cToken,
+                                     true)
+                                 .Where(
+                                     x => x.DisplayInfo != null
+                                     && x.DisplayInfo.PromotionInfo != null
+                                     && x.DisplayInfo.PromotionInfo.PossiblePromotion)
+                                 .OrderBy(
+                                     x => x.NamePartA)
+                                 .ThenBy(
+                                     x => x.NamePartB)
+                                 .ToListAsync(
+                                     cToken),
+                            MultipleStarters = await dcH
+                                 .GetMultipleStarterAsync(
+                                     foundCompId,
+                                     cToken)
+                                 .ToListAsync(
+                                     cToken),
+                        };
+                    },
+                    cancellationToken);
         }
 
         #region Helper

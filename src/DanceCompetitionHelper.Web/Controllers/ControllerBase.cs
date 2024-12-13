@@ -53,7 +53,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
 
 
-
+        [Obsolete("use GetDefaultRequestHandler()")]
         public async Task<IActionResult> DefaultIndexAndShow<TModel>(
             Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<TModel>> funcIndex,
             string viewNameSuccess,
@@ -100,6 +100,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     $"Read for {viewNameSuccess} failed!");
         }
 
+        [Obsolete("use GetDefaultRequestHandler()")]
         public async Task<IActionResult> DefaultCreateNew<TModel, TEntity>(
             TModel movelView,
             TEntity newEntity,
@@ -166,6 +167,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     "Creation failed");
         }
 
+        [Obsolete("use GetDefaultRequestHandler()")]
         public async Task<IActionResult> DefaultEdit<TModel>(
             TModel movelView,
             Func<IDanceCompetitionHelper, CancellationToken, Task>? funcOnModelStateInvalid,
@@ -233,6 +235,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     "Edit failed");
         }
 
+        [Obsolete("use GetDefaultRequestHandler()")]
         public async Task<IActionResult> DefaultDelete<TDeleteId>(
             TDeleteId deleteId,
             Func<IDanceCompetitionHelper, TDeleteId, CancellationToken, Task<object?>> funcDelete,

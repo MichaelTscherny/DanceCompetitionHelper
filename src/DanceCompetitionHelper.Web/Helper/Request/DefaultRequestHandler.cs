@@ -3,6 +3,7 @@ using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -17,13 +18,13 @@ namespace DanceCompetitionHelper.Web.Helper.Request
         protected readonly IMapper _mapper;
 
         public string? ViewOnSuccess { get; private set; }
-        public Func<TModel, IDanceCompetitionHelper, IMapper, CancellationToken, Task<object?>>? FuncOnSuccess { get; private set; }
+        public Func<TModel, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>>? FuncOnSuccess { get; private set; }
 
         public string? ViewOnError { get; private set; }
-        public Func<TModel, IDanceCompetitionHelper, IMapper, CancellationToken, Task<object?>>? FuncOnError { get; private set; }
+        public Func<TModel, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>>? FuncOnError { get; private set; }
 
         public string? ViewOnModelStateInvalid { get; private set; }
-        public Func<TModel, IDanceCompetitionHelper, IMapper, CancellationToken, Task<object?>>? FuncOnModelStateInvalid { get; private set; }
+        public Func<TModel, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>>? FuncOnModelStateInvalid { get; private set; }
 
         public string? ViewOnNoData { get; private set; }
         public object? RouteValuesOnNoData { get; private set; }
@@ -46,7 +47,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
 
         public DefaultRequestHandler<TLogger, TEntity, TModel> SetOnSuccess(
             string viewOnSuccess,
-            Func<TModel, IDanceCompetitionHelper, IMapper, CancellationToken, Task<object?>>? funcOnSuccess = null)
+            Func<TModel, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>>? funcOnSuccess = null)
         {
             ViewOnSuccess = viewOnSuccess;
             FuncOnSuccess = funcOnSuccess;
@@ -56,7 +57,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
 
         public DefaultRequestHandler<TLogger, TEntity, TModel> SetOnError(
             string viewOnError,
-            Func<TModel, IDanceCompetitionHelper, IMapper, CancellationToken, Task<object?>>? funcOnError = null)
+            Func<TModel, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>>? funcOnError = null)
         {
             ViewOnError = viewOnError;
             FuncOnError = funcOnError;
@@ -66,7 +67,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
 
         public DefaultRequestHandler<TLogger, TEntity, TModel> SetOnModelStateInvalid(
             string viewOnModelStateInvalid,
-            Func<TModel, IDanceCompetitionHelper, IMapper, CancellationToken, Task<object?>>? funcOnModelStateInvalid = null)
+            Func<TModel, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>>? funcOnModelStateInvalid = null)
         {
             ViewOnModelStateInvalid = viewOnModelStateInvalid;
             FuncOnModelStateInvalid = funcOnModelStateInvalid;
@@ -84,10 +85,35 @@ namespace DanceCompetitionHelper.Web.Helper.Request
             return this;
         }
 
+        public DefaultRequestHandler<TLogger, TEntity, TModel> SetOnFunc(
+            SetOnEnum setOn,
+            Func<TModel, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>>? funcOn)
+        {
+            if (setOn.HasFlag(SetOnEnum.OnSuccess))
+            {
+                FuncOnSuccess = funcOn;
+            }
+
+            if (setOn.HasFlag(SetOnEnum.OnError))
+            {
+                FuncOnError = funcOn;
+            }
+
+            if (setOn.HasFlag(SetOnEnum.OnModelStateInvalid))
+            {
+                FuncOnModelStateInvalid = funcOn;
+            }
+
+
+            return this;
+        }
+
+
         #region Methods
 
-        public async Task<IActionResult> DefaultIndexAsync(
-            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<TModel?>> funcIndex,
+        public async Task<IActionResult> DefaultIndexAsync<TShowId>(
+            TShowId indexId,
+            Func<TShowId, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<TModel?>> funcIndex,
             CancellationToken cancellationToken,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
@@ -119,8 +145,10 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     try
                     {
                         var foundData = await funcIndex(
+                            indexId,
                             dcH,
                             _mapper,
+                            ViewData,
                             cToken);
 
                         if (foundData == null)
@@ -152,8 +180,9 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     $"Read for '{ViewOnSuccess}' failed!");
         }
 
-        public async Task<IActionResult> DefaultShowAsync(
-            Func<IDanceCompetitionHelper, IMapper, CancellationToken, Task<TModel?>> funcShow,
+        public async Task<IActionResult> DefaultShowAsync<TShowId>(
+            TShowId showId,
+            Func<TShowId, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<TModel?>> funcShow,
             CancellationToken cancellationToken,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
@@ -185,8 +214,10 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     try
                     {
                         var foundData = await funcShow(
+                            showId,
                             dcH,
                             _mapper,
+                            ViewData,
                             cToken);
 
                         if (foundData == null)
@@ -226,7 +257,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
             Func<IDanceCompetitionHelper, CancellationToken, Task>? funcOnModelStateInvalid,
             string viewNameModelStateInvalid,
             */
-            Func<IDanceCompetitionHelper, TEntity, IMapper, CancellationToken, Task<object?>> funcCreateNew,
+            Func<IDanceCompetitionHelper, TEntity, IMapper, ViewDataDictionary, CancellationToken, Task<object?>> funcCreateNew,
             /*
             string viewNameSuccess,
             Func<IDanceCompetitionHelper, TModel, CancellationToken, Task>? funcOnError,
@@ -257,14 +288,11 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     nameof(ViewOnModelStateInvalid));
             }
 
-            /*
-            if (FuncOnModelStateInvalid == null)
+            if (funcCreateNew == null)
             {
                 throw new ArgumentNullException(
-                    nameof(FuncOnModelStateInvalid));
+                    nameof(funcCreateNew));
             }
-            */
-
 
             if (ModelState.IsValid == false)
             {
@@ -277,6 +305,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                         modelView,
                         _danceCompHelper,
                         _mapper,
+                        ViewData,
                         cancellationToken);
                 }
 
@@ -290,6 +319,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     dcH,
                     newEntity,
                     _mapper,
+                    ViewData,
                     cToken),
                 (routeObjects, cToken) => Task.FromResult<IActionResult>(
                     RedirectToAction(
@@ -303,10 +333,11 @@ namespace DanceCompetitionHelper.Web.Helper.Request
 
                     if (FuncOnError != null)
                     {
-                        var routeObjectsError = await FuncOnError.Invoke(
+                        var routeObjectsError = await FuncOnError(
                             modelView,
                             _danceCompHelper,
                             _mapper,
+                            ViewData,
                             cToken);
                     }
 
@@ -321,6 +352,139 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                 ?? Error(
                     "Creation failed");
         }
+
+        public async Task<IActionResult> DefaultEditSaveAsync(
+            TModel modelView,
+            Func<TModel, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>> funcEdit,
+            CancellationToken cancellationToken,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (string.IsNullOrEmpty(
+                ViewOnSuccess))
+            {
+                throw new ArgumentNullException(
+                    nameof(ViewOnSuccess));
+            }
+
+            if (string.IsNullOrEmpty(
+                ViewOnError))
+            {
+                throw new ArgumentNullException(
+                    nameof(ViewOnError));
+            }
+
+            if (string.IsNullOrEmpty(
+                ViewOnModelStateInvalid))
+            {
+                throw new ArgumentNullException(
+                    nameof(ViewOnModelStateInvalid));
+            }
+
+            if (funcEdit == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(funcEdit));
+            }
+
+            if (ModelState.IsValid == false)
+            {
+                modelView.AddErrors(
+                    ModelState);
+
+                if (FuncOnModelStateInvalid != null)
+                {
+                    await FuncOnModelStateInvalid(
+                        modelView,
+                        _danceCompHelper,
+                        _mapper,
+                        ViewData,
+                        cancellationToken);
+                }
+
+                return View(
+                    ViewOnModelStateInvalid,
+                    modelView);
+            }
+
+            return (await _danceCompHelper.RunInTransactionWithSaveChangesAndCommit<IActionResult>(
+                (dcH, dbCtx, dbTrans, cToken) => funcEdit(
+                    modelView,
+                    dcH,
+                    _mapper,
+                    ViewData,
+                    cToken),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        ViewOnSuccess,
+                        routeObjects)),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        ViewOnNoData,
+                        routeObjects)),
+                async (exc, routeObjects, cToken) =>
+                {
+                    modelView.AddErrors(
+                        exc);
+
+                    if (FuncOnError != null)
+                    {
+                        await FuncOnError(
+                            modelView,
+                            _danceCompHelper,
+                            _mapper,
+                            ViewData,
+                            cToken);
+                    }
+
+                    return View(
+                        ViewOnError,
+                        modelView);
+                },
+                cancellationToken))
+                ?? Error(
+                    "Edit failed");
+        }
+
+        public async Task<IActionResult> DefaultDeleteAsync<TDeleteId>(
+            TDeleteId id,
+            Func<TDeleteId, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>> funcDelete,
+            CancellationToken cancellationToken,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (funcDelete == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(funcDelete));
+            }
+
+            return (await _danceCompHelper.RunInTransactionWithSaveChangesAndCommit<IActionResult>(
+                (dcH, _, _, cToken) => funcDelete(
+                    id,
+                    dcH,
+                    _mapper,
+                    ViewData,
+                    cToken),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        ViewOnSuccess,
+                        routeObjects)),
+                (routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        ViewOnNoData,
+                        routeObjects)),
+                (exc, routeObjects, cToken) => Task.FromResult<IActionResult>(
+                    RedirectToAction(
+                        ViewOnError,
+                        routeObjects)),
+                cancellationToken))
+                ?? Error(
+                    "Delete failed");
+        }
+
 
         #endregion Methods
 
