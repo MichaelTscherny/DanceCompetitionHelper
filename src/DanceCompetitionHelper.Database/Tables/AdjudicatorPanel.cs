@@ -1,4 +1,6 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
+using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,7 +11,7 @@ namespace DanceCompetitionHelper.Database.Tables
     [Index(nameof(AdjudicatorPanelId), nameof(CompetitionId), IsUnique = true)]
     [Index(nameof(Name), nameof(CompetitionId), IsUnique = true)]
     [PrimaryKey(nameof(AdjudicatorPanelId))]
-    public class AdjudicatorPanel : TableBase
+    public class AdjudicatorPanel : TableBase, IDefaultTrim
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -32,6 +34,11 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [NotMapped]
         public AdjudicatorPanelDisplayInfos? DisplayInfo { get; set; }
+
+        public void DefaultTrim()
+        {
+            Name = Name.DefaultTrim();
+        }
 
         public override string ToString()
         {

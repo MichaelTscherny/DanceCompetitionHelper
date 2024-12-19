@@ -1,4 +1,6 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
+using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,7 +12,7 @@ namespace DanceCompetitionHelper.Database.Tables
     [Index(nameof(CompetitionId), nameof(CompetitionClassName), IsUnique = true)]
     [Index(nameof(AdjudicatorPanelId), IsUnique = false)]
     [PrimaryKey(nameof(CompetitionClassId))]
-    public class CompetitionClass : TableBase
+    public class CompetitionClass : TableBase, IDefaultTrim
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -83,6 +85,16 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [NotMapped]
         public CompetitionClassDisplayInfo? DisplayInfo { get; set; }
+
+        public void DefaultTrim()
+        {
+            CompetitionClassName = CompetitionClassName.DefaultTrim();
+            OrgClassId = OrgClassId.DefaultTrim();
+            AgeClass = AgeClass.DefaultNullableTrim();
+            AgeGroup = AgeGroup.DefaultNullableTrim();
+            Discipline = Discipline.DefaultNullableTrim();
+            Class = Class.DefaultNullableTrim();
+        }
 
         public override string ToString()
         {

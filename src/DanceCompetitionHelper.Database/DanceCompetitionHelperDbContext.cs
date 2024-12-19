@@ -1,4 +1,5 @@
 ﻿using DanceCompetitionHelper.Database.Config;
+using DanceCompetitionHelper.Database.Interfaces;
 using DanceCompetitionHelper.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -140,6 +141,8 @@ namespace DanceCompetitionHelper.Database
                 UpdateTimestamps(
                     curEntity,
                     useDateTime);
+                DoDefaultTrim(
+                    curEntity);
             }
 
             _logger.LogTrace(
@@ -174,6 +177,21 @@ namespace DanceCompetitionHelper.Database
                         entityWithTimestamps.LastModifiedBy = User;
                         break;
                 }
+            }
+        }
+
+        private static void DoDefaultTrim(
+            EntityEntry entity)
+        {
+            if (entity == null
+                || entity.Entity == null)
+            {
+                return;
+            }
+
+            if (entity.Entity is IDefaultTrim entityWithDefaultTrim)
+            {
+                entityWithDefaultTrim.DefaultTrim();
             }
         }
 

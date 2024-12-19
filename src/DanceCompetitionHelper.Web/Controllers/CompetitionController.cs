@@ -96,11 +96,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _, cToken) =>
+                    async (model, dcH, _, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewData(
                             dcH,
                             model.CompetitionId,
+                            _viewData,
                             cToken);
 
                         return null;
@@ -166,11 +167,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _, cToken) =>
+                    async (model, dcH, _, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewData(
                             dcH,
                             model.CompetitionId,
+                            _viewData,
                             cToken);
 
                         return null;

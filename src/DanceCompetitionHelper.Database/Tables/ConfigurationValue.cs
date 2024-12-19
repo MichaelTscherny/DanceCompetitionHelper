@@ -1,5 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.Data;
 using DanceCompetitionHelper.Database.Enum;
+using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,7 +12,7 @@ namespace DanceCompetitionHelper.Database.Tables
     [PrimaryKey(nameof(ConfigurationValueId))]
     [Index(nameof(Organization), nameof(CompetitionId), nameof(CompetitionClassId), nameof(CompetitionVenueId), nameof(Key), IsUnique = true)]
     [Index(nameof(Key), IsUnique = false)]
-    public class ConfigurationValue : TableBase
+    public class ConfigurationValue : TableBase, IDefaultTrim
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -157,6 +159,11 @@ namespace DanceCompetitionHelper.Database.Tables
         [NotMapped]
         public ConfigurationValueParser ValueParser =>
             new ConfigurationValueParser(this);
+
+        public void DefaultTrim()
+        {
+            Key = Key.DefaultTrim();
+        }
 
         public override string ToString()
         {

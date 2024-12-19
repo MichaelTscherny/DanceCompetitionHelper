@@ -3,6 +3,7 @@ using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
+using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,78 +29,82 @@ namespace DanceCompetitionHelper.Web.Controllers
             Guid id,
             CancellationToken cancellationToken)
         {
-            return DefaultIndexAndShow(
-                async (dcH, mapper, cToken) =>
-                {
-                    var foundComp = await _danceCompHelper
-                        .FindCompetitionAsync(
-                            id,
-                            cToken);
-
-                    if (foundComp == null)
+            return GetDefaultRequestHandler<Adjudicator, AdjudicatorOverviewViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultIndexAsync(
+                    id,
+                    async (indexId, dcH, _, _viewData, cToken) =>
                     {
-                        return null;
-                    }
+                        var foundComp = await _danceCompHelper
+                            .FindCompetitionAsync(
+                                id,
+                                cToken);
 
-                    var foundCompId = foundComp.CompetitionId;
-                    ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
-                    return
-                        new AdjudicatorOverviewViewModel()
+                        if (foundComp == null)
                         {
-                            Competition = await _danceCompHelper.GetCompetitionAsync(
-                                foundCompId,
-                                cToken),
-                            OverviewItems = await _danceCompHelper
-                                .GetAdjudicatorsAsync(
+                            return null;
+                        }
+
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
+
+                        return
+                            new AdjudicatorOverviewViewModel()
+                            {
+                                Competition = await _danceCompHelper.GetCompetitionAsync(
                                     foundCompId,
-                                    null,
-                                    cToken)
-                                .ToListAsync(
                                     cToken),
-                        };
-                },
-                // --
-                nameof(Index),
-                nameof(Index),
-                // --
-                cancellationToken);
+                                OverviewItems = await _danceCompHelper
+                                    .GetAdjudicatorsAsync(
+                                        foundCompId,
+                                        null,
+                                        cToken)
+                                    .ToListAsync(
+                                        cToken),
+                            };
+                    },
+                    cancellationToken);
         }
 
         public Task<IActionResult> ShowCreateEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return DefaultIndexAndShow(
-                async (dcH, mapper, cToken) =>
-                {
-                    var foundComp = await _danceCompHelper.FindCompetitionAsync(
-                        id,
-                        cancellationToken);
-
-                    if (foundComp == null)
+            return GetDefaultRequestHandler<Adjudicator, AdjudicatorViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowCreateEdit))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
                     {
-                        return null;
-                    }
+                        var foundComp = await _danceCompHelper.FindCompetitionAsync(
+                         id,
+                         cancellationToken);
 
-                    var foundCompId = foundComp.CompetitionId;
-                    ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
-                    return await FillAdjudicatorViewModel(
-                        dcH,
-                        foundComp,
-                        new AdjudicatorViewModel()
+                        if (foundComp == null)
                         {
-                            CompetitionId = foundCompId,
-                            CompetitionName = foundComp.GetCompetitionName(),
-                        },
-                        cToken);
-                },
-                // --
-                nameof(ShowCreateEdit),
-                nameof(ShowCreateEdit),
-                // --
-                cancellationToken);
+                            return null;
+                        }
+
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
+
+                        return await FillAdjudicatorViewModel(
+                            dcH,
+                            foundComp,
+                            new AdjudicatorViewModel()
+                            {
+                                CompetitionId = foundCompId,
+                                CompetitionName = foundComp.GetCompetitionName(),
+                            },
+                            cToken);
+                    },
+                    cancellationToken);
         }
 
         [HttpPost]
@@ -108,111 +113,104 @@ namespace DanceCompetitionHelper.Web.Controllers
             AdjudicatorViewModel createAdjudicator,
             CancellationToken cancellationToken)
         {
-            return DefaultCreateNew(
-                createAdjudicator,
-                _mapper.Map<Adjudicator>(
-                    createAdjudicator),
-                // --
-                async (dcH, cToken) =>
-                {
-                    await DefaultGetCompetitionAndSetViewData(
-                        dcH,
-                        createAdjudicator.CompetitionId,
-                        cToken);
-
-                    await FillAdjudicatorViewModel(
-                        dcH,
-                        createAdjudicator.CompetitionId,
-                        createAdjudicator,
-                        cToken);
-                },
-                nameof(ShowCreateEdit),
-                // --
-                async (dcH, newEntity, mapper, cToken) =>
-                {
-                    newEntity.Abbreviation = newEntity.Abbreviation.ToUpper();
-
-                    await dcH.CreateAdjudicatorAsync(
-                        newEntity,
-                        cToken);
-
-                    HttpContext.Session.SetString(
-                        AdjudicatorLastCreatedAdjudicatorPanelId,
-                        newEntity.AdjudicatorPanelId.ToString());
-
-                    return new
+            return GetDefaultRequestHandler<Adjudicator, AdjudicatorViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
                     {
-                        Id = createAdjudicator.CompetitionId,
-                    };
-                },
-                // -- on success
-                nameof(Index),
-                //
-                async (dcH, model, cToken) =>
-                {
-                    var foundComp = await DefaultGetCompetitionAndSetViewData(
-                        dcH,
-                        model.CompetitionId,
-                        cToken);
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            createAdjudicator.CompetitionId,
+                            _viewData,
+                            cToken);
 
-                    await FillAdjudicatorViewModel(
-                        dcH,
-                        foundComp,
-                        model,
-                        cToken);
-                },
-                nameof(ShowCreateEdit),
-                // --
-                cancellationToken);
+                        await FillAdjudicatorViewModel(
+                            dcH,
+                            createAdjudicator.CompetitionId,
+                            createAdjudicator,
+                            cToken);
+
+                        return null;
+                    })
+                .DefaultCreateNewAsync(
+                    createAdjudicator,
+                    _mapper.Map<Adjudicator>(
+                        createAdjudicator),
+                    async (dcH, newEntity, _, _, cToken) =>
+                    {
+                        newEntity.Abbreviation = newEntity.Abbreviation.ToUpper();
+
+                        await dcH.CreateAdjudicatorAsync(
+                            newEntity,
+                            cToken);
+
+                        HttpContext.Session.SetString(
+                            AdjudicatorLastCreatedAdjudicatorPanelId,
+                            newEntity.AdjudicatorPanelId.ToString());
+
+                        return new
+                        {
+                            Id = createAdjudicator.CompetitionId,
+                        };
+                    },
+                    cancellationToken);
         }
 
         public Task<IActionResult> ShowEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return DefaultIndexAndShow(
-                async (dcH, mapper, cToken) =>
-                {
-                    var foundAdjucator = await _danceCompHelper.GetAdjudicatorAsync(
+            return GetDefaultRequestHandler<Adjudicator, AdjudicatorViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowCreateEdit))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    {
+                        var foundAdjucator = await _danceCompHelper.GetAdjudicatorAsync(
                         id,
                         cancellationToken);
 
-                    if (foundAdjucator == null)
-                    {
-                        return null;
-                    }
-
-                    var foundComp = await _danceCompHelper.GetCompetitionAsync(
-                        foundAdjucator.AdjudicatorPanel.CompetitionId,
-                        cancellationToken);
-
-                    if (foundComp == null)
-                    {
-                        return null;
-                    }
-
-                    ViewData["Use" + nameof(CompetitionClass)] = foundComp.CompetitionId;
-
-                    return await FillAdjudicatorViewModel(
-                        dcH,
-                        foundComp,
-                        new AdjudicatorViewModel()
+                        if (foundAdjucator == null)
                         {
-                            CompetitionId = foundComp.CompetitionId,
-                            CompetitionName = foundComp.GetCompetitionName(),
-                            AdjudicatorId = foundAdjucator.AdjudicatorId,
-                            AdjudicatorPanelId = foundAdjucator.AdjudicatorPanelId,
-                            Abbreviation = foundAdjucator.Abbreviation.ToUpper(),
-                            Name = foundAdjucator.Name,
-                            Comment = foundAdjucator.Comment,
-                        },
-                        cToken);
-                },
-                // -- on no data
-                nameof(ShowCreateEdit),
-                nameof(Index),
-                // --
-                cancellationToken);
+                            return null;
+                        }
+
+                        var foundComp = await _danceCompHelper.GetCompetitionAsync(
+                            foundAdjucator.AdjudicatorPanel.CompetitionId,
+                            cancellationToken);
+
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
+
+                        _viewData["Use" + nameof(CompetitionClass)] = foundComp.CompetitionId;
+
+                        return await FillAdjudicatorViewModel(
+                            dcH,
+                            foundComp,
+                            new AdjudicatorViewModel()
+                            {
+                                CompetitionId = foundComp.CompetitionId,
+                                CompetitionName = foundComp.GetCompetitionName(),
+                                AdjudicatorId = foundAdjucator.AdjudicatorId,
+                                AdjudicatorPanelId = foundAdjucator.AdjudicatorPanelId,
+                                Abbreviation = foundAdjucator.Abbreviation.ToUpper(),
+                                Name = foundAdjucator.Name,
+                                Comment = foundAdjucator.Comment,
+                            },
+                            cToken);
+                    },
+                    cancellationToken);
         }
 
         [HttpPost]
@@ -221,91 +219,97 @@ namespace DanceCompetitionHelper.Web.Controllers
             AdjudicatorViewModel editAdjudicator,
             CancellationToken cancellationToken)
         {
-            return DefaultEdit(
-                editAdjudicator,
-                // --
-                null,
-                nameof(ShowCreateEdit),
-                // -- on success
-                async (dcH, mapper, cToken) =>
-                {
-                    var foundAdjPanel = await dcH.GetAdjudicatorAsync(
-                        editAdjudicator.AdjudicatorId ?? Guid.Empty,
-                        cToken)
-                        ?? throw new NoDataFoundException(
-                            string.Format(
-                                "{0} with id '{1}' not found!",
-                                nameof(Adjudicator),
-                                editAdjudicator.AdjudicatorId));
-
-                    // override the values...
-                    mapper.Map(
-                        editAdjudicator,
-                        foundAdjPanel);
-
-                    return new
+            return GetDefaultRequestHandler<Adjudicator, AdjudicatorViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
                     {
-                        Id = editAdjudicator.CompetitionId,
-                    };
-                },
-                nameof(Index),
-                // -- on no data
-                nameof(Index),
-                // -- on error
-                async (dcH, model, cToken) =>
-                {
-                    var foundComp = await DefaultGetCompetitionAndSetViewData(
-                        dcH,
-                        model.CompetitionId,
-                        cToken);
+                        var foundComp = await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            _viewData,
+                            cToken);
 
-                    await FillAdjudicatorViewModel(
-                        dcH,
-                        foundComp,
-                        model,
-                        cToken);
-                },
-                nameof(ShowCreateEdit),
-                // --
-                cancellationToken);
+                        await FillAdjudicatorViewModel(
+                            dcH,
+                            foundComp,
+                            model,
+                            cToken);
+
+                        return null;
+                    })
+                .DefaultEditSaveAsync(
+                    editAdjudicator,
+                    async (model, dcH, mapper, _, cToken) =>
+                    {
+                        var foundAdjudicator = await dcH.GetAdjudicatorAsync(
+                            editAdjudicator.AdjudicatorId ?? Guid.Empty,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(Adjudicator),
+                                    editAdjudicator.AdjudicatorId));
+
+                        // override the values...
+                        mapper.Map(
+                            editAdjudicator,
+                            foundAdjudicator);
+
+                        return new
+                        {
+                            Id = editAdjudicator.CompetitionId,
+                        };
+                    },
+                    cancellationToken);
         }
 
         public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return DefaultDelete(
-                id,
-                async (dcH, delId, cToken) =>
-                {
-                    var helpComp = await _danceCompHelper.FindCompetitionAsync(
-                        id,
-                        cancellationToken);
-
-                    var foundAdj = await dcH.GetAdjudicatorAsync(
-                        delId,
-                        cToken)
-                        ?? throw new NoDataFoundException(
-                            string.Format(
-                                "{0} with id '{1}' not found!",
-                                nameof(AdjudicatorPanel),
-                                delId));
-
-                    await dcH.RemoveAdjudicatorAsync(
-                        foundAdj,
-                        cToken);
-
-                    return new
+            return GetDefaultRequestHandler<Adjudicator, AdjudicatorViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(Index))
+                .DefaultDeleteAsync(
+                    id,
+                    async (delId, dcH, _, _, cToken) =>
                     {
-                        Id = helpComp?.CompetitionId ?? Guid.Empty,
-                    };
-                },
-                // --
-                nameof(Index),
-                nameof(Index),
-                nameof(Index),
-                // --
-                cancellationToken);
+                        var helpComp = await _danceCompHelper.FindCompetitionAsync(
+                            id,
+                            cancellationToken);
+
+                        var foundAdj = await dcH.GetAdjudicatorAsync(
+                            delId,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(AdjudicatorPanel),
+                                    delId));
+
+                        await dcH.RemoveAdjudicatorAsync(
+                            foundAdj,
+                            cToken);
+
+                        return new
+                        {
+                            Id = helpComp?.CompetitionId ?? Guid.Empty,
+                        };
+                    },
+                    cancellationToken);
         }
 
         #region Helper

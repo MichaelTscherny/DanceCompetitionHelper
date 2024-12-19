@@ -65,11 +65,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
-        public async Task<IActionResult> DetailedView(
+        public Task<IActionResult> DetailedView(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await GetDefaultRequestHandler<CompetitionClass, CompetitionClassOverviewViewModel>()
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassOverviewViewModel>()
                 .SetOnSuccess(
                     nameof(Index))
                 .SetOnNoData(
@@ -88,7 +88,6 @@ namespace DanceCompetitionHelper.Web.Controllers
                         }
 
                         var foundCompId = foundComp.CompetitionId;
-                        ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
                         _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
                         return new CompetitionClassOverviewViewModel()
@@ -108,11 +107,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
-        public async Task<IActionResult> ShowCreateEdit(
+        public Task<IActionResult> ShowCreateEdit(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
                 .SetOnSuccess(
                     nameof(ShowCreateEdit))
                 .SetOnNoData(
@@ -131,7 +130,6 @@ namespace DanceCompetitionHelper.Web.Controllers
                         }
 
                         var foundCompId = foundComp.CompetitionId;
-                        ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
                         _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
                         _ = Guid.TryParse(
@@ -166,11 +164,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _, cToken) =>
+                    async (model, dcH, _, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewData(
                             dcH,
                             model.CompetitionId,
+                            _viewData,
                             cToken);
 
                         await FillCompetitionClassViewModel(
@@ -255,12 +254,13 @@ namespace DanceCompetitionHelper.Web.Controllers
                 .SetOnError(
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
-                    SetOnEnum.OnError | SetOnEnum.OnModelStateInvalid,
-                    async (model, dcH, _, _, cToken) =>
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewData(
                             dcH,
                             model.CompetitionId,
+                            _viewData,
                             cToken);
 
                         await FillCompetitionClassViewModel(

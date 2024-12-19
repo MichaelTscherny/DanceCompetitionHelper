@@ -4,6 +4,7 @@ using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -272,6 +273,7 @@ namespace DanceCompetitionHelper.Web.Controllers
         public async Task<Competition?> DefaultGetCompetitionAndSetViewData(
             IDanceCompetitionHelper danceCompetitionHelper,
             Guid? competitionId,
+            ViewDataDictionary? viewData,
             CancellationToken cancellationToken)
         {
             var foundComp = await danceCompetitionHelper.FindCompetitionAsync(
@@ -283,7 +285,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return null;
             }
 
-            ViewData["Use" + nameof(CompetitionClass)] = foundComp.CompetitionId;
+            (viewData ?? ViewData)["Use" + nameof(CompetitionClass)] = foundComp.CompetitionId;
 
             return foundComp;
         }

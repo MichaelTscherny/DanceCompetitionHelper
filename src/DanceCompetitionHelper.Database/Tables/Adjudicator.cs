@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,7 +10,7 @@ namespace DanceCompetitionHelper.Database.Tables
     [Index(nameof(AdjudicatorId), nameof(AdjudicatorPanelId), IsUnique = true)]
     [Index(nameof(Name), nameof(AdjudicatorPanelId), IsUnique = true)]
     [PrimaryKey(nameof(AdjudicatorId))]
-    public class Adjudicator : TableBase
+    public class Adjudicator : TableBase, IDefaultTrim
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -32,6 +34,12 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsLarge)]
         public string? Comment { get; set; }
+
+        public void DefaultTrim()
+        {
+            Abbreviation = Abbreviation.DefaultTrim();
+            Name = Name.DefaultTrim();
+        }
 
         public override string ToString()
         {

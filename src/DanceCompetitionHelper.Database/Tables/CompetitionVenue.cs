@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,7 +9,7 @@ namespace DanceCompetitionHelper.Database.Tables
 {
     [PrimaryKey(nameof(CompetitionVenueId))]
     [Index(nameof(CompetitionId), nameof(Name), IsUnique = true)]
-    public class CompetitionVenue : TableBase
+    public class CompetitionVenue : TableBase, IDefaultTrim
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -35,6 +37,11 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }
+
+        public void DefaultTrim()
+        {
+            Name = Name.DefaultTrim();
+        }
 
         public override string ToString()
         {

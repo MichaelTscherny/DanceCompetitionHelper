@@ -1,11 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DanceCompetitionHelper.Database.Tables
 {
     [PrimaryKey(nameof(CompetitionId), nameof(TableName), nameof(CurrentVersion))]
-    public class TableVersionInfo : TableBase
+    public class TableVersionInfo : TableBase, IDefaultTrim
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -26,5 +28,9 @@ namespace DanceCompetitionHelper.Database.Tables
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsLarge)]
         public string Comment { get; set; } = default!;
 
+        public void DefaultTrim()
+        {
+            TableName = TableName.DefaultTrim();
+        }
     }
 }
