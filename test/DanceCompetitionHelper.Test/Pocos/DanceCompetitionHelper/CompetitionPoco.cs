@@ -10,6 +10,25 @@ namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
         public string? CompetitionInfo { get; set; }
         public DateTime? CompetitionDate { get; set; }
 
+        public CompetitionPoco ValidateCreate()
+        {
+            if (string.IsNullOrEmpty(
+                OrgCompetitionId))
+            {
+                throw new ArgumentNullException(
+                    nameof(OrgCompetitionId));
+            }
+
+            if (string.IsNullOrEmpty(
+                CompetitionName))
+            {
+                throw new ArgumentNullException(
+                    nameof(CompetitionName));
+            }
+
+            return this;
+        }
+
         public override string ToString()
         {
             return string.Format(

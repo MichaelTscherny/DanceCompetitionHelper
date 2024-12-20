@@ -1,4 +1,5 @@
-﻿using DanceCompetitionHelper.Database;
+﻿using AutoMapper;
+using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test;
@@ -26,6 +27,11 @@ namespace DanceCompetitionHelper.Test.Bindings
         {
             _useHost = TestConfiguration.CreateDefaultTestHost(
                 GetNewDbName());
+        }
+
+        public IMapper GetMapper()
+        {
+            return _useHost.Services.GetRequiredService<IMapper>();
         }
 
         #region Dance Competition Helper Database
@@ -93,6 +99,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             var newComps = table.CreateSet<CompetitionPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
+            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -104,18 +111,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                 try
                 {
                     useDb.Competitions.Add(
-                        new Competition()
-                        {
-                            Organization = newComp.Organization,
-                            OrgCompetitionId = newComp.OrgCompetitionId
-                                ?? throw new ArgumentNullException(
-                                    nameof(newComp.OrgCompetitionId)),
-                            CompetitionName = newComp.CompetitionName
-                                ?? throw new ArgumentNullException(
-                                    nameof(newComp.CompetitionName)),
-                            CompetitionInfo = newComp.CompetitionInfo,
-                            CompetitionDate = newComp.CompetitionDate ?? UseNow,
-                        });
+                        mapper.Map<Competition>(
+                            newComp
+                                .ValidateCreate()));
 
                     await useDb.SaveChangesAsync();
                 }

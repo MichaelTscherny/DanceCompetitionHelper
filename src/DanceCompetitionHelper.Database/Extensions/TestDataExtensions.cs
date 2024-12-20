@@ -431,7 +431,8 @@ namespace DanceCompetitionHelper.Database.Extensions
                     OrgStartsPartA = 5,
                 });
 
-            dbCtx.SaveChanges();
+            await dbCtx.SaveChangesAsync(
+                cancellationToken);
         }
 
         private static async Task AddFathCompetitionAsync(

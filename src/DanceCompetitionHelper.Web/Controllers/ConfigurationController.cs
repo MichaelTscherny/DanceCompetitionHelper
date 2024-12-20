@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Extensions;
 using DanceCompetitionHelper.Web.Extensions;
+using DanceCompetitionHelper.Web.Models.CompetitionModels;
 using DanceCompetitionHelper.Web.Models.ConfigurationModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
@@ -30,13 +33,26 @@ namespace DanceCompetitionHelper.Web.Controllers
             Guid id,
             CancellationToken cancellationToken)
         {
-            return ShowConfig(
-                id,
-                cancellationToken);
+            return GetDefaultRequestHandler<ConfigurationValue, ConfigurationOverviewViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultIndexAsync(
+                    Guid.Empty,
+                    async (_, dcH, _, _viewData, cToken) =>
+                    {
+                        return await ShowConfig(
+                            id,
+                            _viewData,
+                            cancellationToken);
+                    },
+                    cancellationToken);
         }
 
-        private async Task<IActionResult> ShowConfig(
+        private async Task<ConfigurationOverviewViewModel> ShowConfig(
              Guid? id,
+             ViewDataDictionary? viewData,
              CancellationToken cancellationToken,
              ConfigurationViewModel? showConfiguration = null,
              string? errorsAdd = null,
@@ -54,7 +70,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             if (foundCompId != Guid.Empty)
             {
-                ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                (viewData ?? ViewData)["Use" + nameof(CompetitionClass)] = foundCompId;
             }
 
             var (showConfig, _, useComps, useCompClasses, useCompVenues) =
@@ -153,166 +169,143 @@ namespace DanceCompetitionHelper.Web.Controllers
             };
             useCfgViewModel.OriginCompetitionId = foundCompId;
 
-            return View(
-                nameof(Index),
-                new ConfigurationOverviewViewModel()
-                {
-                    ConfigurationViewModel = useCfgViewModel,
-                    ErrorsAdd = errorsAdd,
-                    ErrorsChange = errorsChange,
-                    // 
-                    ShowGlobalConfigOnly = foundCompId == Guid.Empty,
-                    // 
-                    Competition = foundComp,
-                    OverviewItems = showConfig,
-                    // for displaying all...
-                    AvailableOrganizations = availOrgs,
-                    //
-                    Competitions = useComps,
-                    AvailableCompetitions = availComps,
-                    // 
-                    CompetitionClasses = useCompClasses,
-                    AvailableCompetitionClasses = availCompClasses,
-                    //
-                    CompetitionVenues = useCompVenues,
-                    AvailableCompetitionVenues = availCompVenues,
-                });
+            return new ConfigurationOverviewViewModel()
+            {
+                ConfigurationViewModel = useCfgViewModel,
+                ErrorsAdd = errorsAdd,
+                ErrorsChange = errorsChange,
+                // 
+                ShowGlobalConfigOnly = foundCompId == Guid.Empty,
+                // 
+                Competition = foundComp,
+                OverviewItems = showConfig,
+                // for displaying all...
+                AvailableOrganizations = availOrgs,
+                //
+                Competitions = useComps,
+                AvailableCompetitions = availComps,
+                // 
+                CompetitionClasses = useCompClasses,
+                AvailableCompetitionClasses = availCompClasses,
+                //
+                CompetitionVenues = useCompVenues,
+                AvailableCompetitionVenues = availCompVenues,
+            };
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateNew(
+        public Task<IActionResult> CreateNew(
             ConfigurationViewModel createConfiguration,
             CancellationToken cancellationToken)
         {
-            if (ModelState.IsValid == false)
-            {
-                return await ShowConfig(
-                    createConfiguration.OriginCompetitionId,
-                    cancellationToken,
+            return GetDefaultRequestHandler<ConfigurationValue, ConfigurationViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(Index))
+                .DefaultCreateNewAsync(
                     createConfiguration,
-                    ModelState.GetErrorMessages());
-            }
+                    _mapper.Map<ConfigurationValue>(
+                        createConfiguration),
+                    // ----
+                    async (dcH, newEntity, _, _, cToken) =>
+                    {
+                        await dcH.CreateConfigurationAsync(
+                            newEntity,
+                            cToken);
 
-            try
-            {
-                createConfiguration.SanityCheck();
-
-                await _danceCompHelper.CreateConfigurationAsync(
-                    createConfiguration.Organization,
-                    createConfiguration.CompetitionId,
-                    createConfiguration.CompetitionClassId,
-                    createConfiguration.CompetitionVenueId,
-                    createConfiguration.Key,
-                    createConfiguration.Value,
-                    createConfiguration.Comment,
+                        return new
+                        {
+                            Id = createConfiguration.OriginCompetitionId,
+                        };
+                    },
                     cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                return await ShowConfig(
-                    createConfiguration.OriginCompetitionId,
-                    cancellationToken,
-                    createConfiguration,
-                    errorsAdd: exc.InnerException?.Message ?? exc.Message);
-            }
-
-            return RedirectToAction(
-                nameof(ConfigurationController.Index),
-                new
-                {
-                    Id = createConfiguration.OriginCompetitionId,
-                });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(
+        public Task<IActionResult> Edit(
             ConfigurationViewModel editConfiguration,
             CancellationToken cancellationToken)
         {
-            if (ModelState.IsValid == false)
-            {
-                return await ShowConfig(
-                    editConfiguration.OriginCompetitionId,
-                    cancellationToken,
+            return GetDefaultRequestHandler<ConfigurationValue, ConfigurationViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(Index))
+                .DefaultEditSaveAsync(
                     editConfiguration,
-                    errorsChange: ModelState.GetErrorMessages());
-            }
+                    async (model, dcH, mapper, _, cToken) =>
+                    {
+                        model.SanityCheck();
 
-            try
-            {
-                editConfiguration.SanityCheck();
+                        var foundConfig = await dcH.GetConfigurationAsync(
+                            mapper.Map<ConfigurationValue>(
+                                model),
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(ConfigurationValue),
+                                    model.CompetitionId));
 
-                await _danceCompHelper.EditConfigurationAsync(
-                    editConfiguration.Organization,
-                    editConfiguration.CompetitionId,
-                    editConfiguration.CompetitionClassId,
-                    editConfiguration.CompetitionVenueId,
-                    editConfiguration.Key,
-                    editConfiguration.Value,
-                    editConfiguration.Comment,
+                        // override the values...
+                        mapper.Map(
+                            model,
+                            foundConfig);
+
+                        return new
+                        {
+                            Id = model.OriginCompetitionId,
+                        };
+                    },
                     cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                return await ShowConfig(
-                    editConfiguration.OriginCompetitionId,
-                    cancellationToken,
-                    editConfiguration,
-                    errorsChange: exc.InnerException?.Message ?? exc.Message);
-            }
-
-            return RedirectToAction(
-                nameof(ConfigurationController.Index),
-                new
-                {
-                    Id = editConfiguration.OriginCompetitionId,
-                });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(
+        public Task<IActionResult> Delete(
             ConfigurationViewModel deleteConfiguration,
             CancellationToken cancellationToken)
         {
-            if (ModelState.IsValid == false)
-            {
-                return await ShowConfig(
-                    deleteConfiguration.OriginCompetitionId,
-                    cancellationToken,
+            return GetDefaultRequestHandler<Competition, CompetitionViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(Index))
+                .DefaultDeleteAsync(
                     deleteConfiguration,
-                    errorsChange: ModelState.GetErrorMessages());
-            }
+                    async (delConf, dcH, mapper, _, cToken) =>
+                    {
+                        var foundConfig = await dcH.GetConfigurationAsync(
+                            mapper.Map<ConfigurationValue>(
+                                delConf),
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(ConfigurationValue),
+                                    delConf));
 
-            try
-            {
-                deleteConfiguration.SanityCheck();
+                        await _danceCompHelper.RemoveConfigurationAsync(
+                            foundConfig,
+                            cToken);
 
-                await _danceCompHelper.RemoveConfigurationAsync(
-                    deleteConfiguration.Organization,
-                    deleteConfiguration.CompetitionId,
-                    deleteConfiguration.CompetitionClassId,
-                    deleteConfiguration.CompetitionVenueId,
-                    deleteConfiguration.Key,
+                        return new
+                        {
+                            Id = deleteConfiguration.OriginCompetitionId,
+                        };
+                    },
                     cancellationToken);
-            }
-            catch (Exception exc)
-            {
-                return await ShowConfig(
-                    deleteConfiguration.OriginCompetitionId,
-                    cancellationToken,
-                    deleteConfiguration,
-                    errorsChange: exc.InnerException?.Message ?? exc.Message);
-            }
-
-            return RedirectToAction(
-                nameof(ConfigurationController.Index),
-                new
-                {
-                    Id = deleteConfiguration.OriginCompetitionId,
-                });
         }
     }
 }

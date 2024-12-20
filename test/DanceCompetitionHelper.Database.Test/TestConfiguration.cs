@@ -15,6 +15,8 @@ namespace DanceCompetitionHelper.Database.Test
             string sqLiteDbFile) => Host.CreateDefaultBuilder()
                 .ConfigureServices((_, config) =>
                 {
+                    config.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
                     config.AddDbContext<DanceCompetitionHelperDbContext>();
                     config.AddTransient<IDbConfig>(
                         (srvProv) => new SqLiteDbConfig()

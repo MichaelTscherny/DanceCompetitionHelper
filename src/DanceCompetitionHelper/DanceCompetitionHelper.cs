@@ -103,7 +103,7 @@ namespace DanceCompetitionHelper
             // THIS "BeginTransactionAsync()" IS ON PURPOSE!..
             // DO not remove!..
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
-                    cancellationToken)
+                cancellationToken)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -122,8 +122,10 @@ namespace DanceCompetitionHelper
                     }
                 }
 
-                await _danceCompHelperDb.SaveChangesAsync();
-                await dbTrans.CommitAsync();
+                await _danceCompHelperDb.SaveChangesAsync(
+                    cancellationToken);
+                await dbTrans.CommitAsync(
+                    cancellationToken);
             }
             catch (Exception exc)
             {
@@ -1283,6 +1285,7 @@ namespace DanceCompetitionHelper
             }
         }
 
+        [Obsolete("do not use", true)]
         public async Task EditCompetitionClassAsync(
             Guid competitionClassId,
             string competitionClassName,
@@ -1377,35 +1380,11 @@ namespace DanceCompetitionHelper
         #region Participant Crud
 
         public async Task CreateParticipantAsync(
-            Guid competitionId,
-            Guid competitionClassId,
-            int startNumber,
-            // A
-            string namePartA,
-            string? orgIdPartA,
-            // B
-            string? namePartB,
-            string? orgIdPartB,
-            string? clubName,
-            string? orgIdClub,
-            // A
-            double orgPointsPartA,
-            int orgStartsPartA,
-            int? minStartsForPromotionPartA,
-            bool? orgAlreadyPromotedPartA,
-            string? orgAlreadyPromotedInfoPartA,
-            // B
-            double? orgPointsPartB,
-            int? orgStartsPartB,
-            int? minStartsForPromotionPartB,
-            bool? orgAlreadyPromotedPartB,
-            string? orgAlreadyPromotedInfoPartB,
-            string? comment,
-            bool ignore,
+            Participant createParticipant,
             CancellationToken cancellationToken)
         {
             var foundCompId = await GetCompetitionAsync(
-                competitionId,
+                createParticipant.CompetitionId,
                 cancellationToken);
 
             if (foundCompId == null)
@@ -1414,11 +1393,11 @@ namespace DanceCompetitionHelper
                     string.Format(
                         "{0} with id '{1}' not found!",
                         nameof(Competition),
-                        competitionId));
+                        createParticipant.CompetitionId));
             }
 
             var foundCompClassId = await GetCompetitionClassAsync(
-                competitionClassId,
+                createParticipant.CompetitionClassId,
                 cancellationToken);
 
             if (foundCompClassId == null)
@@ -1427,152 +1406,21 @@ namespace DanceCompetitionHelper
                     string.Format(
                         "{0} with id '{1}' not found!",
                         nameof(CompetitionClass),
-                        competitionClassId));
+                        createParticipant.CompetitionClassId));
             }
 
             _danceCompHelperDb.Participants.Add(
-                new Participant()
-                {
-                    CompetitionId = competitionId,
-                    CompetitionClassId = competitionClassId,
-                    StartNumber = startNumber,
-                    NamePartA = namePartA,
-                    OrgIdPartA = orgIdPartA,
-                    NamePartB = namePartB,
-                    OrgIdPartB = orgIdPartB,
-                    ClubName = clubName,
-                    OrgIdClub = orgIdClub,
-                    // A
-                    OrgPointsPartA = orgPointsPartA,
-                    OrgStartsPartA = orgStartsPartA,
-                    MinStartsForPromotionPartA = minStartsForPromotionPartA,
-                    OrgAlreadyPromotedPartA = orgAlreadyPromotedPartA,
-                    OrgAlreadyPromotedInfoPartA = orgAlreadyPromotedInfoPartA,
-                    // B
-                    OrgPointsPartB = orgPointsPartB,
-                    OrgStartsPartB = orgStartsPartB,
-                    MinStartsForPromotionPartB = minStartsForPromotionPartB,
-                    OrgAlreadyPromotedPartB = orgAlreadyPromotedPartB,
-                    OrgAlreadyPromotedInfoPartB = orgAlreadyPromotedInfoPartB,
-                    Comment = comment,
-                    Ignore = ignore,
-                });
-
-            // TODO: needed?..
-            await _danceCompHelperDb.SaveChangesAsync(
-                cancellationToken);
+                createParticipant);
         }
 
-        public async Task EditParticipantAsync(
-            Guid participantId,
-            Guid competitionClassId,
-            int startNumber,
-            // A
-            string namePartA,
-            string? orgIdPartA,
-            // A
-            string? namePartB,
-            string? orgIdPartB,
-            string? clubName,
-            string? orgIdClub,
-            // A
-            double orgPointsPartA,
-            int orgStartsPartA,
-            int? minStartsForPromotionPartA,
-            bool? orgAlreadyPromotedPartA,
-            string? orgAlreadyPromotedInfoPartA,
-            // B
-            double? orgPointsPartB,
-            int? orgStartsPartB,
-            int? minStartsForPromotionPartB,
-            bool? orgAlreadyPromotedPartB,
-            string? orgAlreadyPromotedInfoPartB,
-            string? comment,
-            bool ignore,
+        public Task RemoveParticipantAsync(
+            Participant removeParticipant,
             CancellationToken cancellationToken)
         {
-            var foundCompClassId = await GetCompetitionClassAsync(
-                competitionClassId,
-                cancellationToken);
-
-            if (foundCompClassId == null)
-            {
-                throw new ArgumentException(
-                    string.Format(
-                        "{0} with id '{1}' not found!",
-                        nameof(CompetitionClass),
-                        competitionClassId));
-            }
-
-            var foundParticipant = _danceCompHelperDb.Participants
-                .TagWith(
-                    nameof(EditParticipantAsync) + "(Guid,...)[1]")
-                .FirstOrDefault(
-                    x => x.ParticipantId == participantId);
-
-            if (foundParticipant == null)
-            {
-                throw new ArgumentException(
-                    string.Format(
-                        "{0} with id '{1}' not found!",
-                        nameof(Participant),
-                        participantId));
-            }
-
-            foundParticipant.CompetitionClassId = competitionClassId;
-            foundParticipant.StartNumber = startNumber;
-            foundParticipant.NamePartA = namePartA;
-            foundParticipant.OrgIdPartA = orgIdPartA;
-            foundParticipant.NamePartB = namePartB;
-            foundParticipant.OrgIdPartB = orgIdPartB;
-            foundParticipant.ClubName = clubName;
-            foundParticipant.OrgIdClub = orgIdClub;
-            // A
-            foundParticipant.OrgPointsPartA = orgPointsPartA;
-            foundParticipant.OrgStartsPartA = orgStartsPartA;
-            foundParticipant.MinStartsForPromotionPartA = minStartsForPromotionPartA;
-            foundParticipant.OrgAlreadyPromotedPartA = orgAlreadyPromotedPartA;
-            foundParticipant.OrgAlreadyPromotedInfoPartA = orgAlreadyPromotedInfoPartA;
-            // B
-            foundParticipant.OrgPointsPartB = orgPointsPartB;
-            foundParticipant.OrgStartsPartB = orgStartsPartB;
-            foundParticipant.MinStartsForPromotionPartB = minStartsForPromotionPartB;
-            foundParticipant.OrgAlreadyPromotedPartB = orgAlreadyPromotedPartB;
-            foundParticipant.OrgAlreadyPromotedInfoPartB = orgAlreadyPromotedInfoPartB;
-            foundParticipant.Comment = comment;
-            foundParticipant.Ignore = ignore;
-
-            // TODO: needed?..
-            await _danceCompHelperDb.SaveChangesAsync(
-                cancellationToken);
-        }
-
-        public async Task RemoveParticipantAsync(
-            Guid participantId,
-            CancellationToken cancellationToken)
-        {
-            var foundParticipant = await _danceCompHelperDb.Participants
-                .TagWith(
-                    nameof(RemoveParticipantAsync) + "(Guid)[0]")
-                .FirstOrDefaultAsync(
-                    x => x.ParticipantId == participantId,
-                    cancellationToken);
-
-            if (foundParticipant == null)
-            {
-                _logger.LogWarning(
-                    "{Participant} with id '{ParticipantId}' not found!",
-                    nameof(Participant),
-                    participantId);
-                return;
-            }
-
             _danceCompHelperDb.Participants.Remove(
-                foundParticipant);
+                removeParticipant);
 
-            // TODO: needed?..
-            await _danceCompHelperDb.SaveChangesAsync(
-                cancellationToken);
+            return Task.CompletedTask;
         }
 
         #endregion Participant Crud
@@ -1880,140 +1728,87 @@ namespace DanceCompetitionHelper
         }
 
         public async Task CreateConfigurationAsync(
-            OrganizationEnum? organization,
-            Guid? competitionId,
-            Guid? competitionClassId,
-            Guid? competitionVenueId,
-            string key,
-            string? value,
-            string? comment,
+            ConfigurationValue crateConfigurationValue,
             CancellationToken cancellationToken)
         {
-            var useOrganization = organization;
-            if (useOrganization == OrganizationEnum.Any)
+            if (crateConfigurationValue.Organization == OrganizationEnum.Any)
             {
-                organization = null;
+                crateConfigurationValue.Organization = null;
             }
 
-            Competition? chkComp = null;
-            if (competitionId != null)
+            try
             {
-                chkComp = await GetCompetitionAsync(
-                    competitionId,
-                    cancellationToken);
-
-                if (chkComp != null
-                    && chkComp.Organization != useOrganization)
+                Competition? chkComp = null;
+                if (crateConfigurationValue.CompetitionId != null)
                 {
-                    throw new ArgumentOutOfRangeException(
-                        nameof(competitionClassId),
-                        string.Format(
-                            "{0} ({1}) does not match passed {2} ({3})",
-                            nameof(organization),
-                            organization,
-                            nameof(Competition),
-                            chkComp.Organization));
-                }
-            }
-
-            CompetitionClass? chkCompClass = null;
-            if (competitionClassId != null)
-            {
-                chkCompClass = await GetCompetitionClassAsync(
-                    competitionClassId.Value,
-                    cancellationToken);
-
-                if (chkCompClass == null
-                    || chkCompClass.CompetitionId != chkComp?.CompetitionId)
-                {
-                    throw new ArgumentOutOfRangeException(
-                        nameof(competitionClassId),
-                        string.Format(
-                            "{0} ({1}) does not match passed {2} ({3})",
-                            nameof(CompetitionClass),
-                            competitionClassId,
-                            nameof(Competition),
-                            competitionId));
-                }
-            }
-
-            _danceCompHelperDb.Configurations
-                .Add(
-                    new ConfigurationValue()
-                    {
-                        Organization = useOrganization,
-                        CompetitionId = competitionId,
-                        CompetitionClassId = competitionClassId,
-                        CompetitionVenueId = competitionVenueId,
-                        Key = key,
-                        Value = value,
-                        Comment = comment,
-                    });
-
-            // TODO: needed?..
-            await _danceCompHelperDb.SaveChangesAsync(
-                cancellationToken);
-        }
-
-        public async Task EditConfigurationAsync(
-            OrganizationEnum? organization,
-            Guid? competitionId,
-            Guid? competitionClassId,
-            Guid? competitionVenueId,
-            string key,
-            string? value,
-            string? comment,
-            CancellationToken cancellationToken)
-        {
-            var toEdit = await _danceCompHelperDb.Configurations
-                .TagWith(
-                    nameof(EditConfigurationAsync))
-                .FirstOrDefaultAsync(
-                    x => x.Organization == organization
-                        && x.CompetitionId == competitionId
-                        && x.CompetitionClassId == competitionClassId
-                        && x.CompetitionVenueId == competitionVenueId
-                        && x.Key == key,
-                    cancellationToken);
-
-            if (toEdit != null)
-            {
-                toEdit.Value = value;
-                toEdit.Comment = comment;
-            }
-
-            // TODO: needed?..
-            await _danceCompHelperDb.SaveChangesAsync(
-                cancellationToken);
-        }
-
-        public async Task RemoveConfigurationAsync(
-            OrganizationEnum? organization,
-            Guid? competitionId,
-            Guid? competitionClassId,
-            Guid? competitionVenueId,
-            string key,
-            CancellationToken cancellationToken)
-        {
-            var toRemove = await _danceCompHelperDb.Configurations
-                    .TagWith(
-                        nameof(RemoveConfigurationAsync))
-                    .FirstOrDefaultAsync(
-                        x => x.Organization == organization
-                            && x.CompetitionId == competitionId
-                            && x.CompetitionClassId == competitionClassId
-                            && x.CompetitionVenueId == competitionVenueId
-                            && x.Key == key,
+                    chkComp = await GetCompetitionAsync(
+                        crateConfigurationValue.CompetitionId,
                         cancellationToken);
 
-            if (toRemove != null)
-            {
-                _danceCompHelperDb.Configurations.Remove(
-                    toRemove);
-            }
+                    if (chkComp != null
+                        && chkComp.Organization != crateConfigurationValue.Organization)
+                    {
+                        throw new ArgumentOutOfRangeException(
+                            nameof(crateConfigurationValue.CompetitionId),
+                            string.Format(
+                                "{0} ({1}) does not match passed {2} ({3})",
+                                nameof(crateConfigurationValue.Organization),
+                                crateConfigurationValue.Organization,
+                                nameof(Competition),
+                                chkComp.Organization));
+                    }
+                }
 
-            await _danceCompHelperDb.SaveChangesAsync(
-                cancellationToken);
+                CompetitionClass? chkCompClass = null;
+                if (crateConfigurationValue.CompetitionClassId != null)
+                {
+                    chkCompClass = await GetCompetitionClassAsync(
+                        crateConfigurationValue.CompetitionClassId.Value,
+                        cancellationToken);
+
+                    if (chkCompClass == null
+                        || chkCompClass.CompetitionId != chkComp?.CompetitionId)
+                    {
+                        throw new ArgumentOutOfRangeException(
+                            nameof(crateConfigurationValue.CompetitionClassId),
+                            string.Format(
+                                "{0} ({1}) does not match passed {2} ({3})",
+                                nameof(CompetitionClass),
+                                crateConfigurationValue.CompetitionClassId,
+                                nameof(Competition),
+                                crateConfigurationValue.CompetitionId));
+                    }
+                }
+
+                _danceCompHelperDb.Configurations.Add(
+                    crateConfigurationValue);
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during {Method}: {Message}",
+                    nameof(CreateConfigurationAsync),
+                    exc.Message);
+
+                throw;
+            }
+            finally
+            {
+                _logger.LogTrace(
+                    "{Method}() done",
+                    nameof(CreateConfigurationAsync));
+            }
+        }
+
+        public Task RemoveConfigurationAsync(
+            ConfigurationValue removeConfigurationValue,
+            CancellationToken cancellationToken)
+        {
+            _danceCompHelperDb.Configurations.Remove(
+                removeConfigurationValue);
+
+            return Task.CompletedTask;
         }
 
         #endregion Configuration
@@ -2147,8 +1942,10 @@ namespace DanceCompetitionHelper
                                 retWorkStatus.WorkInfo.AddRange(
                                     importFunc());
 
-                                _danceCompHelperDb.SaveChanges();
-                                dbTrans.Commit();
+                                await _danceCompHelperDb.SaveChangesAsync(
+                                    cancellationToken);
+                                await dbTrans.CommitAsync(
+                                    cancellationToken);
 
                                 // read back infos
                                 checkComp = await _danceCompHelperDb.Competitions

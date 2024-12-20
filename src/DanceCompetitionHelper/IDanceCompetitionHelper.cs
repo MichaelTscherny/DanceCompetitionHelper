@@ -173,55 +173,11 @@ namespace DanceCompetitionHelper
         #region Participant Crud
 
         Task CreateParticipantAsync(
-            Guid competitionId,
-            Guid competitionClassId,
-            int startNumber,
-            string namePartA,
-            string? orgIdPartA,
-            string? namePartB,
-            string? orgIdPartB,
-            string? clubName,
-            string? orgIdClub,
-            double orgPointsPartA,
-            int orgStartsPartA,
-            int? minStartsForPromotionPartA,
-            bool? orgAlreadyPromotedPartA,
-            string? OrgAlreadyPromotedInfoPartA,
-            double? orgPointsPartB,
-            int? orgStartsPartB,
-            int? minStartsForPromotionPartB,
-            bool? orgAlreadyPromotedPartB,
-            string? OrgAlreadyPromotedInfoPartB,
-            string? comment,
-            bool ignore,
-            CancellationToken cancellationToken);
-
-        Task EditParticipantAsync(
-            Guid participantId,
-            Guid competitionClassId,
-            int startNumber,
-            string namePartA,
-            string? orgIdPartA,
-            string? namePartB,
-            string? orgIdPartB,
-            string? clubName,
-            string? orgIdClub,
-            double orgPointsPartA,
-            int orgStartsPartA,
-            int? minStartsForPromotionPartA,
-            bool? orgAlreadyPromotedPartA,
-            string? OrgAlreadyPromotedInfoPartA,
-            double? orgPointsPartB,
-            int? orgStartsPartB,
-            int? minStartsForPromotionPartB,
-            bool? orgAlreadyPromotedPartB,
-            string? OrgAlreadyPromotedInfoPartB,
-            string? comment,
-            bool ignore,
+            Participant createParticipant,
             CancellationToken cancellationToken);
 
         Task RemoveParticipantAsync(
-            Guid participantId,
+            Participant removeParticipant,
             CancellationToken cancellationToken);
 
         #endregion CompetitionClass Crud
@@ -275,31 +231,11 @@ namespace DanceCompetitionHelper
             CancellationToken cancellationToken);
 
         Task CreateConfigurationAsync(
-            OrganizationEnum? organization,
-            Guid? competitionId,
-            Guid? competitionClassId,
-            Guid? competitionVenueId,
-            string key,
-            string? value,
-            string? comment,
-            CancellationToken cancellationToken);
-
-        Task EditConfigurationAsync(
-            OrganizationEnum? organization,
-            Guid? competitionId,
-            Guid? competitionClassId,
-            Guid? competitionVenueId,
-            string key,
-            string? value,
-            string? comment,
+            ConfigurationValue crateConfigurationValue,
             CancellationToken cancellationToken);
 
         Task RemoveConfigurationAsync(
-            OrganizationEnum? organization,
-            Guid? competitionId,
-            Guid? competitionClassId,
-            Guid? competitionVenueId,
-            string key,
+            ConfigurationValue removeConfigurationValue,
             CancellationToken cancellationToken);
 
         #endregion Configuration
