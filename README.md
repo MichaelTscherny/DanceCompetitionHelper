@@ -85,6 +85,10 @@ if the imported or entered data contains parts of addresses or other personal da
 If you like to help on this project, please check 
 [CONTRIBUTING](CONTRIBUTING.md), create an issue and a branch.
 
+## Changelog
+
+Noticable changes are described in the [CHANGELOG](CHANGELOG.md).
+
 ## Thanks to
 
 following sources helped to get this project "on track":
