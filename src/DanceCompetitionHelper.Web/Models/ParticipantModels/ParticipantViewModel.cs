@@ -5,10 +5,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DanceCompetitionHelper.Web.Models.ParticipantModels
 {
-    public class ParticipantViewModel
+    public class ParticipantViewModel : ViewModelBase
     {
-        public string? Errors { get; set; }
-
         [Required]
         [FromForm]
         [HiddenInput]

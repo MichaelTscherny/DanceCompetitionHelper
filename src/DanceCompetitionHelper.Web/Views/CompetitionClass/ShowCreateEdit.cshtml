@@ -22,11 +22,11 @@
 <div class="container text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
-    @if (string.IsNullOrEmpty(Model.Errors) == false)
+    @foreach (var curError in Model.Errors)
     {
         <div class="row py-2 text-danger">
             <div class="col-md">
-                @Model.Errors
+                @curError
             </div>
         </div>
     }
@@ -45,6 +45,7 @@
                 <input asp-for="CompetitionClassName"
                        class="form-control"
                        placeholder="Competition Name" 
+                       autofocus="true"
                        style="width: 100%" />
                 <span asp-validation-for="CompetitionClassName"
                       class="text-danger"></span>

@@ -1,4 +1,5 @@
 ﻿using DanceCompetitionHelper.Database.Config;
+using DanceCompetitionHelper.Database.Interfaces;
 using DanceCompetitionHelper.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -14,21 +15,21 @@ namespace DanceCompetitionHelper.Database
         public IDbConfig SqLiteDbConfig { get; }
         public static string User { get; set; } = Environment.UserName;
 
-        public virtual DbSet<Competition> Competitions { get; set; }
-        public virtual DbSet<CompetitionClass> CompetitionClasses { get; set; }
-        public virtual DbSet<CompetitionClassHistory> CompetitionClassesHistory { get; set; }
-        public virtual DbSet<Participant> Participants { get; set; }
-        public virtual DbSet<ParticipantHistory> ParticipantsHistory { get; set; }
+        public virtual DbSet<Competition> Competitions { get; set; } = null!;
+        public virtual DbSet<CompetitionClass> CompetitionClasses { get; set; } = null!;
+        public virtual DbSet<CompetitionClassHistory> CompetitionClassesHistory { get; set; } = null!;
+        public virtual DbSet<Participant> Participants { get; set; } = null!;
+        public virtual DbSet<ParticipantHistory> ParticipantsHistory { get; set; } = null!;
 
-        public virtual DbSet<AdjudicatorPanel> AdjudicatorPanels { get; set; }
-        public virtual DbSet<AdjudicatorPanelHistory> AdjudicatorPanelsHistroy { get; set; }
-        public virtual DbSet<Adjudicator> Adjudicators { get; set; }
-        public virtual DbSet<AdjudicatorHistory> AdjudicatorsHistory { get; set; }
+        public virtual DbSet<AdjudicatorPanel> AdjudicatorPanels { get; set; } = null!;
+        public virtual DbSet<AdjudicatorPanelHistory> AdjudicatorPanelsHistroy { get; set; } = null!;
+        public virtual DbSet<Adjudicator> Adjudicators { get; set; } = null!;
+        public virtual DbSet<AdjudicatorHistory> AdjudicatorsHistory { get; set; } = null!;
 
-        public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; }
-        public virtual DbSet<ConfigurationValue> Configurations { get; set; }
+        public virtual DbSet<TableVersionInfo> TableVersionInfos { get; set; } = null!;
+        public virtual DbSet<ConfigurationValue> Configurations { get; set; } = null!;
 
-        public virtual DbSet<CompetitionVenue> CompetitionVenues { get; set; }
+        public virtual DbSet<CompetitionVenue> CompetitionVenues { get; set; } = null!;
 
         public DanceCompetitionHelperDbContext(
             IDbConfig sqLiteDbConfig,
@@ -114,13 +115,15 @@ namespace DanceCompetitionHelper.Database
 
         #region Usefull methods
 
-        public void Migrate()
-            => Database.Migrate();
+        public Task MigrateAsync()
+            => Database.MigrateAsync();
 
-        public IDbContextTransaction? BeginTransaction(
+        public async Task<IDbContextTransaction?> BeginTransactionAsync(
+            CancellationToken cancellationToken,
             bool useTransaction = true)
             => useTransaction
-                ? Database.CurrentTransaction ?? Database.BeginTransaction()
+                ? Database.CurrentTransaction ?? await Database.BeginTransactionAsync(
+                    cancellationToken)
                 : null;
 
         #endregion Usefull methods
@@ -138,6 +141,8 @@ namespace DanceCompetitionHelper.Database
                 UpdateTimestamps(
                     curEntity,
                     useDateTime);
+                DoDefaultTrim(
+                    curEntity);
             }
 
             _logger.LogTrace(
@@ -175,6 +180,21 @@ namespace DanceCompetitionHelper.Database
             }
         }
 
-        #endregion // Helpers
+        private static void DoDefaultTrim(
+            EntityEntry entity)
+        {
+            if (entity == null
+                || entity.Entity == null)
+            {
+                return;
+            }
+
+            if (entity.Entity is IDefaultTrim entityWithDefaultTrim)
+            {
+                entityWithDefaultTrim.DefaultTrim();
+            }
+        }
+
+        #endregion Helpers
     }
 }

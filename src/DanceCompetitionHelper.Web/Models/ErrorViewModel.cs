@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DanceCompetitionHelper.Web.Models
 {
-    public class ErrorViewModel
+    public class ErrorViewModel : ViewModelBase
     {
         public string? RequestId { get; set; }
 

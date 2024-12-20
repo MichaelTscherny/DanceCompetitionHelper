@@ -69,5 +69,17 @@ namespace DanceCompetitionHelper.Database.Extensions
                 useNameA,
                 useNameB);
         }
+
+        public static string DefaultTrim(
+            this string forString)
+        {
+            return forString?.Trim() ?? string.Empty;
+        }
+
+        public static string? DefaultNullableTrim(
+            this string? forString)
+        {
+            return forString?.Trim();
+        }
     }
 }

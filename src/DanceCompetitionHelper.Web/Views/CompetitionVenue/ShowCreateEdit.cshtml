@@ -3,6 +3,7 @@
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
 @using DanceCompetitionHelper.Web.Models.ParticipantModels;
+@using DanceCompetitionHelper.Web.Models.CompetitionVenueModels;
 
 @model CompetitionVenueViewModel
 
@@ -24,11 +25,11 @@
 <div class="container text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
-    @if (string.IsNullOrEmpty(Model.Errors) == false)
+    @foreach (var curError in Model.Errors)
     {
         <div class="row py-2 text-danger">
             <div class="col-md">
-                @Model.Errors
+                @curError
             </div>
         </div>
     }
@@ -63,21 +64,10 @@
                 Dimensions
             </div>
             <div class="col-md-4">
-                <div class="input-group mb-3">
-                    <span class="input-group-text">Length:</span>
+                <div class="input-group">
+                    <span class="input-group-text col-md-3">Length:</span>
                     <input asp-for="LengthInMeter"
-                           class="form-control"
-                           placeholder="Name"
-                           style="width: 100%" />
-                    <span asp-validation-for="LengthInMeter"
-                          class="text-danger"></span>
-                    <span class="input-group-text">Width:</span>
-                    <input asp-for="WidthInMeter"
-                           class="form-control"
-                           placeholder="Name"
-                           style="width: 100%" />
-                    <span asp-validation-for="WidthInMeter"
-                          class="text-danger"></span>
+                           class="form-control" />
                 </div>
             </div>
             <div class="col-md text-start">
@@ -85,10 +75,27 @@
                        class="control-label">
                     Length In Meter
                 </label>
+                <span asp-validation-for="LengthInMeter"
+                      class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row row-cols-3 py-1">
+            <div class="col-md text-end">
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text col-md-3">Width:&nbsp;</span>
+                    <input asp-for="WidthInMeter"
+                           class="form-control" />
+                </div>
+            </div>
+            <div class="col-md text-start">
                 <label asp-for="WidthInMeter"
                        class="control-label">
                     Width In Meter
                 </label>
+                <span asp-validation-for="WidthInMeter"
+                      class="text-danger"></span>
             </div>
         </div>
         <div class="row row-cols-3 py-1">

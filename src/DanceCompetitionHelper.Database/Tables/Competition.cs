@@ -1,5 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
+using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,7 +11,7 @@ namespace DanceCompetitionHelper.Database.Tables
     [Comment("A Competition 'root'")]
     [Index(nameof(Organization), nameof(OrgCompetitionId), IsUnique = true)]
     [PrimaryKey(nameof(CompetitionId))]
-    public class Competition : TableBase
+    public class Competition : TableBase, IDefaultTrim
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -38,6 +40,12 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [NotMapped]
         public CompetitionDisplayInfo? DisplayInfo { get; set; }
+
+        public void DefaultTrim()
+        {
+            OrgCompetitionId = OrgCompetitionId.DefaultTrim();
+            CompetitionName = CompetitionName.DefaultTrim();
+        }
 
         public override string ToString()
         {

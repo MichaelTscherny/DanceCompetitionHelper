@@ -1,334 +1,331 @@
-﻿using DanceCompetitionHelper.Database.Extensions;
+﻿using AutoMapper;
+using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
+using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.ParticipantModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
-    public class ParticipantController : Controller
+    public class ParticipantController : ControllerBase<ParticipantController>
     {
         public const string RefName = "Participant";
         public const string ParticipantLastCreatedCompetitionClassId = nameof(ParticipantLastCreatedCompetitionClassId);
 
-        private readonly IDanceCompetitionHelper _danceCompHelper;
-        private readonly ILogger<CompetitionController> _logger;
-        private readonly IServiceProvider _serviceProvider;
-
         public ParticipantController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<CompetitionController> logger,
-            IServiceProvider serviceProvider)
+            ILogger<ParticipantController> logger,
+            IMapper mapper)
+            : base(
+                danceCompHelper,
+                logger,
+                mapper)
         {
-            _danceCompHelper = danceCompHelper
-                ?? throw new ArgumentNullException(
-                    nameof(danceCompHelper));
-            _logger = logger
-                ?? throw new ArgumentNullException(
-                    nameof(logger));
-            _serviceProvider = serviceProvider
-                ?? throw new ArgumentNullException(
-                    nameof(serviceProvider));
         }
 
-        public IActionResult Index(
-            Guid id)
+        public Task<IActionResult> Index(
+            Guid id,
+            CancellationToken cancellationToken,
+            bool detailedView = false)
         {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
+            return GetDefaultRequestHandler<Participant, ParticipantOverviewViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultIndexAsync(
+                    Guid.Empty,
+                    async (_, dcH, _, _viewData, cToken) =>
+                    {
+                        var foundComp = await dcH.FindCompetitionAsync(
+                        id,
+                        cToken);
 
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
 
-            return View(
-                new ParticipantOverviewViewModel()
-                {
-                    Competition = _danceCompHelper.GetCompetition(
-                        foundCompId),
-                    OverviewItems = _danceCompHelper
-                        .GetParticipants(
-                            foundCompId,
-                            null,
-                            true)
-                        .ToList(),
-                });
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
+
+                        return new ParticipantOverviewViewModel()
+                        {
+                            Competition = foundComp,
+                            OverviewItems = await _danceCompHelper
+                                .GetParticipantsAsync(
+                                    foundCompId,
+                                    null,
+                                    cancellationToken,
+                                    true,
+                                    detailedView)
+                                .ToListAsync(
+                                    cancellationToken),
+                            DetailedView = detailedView,
+                        };
+                    },
+                    cancellationToken);
         }
 
-        public IActionResult DetailedView(
-            Guid id)
+        public Task<IActionResult> DetailedView(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
-
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
-            return View(
-                nameof(Index),
-                new ParticipantOverviewViewModel()
-                {
-                    Competition = _danceCompHelper.GetCompetition(
-                        foundCompId),
-                    OverviewItems = _danceCompHelper
-                        .GetParticipants(
-                            foundCompId,
-                            null,
-                            true,
-                            true)
-                        .ToList(),
-                    DetailedView = true,
-                });
+            return Index(
+                id,
+                cancellationToken,
+                true);
         }
 
-        public IActionResult ShowCreateEdit(
-            Guid id)
+        public Task<IActionResult> ShowCreateEdit(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
+            return GetDefaultRequestHandler<Participant, ParticipantViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowCreateEdit))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    {
+                        var foundComp = await dcH.FindCompetitionAsync(
+                            showId,
+                            cToken);
 
-            if (foundCompId == null)
-            {
-                return NotFound();
-            }
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
 
-            var foundComp = _danceCompHelper.GetCompetition(
-                foundCompId);
+                        var foundCompId = foundComp.CompetitionId;
+                        ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        _ = Guid.TryParse(
+                            HttpContext.Session.GetString(
+                                ParticipantLastCreatedCompetitionClassId),
+                            out var lastCreatedClassId);
 
-            var helpCompName = string.Empty;
-
-            _ = Guid.TryParse(
-                HttpContext.Session.GetString(
-                    ParticipantLastCreatedCompetitionClassId),
-                out var lastCreatedClassId);
-
-            return View(
-                new ParticipantViewModel()
-                {
-                    CompetitionId = foundCompId.Value,
-                    CompetitionName = foundComp.GetCompetitionName(),
-                    CompetitionClasses = _danceCompHelper
-                        .GetCompetitionClasses(
-                            foundCompId)
-                        .ToSelectListItem(
-                            lastCreatedClassId),
-                });
+                        return new ParticipantViewModel()
+                        {
+                            CompetitionId = foundCompId,
+                            CompetitionName = foundComp.GetCompetitionName(),
+                            CompetitionClasses = await _danceCompHelper
+                                .GetCompetitionClassesAsync(
+                                    foundCompId,
+                                    cToken)
+                                .ToSelectListItemAsync(
+                                    lastCreatedClassId)
+                                .ToListAsync(
+                                    cToken),
+                        };
+                    },
+                    cancellationToken);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateNew(
-            ParticipantViewModel createParticipant)
+        public Task<IActionResult> CreateNew(
+            ParticipantViewModel createParticipant,
+            CancellationToken cancellationToken)
         {
-            if (ModelState.IsValid == false)
-            {
-                createParticipant.Errors = ModelState.GetErrorMessages();
-
-                createParticipant.CompetitionClasses = _danceCompHelper
-                    .GetCompetitionClasses(
-                        createParticipant.CompetitionId)
-                    .ToSelectListItem(
-                        createParticipant.CompetitionClassId);
-
-                return View(
-                    nameof(ShowCreateEdit),
-                    createParticipant);
-            }
-
-            try
-            {
-                var useCompetitionClassId = createParticipant.CompetitionClassId ?? Guid.Empty;
-
-                _danceCompHelper.CreateParticipant(
-                     createParticipant.CompetitionId,
-                     useCompetitionClassId,
-                     createParticipant.StartNumber,
-                     // A
-                     createParticipant.NamePartA,
-                     createParticipant.OrgIdPartA,
-                     // B
-                     createParticipant.NamePartB,
-                     createParticipant.OrgIdPartB,
-                     createParticipant.ClubName,
-                     createParticipant.OrgIdClub,
-                     // A
-                     createParticipant.OrgPointsPartA,
-                     createParticipant.OrgStartsPartA,
-                     createParticipant.MinStartsForPromotionPartA,
-                     createParticipant.OrgAlreadyPromotedPartA,
-                     createParticipant.OrgAlreadyPromotedInfoPartA,
-                     // B
-                     createParticipant.OrgPointsPartB,
-                     createParticipant.OrgStartsPartB,
-                     createParticipant.MinStartsForPromotionPartB,
-                     createParticipant.OrgAlreadyPromotedPartB,
-                     createParticipant.OrgAlreadyPromotedInfoPartB,
-                     createParticipant.Comment,
-                     createParticipant.Ignore);
-
-                HttpContext.Session.SetString(
-                    ParticipantLastCreatedCompetitionClassId,
-                    useCompetitionClassId.ToString());
-
-                return RedirectToAction(
-                    nameof(Index),
-                    new
+            return GetDefaultRequestHandler<Participant, ParticipantViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
                     {
-                        Id = createParticipant.CompetitionId
-                    });
-            }
-            catch (Exception exc)
-            {
-                createParticipant.Errors = exc.InnerException?.Message ?? exc.Message;
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            _viewData,
+                            cToken);
 
-                createParticipant.CompetitionClasses = _danceCompHelper
-                    .GetCompetitionClasses(
-                        createParticipant.CompetitionId)
-                    .ToSelectListItem(
-                        createParticipant.CompetitionClassId);
+                        model.CompetitionClasses = await dcH
+                            .GetCompetitionClassesAsync(
+                                createParticipant.CompetitionId,
+                                cancellationToken)
+                            .ToSelectListItemAsync(
+                                createParticipant.CompetitionClassId)
+                            .ToListAsync(
+                                cancellationToken);
 
-                return View(
-                    nameof(ShowCreateEdit),
-                    createParticipant);
-            }
+                        return null;
+                    })
+                .DefaultCreateNewAsync(
+                    createParticipant,
+                    _mapper.Map<Participant>(
+                        createParticipant),
+                    async (dcH, newEntity, _, _, cToken) =>
+                    {
+                        var useCompetitionClassId = createParticipant.CompetitionClassId ?? Guid.Empty;
+
+                        await dcH.CreateParticipantAsync(
+                            newEntity,
+                            cancellationToken);
+
+                        HttpContext.Session.SetString(
+                            ParticipantLastCreatedCompetitionClassId,
+                            useCompetitionClassId.ToString());
+
+                        return new
+                        {
+                            Id = newEntity.CompetitionId,
+                        };
+                    },
+                    cancellationToken);
         }
 
-        public IActionResult ShowEdit(
-            Guid id)
+        public Task<IActionResult> ShowEdit(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundParticipant = _danceCompHelper.GetParticipant(
-                id);
+            return GetDefaultRequestHandler<Participant, ParticipantViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowCreateEdit))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    {
+                        var foundPart = await dcH.GetParticipantAsync(
+                            showId,
+                            cancellationToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(Participant),
+                                    showId));
 
-            if (foundParticipant == null)
-            {
-                return RedirectToAction(
-                    nameof(Index));
-            }
+                        _viewData["Use" + nameof(CompetitionClass)] = foundPart.CompetitionId;
 
-            var foundComp = _danceCompHelper.GetCompetition(
-                foundParticipant.CompetitionId);
+                        // override the values...
+                        var partModel = mapper.Map<ParticipantViewModel>(
+                            foundPart);
 
-            if (foundComp == null)
-            {
-                return NotFound();
-            }
+                        partModel.CompetitionClasses = await dcH
+                            .GetCompetitionClassesAsync(
+                                foundPart.CompetitionId,
+                                cancellationToken)
+                            .ToSelectListItemAsync(
+                                foundPart.CompetitionClassId)
+                            .ToListAsync(
+                                cancellationToken);
 
-            ViewData["Use" + nameof(CompetitionClass)] = foundComp.CompetitionId;
-
-            return View(
-                nameof(ShowCreateEdit),
-                new ParticipantViewModel()
-                {
-                    CompetitionId = foundParticipant.CompetitionId,
-                    CompetitionName = foundComp.GetCompetitionName(),
-                    CompetitionClassId = foundParticipant.CompetitionClassId,
-                    ParticipantId = foundParticipant.ParticipantId,
-                    StartNumber = foundParticipant.StartNumber,
-                    // A
-                    NamePartA = foundParticipant.NamePartA,
-                    OrgIdPartA = foundParticipant.OrgIdPartA,
-                    // B
-                    NamePartB = foundParticipant.NamePartB,
-                    OrgIdPartB = foundParticipant.OrgIdPartB,
-                    ClubName = foundParticipant.ClubName,
-                    OrgIdClub = foundParticipant.OrgIdClub,
-                    // A
-                    OrgPointsPartA = foundParticipant.OrgPointsPartA,
-                    OrgStartsPartA = foundParticipant.OrgStartsPartA,
-                    MinStartsForPromotionPartA = foundParticipant.MinStartsForPromotionPartA,
-                    OrgAlreadyPromotedPartA = foundParticipant.OrgAlreadyPromotedPartA,
-                    OrgAlreadyPromotedInfoPartA = foundParticipant.OrgAlreadyPromotedInfoPartA,
-                    // B
-                    OrgPointsPartB = foundParticipant.OrgPointsPartB,
-                    OrgStartsPartB = foundParticipant.OrgStartsPartB,
-                    MinStartsForPromotionPartB = foundParticipant.MinStartsForPromotionPartB,
-                    OrgAlreadyPromotedPartB = foundParticipant.OrgAlreadyPromotedPartB,
-                    OrgAlreadyPromotedInfoPartB = foundParticipant.OrgAlreadyPromotedInfoPartB,
-                    Comment = foundParticipant.Comment,
-                    Ignore = foundParticipant.Ignore,
-
-                    CompetitionClasses = _danceCompHelper
-                        .GetCompetitionClasses(
-                            foundParticipant.CompetitionId)
-                        .ToSelectListItem(
-                            foundParticipant.CompetitionClassId),
-                });
+                        return partModel;
+                    },
+                    cancellationToken);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditSave(
-            ParticipantViewModel editParticipant)
+        public Task<IActionResult> EditSave(
+            ParticipantViewModel editParticipant,
+            CancellationToken cancellationToken)
         {
-            if (ModelState.IsValid == false)
-            {
-                editParticipant.Errors = ModelState.GetErrorMessages();
-
-                return View(
-                    nameof(ShowCreateEdit),
-                    editParticipant);
-            }
-
-            try
-            {
-                _danceCompHelper.EditParticipant(
-                    editParticipant.ParticipantId ?? Guid.Empty,
-                    editParticipant.CompetitionClassId ?? Guid.Empty,
-                    editParticipant.StartNumber,
-                    // A
-                    editParticipant.NamePartA,
-                    editParticipant.OrgIdPartA,
-                    // B
-                    editParticipant.NamePartB,
-                    editParticipant.OrgIdPartB,
-                    editParticipant.ClubName,
-                    editParticipant.OrgIdClub,
-                    // A
-                    editParticipant.OrgPointsPartA,
-                    editParticipant.OrgStartsPartA,
-                    editParticipant.MinStartsForPromotionPartA,
-                    editParticipant.OrgAlreadyPromotedPartA,
-                    editParticipant.OrgAlreadyPromotedInfoPartA,
-                    // B
-                    editParticipant.OrgPointsPartB,
-                    editParticipant.OrgStartsPartB,
-                    editParticipant.MinStartsForPromotionPartB,
-                    editParticipant.OrgAlreadyPromotedPartB,
-                    editParticipant.OrgAlreadyPromotedInfoPartB,
-                    editParticipant.Comment,
-                    editParticipant.Ignore);
-
-                return RedirectToAction(
-                    nameof(Index),
-                    new
+            return GetDefaultRequestHandler<Participant, ParticipantViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
                     {
-                        Id = editParticipant.CompetitionClassId ?? Guid.Empty
-                    });
-            }
-            catch (Exception exc)
-            {
-                editParticipant.Errors = exc.InnerException?.Message ?? exc.Message;
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            _viewData,
+                            cToken);
 
-                return View(
-                    nameof(ShowCreateEdit),
-                    editParticipant);
-            }
+                        model.CompetitionClasses = await dcH
+                            .GetCompetitionClassesAsync(
+                                model.CompetitionId,
+                                cancellationToken)
+                            .ToSelectListItemAsync(
+                                model.CompetitionClassId)
+                            .ToListAsync(
+                                cancellationToken);
+
+                        return null;
+                    })
+                .DefaultEditSaveAsync(
+                    editParticipant,
+                    async (model, dcH, mapper, _, cToken) =>
+                    {
+                        var foundPart = await dcH.GetParticipantAsync(
+                            model.ParticipantId ?? Guid.Empty,
+                            cancellationToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(Participant),
+                                    model.ParticipantId));
+
+                        // override the values...
+                        mapper.Map(
+                            model,
+                            foundPart);
+
+                        return new
+                        {
+                            Id = model.CompetitionClassId ?? Guid.Empty
+                        };
+                    },
+                    cancellationToken);
         }
 
-        public IActionResult Delete(
-            Guid id)
+        public Task<IActionResult> Delete(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var helpCompClassId = _danceCompHelper.FindCompetitionClass(
-                    id);
+            return GetDefaultRequestHandler<Participant, ParticipantViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(Index))
+                .DefaultDeleteAsync(
+                    id,
+                    async (delId, dcH, _, _, cToken) =>
+                    {
+                        var helpComp = await _danceCompHelper.FindCompetitionAsync(
+                            id,
+                            cancellationToken);
 
-            _danceCompHelper.RemoveParticipant(
-                id);
+                        var foundPart = await dcH.GetParticipantAsync(
+                            delId,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(Participant),
+                                    delId));
 
-            return RedirectToAction(
-                nameof(Index),
-                new
-                {
-                    Id = helpCompClassId ?? Guid.Empty
-                });
+                        await dcH.RemoveParticipantAsync(
+                            foundPart,
+                            cToken);
+
+                        return new
+                        {
+                            Id = helpComp?.CompetitionId ?? Guid.Empty,
+                        };
+                    },
+                    cancellationToken);
         }
     }
 }

@@ -97,7 +97,15 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                             useFollowUpClass);
                     }
 
-                    useFollowUpClass = useFollowUpClass.FollowUpCompetitionClass;
+                    // must not be me...
+                    if (useFollowUpClass.FollowUpCompetitionClass != useFollowUpClass)
+                    {
+                        useFollowUpClass = useFollowUpClass.FollowUpCompetitionClass;
+                    }
+                    else
+                    {
+                        useFollowUpClass = null;
+                    }
 
                     retChkPromo = GetCheckPromotionInfo(
                         participant,

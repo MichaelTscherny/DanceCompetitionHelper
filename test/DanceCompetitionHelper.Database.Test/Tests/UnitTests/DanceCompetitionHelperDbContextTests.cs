@@ -1,12 +1,6 @@
-﻿using DanceCompetitionHelper.Config;
-using DanceCompetitionHelper.Database.Config;
-using DanceCompetitionHelper.Database.Diagnostic;
-using DanceCompetitionHelper.OrgImpl.Oetsv;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using TestHelper.Logging;
 
 namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
 {
@@ -17,35 +11,8 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
 
         public DanceCompetitionHelperDbContextTests()
         {
-            _useHost = Host.CreateDefaultBuilder()
-                .ConfigureServices((_, config) =>
-                {
-                    config.AddDbContext<DanceCompetitionHelperDbContext>();
-                    config.AddTransient<IDbConfig>(
-                        (srvProv) => new SqLiteDbConfig()
-                        {
-                            SqLiteDbFile = GetNewDbName(),
-                            // LogAllSqls = true,
-                        });
-                    config.AddTransient(
-                        (srvProv) => new ImporterSettings()
-                        {
-                            // LogAllSqls = true,
-                        });
-                    config.AddSingleton<ILoggerProvider, NUnitLoggerProvider>();
-                    config.AddTransient<IObserver<DiagnosticListener>, DbDiagnosticObserver>();
-                    config.AddTransient<IObserver<KeyValuePair<string, object?>>, DbKeyValueObserver>();
-
-                    // OeTSV Stuff...
-                    config.AddTransient<OetsvCompetitionImporter>();
-                    config.AddTransient<OetsvParticipantChecker>();
-                })
-                .ConfigureLogging((_, config) =>
-                {
-                    config.AddConsole();
-                    config.SetMinimumLevel(LogLevel.Trace);
-                })
-                .Build();
+            _useHost = TestConfiguration.CreateDefaultTestHost(
+                GetNewDbName());
         }
 
         private static long _dbCounter = 0;
@@ -110,7 +77,7 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             // for DB-loggigns...
             DiagnosticListener.AllListeners.Subscribe(
                 _useHost.Services.GetRequiredService<IObserver<DiagnosticListener>>());
-            dbCtx.Migrate();
+            dbCtx.MigrateAsync();
 
             return dbCtx;
         }
@@ -122,10 +89,11 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
         }
 
         [Test]
-        public void SimpleCreate()
+        public async Task SimpleCreate()
         {
             using var dbCtx = GetDanceCompetitionHelperDbContext();
-            using var dbTrans = dbCtx.BeginTransaction()
+            using var dbTrans = await dbCtx.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -140,8 +108,8 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
                         CompetitionInfo = "Just an info",
                     });
 
-                dbCtx.SaveChanges();
-                dbTrans.Commit();
+                await dbCtx.SaveChangesAsync();
+                await dbTrans.CommitAsync();
 
                 foreach (var curComp in dbCtx.Competitions)
                 {
@@ -155,7 +123,7 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
             }
             catch
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
 
                 throw;
             }

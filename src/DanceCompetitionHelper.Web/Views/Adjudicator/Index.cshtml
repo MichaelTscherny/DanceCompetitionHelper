@@ -36,6 +36,9 @@
                     <th>
                         Name
                     </th>
+                    <th>
+                        Comment
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -56,14 +59,21 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.Name)
                         </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Comment)
+                        </td>
                         <td class="text-nowrap">
                             <a asp-controller="@AdjudicatorController.RefName"
                                asp-action="@nameof(AdjudicatorController.ShowEdit)" 
-                               asp-route-id="@item.AdjudicatorId">Edit</a> |
+                               asp-route-id="@item.AdjudicatorId"
+                               class="bi bi-pencil-square"
+                               title="Edit"></a> |
                             <a asp-controller="@AdjudicatorController.RefName"
                                asp-action="@nameof(AdjudicatorController.Delete)"
-                               asp-route-id="@item.AdjudicatorId">Delete</a> |
-                            Clone
+                               asp-route-id="@item.AdjudicatorId"
+                               class="bi bi-trash3-fill link-danger"
+                               title="Delete"></a> |
+                            <i class="bi bi-copy" title="Clone"></i>
                         </td>
                     </tr>
                 }
@@ -87,16 +97,18 @@
 
     <div class="hstack gap-2 justify-content-center">
         <a asp-controller="@AdjudicatorController.RefName"
-            asp-action="@nameof(AdjudicatorController.ShowCreateEdit)"
-            asp-route-id="@Model.Competition?.CompetitionId"
-            class="btn btn-primary px-lg-4">
-            Create new
+           asp-action="@nameof(AdjudicatorController.ShowCreateEdit)"
+           asp-route-id="@Model.Competition?.CompetitionId"
+           class="btn btn-primary px-lg-4 bi bi-file-earmark-plus"
+           title="Create new">
+           Create new
         </a>
         <a asp-controller="@CompetitionClassController.RefName"
-            asp-action="@nameof(CompetitionClassController.Index)"
-            asp-route-id="@Model.Competition?.CompetitionId"
-            class="btn btn-secondary px-lg-4">
-            Back
+           asp-action="@nameof(CompetitionClassController.Index)"
+           asp-route-id="@Model.Competition?.CompetitionId"
+           class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
+           title="Back">
+           Back
         </a>
     </div>
     <br />

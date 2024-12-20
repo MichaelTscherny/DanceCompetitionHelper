@@ -1,415 +1,487 @@
-﻿using DanceCompetitionHelper.Database.Tables;
+﻿using AutoMapper;
+using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
+using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
-    public class CompetitionClassController : Controller
+    public class CompetitionClassController : ControllerBase<CompetitionClassController>
     {
         public const string RefName = "CompetitionClass";
         public const string CompetitionClassLastCreatedAdjudicatorPanelId = nameof(CompetitionClassLastCreatedAdjudicatorPanelId);
         public const string DefaultCompetitionColor = "#ffffff";
 
-        private readonly IDanceCompetitionHelper _danceCompHelper;
-        private readonly ILogger<CompetitionController> _logger;
-        private readonly IServiceProvider _serviceProvider;
-
         public CompetitionClassController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<CompetitionController> logger,
-            IServiceProvider serviceProvider)
+            ILogger<CompetitionClassController> logger,
+            IMapper mapper)
+            : base(
+                danceCompHelper,
+                logger,
+                mapper)
         {
-            _danceCompHelper = danceCompHelper
-                ?? throw new ArgumentNullException(
-                    nameof(danceCompHelper));
-            _logger = logger
-                ?? throw new ArgumentNullException(
-                    nameof(logger));
-            _serviceProvider = serviceProvider
-                ?? throw new ArgumentNullException(
-                    nameof(serviceProvider));
         }
 
-        public IActionResult Index(
-            Guid id)
+        public async Task<IActionResult> Index(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
+            return await GetDefaultRequestHandler<CompetitionClass, CompetitionClassOverviewViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultIndexAsync(
+                    id,
+                    async (indexId, dcH, _, _viewData, cToken) =>
+                    {
+                        var foundComp = await dcH.FindCompetitionAsync(
+                            indexId,
+                            cToken);
 
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
 
-            return View(
-                new CompetitionClassOverviewViewModel()
-                {
-                    Competition = _danceCompHelper.GetCompetition(
-                        foundCompId),
-                    OverviewItems = _danceCompHelper
-                        .GetCompetitionClasses(
-                            foundCompId,
-                            true)
-                        .ToList(),
-                });
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
+
+                        return new CompetitionClassOverviewViewModel()
+                        {
+                            Competition = foundComp,
+                            OverviewItems = await dcH
+                                .GetCompetitionClassesAsync(
+                                    foundCompId,
+                                    cToken,
+                                    true)
+                                .ToListAsync(
+                                    cToken),
+                        };
+                    },
+                    cancellationToken);
         }
 
-        public IActionResult DetailedView(
-            Guid id)
+        public Task<IActionResult> DetailedView(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassOverviewViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, _, _viewData, cToken) =>
+                    {
+                        var foundComp = await dcH.FindCompetitionAsync(
+                            showId,
+                            cToken);
 
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
 
-            return View(
-                nameof(Index),
-                new CompetitionClassOverviewViewModel()
-                {
-                    Competition = _danceCompHelper.GetCompetition(
-                        foundCompId),
-                    OverviewItems = _danceCompHelper
-                        .GetCompetitionClasses(
-                            foundCompId,
-                            true,
-                            true)
-                        .ToList(),
-                    DetailedView = true,
-                });
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
+
+                        return new CompetitionClassOverviewViewModel()
+                        {
+                            Competition = foundComp,
+                            OverviewItems = await dcH
+                                .GetCompetitionClassesAsync(
+                                    foundCompId,
+                                    cToken,
+                                    true,
+                                    true)
+                                .ToListAsync(
+                                    cToken),
+                            DetailedView = true,
+                        };
+                    },
+                    cancellationToken);
         }
 
-        public IActionResult ShowCreateEdit(
-            Guid id)
+        public Task<IActionResult> ShowCreateEdit(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowCreateEdit))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    {
+                        var foundComp = await dcH.FindCompetitionAsync(
+                            showId,
+                            cToken);
 
-            if (foundCompId == null)
-            {
-                return NotFound();
-            }
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
 
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
 
+                        _ = Guid.TryParse(
+                            HttpContext.Session.GetString(
+                                CompetitionClassLastCreatedAdjudicatorPanelId),
+                            out var lastCreatedAdjudicatorPanelId);
+
+                        return await FillCompetitionClassViewModel(
+                            dcH,
+                            foundComp,
+                            new CompetitionClassViewModel()
+                            {
+                                CompetitionId = foundCompId,
+                            },
+                            cToken);
+                    },
+                    cancellationToken);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public Task<IActionResult> CreateNew(
+            CompetitionClassViewModel createCompetitionClass,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
+                    {
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            _viewData,
+                            cToken);
+
+                        await FillCompetitionClassViewModel(
+                            dcH,
+                            model.CompetitionId,
+                            model,
+                            cToken);
+
+                        return null;
+                    })
+                .DefaultCreateNewAsync(
+                    createCompetitionClass,
+                    _mapper.Map<CompetitionClass>(
+                        createCompetitionClass),
+                    async (dcH, newEntity, _, _, cToken) =>
+                    {
+                        await dcH.CreateCompetitionClassAsync(
+                            newEntity,
+                            cToken);
+
+                        HttpContext.Session.SetString(
+                            CompetitionClassLastCreatedAdjudicatorPanelId,
+                            newEntity.AdjudicatorPanelId.ToString());
+
+                        return new
+                        {
+                            Id = newEntity.CompetitionId,
+                        };
+                    },
+                    cancellationToken);
+        }
+
+        public Task<IActionResult> ShowEdit(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowCreateEdit))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    {
+                        var foundCompClass = await dcH.GetCompetitionClassAsync(
+                            showId,
+                            cToken);
+
+                        if (foundCompClass == null)
+                        {
+                            return null;
+                        }
+
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompClass.CompetitionId;
+
+                        var ccVm = mapper.Map<CompetitionClassViewModel>(
+                            foundCompClass);
+
+                        return await FillCompetitionClassViewModel(
+                            dcH,
+                            foundCompClass.CompetitionId,
+                            ccVm,
+                            cToken);
+                    },
+                    cancellationToken);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public Task<IActionResult> EditSave(
+            CompetitionClassViewModel editCompetitionClass,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
+                    {
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            _viewData,
+                            cToken);
+
+                        await FillCompetitionClassViewModel(
+                            dcH,
+                            model.CompetitionId,
+                            model,
+                            cToken);
+
+                        return null;
+                    })
+                .DefaultEditSaveAsync(
+                    editCompetitionClass,
+                    async (model, dcH, mapper, _, cToken) =>
+                    {
+                        var foundCompClass = await dcH.GetCompetitionClassAsync(
+                            model.CompetitionClassId ?? Guid.Empty,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(CompetitionClass),
+                                    model.CompetitionClassId));
+
+                        // override the values...
+                        mapper.Map(
+                            model,
+                            foundCompClass);
+
+                        // mitigate loops...
+                        if (foundCompClass.FollowUpCompetitionClassId == foundCompClass.CompetitionClassId)
+                        {
+                            foundCompClass.FollowUpCompetitionClassId = null;
+                        }
+
+                        return new
+                        {
+                            Id = model.CompetitionId
+                        };
+                    },
+                    cancellationToken);
+        }
+
+        public Task<IActionResult> Delete(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(Index))
+                .DefaultDeleteAsync(
+                    id,
+                    async (delId, dcH, _, _, cToken) =>
+                    {
+                        var foundCompClass = await dcH.GetCompetitionClassAsync(
+                            delId,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(CompetitionClass),
+                                    delId));
+
+                        await dcH.RemoveCompetitionClassAsync(
+                            foundCompClass,
+                            cToken);
+
+                        return new
+                        {
+                            Id = foundCompClass.CompetitionId,
+                        };
+                    },
+                    cancellationToken);
+        }
+
+        public Task<IActionResult> ShowMultipleStarters(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<CompetitionClass, ShowMultipleStartersOverviewViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowMultipleStarters))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    {
+                        var foundComp = await dcH.FindCompetitionAsync(
+                            showId,
+                            cToken);
+
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
+
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
+
+                        return new ShowMultipleStartersOverviewViewModel()
+                        {
+                            Competition = foundComp,
+                            OverviewItems = await dcH
+                                .GetMultipleStarterAsync(
+                                    foundCompId,
+                                    cToken)
+                                .ToListAsync(
+                                    cToken),
+                        };
+                    },
+                    cancellationToken);
+        }
+
+        public Task<IActionResult> ShowPossiblePromotions(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<CompetitionClass, ShowPossiblePromotionsViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowPossiblePromotions))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    {
+                        var foundComp = await dcH.FindCompetitionAsync(
+                            showId,
+                            cancellationToken);
+
+                        if (foundComp == null)
+                        {
+                            return null;
+                        }
+
+                        var foundCompId = foundComp.CompetitionId;
+                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
+
+                        return new ShowPossiblePromotionsViewModel()
+                        {
+                            Competition = foundComp,
+                            OverviewItems = await dcH
+                                 .GetParticipantsAsync(
+                                     foundCompId,
+                                     null,
+                                     cToken,
+                                     true)
+                                 .Where(
+                                     x => x.DisplayInfo != null
+                                     && x.DisplayInfo.PromotionInfo != null
+                                     && x.DisplayInfo.PromotionInfo.PossiblePromotion)
+                                 .OrderBy(
+                                     x => x.NamePartA)
+                                 .ThenBy(
+                                     x => x.NamePartB)
+                                 .ToListAsync(
+                                     cToken),
+                            MultipleStarters = await dcH
+                                 .GetMultipleStarterAsync(
+                                     foundCompId,
+                                     cToken)
+                                 .ToListAsync(
+                                     cToken),
+                        };
+                    },
+                    cancellationToken);
+        }
+
+        #region Helper
+
+        public Task<CompetitionClassViewModel> FillCompetitionClassViewModel(
+            IDanceCompetitionHelper dcH,
+            Competition? foundComp,
+            CompetitionClassViewModel useModel,
+            CancellationToken cancellationToken)
+        {
+            return FillCompetitionClassViewModel(
+                dcH,
+                foundComp?.CompetitionId ?? Guid.Empty,
+                useModel,
+                cancellationToken);
+        }
+
+        public async Task<CompetitionClassViewModel> FillCompetitionClassViewModel(
+            IDanceCompetitionHelper dcH,
+            Guid foundCompId,
+            CompetitionClassViewModel useModel,
+            CancellationToken cancellationToken)
+        {
             _ = Guid.TryParse(
                 HttpContext.Session.GetString(
                     CompetitionClassLastCreatedAdjudicatorPanelId),
                 out var lastCreatedAdjudicatorPanelId);
 
-            return View(
-                new CompetitionClassViewModel()
-                {
-                    CompetitionId = foundCompId.Value,
-                    AdjudicatorPanels = _danceCompHelper
-                        .GetAdjudicatorPanels(
-                            foundCompId)
-                        .ToSelectListItem(
-                            lastCreatedAdjudicatorPanelId),
-                    FollowUpCompetitionClasses = _danceCompHelper
-                        .GetCompetitionClasses(
-                            foundCompId.Value)
-                        .ToSelectListItem(
-                            addEmpty: true)
-                });
+            useModel.AdjudicatorPanels = await dcH
+                .GetAdjudicatorPanelsAsync(
+                    foundCompId,
+                    cancellationToken)
+                .ToSelectListItemAsync(
+                    lastCreatedAdjudicatorPanelId)
+                .ToListAsync(
+                    cancellationToken);
+            useModel.FollowUpCompetitionClasses = await dcH
+                .GetCompetitionClassesAsync(
+                    foundCompId,
+                    cancellationToken)
+                .Where(
+                    x => x.CompetitionClassId != useModel.CompetitionClassId)
+                .ToSelectListItemAsync(
+                    addEmpty: true)
+                .ToListAsync(
+                    cancellationToken);
+
+            return useModel;
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CreateNew(
-            CompetitionClassViewModel createCompetition)
-        {
-            if (ModelState.IsValid == false)
-            {
-                createCompetition.Errors = ModelState.GetErrorMessages();
+        #endregion Helper
 
-                createCompetition.FollowUpCompetitionClassId = createCompetition.FollowUpCompetitionClassId;
-                createCompetition.FollowUpCompetitionClasses = _danceCompHelper
-                    .GetCompetitionClasses(
-                        createCompetition.CompetitionId)
-                    .ToSelectListItem(
-                        createCompetition.FollowUpCompetitionClassId,
-                        addEmpty: true);
-
-                createCompetition.AdjudicatorPanelId = createCompetition.AdjudicatorPanelId;
-                createCompetition.AdjudicatorPanels = _danceCompHelper
-                    .GetAdjudicatorPanels(
-                        createCompetition.CompetitionId)
-                    .ToSelectListItem(
-                        createCompetition.AdjudicatorPanelId);
-
-                return View(
-                    nameof(ShowCreateEdit),
-                    createCompetition);
-            }
-
-            try
-            {
-                var useAdjudicatorPanelId = createCompetition.AdjudicatorPanelId;
-
-                _danceCompHelper.CreateCompetitionClass(
-                    createCompetition.CompetitionId,
-                    createCompetition.CompetitionClassName,
-                    createCompetition.FollowUpCompetitionClassId,
-                    useAdjudicatorPanelId,
-                    createCompetition.OrgClassId,
-                    createCompetition.Discipline,
-                    createCompetition.AgeClass,
-                    createCompetition.AgeGroup,
-                    createCompetition.Class,
-                    createCompetition.MinStartsForPromotion,
-                    createCompetition.MinPointsForPromotion,
-                    createCompetition.PointsForFirst,
-                    createCompetition.ExtraManualStarter,
-                    createCompetition.Comment,
-                    createCompetition.Ignore,
-                    createCompetition.CompetitionColor);
-
-                HttpContext.Session.SetString(
-                    CompetitionClassLastCreatedAdjudicatorPanelId,
-                    useAdjudicatorPanelId.ToString());
-
-                return RedirectToAction(
-                    nameof(Index),
-                    new
-                    {
-                        Id = createCompetition.CompetitionId
-                    });
-            }
-            catch (Exception exc)
-            {
-                createCompetition.Errors = exc.InnerException?.Message ?? exc.Message;
-
-                createCompetition.FollowUpCompetitionClassId = createCompetition.FollowUpCompetitionClassId;
-                createCompetition.FollowUpCompetitionClasses = _danceCompHelper
-                    .GetCompetitionClasses(
-                        createCompetition.CompetitionId)
-                    .ToSelectListItem(
-                        createCompetition.FollowUpCompetitionClassId,
-                        addEmpty: true);
-
-                createCompetition.AdjudicatorPanelId = createCompetition.AdjudicatorPanelId;
-                createCompetition.AdjudicatorPanels = _danceCompHelper
-                    .GetAdjudicatorPanels(
-                        createCompetition.CompetitionId)
-                    .ToSelectListItem(
-                        createCompetition.AdjudicatorPanelId);
-
-                return View(
-                    nameof(ShowCreateEdit),
-                    createCompetition);
-            }
-        }
-
-        public IActionResult ShowEdit(
-            Guid id)
-        {
-            var foundCompClass = _danceCompHelper.GetCompetitionClass(
-                id);
-
-            if (foundCompClass == null)
-            {
-                var helpCompClassId = _danceCompHelper.FindCompetition(
-                    id);
-
-                return RedirectToAction(
-                    nameof(Index),
-                    new
-                    {
-                        Id = helpCompClassId ?? Guid.Empty
-                    });
-            }
-
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompClass.CompetitionId;
-
-            return View(
-                nameof(ShowCreateEdit),
-                new CompetitionClassViewModel()
-                {
-                    CompetitionId = foundCompClass.CompetitionId,
-                    CompetitionClassId = foundCompClass.CompetitionClassId,
-                    CompetitionClassName = foundCompClass.CompetitionClassName,
-
-                    FollowUpCompetitionClassId = foundCompClass.FollowUpCompetitionClassId,
-                    FollowUpCompetitionClasses = _danceCompHelper
-                        .GetCompetitionClasses(
-                            foundCompClass.CompetitionId)
-                        .ToSelectListItem(
-                            foundCompClass.FollowUpCompetitionClassId,
-                            addEmpty: true),
-                    AdjudicatorPanelId = foundCompClass.AdjudicatorPanelId,
-                    AdjudicatorPanels = _danceCompHelper
-                        .GetAdjudicatorPanels(
-                            foundCompClass.CompetitionId)
-                        .ToSelectListItem(
-                            foundCompClass.AdjudicatorPanelId),
-                    OrgClassId = foundCompClass.OrgClassId,
-                    Discipline = foundCompClass.Discipline,
-                    AgeClass = foundCompClass.AgeClass,
-                    AgeGroup = foundCompClass.AgeGroup,
-                    Class = foundCompClass.Class,
-                    MinStartsForPromotion = foundCompClass.MinStartsForPromotion,
-                    MinPointsForPromotion = foundCompClass.MinPointsForPromotion,
-                    PointsForFirst = foundCompClass.PointsForFirst,
-                    ExtraManualStarter = foundCompClass.ExtraManualStarter,
-                    Comment = foundCompClass.Comment,
-                    Ignore = foundCompClass.Ignore,
-                    CompetitionColor = foundCompClass.CompetitionColor ?? DefaultCompetitionColor,
-                });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult EditSave(
-            CompetitionClassViewModel editCompetitionClass)
-        {
-            if (ModelState.IsValid == false)
-            {
-                editCompetitionClass.Errors = ModelState.GetErrorMessages();
-
-                editCompetitionClass.AdjudicatorPanels = _danceCompHelper
-                    .GetAdjudicatorPanels(
-                        editCompetitionClass.CompetitionId)
-                    .ToSelectListItem(
-                        editCompetitionClass.AdjudicatorPanelId);
-
-                return View(
-                    nameof(ShowCreateEdit),
-                    editCompetitionClass);
-            }
-
-            try
-            {
-                _danceCompHelper.EditCompetitionClass(
-                    editCompetitionClass.CompetitionClassId ?? Guid.Empty,
-                    editCompetitionClass.CompetitionClassName,
-                    editCompetitionClass.FollowUpCompetitionClassId,
-                    editCompetitionClass.AdjudicatorPanelId,
-                    editCompetitionClass.OrgClassId,
-                    editCompetitionClass.Discipline,
-                    editCompetitionClass.AgeClass,
-                    editCompetitionClass.AgeGroup,
-                    editCompetitionClass.Class,
-                    editCompetitionClass.MinStartsForPromotion,
-                    editCompetitionClass.MinPointsForPromotion,
-                    editCompetitionClass.PointsForFirst,
-                    editCompetitionClass.ExtraManualStarter,
-                    editCompetitionClass.Comment,
-                    editCompetitionClass.Ignore,
-                    editCompetitionClass.CompetitionColor);
-
-                return RedirectToAction(
-                    nameof(Index),
-                    new
-                    {
-                        Id = editCompetitionClass.CompetitionId
-                    });
-            }
-            catch (Exception exc)
-            {
-                editCompetitionClass.Errors = exc.InnerException?.Message ?? exc.Message;
-
-                editCompetitionClass.FollowUpCompetitionClassId = editCompetitionClass.FollowUpCompetitionClassId;
-                editCompetitionClass.FollowUpCompetitionClasses = _danceCompHelper
-                    .GetCompetitionClasses(
-                        editCompetitionClass.CompetitionId)
-                    .ToSelectListItem(
-                        editCompetitionClass.FollowUpCompetitionClassId,
-                        addEmpty: true);
-
-                editCompetitionClass.AdjudicatorPanelId = editCompetitionClass.AdjudicatorPanelId;
-                editCompetitionClass.AdjudicatorPanels = _danceCompHelper
-                    .GetAdjudicatorPanels(
-                        editCompetitionClass.CompetitionId)
-                    .ToSelectListItem(
-                        editCompetitionClass.AdjudicatorPanelId);
-
-                return View(
-                    nameof(ShowCreateEdit),
-                    editCompetitionClass);
-            }
-        }
-
-        public IActionResult Delete(
-            Guid id)
-        {
-            var helpCompClassId = _danceCompHelper.FindCompetition(
-                    id);
-
-            _danceCompHelper.RemoveCompetitionClass(
-                id);
-
-            return RedirectToAction(
-                nameof(Index),
-                new
-                {
-                    Id = helpCompClassId ?? Guid.Empty
-                });
-        }
-
-        public IActionResult ShowMultipleStarters(
-            Guid id)
-        {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                    id);
-
-            if (foundCompId == null)
-            {
-                return NotFound();
-            }
-
-            var helpComp = _danceCompHelper.GetCompetition(
-                foundCompId);
-
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
-            return View(
-                new ShowMultipleStartersOverviewViewModel()
-                {
-                    Competition = helpComp,
-                    OverviewItems = _danceCompHelper
-                        .GetMultipleStarter(
-                            foundCompId.Value)
-                        .ToList(),
-                });
-        }
-
-        public IActionResult ShowPossiblePromotions(
-            Guid id)
-        {
-            var foundCompId = _danceCompHelper.FindCompetition(
-                id);
-
-            if (foundCompId == null)
-            {
-                return NotFound();
-            }
-
-            var helpComp = _danceCompHelper.GetCompetition(
-                foundCompId);
-
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
-            return View(
-                new ShowPossiblePromotionsViewModel()
-                {
-                    Competition = helpComp,
-                    OverviewItems = _danceCompHelper
-                        .GetParticipants(
-                            foundCompId.Value,
-                            null,
-                            true)
-                        .Where(
-                            x => x.DisplayInfo != null
-                            && x.DisplayInfo.PromotionInfo != null
-                            && x.DisplayInfo.PromotionInfo.PossiblePromotion)
-                        .OrderBy(
-                            x => x.NamePartA)
-                        .ThenBy(
-                            x => x.NamePartB)
-                        .ToList(),
-                    MultipleStarters = _danceCompHelper
-                        .GetMultipleStarter(
-                            foundCompId.Value)
-                        .ToList(),
-                });
-        }
     }
 }

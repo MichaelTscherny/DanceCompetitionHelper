@@ -1,5 +1,4 @@
 ﻿using DanceCompetitionHelper.Database.Test.Tests.UnitTests;
-using TechTalk.SpecFlow;
 
 namespace DanceCompetitionHelper.Test.Bindings
 {

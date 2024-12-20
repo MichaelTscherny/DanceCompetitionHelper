@@ -1,5 +1,8 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
+using DanceCompetitionHelper.Database.Extensions;
+using DanceCompetitionHelper.Database.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,7 +11,7 @@ namespace DanceCompetitionHelper.Database.Tables
     [Comment("The Participants of a " + nameof(Competition))]
     [Index(nameof(CompetitionId), nameof(ParticipantId), IsUnique = true)]
     [PrimaryKey(nameof(ParticipantId))]
-    public class Participant : TableBase
+    public class Participant : TableBase, IDefaultTrim
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -83,6 +86,17 @@ namespace DanceCompetitionHelper.Database.Tables
 
         [NotMapped]
         public ParticipantDisplayInfo? DisplayInfo { get; set; }
+
+        public void DefaultTrim()
+        {
+            NamePartA = NamePartA.DefaultTrim();
+            OrgIdPartA = OrgIdPartA.DefaultNullableTrim();
+            NamePartB = NamePartB.DefaultNullableTrim();
+            OrgIdPartB = OrgIdPartB.DefaultNullableTrim();
+
+            ClubName = ClubName.DefaultNullableTrim();
+            OrgIdClub = OrgIdClub.DefaultNullableTrim();
+        }
 
         public override string ToString()
         {

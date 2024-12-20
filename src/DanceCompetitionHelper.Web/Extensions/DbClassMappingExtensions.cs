@@ -7,8 +7,8 @@ namespace DanceCompetitionHelper.Web.Extensions
 {
     public static class DbClassMappingExtensions
     {
-        public static List<SelectListItem> ToSelectListItem(
-            this IEnumerable<OrganizationEnum> organizations,
+        public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
+            this IAsyncEnumerable<OrganizationEnum> organizations,
             OrganizationEnum? selectedItem = null,
             bool addEmpty = false)
         {
@@ -16,148 +16,116 @@ namespace DanceCompetitionHelper.Web.Extensions
 
             if (addEmpty)
             {
-                retList.Add(
-                    new SelectListItem()
-                    {
-                        Value = string.Empty,
-                        Text = "None",
-                        Selected = false,
-                    });
+                yield return new SelectListItem()
+                {
+                    Value = string.Empty,
+                    Text = "None",
+                    Selected = false,
+                };
             }
 
-            if (organizations != null)
+            await foreach (var curItem in organizations ?? AsyncEnumerable.Empty<OrganizationEnum>())
             {
-                retList.AddRange(
-                    organizations.Select(
-                        x => new SelectListItem()
-                        {
-                            Value = x.ToString(),
-                            Text = x.ToString(),
-                            Selected = x == selectedItem
-                        }));
+                yield return new SelectListItem()
+                {
+                    Value = curItem.ToString(),
+                    Text = curItem.ToString(),
+                    Selected = curItem == selectedItem
+                };
             }
-
-            return retList;
         }
 
-        public static List<SelectListItem> ToSelectListItem(
-            this IEnumerable<Competition> competitions,
+        public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
+            this IAsyncEnumerable<Competition> competitions,
             Guid? selectedItem = null,
             bool addEmpty = false)
         {
-            var retList = new List<SelectListItem>();
-
             if (addEmpty)
             {
-                retList.Add(
-                    new SelectListItem()
-                    {
-                        Value = string.Empty,
-                        Text = "None",
-                        Selected = false
-                    });
+                yield return new SelectListItem()
+                {
+                    Value = string.Empty,
+                    Text = "None",
+                    Selected = false
+                };
             }
 
-            if (competitions != null)
+            await foreach (var curItem in competitions ?? AsyncEnumerable.Empty<Competition>())
             {
-                retList.AddRange(
-                    competitions.Select(
-                        x => new SelectListItem()
-                        {
-                            Value = x.CompetitionId.ToString(),
-                            Text = x.GetCompetitionName(),
-                            Selected = x.CompetitionId == selectedItem
-                        }));
+                yield return new SelectListItem()
+                {
+                    Value = curItem.CompetitionId.ToString(),
+                    Text = curItem.GetCompetitionName(),
+                    Selected = curItem.CompetitionId == selectedItem
+                };
             }
-
-            return retList;
         }
 
-        public static List<SelectListItem> ToSelectListItem(
-            this IEnumerable<CompetitionClass> competitionClasses,
+        public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
+            this IAsyncEnumerable<CompetitionClass> competitionClasses,
             Guid? selectedItem = null,
             bool addEmpty = false)
         {
-            var retList = new List<SelectListItem>();
-
             if (addEmpty)
             {
-                retList.Add(
-                    new SelectListItem()
-                    {
-                        Value = string.Empty,
-                        Text = "None",
-                        Selected = false
-                    });
+                yield return new SelectListItem()
+                {
+                    Value = string.Empty,
+                    Text = "None",
+                    Selected = false
+                };
             }
 
-            if (competitionClasses != null)
+            await foreach (var curItem in competitionClasses ?? AsyncEnumerable.Empty<CompetitionClass>())
             {
-                retList.AddRange(
-                    competitionClasses.Select(
-                        x => new SelectListItem()
-                        {
-                            Value = x.CompetitionClassId.ToString(),
-                            Text = x.CompetitionClassName,
-                            Selected = x.CompetitionClassId == selectedItem
-                        }));
+                yield return new SelectListItem()
+                {
+                    Value = curItem.CompetitionClassId.ToString(),
+                    Text = curItem.GetCompetitionClassName(),
+                    Selected = curItem.CompetitionClassId == selectedItem
+                };
             }
-
-            return retList;
         }
 
-        public static List<SelectListItem> ToSelectListItem(
-            this IEnumerable<CompetitionVenue> competitionVenues,
+        public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
+            this IAsyncEnumerable<CompetitionVenue> competitionVenues,
             Guid? selectedItem = null,
             bool addEmpty = false)
         {
-            var retList = new List<SelectListItem>();
-
             if (addEmpty)
             {
-                retList.Add(
-                    new SelectListItem()
-                    {
-                        Value = string.Empty,
-                        Text = "None",
-                        Selected = false
-                    });
+                yield return new SelectListItem()
+                {
+                    Value = string.Empty,
+                    Text = "None",
+                    Selected = false
+                };
             }
 
-            if (competitionVenues != null)
+            await foreach (var curItem in competitionVenues ?? AsyncEnumerable.Empty<CompetitionVenue>())
             {
-                retList.AddRange(
-                    competitionVenues.Select(
-                        x => new SelectListItem()
-                        {
-                            Value = x.CompetitionVenueId.ToString(),
-                            Text = x.Name,
-                            Selected = x.CompetitionVenueId == selectedItem
-                        }));
+                yield return new SelectListItem()
+                {
+                    Value = curItem.CompetitionVenueId.ToString(),
+                    Text = curItem.Name,
+                    Selected = curItem.CompetitionVenueId == selectedItem
+                };
             }
-
-            return retList;
         }
 
-        public static List<SelectListItem> ToSelectListItem(
-            this IEnumerable<AdjudicatorPanel> adjudicatorPanels,
+        public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
+            this IAsyncEnumerable<AdjudicatorPanel> adjudicatorPanels,
             Guid? selectedItem = null)
         {
-            var retList = new List<SelectListItem>();
-
-            if (adjudicatorPanels != null)
+            await foreach (var curItem in adjudicatorPanels ?? AsyncEnumerable.Empty<AdjudicatorPanel>())
             {
-                retList.AddRange(
-                    adjudicatorPanels.Select(
-                        x => new SelectListItem()
-                        {
-                            Value = x.AdjudicatorPanelId.ToString(),
-                            Text = x.Name,
-                            Selected = x.AdjudicatorPanelId == selectedItem
-                        }));
+                yield return new SelectListItem()
+                {
+                    Value = curItem.AdjudicatorPanelId.ToString(),
+                    Text = curItem.Name,
+                    Selected = curItem.AdjudicatorPanelId == selectedItem,
+                };
             }
-
-            return retList;
         }
 
         // TODO: needed?..
@@ -175,7 +143,7 @@ namespace DanceCompetitionHelper.Web.Extensions
                         {
                             Value = x.AdjudicatorId.ToString(),
                             Text = x.Name,
-                            Selected = x.AdjudicatorId == selectedItem
+                            Selected = x.AdjudicatorId == selectedItem,
                         }));
             }
 

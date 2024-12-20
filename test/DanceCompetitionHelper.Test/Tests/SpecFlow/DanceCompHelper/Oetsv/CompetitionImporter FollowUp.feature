@@ -68,3 +68,9 @@ Scenario: Import 02
     And none multiple starts exists in Competitions of DanceCompetitionHelper "DanceCompHelper"
         | CompetitionName  |
         | Small Tournament |
+
+
+# #1609 -> test import and follow up
+# Jun. I La D (014) 	Jun. I La C (015)
+# Jun. I La C (015) 	Jun. II La B (019) 
+#

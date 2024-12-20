@@ -72,6 +72,9 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv.OetsvConsts
         [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group4, Classes.A, null)]
         [TestCase(Disciplines.La, AgeClasses.Senior, AgeGroups.Group4, Classes.S, null)]
         // -------------
+        // # Jun. I La D (014) => Jun. I La C (015)
+        // # Jun. I La C (015) !> Jun. II La B (019) 
+        // -------------        
         [TestCase(null, null, null, null, null)]
         [TestCase("", "", "", "", null)]
         [TestCase("dummy", "dummy", "dummy", "dummy", null)]

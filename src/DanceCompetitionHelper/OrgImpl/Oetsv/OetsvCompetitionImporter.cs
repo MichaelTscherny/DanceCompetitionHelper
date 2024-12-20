@@ -16,6 +16,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
     {
         private readonly ILogger<OetsvCompetitionImporter> _logger;
         private readonly ImporterSettings _importerSettings;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         public DanceCompetitionHelper? DanceCompetitionHelper { get; set; }
         public DanceCompetitionHelperDbContext? DbCtx => DanceCompetitionHelper?.GetDbCtx();
@@ -103,7 +104,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         public const string ExpectedDownloadContentType = "text/csv";
 
-        #endregion // Constants...
+        #endregion Constants...
 
         static OetsvCompetitionImporter()
         {
@@ -113,12 +114,15 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
         public OetsvCompetitionImporter(
             ILogger<OetsvCompetitionImporter> logger,
-            ImporterSettings importerSettings)
+            ImporterSettings importerSettings,
+            IHttpClientFactory httpClientFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(
                 nameof(logger));
             _importerSettings = importerSettings ?? throw new ArgumentNullException(
                 nameof(importerSettings));
+            _httpClientFactory = httpClientFactory
+                ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
         public List<string> ImportOrUpdateByFile(
@@ -255,15 +259,14 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             try
             {
-                using var httpClient = new HttpClient()
-                {
-                    Timeout = TimeSpan.FromMinutes(1),
-                };
+                using var httpClient = _httpClientFactory.CreateClient();
+                httpClient.Timeout = TimeSpan.FromMinutes(1);
 
                 var retTask = httpClient
                     .GetAsync(
                         updateUri);
-                retTask.Wait();
+                Task.WaitAll(
+                    retTask);
                 var getResp = retTask.Result;
 
                 if (getResp.StatusCode != HttpStatusCode.OK)
@@ -320,12 +323,13 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             try
             {
-                using var httpClient = new HttpClient();
+                using var httpClient = _httpClientFactory.CreateClient();
 
                 var retTask = httpClient
                     .GetAsync(
                         downloadUri);
-                retTask.Wait();
+                Task.WaitAll(
+                    retTask);
                 var getResp = retTask.Result;
 
                 if (getResp.StatusCode != HttpStatusCode.OK)
@@ -1109,12 +1113,17 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 {
                     foreach (var curNewClass in allCreatedCompClasses)
                     {
-                        curNewClass.FollowUpCompetitionClass = (compClassChecker?
+                        var higherClass = (compClassChecker?
                             .GetHigherClassifications(
                                 curNewClass,
                                 allCompClasses.Values)
                                 ?? Enumerable.Empty<CompetitionClass>())
                             .FirstOrDefault();
+
+                        if (curNewClass != higherClass)
+                        {
+                            curNewClass.FollowUpCompetitionClass = higherClass;
+                        }
                     }
                 }
             }

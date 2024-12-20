@@ -301,7 +301,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             return foundCompVenue;
         }
 
-        #endregion // Data Caching Stuff
+        #endregion Data Caching Stuff
 
         #region Special Sort Stuff
 
@@ -398,6 +398,6 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
         }
 
-        #endregion // Dispose Stuff
+        #endregion Dispose Stuff
     }
 }

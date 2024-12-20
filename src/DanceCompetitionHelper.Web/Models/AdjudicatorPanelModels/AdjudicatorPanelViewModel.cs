@@ -4,10 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DanceCompetitionHelper.Web.Models.AdjudicatorPanelModels
 {
-    public class AdjudicatorPanelViewModel
+    public class AdjudicatorPanelViewModel : ViewModelBase
     {
-        public string? Errors { get; set; }
-
         [Required]
         [FromForm]
         [HiddenInput]

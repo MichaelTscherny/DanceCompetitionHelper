@@ -1,7 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.Tables;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace DanceCompetitionHelper.Web.Models.Configuration
+namespace DanceCompetitionHelper.Web.Models.ConfigurationModels
 {
     public class ConfigurationOverviewViewModel : OverviewModelBase<ConfigurationValue>
     {
@@ -10,6 +10,8 @@ namespace DanceCompetitionHelper.Web.Models.Configuration
         public string? Dummy { get; set; }
         public string? ErrorsAdd { get; set; }
         public string? ErrorsChange { get; set; }
+
+        public bool ShowGlobalConfigOnly { get; set; }
 
         public List<SelectListItem>? AvailableOrganizations { get; set; } = new List<SelectListItem>();
 

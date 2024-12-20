@@ -17,7 +17,7 @@
         multipleStartersCount,
         compInfoStr);
 
-    var displayInfos = new List<(string ClassName, Guid ClassId)>(
+    var displayInfos = new List<(string ClassName, Guid ClassId, bool Ignore)>(
         Model.OverviewItems
             ?.SelectMany(
                 x => x.CompetitionClasses)
@@ -25,9 +25,10 @@
                 x => x.OrgClassId)
             .Select(
                 x => (x.GetCompetitionClassName(), 
-                    x.CompetitionClassId))
+                    x.CompetitionClassId,
+                    x.Ignore))
             .Distinct()
-            ?? Enumerable.Empty<(string, Guid)>());
+            ?? Enumerable.Empty<(string, Guid, bool)>());
 }
 
 <div class="text-center">
@@ -43,8 +44,15 @@
 
                     @foreach (var curDisplayInfo in displayInfos)
                     {
+                        var infoString = string.Empty;
+
+                        if(curDisplayInfo.Ignore)
+                        {
+                            infoString = "[IGNORE!]";
+                        }
+
                         <th>
-                            @curDisplayInfo.ClassName
+                            @curDisplayInfo.ClassName @infoString
                         </th>
                     }
                 </tr>
@@ -102,7 +110,8 @@
             <a asp-controller="@CompetitionClassController.RefName"
                asp-action="@nameof(CompetitionClassController.Index)"
                asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-primary px-lg-4">
+               class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
+               title="Back">
                Back
             </a>
         </div>

@@ -21,7 +21,7 @@ namespace DanceCompetitionHelper.Web
                 var builder = WebApplication.CreateBuilder(args);
 
                 // that's on purpose for easier testing
-                SqLiteDbConfig myCfg = new SqLiteDbConfig();
+                var myCfg = new SqLiteDbConfig();
                 builder.Configuration
                     .GetRequiredSection(
                         SqLiteDbConfig.Name)
@@ -33,6 +33,12 @@ namespace DanceCompetitionHelper.Web
                     ?.Bind(myImporterSettigns);
 
                 // Add services to the container.
+                // set up
+                builder.Services
+                    .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
+                    .AddHttpClient();
+                builder.Services
+                    .AddControllersWithViews();
                 builder.Services
                     .AddDbContext<DanceCompetitionHelperDbContext>()
                     .AddScoped<IDanceCompetitionHelper, DanceCompetitionHelper>()
@@ -42,8 +48,7 @@ namespace DanceCompetitionHelper.Web
                     .AddSingleton<IDbConfig>(myCfg)
                     .AddSingleton(myImporterSettigns)
                     // general classes
-                    .AddTransient<TableHistoryCreator>()
-                    .AddControllersWithViews();
+                    .AddTransient<TableHistoryCreator>();
 
                 // Organization specific classes:
                 // Oetsv:
@@ -60,12 +65,16 @@ namespace DanceCompetitionHelper.Web
                         options.Cookie.IsEssential = true;
                     });
 
+                builder.Logging.ClearProviders();
                 builder.Host.UseNLog();
+
 
                 var app = builder.Build();
 
                 var logger = app.Services
                     .GetRequiredService<ILogger<CompetitionController>>();
+                var lifetime = app.Services
+                    .GetRequiredService<IHostApplicationLifetime>();
 
                 // for sql-tracing/loggings...
                 DiagnosticListener.AllListeners.Subscribe(
@@ -84,8 +93,12 @@ namespace DanceCompetitionHelper.Web
                     app.MapFallbackToController(
                         "Index",
                         "Competition");
+
+                    // TODO: needed?..
+                    // app.UseHsts();
                 }
 
+                // app.UseHttpsRedirection();
                 app.UseStaticFiles();
 
                 app.UseRouting();
@@ -118,6 +131,9 @@ namespace DanceCompetitionHelper.Web
                             if (app.Environment.IsDevelopment() == false
                                 || Debugger.IsAttached == false)
                             {
+                                logger.LogDebug(
+                                    "Try starting a Browser for the app...");
+
                                 foreach (var curAddr in addresses)
                                 {
                                     if (Uri.TryCreate(
@@ -137,7 +153,6 @@ namespace DanceCompetitionHelper.Web
                                                 UseShellExecute = true,
 
                                             });
-
                                         return;
                                     }
                                     catch (System.ComponentModel.Win32Exception noBrowser)
@@ -168,6 +183,11 @@ namespace DanceCompetitionHelper.Web
                 // before application-exit (Avoid segmentation fault on Linux)
                 NLog.LogManager.Shutdown();
             }
+        }
+
+        private static void UsedProc_Exited(object? sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

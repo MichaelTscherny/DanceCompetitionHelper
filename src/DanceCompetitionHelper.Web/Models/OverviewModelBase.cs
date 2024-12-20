@@ -2,7 +2,7 @@
 
 namespace DanceCompetitionHelper.Web.Models
 {
-    public abstract class OverviewModelBase<T>
+    public abstract class OverviewModelBase<T> : ViewModelBase
         where T : class
     {
         public Competition? Competition { get; set; }

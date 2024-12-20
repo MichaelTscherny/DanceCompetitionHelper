@@ -200,10 +200,14 @@
                         <td class="text-nowrap">
                             <a asp-controller="@CompetitionClassController.RefName"
                                asp-action="@nameof(CompetitionClassController.ShowEdit)"
-                               asp-route-id="@item.CompetitionClassId">Edit</a> |
+                               asp-route-id="@item.CompetitionClassId"
+                               class="bi bi-pencil-square"
+                               title="Edit"></a> |
                             <a asp-controller="@CompetitionClassController.RefName"
                                asp-action="@nameof(CompetitionController.Delete)"
-                               asp-route-id="@item.CompetitionClassId">Delete</a>
+                               asp-route-id="@item.CompetitionClassId"
+                               class="bi bi-trash3-fill link-danger"
+                               title="Delete"></a>
                         </td>
                     </tr>
                 }
@@ -265,12 +269,14 @@
         <a asp-controller="@CompetitionClassController.RefName"
            asp-action="@nameof(CompetitionClassController.ShowCreateEdit)"
            asp-route-id="@Model.Competition?.CompetitionId"
-           class="btn btn-primary ">
+           class="btn btn-primary  bi bi-file-earmark-plus"
+           title="Create new">
            Create new
         </a>
         <a asp-controller="@CompetitionController.RefName"
            asp-action="@nameof(CompetitionController.Index)"
-           class="btn btn-secondary ">
+           class="btn btn-secondary bi bi-box-arrow-in-left"
+           title="Back">
            Back
         </a>
         <div class="vr"></div>
@@ -279,17 +285,19 @@
             <a asp-controller="@CompetitionClassController.RefName"
                asp-action="@nameof(CompetitionClassController.Index)"
                asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-primary ">
+               class="btn btn-primary bi bi-zoom-out"
+               title="Normal View">
                Normal View
             </a>
         }
         else
         {
             <a asp-controller="@CompetitionClassController.RefName"
-                asp-action="@nameof(CompetitionClassController.DetailedView)"
-                asp-route-id="@Model.Competition?.CompetitionId"
-                class="btn btn-primary">
-                Detailed View
+               asp-action="@nameof(CompetitionClassController.DetailedView)"
+               asp-route-id="@Model.Competition?.CompetitionId"
+               class="btn btn-primary bi bi-zoom-in"
+               title="Detailed Viewout">
+               Detailed View
             </a>
         }
     </div>

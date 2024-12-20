@@ -2,7 +2,7 @@
 @using DanceCompetitionHelper.Database.Tables
 @using DanceCompetitionHelper.Database.Extensions
 @using DanceCompetitionHelper.Web.Controllers
-@using DanceCompetitionHelper.Web.Models.Configuration
+@using DanceCompetitionHelper.Web.Models.ConfigurationModels
 
 @model ConfigurationValue 
 
@@ -144,7 +144,7 @@
             <button type="submit"
                     value="delete"
                     asp-action="@nameof(ConfigurationController.Delete)"
-                    class="btn btn-outline-danger bi bi-trash">
+                    class="btn btn-outline-danger bi bi-trash3-fill">
             </button>
         </div>
     </form>

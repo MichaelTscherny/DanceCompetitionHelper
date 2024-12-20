@@ -5,10 +5,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
 {
-    public class CompetitionClassViewModel
+    public class CompetitionClassViewModel : ViewModelBase
     {
-        public string? Errors { get; set; }
-
         [Required]
         [FromForm]
         [HiddenInput]
@@ -48,7 +46,6 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
         [StringLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]
         public string? Discipline { get; set; } = default!;
 
-        [Required]
         [FromForm]
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]
         [StringLength(DanceCompetitionHelperConstants.MaxLengthCompetitionClassString)]

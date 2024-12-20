@@ -103,6 +103,7 @@
                     <tr class="@extraTrClass">
                         <td class="text-nowrap" style="background-color: @item.CompetitionClass.CompetitionColor">
                             @item.CompetitionClass.CompetitionClassName
+                            (@item.CompetitionClass.OrgClassId)
                             [@(item.CompetitionClass.Comment)]
                         </td>
                         <td>
@@ -220,10 +221,14 @@
                         <td class ="text-nowrap">
                             <a asp-controller="@ParticipantController.RefName"
                                asp-action="@nameof(ParticipantController.ShowEdit)"
-                               asp-route-id="@item.ParticipantId">Edit</a> |
+                               asp-route-id="@item.ParticipantId"
+                               class="bi bi-pencil-square"
+                               title="Edit"></a> |
                             <a asp-controller="@ParticipantController.RefName"
                                asp-action="@nameof(ParticipantController.Delete)"
-                               asp-route-id="@item.ParticipantId">Delete</a>
+                               asp-route-id="@item.ParticipantId"
+                               class="bi bi-trash3-fill link-danger"
+                               title="Delete"></a>
                         </td>
                     </tr>
                 }
@@ -300,13 +305,15 @@
         <a asp-controller="@ParticipantController.RefName"
            asp-action="@nameof(ParticipantController.ShowCreateEdit)"
            asp-route-id="@Model.Competition?.CompetitionId"
-           class="btn btn-primary px-lg-4">
+           class="btn btn-primary px-lg-4 bi bi-file-earmark-plus"
+           title="Create New">
            Create new
         </a>
         <a asp-controller="@CompetitionClassController.RefName"
            asp-action="@nameof(CompetitionClassController.Index)"
            asp-route-id="@Model.Competition?.CompetitionId"
-           class="btn btn-secondary px-lg-4">
+           class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
+           title="Back">
            Back
         </a>
         <div class="vr"></div>
@@ -315,7 +322,8 @@
             <a asp-controller="@ParticipantController.RefName"
                asp-action="@nameof(ParticipantController.Index)"
                asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-primary px-lg-4">
+               class="btn btn-primary px-lg-4 bi bi-zoom-out"
+               title="Normal View">
                Normal View
             </a>
         }
@@ -324,7 +332,8 @@
             <a asp-controller="@ParticipantController.RefName"
                asp-action="@nameof(ParticipantController.DetailedView)"
                asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-primary px-lg-4">
+               class="btn btn-primary px-lg-4 bi bi-zoom-in"
+               title="Detailed View">
                Detailed View
             </a>
         }

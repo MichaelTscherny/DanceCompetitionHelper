@@ -20,15 +20,16 @@ namespace DanceCompetitionHelper.Test.Bindings
         #region Dance Competition Helper Database
 
         [Then(@"following Competitions exists in ""([^""]*)""")]
-        public void ThenFollowingCompetitionsExistsIn(
+        public async Task ThenFollowingCompetitionsExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkComps = table.CreateSet<CompetitionPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -85,20 +86,21 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
             finally
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
             }
         }
 
         [Then(@"following Competition Classes exists in ""([^""]*)""")]
-        public void ThenFollowingCompetitionClassesExistsIn(
+        public async Task ThenFollowingCompetitionClassesExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkCompClasses = table.CreateSet<CompetitionClassPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
             try
@@ -230,20 +232,21 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
             finally
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
             }
         }
 
         [Then(@"following Adjudicator Panels exists in ""([^""]*)""")]
-        public void ThenFollowingAdjudicatorPanelsExistsIn(
+        public async Task ThenFollowingAdjudicatorPanelsExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkAdjPanels = table.CreateSet<AdjudicatorPanelPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -305,20 +308,21 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
             finally
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
             }
         }
 
         [Then(@"following Adjudicators exists in ""([^""]*)""")]
-        public void ThenFollowingAdjudicatorsExistsIn(
+        public async Task ThenFollowingAdjudicatorsExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkAdjs = table.CreateSet<AdjudicatorPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -399,20 +403,21 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
             finally
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
             }
         }
 
         [Then(@"following Competition Classes Histroy exists in ""([^""]*)""")]
-        public void ThenFollowingCompetitionClassesHistoryExistsIn(
+        public async Task ThenFollowingCompetitionClassesHistoryExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkCompClassesHist = table.CreateSet<CompetitionClassHistoryPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -509,20 +514,21 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
             finally
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
             }
         }
 
         [Then(@"following Competition Venues exists in ""([^""]*)""")]
-        public void ThenFollowingCompetitionVenuesExistsIn(
+        public async Task ThenFollowingCompetitionVenuesExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkCompVanes = table.CreateSet<CompetitionVenuePoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -584,20 +590,21 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
             finally
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
             }
         }
 
         [Then(@"following Participants exists in ""([^""]*)""")]
-        public void ThenFollowingPartitipantsExistsIn(
+        public async Task ThenFollowingPartitipantsExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkParticipants = table.CreateSet<ParticipantPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -734,20 +741,21 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
             finally
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
             }
         }
 
         [Then(@"following Participants History exists in ""([^""]*)""")]
-        public void ThenFollowingPartitipantsHistoryExistsIn(
+        public async Task ThenFollowingPartitipantsHistoryExistsIn(
             string danceCompHelperDb,
-            Table table)
+            DataTable table)
         {
             var checkParticipantsHist = table.CreateSet<ParticipantHistoryPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
 
-            using var dbTrans = useDb.BeginTransaction()
+            using var dbTrans = await useDb.BeginTransactionAsync(
+                CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
 
@@ -878,7 +886,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             }
             finally
             {
-                dbTrans.Rollback();
+                await dbTrans.RollbackAsync();
             }
         }
 
@@ -887,21 +895,23 @@ namespace DanceCompetitionHelper.Test.Bindings
         #region Dance Competition Helper
 
         [Then(@"following Competitions exists in DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingCompetitionExistsInDanceCompetitionHelper(
+        public Task ThenFollowingCompetitionExistsInDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkComps = table.CreateSet<CompetitionPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
                 danceCompHelper);
 
-            Assert.Multiple(() =>
+            return Assert.MultipleAsync(async () =>
             {
                 foreach (var chkCmp in checkComps)
                 {
-                    var foundComp = useDanceCompHelper.GetCompetition(
-                        useDanceCompHelper.GetCompetition(
-                            chkCmp.CompetitionName));
+                    var foundComp = await useDanceCompHelper.GetCompetitionAsync(
+                        (await useDanceCompHelper.GetCompetitionAsync(
+                            chkCmp.CompetitionName,
+                            CancellationToken.None))?.CompetitionId ?? Guid.Empty,
+                        CancellationToken.None);
 
                     Assert.That(
                         foundComp,
@@ -969,9 +979,9 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"following Classes exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingClassesExistsInCompetitionsOfDanceCompetitionHelper(
+        public Task ThenFollowingClassesExistsInCompetitionsOfDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkCompClass = table.CreateSet<CompetitionClassPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -979,37 +989,35 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var compClassesByCompId = new Dictionary<Guid, List<CompetitionClass>>();
 
-            Assert.Multiple(() =>
+            return Assert.MultipleAsync(async () =>
             {
                 foreach (var chkCompClass in checkCompClass)
                 {
-                    var useComp = useDanceCompHelper.GetCompetition(
-                        chkCompClass.CompetitionName);
+                    var useComp = await useDanceCompHelper.GetCompetitionAsync(
+                        chkCompClass.CompetitionName,
+                        CancellationToken.None);
 
                     Assert.That(
                         useComp,
                         Is.Not.Null,
                         $"{nameof(Competition)} '{chkCompClass.CompetitionName}' not found!");
-                    Assert.That(
-                        useComp.HasValue,
-                        Is.True,
-                        $"{nameof(Competition)} '{chkCompClass.CompetitionName}' not found");
 
                     if (useComp == null)
                     {
                         continue;
                     }
 
-                    var useCompId = useComp.Value;
+                    var useCompId = useComp.CompetitionId;
                     if (compClassesByCompId.TryGetValue(
                         useCompId,
                         out var foundCompClasses) == false)
                     {
-                        foundCompClasses = useDanceCompHelper
-                            .GetCompetitionClasses(
+                        foundCompClasses = await useDanceCompHelper
+                            .GetCompetitionClassesAsync(
                                 useCompId,
+                                CancellationToken.None,
                                 true)
-                            .ToList();
+                            .ToListAsync();
                         compClassesByCompId[useCompId] = foundCompClasses;
                     }
 
@@ -1021,22 +1029,21 @@ namespace DanceCompetitionHelper.Test.Bindings
                         nameof(CompetitionClass),
                         chkCompClass.CompetitionClassName);
 
-                    Assert.Multiple(
-                        () =>
-                        {
-                            Assert.That(
-                                foundCompClass,
-                                Is.Not.Null,
-                                $"{compClassLogString} not found");
-                            Assert.That(
-                                foundCompClass?.DisplayInfo,
-                                Is.Not.Null,
-                                $"{compClassLogString} not invalid - {nameof(CompetitionClass.DisplayInfo)} missing");
-                            Assert.That(
-                                foundCompClass?.DisplayInfo?.ExtraParticipants,
-                                Is.Not.Null,
-                                $"{compClassLogString} not invalid - {nameof(CompetitionClass.DisplayInfo.ExtraParticipants)} missing");
-                        });
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(
+                            foundCompClass,
+                            Is.Not.Null,
+                            $"{compClassLogString} not found");
+                        Assert.That(
+                            foundCompClass?.DisplayInfo,
+                            Is.Not.Null,
+                            $"{compClassLogString} not invalid - {nameof(CompetitionClass.DisplayInfo)} missing");
+                        Assert.That(
+                            foundCompClass?.DisplayInfo?.ExtraParticipants,
+                            Is.Not.Null,
+                            $"{compClassLogString} not invalid - {nameof(CompetitionClass.DisplayInfo.ExtraParticipants)} missing");
+                    });
 
                     Assert.Multiple(() =>
                     {
@@ -1177,39 +1184,37 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"following Competition Venues exists in DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingCompetitionVenuesExistsInDanceCompetitionHelper(
+        public Task ThenFollowingCompetitionVenuesExistsInDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var chkCompVenues = table.CreateSet<CompetitionVenuePoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
                 danceCompHelper);
 
-            Assert.Multiple(() =>
+            return Assert.MultipleAsync(async () =>
             {
                 foreach (var curChk in chkCompVenues)
                 {
-                    var useComp = useDanceCompHelper.GetCompetition(
-                        curChk.CompetitionName);
+                    var useComp = await useDanceCompHelper.GetCompetitionAsync(
+                        curChk.CompetitionName,
+                        CancellationToken.None);
 
                     Assert.That(
                         useComp,
                         Is.Not.Null,
                         $"{nameof(Competition)} '{curChk.CompetitionName}' not found!");
-                    Assert.That(
-                        useComp.HasValue,
-                        Is.True,
-                        $"{nameof(Competition)} '{curChk.CompetitionName}' not found");
 
                     if (useComp == null)
                     {
                         continue;
                     }
 
-                    var useCompVenue = useDanceCompHelper
-                        .GetCompetitionVenues(
-                            useComp)
-                        .FirstOrDefault(
+                    var useCompVenue = await useDanceCompHelper
+                        .GetCompetitionVenuesAsync(
+                            useComp.CompetitionId,
+                            CancellationToken.None)
+                        .FirstOrDefaultAsync(
                             x => x.Name == curChk.Name);
 
                     Assert.That(
@@ -1240,43 +1245,47 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"following Counts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingCountsExistsInDanceCompetitionsOfCompetitionHelper(
+        public Task ThenFollowingCountsExistsInDanceCompetitionsOfCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkCounts = table.CreateSet<DanceCompHelperCountsPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
                 danceCompHelper);
 
-            Assert.Multiple(() =>
+            return Assert.MultipleAsync(async () =>
             {
                 foreach (var curChk in checkCounts)
                 {
-                    Assert.Multiple(() =>
+                    await Assert.MultipleAsync(async () =>
                     {
-                        var compId = useDanceCompHelper.GetCompetition(
-                            curChk.CompetitionName);
+                        var foundComp = await useDanceCompHelper.GetCompetitionAsync(
+                            curChk.CompetitionName,
+                            CancellationToken.None);
 
                         Assert.That(
-                            compId,
+                            foundComp,
                             Is.Not.Null,
                             $"Nothign found for '{nameof(curChk.CompetitionName)}' '{curChk.CompetitionName}' (1)");
-                        Assert.That(
-                            compId.HasValue,
-                            Is.True,
-                            $"Nothign found for '{nameof(curChk.CompetitionName)}' '{curChk.CompetitionName}' (1)");
 
-                        Assert.That(
-                            useDanceCompHelper.GetCompetitionClasses(
-                                compId)
-                                .Count(),
+                        if (foundComp == null)
+                        {
+                            return;
+                        }
+
+                        await Assert.ThatAsync(
+                            async () => await useDanceCompHelper.GetCompetitionClassesAsync(
+                                foundComp.CompetitionId,
+                                CancellationToken.None)
+                                .CountAsync(),
                             Is.EqualTo(curChk.CountClasses),
                             "Count CompClasses");
-                        Assert.That(
-                            useDanceCompHelper.GetParticipants(
-                                compId,
-                                null)
-                                .Count(),
+                        await Assert.ThatAsync(
+                            async () => await useDanceCompHelper.GetParticipantsAsync(
+                                foundComp.CompetitionId,
+                                null,
+                                CancellationToken.None)
+                                .CountAsync(),
                             Is.EqualTo(curChk.CountParticipants),
                             "Count Participtans");
                     });
@@ -1285,9 +1294,9 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"following multiple starts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingMultipleStartsExistsInCompetitionsDanceCompetitionHelper(
+        public Task ThenFollowingMultipleStartsExistsInCompetitionsDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var multiStartParticipants = table.CreateSet<ParticipantPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -1295,36 +1304,34 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var cachedMultipleStarters = new Dictionary<Guid, List<MultipleStarter>>();
 
-            Assert.Multiple(() =>
+            return Assert.MultipleAsync(async () =>
             {
                 foreach (var chkMultiStart in multiStartParticipants)
                 {
-                    var useComp = useDanceCompHelper.GetCompetition(
-                        chkMultiStart.CompetitionName);
+                    var useComp = await useDanceCompHelper.GetCompetitionAsync(
+                        chkMultiStart.CompetitionName,
+                        CancellationToken.None);
 
                     Assert.That(
                         useComp,
                         Is.Not.Null,
                         $"{nameof(Competition)} '{chkMultiStart.CompetitionName}' not found!");
-                    Assert.That(
-                        useComp.HasValue,
-                        Is.True,
-                        $"{nameof(Competition)} '{chkMultiStart.CompetitionName}' not found");
 
                     if (useComp == null)
                     {
                         continue;
                     }
 
-                    var useCompId = useComp.Value;
+                    var useCompId = useComp.CompetitionId;
                     if (cachedMultipleStarters.TryGetValue(
                         useCompId,
                         out var curMultiStarter) == false)
                     {
-                        curMultiStarter = useDanceCompHelper
-                            .GetMultipleStarter(
-                                useCompId)
-                            .ToList();
+                        curMultiStarter = await useDanceCompHelper
+                            .GetMultipleStarterAsync(
+                                useCompId,
+                                CancellationToken.None)
+                            .ToListAsync();
 
                         cachedMultipleStarters[useCompId] = curMultiStarter;
                     }
@@ -1368,40 +1375,38 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"none multiple starts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenNoneMultipleStartsExistsInCompetitionDanceCompetitionHelper(
+        public Task ThenNoneMultipleStartsExistsInCompetitionDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var multiStartParticipants = table.CreateSet<ParticipantPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
                     danceCompHelper);
 
-            Assert.Multiple(() =>
+            return Assert.MultipleAsync(async () =>
             {
                 foreach (var chkMultipleStart in multiStartParticipants)
                 {
-                    var useComp = useDanceCompHelper.GetCompetition(
-                        chkMultipleStart.CompetitionName);
+                    var useComp = await useDanceCompHelper.GetCompetitionAsync(
+                        chkMultipleStart.CompetitionName,
+                        CancellationToken.None);
 
                     Assert.That(
                         useComp,
                         Is.Not.Null,
                         $"{nameof(Competition)} '{chkMultipleStart.CompetitionName}' not found!");
-                    Assert.That(
-                        useComp.HasValue,
-                        Is.True,
-                        $"{nameof(Competition)} '{chkMultipleStart.CompetitionName}' not found");
 
                     if (useComp == null)
                     {
                         continue;
                     }
 
-                    var useCompId = useComp.Value;
-                    var curMultiStarter = useDanceCompHelper
-                        .GetMultipleStarter(
-                            useCompId)
-                        .ToList();
+                    var useCompId = useComp.CompetitionId;
+                    var curMultiStarter = await useDanceCompHelper
+                        .GetMultipleStarterAsync(
+                            useCompId,
+                            CancellationToken.None)
+                        .ToListAsync();
 
                     Assert.That(
                         curMultiStarter.Count,
@@ -1412,9 +1417,9 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"following Participants exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingParticipantsExistsInCompetitionOfDanceCompetitionHelper(
+        public Task ThenFollowingParticipantsExistsInCompetitionOfDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkParticipants = table.CreateSet<ParticipantPoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
@@ -1422,38 +1427,36 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var participtansByCompId = new Dictionary<Guid, List<Participant>>();
 
-            Assert.Multiple(() =>
+            return Assert.MultipleAsync(async () =>
             {
                 foreach (var chkPart in checkParticipants)
                 {
-                    var useComp = useDanceCompHelper.GetCompetition(
-                        chkPart.CompetitionName);
+                    var useComp = await useDanceCompHelper.GetCompetitionAsync(
+                        chkPart.CompetitionName,
+                        CancellationToken.None);
 
                     Assert.That(
                         useComp,
                         Is.Not.Null,
                         $"{nameof(Competition)} '{chkPart.CompetitionName}' not found!");
-                    Assert.That(
-                        useComp.HasValue,
-                        Is.True,
-                        $"{nameof(Competition)} '{chkPart.CompetitionName}' not found");
 
                     if (useComp == null)
                     {
                         continue;
                     }
 
-                    var useCompId = useComp.Value;
+                    var useCompId = useComp.CompetitionId;
                     if (participtansByCompId.TryGetValue(
                         useCompId,
                         out var foundParticipants) == false)
                     {
-                        foundParticipants = useDanceCompHelper
-                            .GetParticipants(
+                        foundParticipants = await useDanceCompHelper
+                            .GetParticipantsAsync(
                                 useCompId,
                                 null,
+                                CancellationToken.None,
                                 true)
-                            .ToList();
+                            .ToListAsync();
 
                         participtansByCompId[useCompId] = foundParticipants;
                     }
@@ -1535,15 +1538,15 @@ namespace DanceCompetitionHelper.Test.Bindings
         }
 
         [Then(@"following Configuration Values exists in DanceCompetitionHelper ""([^""]*)""")]
-        public void ThenFollowingConfigurationValuesExistsInDanceCompetitionHelper(
+        public Task ThenFollowingConfigurationValuesExistsInDanceCompetitionHelper(
             string danceCompHelper,
-            Table table)
+            DataTable table)
         {
             var checkCfgValues = table.CreateSet<ConfigurationValuePoco>();
             var useDanceCompHelper = GetDanceCompetitionHelper(
                 danceCompHelper);
 
-            Assert.Multiple(() =>
+            return Assert.MultipleAsync(async () =>
             {
                 foreach (var curCfgVal in checkCfgValues)
                 {
@@ -1558,10 +1561,12 @@ namespace DanceCompetitionHelper.Test.Bindings
                     if (string.IsNullOrEmpty(
                         curCfgVal.CompetitionName) == false)
                     {
-                        useComp = useDanceCompHelper
-                            .GetCompetition(
-                                useDanceCompHelper.GetCompetition(
-                                    curCfgVal.CompetitionName ?? string.Empty));
+                        useComp = await useDanceCompHelper
+                            .GetCompetitionAsync(
+                                (await useDanceCompHelper.GetCompetitionAsync(
+                                    curCfgVal.CompetitionName ?? string.Empty,
+                                    CancellationToken.None))?.CompetitionId ?? Guid.Empty,
+                                CancellationToken.None);
 
                         Assert.That(
                             useComp,
@@ -1577,13 +1582,16 @@ namespace DanceCompetitionHelper.Test.Bindings
                     if (string.IsNullOrEmpty(
                         curCfgVal.CompetitionClassName) == false)
                     {
-                        var useCompetitionClassId = useDanceCompHelper.GetCompetitionClass(
-                            curCfgVal.CompetitionClassName);
+                        var useCompetitionClassId = (await useDanceCompHelper.GetCompetitionClassAsync(
+                            curCfgVal.CompetitionClassName,
+                            CancellationToken.None))
+                            ?.CompetitionClassId ?? Guid.Empty;
 
-                        useCompClass = useDanceCompHelper
-                            .GetCompetitionClasses(
-                                useComp?.CompetitionId ?? Guid.Empty)
-                            ?.FirstOrDefault(
+                        useCompClass = await useDanceCompHelper
+                            .GetCompetitionClassesAsync(
+                                useComp?.CompetitionId ?? Guid.Empty,
+                                CancellationToken.None)
+                            .FirstOrDefaultAsync(
                                 x => x.CompetitionClassId == useCompetitionClassId);
 
                         Assert.That(
@@ -1606,10 +1614,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                     if (string.IsNullOrEmpty(
                         curCfgVal.CompetitionVenueName) == false)
                     {
-                        useCompVenue = useDanceCompHelper
-                            .GetCompetitionVenues(
-                                useComp?.CompetitionId ?? Guid.Empty)
-                            .FirstOrDefault(
+                        useCompVenue = await useDanceCompHelper
+                            .GetCompetitionVenuesAsync(
+                                useComp?.CompetitionId ?? Guid.Empty,
+                                CancellationToken.None)
+                            .FirstOrDefaultAsync(
                                 x => x.Name == curCfgVal.CompetitionVenueName);
 
                         Assert.That(
@@ -1631,8 +1640,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                         && useCompClass == null
                         && useCompVenue == null)
                     {
-                        foundCfg = useDanceCompHelper.GetConfiguration(
-                            curCfgVal.Key);
+                        foundCfg = await useDanceCompHelper.GetConfigurationAsync(
+                            curCfgVal.Key,
+                            CancellationToken.None);
                     }
 
                     if (foundCfg == null
@@ -1641,10 +1651,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                         && useCompClass != null
                         && useCompVenue != null)
                     {
-                        foundCfg = useDanceCompHelper.GetConfiguration(
+                        foundCfg = await useDanceCompHelper.GetConfigurationAsync(
                             curCfgVal.Key,
                             useCompClass,
-                            useCompVenue);
+                            useCompVenue,
+                            CancellationToken.None);
                     }
 
                     if (foundCfg == null
@@ -1653,10 +1664,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                         && useCompClass == null
                         && useCompVenue != null)
                     {
-                        foundCfg = useDanceCompHelper.GetConfiguration(
+                        foundCfg = await useDanceCompHelper.GetConfigurationAsync(
                             curCfgVal.Key,
                             useComp,
-                            useCompVenue);
+                            useCompVenue,
+                            CancellationToken.None);
                     }
 
                     if (foundCfg == null
@@ -1664,26 +1676,29 @@ namespace DanceCompetitionHelper.Test.Bindings
                         && useComp != null
                         && useCompClass != null)
                     {
-                        foundCfg = useDanceCompHelper.GetConfiguration(
+                        foundCfg = await useDanceCompHelper.GetConfigurationAsync(
                             curCfgVal.Key,
-                            useCompClass);
+                            useCompClass,
+                            CancellationToken.None);
                     }
 
                     if (foundCfg == null
                         && useOrganization != null
                         && useComp != null)
                     {
-                        foundCfg = useDanceCompHelper.GetConfiguration(
+                        foundCfg = await useDanceCompHelper.GetConfigurationAsync(
                             curCfgVal.Key,
-                            useComp);
+                            useComp,
+                            CancellationToken.None);
                     }
 
                     if (foundCfg == null
                         && useOrganization != null)
                     {
-                        foundCfg = useDanceCompHelper.GetConfiguration(
+                        foundCfg = await useDanceCompHelper.GetConfigurationAsync(
                             curCfgVal.Key,
-                            useOrganization.Value);
+                            useOrganization.Value,
+                            CancellationToken.None);
                     }
 
                     // check...

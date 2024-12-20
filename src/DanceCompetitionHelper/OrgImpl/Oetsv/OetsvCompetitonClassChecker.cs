@@ -63,7 +63,10 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             foreach (var curChkClass in checkCompetitionClasses)
             {
-                if (curChkClass.CompetitionId == forCompetitionClass.CompetitionId
+                // not "myself"
+                if (curChkClass.CompetitionClassId != forCompetitionClass.CompetitionClassId
+                    // but with...
+                    && curChkClass.CompetitionId == forCompetitionClass.CompetitionId
                     && curChkClass.Discipline == forCompetitionClass.Discipline
                     && curChkClass.AgeClass == forCompetitionClass.AgeClass
                     && curChkClass.AgeGroup == forCompetitionClass.AgeGroup
