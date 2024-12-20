@@ -112,17 +112,30 @@
                         </td>
                         <td class="text-nowrap">
                             <a asp-controller="@CompetitionController.RefName"
-                               asp-action="@nameof(CompetitionController.ShowEdit)" 
-                               asp-route-id="@item.CompetitionId">Edit</a> |
+                               asp-action="@nameof(CompetitionController.ShowEdit)"
+                               asp-route-id="@item.CompetitionId" 
+                               class="bi bi-pencil-square"
+                               title="Edit"></a> |
                             <a asp-controller="@CompetitionClassController.RefName"
                                asp-action="@nameof(CompetitionClassController.Index)"
-                               asp-route-id="@item.CompetitionId">Details</a> |
+                               asp-route-id="@item.CompetitionId"
+                               class="bi bi-zoom-in"
+                               title="Details"></a> |
                             <a asp-controller="@CompetitionController.RefName"
+                               asp-action="@nameof(CompetitionController.ShowImport)"
+                               asp-route-id="@item.CompetitionId"
+                               class="bi bi-arrow-repeat"
+                               title="Refresh"></a> |
+                            <a asp-controller="@CompetitionController.RefName"                                
                                asp-action="@nameof(CompetitionController.Delete)"
-                               asp-route-id="@item.CompetitionId">Delete</a> |
+                               asp-route-id="@item.CompetitionId"
+                               class="bi bi-trash3-fill link-danger"
+                               title="Delete"></a> |
                             <a asp-controller="@CompetitionController.RefName"
                                asp-action="@nameof(CompetitionController.CreateTableHistory)"
-                               asp-route-id="@item.CompetitionId">+ Version</a>
+                               asp-route-id="@item.CompetitionId"
+                               class="bi bi-clock-history"
+                               title="+ Version"></a>
                         </td>
                     </tr>
                 }
@@ -167,9 +180,13 @@
 
     <div class="hstack gap-2 justify-content-center">
         <a asp-action="@nameof(CompetitionController.ShowCreateEdit)"
-            class="btn btn-primary px-lg-4">Create new</a>&nbsp;
+           class="btn btn-primary px-lg-4 bi bi-file-earmark-plus"
+           title="Create new">
+           Create new</a>&nbsp;
         <a asp-action="@nameof(CompetitionController.ShowImport)" 
-            class="btn btn-primary px-lg-4">Import new/update</a>
+           class="btn btn-primary px-lg-4 bi bi-cloud-download"
+           title="Import new/update">
+           Import new/update</a>
     </div>
     <br />
 </div>

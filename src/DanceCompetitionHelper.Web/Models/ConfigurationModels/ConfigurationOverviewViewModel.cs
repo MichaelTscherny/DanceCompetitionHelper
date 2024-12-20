@@ -11,6 +11,8 @@ namespace DanceCompetitionHelper.Web.Models.ConfigurationModels
         public string? ErrorsAdd { get; set; }
         public string? ErrorsChange { get; set; }
 
+        public bool ShowGlobalConfigOnly { get; set; }
+
         public List<SelectListItem>? AvailableOrganizations { get; set; } = new List<SelectListItem>();
 
         public IEnumerable<Competition>? Competitions { get; set; }

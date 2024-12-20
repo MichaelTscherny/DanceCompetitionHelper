@@ -46,18 +46,16 @@ namespace DanceCompetitionHelper.Web.Controllers
                 id,
                 cancellationToken);
 
-            if (foundComp == null)
-            {
-                return NotFound();
-            }
-
-            var foundCompId = foundComp.CompetitionId;
+            var foundCompId = foundComp?.CompetitionId ?? Guid.Empty;
             var anyError = string.IsNullOrEmpty(errorsAdd) == false
                 || string.IsNullOrEmpty(errorsChange) == false;
 
             // showConfiguration?.SanityCheck();
 
-            ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+            if (foundCompId != Guid.Empty)
+            {
+                ViewData["Use" + nameof(CompetitionClass)] = foundCompId;
+            }
 
             var (showConfig, _, useComps, useCompClasses, useCompVenues) =
                 await _danceCompHelper
@@ -162,6 +160,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     ConfigurationViewModel = useCfgViewModel,
                     ErrorsAdd = errorsAdd,
                     ErrorsChange = errorsChange,
+                    // 
+                    ShowGlobalConfigOnly = foundCompId == Guid.Empty,
                     // 
                     Competition = foundComp,
                     OverviewItems = showConfig,

@@ -273,13 +273,41 @@ namespace DanceCompetitionHelper.Web.Controllers
                     "Create History failed");
         }
 
-        public IActionResult ShowImport()
+        public Task<IActionResult> ShowImport(
+            Guid? id,
+            CancellationToken cancellationToken)
         {
-            return View(
-                new DoImportViewModel()
-                {
-                    OrgCompetitionId = "1524",
-                });
+            return GetDefaultRequestHandler<Competition, DoImportViewModel>()
+                .SetOnSuccess(
+                    nameof(ShowImport))
+                .SetOnNoData(
+                    nameof(Index))
+                .DefaultShowAsync(
+                    id,
+                    async (showId, dcH, mapper, _, cToken) =>
+                    {
+                        var retDoImport = new DoImportViewModel()
+                        {
+                            // OrgCompetitionId = "1524",
+                            FindFollowUpClasses = true,
+                            UpdateData = true,
+                        };
+
+                        var foundComp = await dcH.GetCompetitionAsync(
+                            showId,
+                            cToken);
+
+                        if (foundComp != null
+                            && string.IsNullOrEmpty(
+                                foundComp.OrgCompetitionId) == false)
+                        {
+                            retDoImport.OrgCompetitionId = foundComp.OrgCompetitionId;
+                            retDoImport.FindFollowUpClasses = false;
+                        }
+
+                        return retDoImport;
+                    },
+                    cancellationToken);
         }
 
         public async Task<IActionResult> DoImport(

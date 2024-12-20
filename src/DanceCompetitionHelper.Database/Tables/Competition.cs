@@ -43,6 +43,7 @@ namespace DanceCompetitionHelper.Database.Tables
 
         public void DefaultTrim()
         {
+            OrgCompetitionId = OrgCompetitionId.DefaultTrim();
             CompetitionName = CompetitionName.DefaultTrim();
         }
 

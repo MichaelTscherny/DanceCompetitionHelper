@@ -44,7 +44,9 @@
                     <input asp-for="OrgCompetitionId"
                            class="form-control"
                            placeholder="ÖTSV ID"
-                           style="width: 100%" />
+                           autofocus
+                           style="width: 100%" 
+                           tabindex="1"/>
                     <span asp-validation-for="OrgCompetitionId"
                           class="text-danger"></span>
                 </div>
@@ -55,7 +57,9 @@
                     </label>
                 </div>
                 <div class="col-3 text-start">
-                    <button class="btn btn-primary px-lg-4" type="submit">
+                    <button class="btn btn-primary px-lg-4  bi bi-cloud-download" 
+                            type="submit"
+                            tabindex="10">
                         Create/Update
                     </button>
                 </div>
@@ -67,8 +71,8 @@
                 <div class="col-3 text-start">
                     <input asp-for="FindFollowUpClasses"
                            type="checkbox"
-                           class="form-check-input"
-                           checked />
+                           class="form-check-input" 
+                           tabindex="2" />
                     <span asp-validation-for="FindFollowUpClasses"
                           class="text-danger"></span>
                 </div>
@@ -86,8 +90,8 @@
                 <div class="col-3 text-start">
                     <input asp-for="UpdateData"
                            type="checkbox"
-                           class="form-check-input"
-                           checked />
+                           class="form-check-input" 
+                           tabindex="3" />
                     <span asp-validation-for="UpdateData"
                           class="text-danger"></span>
                 </div>
@@ -100,5 +104,15 @@
             </div>
         </div>
     </form>
+    <br />
+    <div class="hstack gap-2 justify-content-center">
+        <a asp-controller="@CompetitionController.RefName"
+           asp-action="@nameof(CompetitionController.Index)"
+           class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
+           title="Back"
+           tabindex="20">
+           Back
+        </a>
+    </div>
     <br />
 </div>
