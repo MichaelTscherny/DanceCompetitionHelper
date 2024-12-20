@@ -21,6 +21,38 @@
 
         public bool Ignore { get; set; }
 
+        public CompetitionClassHistoryPoco AssertCreate()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(
+                    CompetitionName,
+                    Is.Not.Null
+                        .And.No.Empty,
+                    nameof(CompetitionName));
+
+                Assert.That(
+                    OrgClassId,
+                    Is.Not.Null
+                        .And.No.Empty,
+                    nameof(OrgClassId));
+
+                Assert.That(
+                    CompetitionClassName,
+                    Is.Not.Null
+                        .And.No.Empty,
+                    nameof(CompetitionClassName));
+
+                Assert.That(
+                    AdjudicatorPanelName,
+                    Is.Not.Null
+                        .And.No.Empty,
+                    nameof(AdjudicatorPanelName));
+            });
+
+            return this;
+        }
+
         public override string ToString()
         {
             return string.Format(

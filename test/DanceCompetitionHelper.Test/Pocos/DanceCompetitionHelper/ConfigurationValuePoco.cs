@@ -69,6 +69,21 @@ namespace DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper
             }
         }
 
+        public ConfigurationValuePoco AssertCreate()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(
+                    Key,
+                    Is.Not.Null
+                        .And.No.Empty,
+                    nameof(Key));
+            });
+
+            return this;
+        }
+
+
         public override string ToString()
         {
             return string.Format(

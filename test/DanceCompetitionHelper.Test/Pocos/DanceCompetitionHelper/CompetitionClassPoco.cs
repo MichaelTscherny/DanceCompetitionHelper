@@ -1,5 +1,4 @@
-﻿
-namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
+﻿namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
 {
     public class CompetitionClassPoco
     {
@@ -27,6 +26,38 @@ namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
         public string? Comment { get; set; }
 
         public bool Ignore { get; set; }
+
+        public CompetitionClassPoco AssertCreate()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(
+                    CompetitionName,
+                    Is.Not.Null
+                        .And.No.Empty,
+                    nameof(CompetitionName));
+
+                Assert.That(
+                    OrgClassId,
+                    Is.Not.Null
+                        .And.No.Empty,
+                    nameof(OrgClassId));
+
+                Assert.That(
+                    CompetitionClassName,
+                    Is.Not.Null
+                        .And.No.Empty,
+                    nameof(CompetitionClassName));
+
+                Assert.That(
+                    AdjudicatorPanelName,
+                    Is.Not.Null
+                        .And.No.Empty,
+                    nameof(AdjudicatorPanelName));
+            });
+
+            return this;
+        }
 
         public override bool Equals(object? obj)
         {

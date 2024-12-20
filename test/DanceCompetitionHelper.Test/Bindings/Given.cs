@@ -113,7 +113,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     useDb.Competitions.Add(
                         mapper.Map<Competition>(
                             newComp
-                                .ValidateCreate()));
+                                .AssertCreate()));
 
                     await useDb.SaveChangesAsync();
                 }
@@ -140,6 +140,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             var newAdjPanels = table.CreateSet<AdjudicatorPanelPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
+            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -159,13 +160,13 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.Not.Null,
                         $"{nameof(Competition)} '{newAdjPanel.CompetitionName}' not found!");
 
+                    var newAdjPanelEntity = mapper.Map<AdjudicatorPanel>(
+                        newAdjPanel
+                            .AssertCreate());
+                    newAdjPanelEntity.CompetitionId = useComp.CompetitionId;
+
                     useDb.AdjudicatorPanels.Add(
-                        new AdjudicatorPanel()
-                        {
-                            CompetitionId = useComp.CompetitionId,
-                            Name = newAdjPanel.Name,
-                            Comment = newAdjPanel.Comment,
-                        });
+                        newAdjPanelEntity);
 
                     await useDb.SaveChangesAsync();
                 }
@@ -197,6 +198,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
+            var mapper = GetMapper();
 
             foreach (var newAdj in newAdjs)
             {
@@ -222,14 +224,13 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.Not.Null,
                         $"{nameof(AdjudicatorPanel)} '{useAdjPanelName}' not found!");
 
+                    var newAdjEntity = mapper.Map<Adjudicator>(
+                        newAdj
+                            .AssertCreate());
+                    newAdjEntity.AdjudicatorPanelId = useAdjPanel.AdjudicatorPanelId;
+
                     useDb.Adjudicators.Add(
-                        new Adjudicator()
-                        {
-                            AdjudicatorPanelId = useAdjPanel.AdjudicatorPanelId,
-                            Abbreviation = newAdj.Abbreviation,
-                            Name = newAdj.Name,
-                            Comment = newAdj.Comment,
-                        });
+                        newAdjEntity);
 
                     useDb.SaveChanges();
                 }
@@ -260,6 +261,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
+            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -303,26 +305,16 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                 try
                 {
+                    var newComClassEntity = mapper.Map<CompetitionClass>(
+                        newCompClass
+                            .AssertCreate());
+
+                    newComClassEntity.Competition = useComp;
+                    newComClassEntity.FollowUpCompetitionClass = useFollowUpCopmpClass;
+                    newComClassEntity.AdjudicatorPanel = useAdjPanel;
+
                     useDb.CompetitionClasses.Add(
-                        new CompetitionClass()
-                        {
-                            Competition = useComp,
-                            OrgClassId = newCompClass.OrgClassId,
-                            CompetitionClassName = newCompClass.CompetitionClassName,
-                            FollowUpCompetitionClass = useFollowUpCopmpClass,
-                            AdjudicatorPanel = useAdjPanel,
-                            Discipline = newCompClass.Discipline,
-                            AgeClass = newCompClass.AgeClass,
-                            AgeGroup = newCompClass.AgeGroup,
-                            Class = newCompClass.Class,
-
-                            MinStartsForPromotion = newCompClass.MinStartsForPromotion ?? 0,
-                            MinPointsForPromotion = newCompClass.MinPointsForPromotion ?? 0,
-
-                            PointsForFirst = newCompClass.PointsForFirst ?? 0.0,
-                            ExtraManualStarter = newCompClass.ExtraManualStarter,
-                            Comment = newCompClass.Comment,
-                        });
+                        newComClassEntity);
 
                     await useDb.SaveChangesAsync();
                 }
@@ -350,6 +342,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
+            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -369,24 +362,13 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                 try
                 {
+                    var newCompClassHistEntity = mapper.Map<CompetitionClassHistory>(
+                        newCompClassHist
+                            .AssertCreate());
+                    newCompClassHistEntity.Competition = useComp;
+
                     useDb.CompetitionClassesHistory.Add(
-                        new CompetitionClassHistory()
-                        {
-                            Competition = useComp,
-                            Version = newCompClassHist.Version,
-                            OrgClassId = newCompClassHist.OrgClassId,
-                            Discipline = newCompClassHist.Discipline,
-                            AgeClass = newCompClassHist.AgeClass,
-                            AgeGroup = newCompClassHist.AgeGroup,
-                            Class = newCompClassHist.Class,
-
-                            MinStartsForPromotion = newCompClassHist.MinStartsForPromotion,
-                            MinPointsForPromotion = newCompClassHist.MinPointsForPromotion,
-
-                            PointsForFirst = newCompClassHist.PointsForFirst,
-                            ExtraManualStarter = newCompClassHist.ExtraManualStarter,
-                            Comment = newCompClassHist.Comment,
-                        });
+                        newCompClassHistEntity);
 
                     await useDb.SaveChangesAsync();
                 }
@@ -413,6 +395,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             var newCompVenues = table.CreateSet<CompetitionVenuePoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
+            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -432,13 +415,13 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.Not.Null,
                         $"{nameof(Competition)} '{newCompVenue.CompetitionName}' not found!");
 
+                    var newCompVenueEntity = mapper.Map<CompetitionVenue>(
+                        newCompVenue
+                            .AssertCreate());
+                    newCompVenueEntity.CompetitionId = useComp.CompetitionId;
+
                     useDb.CompetitionVenues.Add(
-                        new CompetitionVenue()
-                        {
-                            CompetitionId = useComp.CompetitionId,
-                            Name = newCompVenue.Name,
-                            Comment = newCompVenue.Comment,
-                        });
+                        newCompVenueEntity);
 
                     await useDb.SaveChangesAsync();
                 }
@@ -465,6 +448,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             var newParticipants = table.CreateSet<ParticipantPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
+            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -494,22 +478,15 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                 try
                 {
+                    var newPartEntity = mapper.Map<Participant>(
+                        newPart
+                            .AssertCreate());
+
+                    newPartEntity.Competition = useComp;
+                    newPartEntity.CompetitionClass = useCompClass;
+
                     useDb.Participants.Add(
-                        new Participant()
-                        {
-                            Competition = useComp,
-                            CompetitionClass = useCompClass,
-                            StartNumber = newPart.StartNumber,
-                            NamePartA = newPart.NamePartA,
-                            OrgIdPartA = newPart.OrgIdPartA,
-                            NamePartB = newPart.NamePartB,
-                            OrgIdPartB = newPart.OrgIdPartB,
-                            ClubName = newPart.ClubName,
-                            OrgIdClub = newPart.OrgIdClub,
-                            OrgPointsPartA = newPart.OrgPointsPartA,
-                            OrgStartsPartA = newPart.OrgStartsPartA,
-                            OrgPointsPartB = newPart.OrgPointsPartB,
-                        });
+                        newPartEntity);
 
                     await useDb.SaveChangesAsync();
                 }
@@ -537,6 +514,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
+            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -566,22 +544,15 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                 try
                 {
+                    var newPartHistEntity = mapper.Map<ParticipantHistory>(
+                        newPartHist
+                            .AssertCreate());
+
+                    newPartHistEntity.Competition = useComp;
+                    newPartHistEntity.CompetitionClassHistory = useCompClassHist;
+
                     useDb.ParticipantsHistory.Add(
-                        new ParticipantHistory()
-                        {
-                            Competition = useComp,
-                            CompetitionClassHistory = useCompClassHist,
-                            Version = newPartHist.Version,
-                            StartNumber = newPartHist.StartNumber,
-                            NamePartA = newPartHist.NamePartA,
-                            OrgIdPartA = newPartHist.OrgIdPartA,
-                            NamePartB = newPartHist.NamePartB,
-                            OrgIdPartB = newPartHist.OrgIdPartB,
-                            OrgIdClub = newPartHist.OrgIdClub,
-                            OrgPointsPartA = newPartHist.OrgPointsPartA,
-                            OrgStartsPartA = newPartHist.OrgStartsPartA,
-                            OrgPointsPartB = newPartHist.OrgPointsPartB,
-                        });
+                        newPartHistEntity);
 
                     await useDb.SaveChangesAsync();
                 }
@@ -611,6 +582,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
+            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -621,8 +593,6 @@ namespace DanceCompetitionHelper.Test.Bindings
             {
                 try
                 {
-                    newCfg.SanityCheck();
-
                     OrganizationEnum? useOrganization = newCfg.Organization;
                     Guid? useCompId = null;
                     Guid? useCompClassId = null;
@@ -691,16 +661,19 @@ namespace DanceCompetitionHelper.Test.Bindings
                         useCompVenueId = useCompVenue.CompetitionVenueId;
                     }
 
+                    newCfg.SanityCheck();
+
+                    var newCfgEntity = mapper.Map<ConfigurationValue>(
+                        newCfg
+                            .AssertCreate());
+
+                    newCfgEntity.Organization = useOrganization;
+                    newCfgEntity.CompetitionId = useCompId;
+                    newCfgEntity.CompetitionClassId = useCompClassId;
+                    newCfgEntity.CompetitionVenueId = useCompVenueId;
+
                     useDb.Configurations.Add(
-                        new ConfigurationValue()
-                        {
-                            Organization = useOrganization,
-                            CompetitionId = useCompId,
-                            CompetitionClassId = useCompClassId,
-                            CompetitionVenueId = useCompVenueId,
-                            Key = newCfg.Key,
-                            Value = newCfg.Value,
-                        });
+                        newCfgEntity);
 
                     await useDb.SaveChangesAsync();
                 }
@@ -773,7 +746,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                 await useDanceCompHelper.ImportOrUpdateCompetitionAsync(
                     toImport.Organization,
                     toImport.OrgCompetitionId,
-                    Database.Enum.ImportTypeEnum.Excel,
+                    ImportTypeEnum.Excel,
                     CancellationToken.None,
                     new[] {
                         Path.Combine(

@@ -10,21 +10,22 @@ namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
         public string? CompetitionInfo { get; set; }
         public DateTime? CompetitionDate { get; set; }
 
-        public CompetitionPoco ValidateCreate()
+        public CompetitionPoco AssertCreate()
         {
-            if (string.IsNullOrEmpty(
-                OrgCompetitionId))
+            Assert.Multiple(() =>
             {
-                throw new ArgumentNullException(
+                Assert.That(
+                    OrgCompetitionId,
+                    Is.Not.Null
+                        .And.No.Empty,
                     nameof(OrgCompetitionId));
-            }
 
-            if (string.IsNullOrEmpty(
-                CompetitionName))
-            {
-                throw new ArgumentNullException(
+                Assert.That(
+                    CompetitionName,
+                    Is.Not.Null
+                        .And.No.Empty,
                     nameof(CompetitionName));
-            }
+            });
 
             return this;
         }
