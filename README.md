@@ -45,12 +45,12 @@ for a competition registration.
 
 ## Technical base
 
-- [C# dotNet core 6.0](https://dotnet.microsoft.com/en-us/) - Win & Linux (x64 each)
+- [C# dotNet core 8.0](https://dotnet.microsoft.com/en-us/) - Win & Linux (x64 each)
 - [ASP.NET Core-Web SDK](https://learn.microsoft.com/de-de/aspnet/core/razor-pages/web-sdk?view=aspnetcore-7.0) for HTTP interfaces
 - [Entity Framework 7](https://learn.microsoft.com/en-us/ef/core/) - [SQLite](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.Sqlite)
 - [MigraDoc](http://www.pdfsharp.net/migradocoverview.ashx?AspxAutoDetectCookieSupport=1) for PDFs
 - [NUnit](https://www.nuget.org/packages/NUnit)
-- [SpecFlow](https://www.nuget.org/packages/SpecFlow/)
+- [req'n'roll](https://reqnroll.net/) (R.I.P: [SpecFlow](https://www.nuget.org/packages/SpecFlow/) :/)
 
 ### Folder struct
 
@@ -65,7 +65,7 @@ This software is supposted to work with folloing information.
 
 ### Participants List/Start numbers
 
-* Full Name (First-, Middle- Last-Name) or parts of it for the participants lists
+* Full Name (First-, Middle-, Last-Name) or parts of it for the participants lists
 * Name (or Parts) of club or organization the participant is member of
 * Nationality of participants and club/organizations ("available" via addresses)
 * Address/Location of the competition

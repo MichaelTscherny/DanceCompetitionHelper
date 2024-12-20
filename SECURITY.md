@@ -10,9 +10,11 @@ will be always be the "current" version. All other branes are for development.
 If there is breaking change, at least one "lower" version will get
 secury updates but no new features.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.1.x   | :heavy_check_mark: |
+| Version | Supported                |
+| ------- | ------------------------ |
+| 0.1.x   | :heavy_multiplication_x: |
+| 0.5.x   | :heavy_multiplication_x: |
+| 0.6.x   | :heavy_check_mark:       |
 
 ## Reporting a Vulnerability
 
