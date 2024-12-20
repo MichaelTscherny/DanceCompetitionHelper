@@ -9,10 +9,12 @@ using DanceCompetitionHelper.Extensions;
 using DanceCompetitionHelper.Helper;
 using DanceCompetitionHelper.OrgImpl;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using System.Runtime.CompilerServices;
 
 namespace DanceCompetitionHelper
@@ -1115,11 +1117,11 @@ namespace DanceCompetitionHelper
                 cancellationToken);
         }
 
-        public async Task<Participant?> GetParticipantAsync(
+        public Task<Participant?> GetParticipantAsync(
             Guid participantId,
             CancellationToken cancellationToken)
         {
-            return await _danceCompHelperDb.Participants
+            return _danceCompHelperDb.Participants
                 .TagWith(
                     nameof(GetParticipantAsync) + "(Guid)[0]")
                 .FirstOrDefaultAsync(

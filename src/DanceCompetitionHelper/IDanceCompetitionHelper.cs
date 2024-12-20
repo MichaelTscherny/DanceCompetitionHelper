@@ -3,7 +3,9 @@ using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
+
 using Microsoft.EntityFrameworkCore.Storage;
+
 using System.Runtime.CompilerServices;
 
 namespace DanceCompetitionHelper
