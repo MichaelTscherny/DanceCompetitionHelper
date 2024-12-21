@@ -337,7 +337,8 @@
                    value="@(isCreate ? "Create" : "Save")" 
                    class="btn btn-primary px-lg-4" />
             &nbsp;
-            <a asp-action="@nameof(CompetitionClassController.Index)"
+            <a asp-controller="@CompetitionClassController.RefName"
+               asp-action="@nameof(CompetitionClassController.Index)"
                asp-route-id="@Model.CompetitionId"
                class="btn btn-secondary px-lg-4">
                Cancel

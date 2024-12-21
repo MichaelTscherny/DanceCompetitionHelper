@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.CompetitionModels;
+
 using Microsoft.AspNetCore.Mvc;
+
+using System.Net.Mime;
+using System.Text;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
@@ -366,6 +371,14 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             return View(
                 doImportView);
+        }
+
+        public IActionResult DownloadDummyFile()
+        {
+            return File(
+                Encoding.UTF8.GetBytes("Dummy text file!\r\nyet another file!.."),
+                MediaTypeNames.Text.Plain,
+                "dummy.txt");
         }
 
         public IActionResult Privacy()
