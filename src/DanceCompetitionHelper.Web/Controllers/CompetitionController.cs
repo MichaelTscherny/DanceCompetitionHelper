@@ -4,12 +4,10 @@ using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
 using DanceCompetitionHelper.Web.Helper.Request;
+using DanceCompetitionHelper.Web.Models;
 using DanceCompetitionHelper.Web.Models.CompetitionModels;
 
 using Microsoft.AspNetCore.Mvc;
-
-using System.Net.Mime;
-using System.Text;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
@@ -373,12 +371,29 @@ namespace DanceCompetitionHelper.Web.Controllers
                 doImportView);
         }
 
-        public IActionResult DownloadDummyFile()
+        public Task<IActionResult> DownloadDummyFile(
+            CancellationToken cancellationToken)
         {
+            return GetPdfDocument(
+                new PdfViewModel()
+                {
+                },
+                async (model, dcH, pdfHelper, cToken) =>
+                {
+                    return new PdfViewModel()
+                    {
+                        PdtStream = pdfHelper.GetDummyPdf(),
+                        FileName = "dummy.pdf",
+                    };
+                },
+                cancellationToken);
+
+            /*
             return File(
                 Encoding.UTF8.GetBytes("Dummy text file!\r\nyet another file!.."),
                 MediaTypeNames.Text.Plain,
                 "dummy.txt");
+            */
         }
 
         public IActionResult Privacy()
