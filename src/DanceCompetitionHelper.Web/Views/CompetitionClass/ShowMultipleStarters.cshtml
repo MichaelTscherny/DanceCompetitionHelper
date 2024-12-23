@@ -118,3 +118,24 @@
     </div>
 </div>
 
+<div class="container text-center">
+    <div class="row d-flex justify-content-center py-1">
+        <form asp-controller="@CompetitionClassController.RefName"
+              asp-action="@nameof(CompetitionClassController.PdfMultipleStarters)" 
+              method="get"
+              class="form-horizontal needs-validation border rounded"              
+              role="form">
+            <input id="@nameof(PdfViewModel.CompetitionId)"
+                    name="@nameof(PdfViewModel.CompetitionId)"
+                    type="hidden" 
+                    value="@Model.Competition?.CompetitionId"/>
+
+            <button type="submit"
+                    class="btn btn-primary bi bi-filetype-pdf"
+                    title="Get Multiple Starters as PDF">
+                Multiple Starters
+            </button>
+        </form>
+    </div>
+</div>
+

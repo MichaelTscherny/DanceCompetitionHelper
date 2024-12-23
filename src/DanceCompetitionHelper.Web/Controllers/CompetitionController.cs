@@ -320,7 +320,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             if (ModelState.IsValid == false)
             {
                 doImportView.AddErrors(
-                    ModelState); ;
+                    ModelState);
 
                 return View(
                     nameof(ShowImport),
@@ -374,26 +374,17 @@ namespace DanceCompetitionHelper.Web.Controllers
         public Task<IActionResult> DownloadDummyFile(
             CancellationToken cancellationToken)
         {
-            return GetPdfDocument(
-                new PdfViewModel()
-                {
-                },
-                async (model, dcH, pdfHelper, cToken) =>
-                {
-                    return new PdfViewModel()
+            return GetPdfDocumentHelper()
+                .GetDummyPdf(
+                    new PdfViewModel()
                     {
-                        PdtStream = pdfHelper.GetDummyPdf(),
-                        FileName = "dummy.pdf",
-                    };
-                },
-                cancellationToken);
+                        CompetitionId = Guid.Parse("0623cd95-0929-4d3f-8767-daa17b65d63b"),
+                        CompetitionClassId = Guid.Parse("0c2d36f9-31f8-48ce-86ab-67915bda2df3"),
 
-            /*
-            return File(
-                Encoding.UTF8.GetBytes("Dummy text file!\r\nyet another file!.."),
-                MediaTypeNames.Text.Plain,
-                "dummy.txt");
-            */
+                        // PageFormat = MigraDoc.DocumentObjectModel.PageFormat.A5,
+                        // Orientation = MigraDoc.DocumentObjectModel.Orientation.Landscape,
+                    },
+                    cancellationToken);
         }
 
         public IActionResult Privacy()

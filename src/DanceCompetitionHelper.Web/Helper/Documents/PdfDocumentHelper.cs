@@ -1,16 +1,21 @@
 ﻿using AutoMapper;
 
-using MigraDoc.DocumentObjectModel;
-using MigraDoc.DocumentObjectModel.Tables;
-using MigraDoc.Rendering;
+using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Exceptions;
+using DanceCompetitionHelper.Web.Controllers;
+using DanceCompetitionHelper.Web.Models;
 
-using PdfSharp.Pdf;
+using Microsoft.AspNetCore.Mvc;
+
+using System.Net.Mime;
 
 namespace DanceCompetitionHelper.Web.Helper.Documents
 {
-    public class PdfDocumentHelper
+    public class PdfDocumentHelper<TLogger>
     {
+        private readonly ControllerBase<TLogger> _controllerBase;
         private readonly IDanceCompetitionHelper _danceCompHelper;
+        private readonly ILogger<TLogger> _logger;
         private readonly IMapper _mapper;
 
         static PdfDocumentHelper()
@@ -22,112 +27,131 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         }
 
         public PdfDocumentHelper(
+            ControllerBase<TLogger> controllerBase,
             IDanceCompetitionHelper danceCompHelper,
+            ILogger<TLogger> logger,
             IMapper mapper)
         {
+            _controllerBase = controllerBase
+                ?? throw new ArgumentNullException(
+                    nameof(controllerBase));
             _danceCompHelper = danceCompHelper
                 ?? throw new ArgumentNullException(
                     nameof(danceCompHelper));
+            _logger = logger
+                ?? throw new ArgumentNullException(
+                    nameof(logger));
             _mapper = mapper
                 ?? throw new ArgumentNullException(
                     nameof(mapper));
         }
 
-        public Stream GetDummyPdf()
+        public async Task<IActionResult> ReturnPdfViewModel<TModel>(
+            TModel model,
+            Func<TModel, PdfDocumentHelper<TLogger>, PdfGenerator, IDanceCompetitionHelper, IMapper, CancellationToken, Task<TModel>> geneeratePdfFunc,
+            CancellationToken cancellationToken)
+            where TModel : PdfViewModel
         {
-            var memStream = new MemoryStream();
-            var document = new Document
+            try
             {
-                Info =
-                {
-                    Title = "Hello, MigraDoc",
-                    Subject = "Demonstrates an excerpt of the capabilities of MigraDoc.",
-                    Author = "Stefan Lange"
-                },
-
-            };
-
-            document.LastSection.AddParagraph(
-                "Test",
-                StyleNames.Heading1);
-
-            /*
-            document.LastSection.PageSetup.PageFormat = PageFormat.A3;
-            document.LastSection.PageSetup.Orientation = Orientation.Landscape;
-            */
-
-            var table = new Table
-            {
-                Borders =
-                {
-                    Width = 0.75,
-                },
-            };
-
-            document.LastSection.PageSetup = document.DefaultPageSetup.Clone();
-            var usePageSetup = document.LastSection.PageSetup;
-
-            var tableWidth = usePageSetup.EffectivePageWidth - usePageSetup.LeftMargin - usePageSetup.RightMargin;
-
-            var column = table.AddColumn(tableWidth * 0.33);
-            column.Format.Alignment = ParagraphAlignment.Center;
-
-            table.AddColumn(tableWidth * 0.66);
-
-            var row = table.AddRow();
-            row.Shading.Color = Colors.PaleGoldenrod;
-            row.HeadingFormat = true;
-            var cell = row.Cells[0];
-            cell.AddParagraph("Itemus");
-            cell = row.Cells[1];
-            cell.AddParagraph("Descriptum");
-
-            row = table.AddRow();
-            cell = row.Cells[0];
-            cell.AddParagraph("1");
-            cell = row.Cells[1];
-            cell.AddParagraph("FillerText.ShortText");
-
-            row = table.AddRow();
-            cell = row.Cells[0];
-            cell.AddParagraph("2");
-            cell = row.Cells[1];
-            cell.AddParagraph("FillerText.Text");
-
-            table.SetEdge(
-                0,
-                0,
-                2,
-                3,
-                Edge.Box,
-                BorderStyle.Single,
-                1,
-                Colors.Black);
-
-            document.LastSection.Add(table);
-
-            var pdfRenderer = new PdfDocumentRenderer
-            {
-                // Associate the MigraDoc document with a renderer.
-                Document = document,
-                PdfDocument =
-                {
-                    // Change some settings before rendering the MigraDoc document.
-                    PageLayout = PdfPageLayout.SinglePage,
-                    ViewerPreferences =
+                var pdfView = await _danceCompHelper.RunInReadonlyTransaction<PdfViewModel>(
+                    async (dcH, dbCtx, dbTrans, cToken) =>
                     {
-                        FitWindow = true,
-                    }
+                        return await geneeratePdfFunc(
+                            model,
+                            this,
+                            new PdfGenerator(),
+                            dcH,
+                            _mapper,
+                            cToken);
+                    },
+                    cancellationToken);
+
+                if (pdfView == null)
+                {
+                    throw new Exception(
+                        "No PDF Data returend");
                 }
-            };
 
-            // Layout and render document to PDF.
-            pdfRenderer.RenderDocument();
+                return _controllerBase.File(
+                    pdfView.PdtStream,
+                    MediaTypeNames.Application.Pdf,
+                    pdfView.FileName);
+            }
+            catch (Exception exc)
+            {
+                _logger.LogError(
+                    exc,
+                    "Error during creation of PDF: {errorMessage}",
+                    exc.Message);
 
-            pdfRenderer.PdfDocument.Save(
-                memStream);
+                return _controllerBase.Error(
+                    string.Format(
+                        "Error during creation of PDF: {0}",
+                        exc.Message));
+            }
+        }
 
-            return memStream;
+        public Task<IActionResult> GetMultipleStarters(
+            PdfViewModel pdfViewModel,
+            CancellationToken cancellationToken)
+        {
+            return ReturnPdfViewModel(
+                pdfViewModel,
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                {
+                    var foundComp = await dcH.FindCompetitionAsync(
+                        pdfModel.CompetitionId,
+                        cToken)
+                        ?? throw new NoDataFoundException(
+                            string.Format(
+                                "{0} with id '{1}' not found!",
+                                nameof(Competition),
+                                pdfModel.CompetitionId));
+
+                    // pdfGen.DefaultFontSize = 12;
+
+                    return new PdfViewModel()
+                    {
+                        PdtStream = pdfGen.GetMultipleStarters(
+                            foundComp,
+                            await dcH
+                                .GetMultipleStarterAsync(
+                                    foundComp.CompetitionId,
+                                    cToken)
+                                .ToListAsync(
+                                    cToken),
+                            pdfModel),
+                        FileName = string.Format(
+                            "Multiple Starters {0}.pdf",
+                            foundComp.OrgCompetitionId),
+                    };
+                },
+                cancellationToken);
+        }
+
+        public Task<IActionResult> GetDummyPdf(
+            PdfViewModel pdfViewModel,
+            CancellationToken cancellationToken)
+        {
+            return ReturnPdfViewModel(
+                pdfViewModel,
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                {
+                    return new PdfViewModel()
+                    {
+                        PdtStream = pdfGen.GetDummyPdf(
+                            await dcH.GetCompetitionAsync(
+                                pdfModel.CompetitionId ?? Guid.Empty,
+                                cToken),
+                            await dcH.GetCompetitionClassAsync(
+                                pdfModel.CompetitionClassId ?? Guid.Empty,
+                                cToken),
+                            pdfModel),
+                        FileName = "dummy.pdf"
+                    };
+                },
+                cancellationToken);
         }
     }
 }

@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Helper.Request;
+using DanceCompetitionHelper.Web.Models;
 using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
@@ -25,11 +28,11 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
         }
 
-        public async Task<IActionResult> Index(
+        public Task<IActionResult> Index(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await GetDefaultRequestHandler<CompetitionClass, CompetitionClassOverviewViewModel>()
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassOverviewViewModel>()
                 .SetOnSuccess(
                     nameof(Index))
                 .SetOnNoData(
@@ -375,6 +378,20 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     cToken),
                         };
                     },
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> PdfMultipleStarters(
+            PdfViewModel pdf,
+            CancellationToken cancellationToken)
+        {
+            pdf.PageFormat = MigraDoc.DocumentObjectModel.PageFormat.A4;
+            pdf.Orientation = MigraDoc.DocumentObjectModel.Orientation.Landscape;
+
+            return GetPdfDocumentHelper()
+                .GetMultipleStarters(
+                    pdf,
                     cancellationToken);
         }
 

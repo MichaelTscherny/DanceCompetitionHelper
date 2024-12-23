@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 using System.Diagnostics;
-using System.Net.Mime;
 using System.Runtime.CompilerServices;
 
 namespace DanceCompetitionHelper.Web.Controllers
@@ -52,55 +51,19 @@ namespace DanceCompetitionHelper.Web.Controllers
                 _mapper);
         }
 
-        #endregion Chaining
-
-        public async Task<IActionResult> GetPdfDocument<TModel>(
-            TModel pdfInfoModel,
-            Func<TModel, IDanceCompetitionHelper, PdfDocumentHelper, CancellationToken, Task<PdfViewModel>> geneeratePdfFunc,
-            CancellationToken cancellationToken)
-            where TModel : ViewModelBase
+        public PdfDocumentHelper<TLogger> GetPdfDocumentHelper(
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
         {
-            try
-            {
-                var pdfView = await _danceCompHelper.RunInReadonlyTransaction<PdfViewModel>(
-                    async (dcH, dbCtx, dbTrans, cToken) =>
-                    {
-                        var pdfDoc = new PdfDocumentHelper(
-                            dcH, _mapper);
-
-                        try
-                        {
-                            return await geneeratePdfFunc(
-                                pdfInfoModel,
-                                dcH,
-                                pdfDoc,
-                                cToken);
-                        }
-                        catch (Exception exc)
-                        {
-                            _logger.LogError(
-                                exc,
-                                "Error during creation of PDF: {errorMessage}",
-                                exc.Message);
-
-                            throw;
-                        }
-                    },
-                    cancellationToken);
-
-                return File(
-                    pdfView.PdtStream,
-                    MediaTypeNames.Application.Pdf,
-                    pdfView.FileName);
-            }
-            catch (Exception exc)
-            {
-                return Error(
-                    string.Format(
-                        "Error during creation of PDF: {0}",
-                        exc.Message));
-            }
+            return new PdfDocumentHelper<TLogger>(
+                this,
+                _danceCompHelper,
+                _logger,
+                _mapper);
         }
+
+        #endregion Chaining
 
         public async Task<Competition?> DefaultGetCompetitionAndSetViewData(
             IDanceCompetitionHelper danceCompetitionHelper,

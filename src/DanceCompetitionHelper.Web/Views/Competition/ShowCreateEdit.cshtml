@@ -31,7 +31,8 @@
         </div>
     }
 
-    <form asp-action="@formAction" method="post">
+    <form asp-controller="@CompetitionController.RefName"
+          asp-action="@formAction" method="post">
         <input asp-for="CompetitionId" />
 
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>

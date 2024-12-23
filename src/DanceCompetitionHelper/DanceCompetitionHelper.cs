@@ -25,6 +25,10 @@ namespace DanceCompetitionHelper
         private readonly ILogger<DanceCompetitionHelperDbContext> _logger;
         private readonly IServiceProvider _serviceProvider;
 
+        public static readonly string DanceCompetitionHelperInfoString = string.Format(
+            "DanceCompetitionHelper (c) 2022-{0}",
+            DateTime.Now.ToString("yyyy"));
+
         public IReadOnlyList<ConfigurationValue> MandatoryConfigurationValues { get; } = new List<ConfigurationValue>()
         {
             // GLOBAL

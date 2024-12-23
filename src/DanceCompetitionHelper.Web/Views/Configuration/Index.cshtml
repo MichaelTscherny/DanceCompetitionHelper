@@ -176,7 +176,8 @@
 </div>
 
 <div class="container text-center" role="group">
-    <form asp-action="@nameof(ConfigurationController.CreateNew)" method="post">
+    <form asp-controller="@ConfigurationController.RefName"
+          asp-action="@nameof(ConfigurationController.CreateNew)" method="post">
         <input id="@nameof(ConfigurationViewModel.OriginCompetitionId)"
                name="@nameof(ConfigurationViewModel.OriginCompetitionId)"
                type="hidden" 

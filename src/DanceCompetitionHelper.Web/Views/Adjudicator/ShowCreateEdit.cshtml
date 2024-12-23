@@ -33,7 +33,8 @@
         </div>
     }
 
-    <form asp-action="@formAction" method="post">
+    <form asp-controller="@AdjudicatorController.RefName"
+          asp-action="@formAction" method="post">
         <input asp-for="CompetitionId" />
         <input asp-for="AdjudicatorId" />
 
