@@ -130,6 +130,58 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 cancellationToken);
         }
 
+        public Task<IActionResult> GetPossiblePromotions(
+            PdfViewModel pdfViewModel,
+            CancellationToken cancellationToken)
+        {
+            return ReturnPdfViewModel(
+                pdfViewModel,
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                {
+                    var foundComp = await dcH.FindCompetitionAsync(
+                        pdfModel.CompetitionId,
+                        cToken)
+                        ?? throw new NoDataFoundException(
+                            string.Format(
+                                "{0} with id '{1}' not found!",
+                                nameof(Competition),
+                                pdfModel.CompetitionId));
+
+                    return new PdfViewModel()
+                    {
+                        PdtStream = pdfGen.GetPossiblePromotions(
+                            foundComp,
+                            await dcH
+                                 .GetParticipantsAsync(
+                                     foundComp.CompetitionId,
+                                     null,
+                                     cToken,
+                                     true)
+                                 .Where(
+                                     x => x.DisplayInfo != null
+                                     && x.DisplayInfo.PromotionInfo != null
+                                     && x.DisplayInfo.PromotionInfo.PossiblePromotion)
+                                 .OrderBy(
+                                     x => x.NamePartA)
+                                 .ThenBy(
+                                     x => x.NamePartB)
+                                 .ToListAsync(
+                                     cToken),
+                            await dcH
+                                .GetMultipleStarterAsync(
+                                    foundComp.CompetitionId,
+                                    cToken)
+                                .ToListAsync(
+                                    cToken),
+                            pdfModel),
+                        FileName = string.Format(
+                            "Possible Promotions {0}.pdf",
+                            foundComp.OrgCompetitionId),
+                    };
+                },
+                cancellationToken);
+        }
+
         public Task<IActionResult> GetDummyPdf(
             PdfViewModel pdfViewModel,
             CancellationToken cancellationToken)

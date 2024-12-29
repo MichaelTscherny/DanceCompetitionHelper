@@ -4,6 +4,7 @@
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+@using MigraDoc.DocumentObjectModel
 
 @model ShowMultipleStartersOverviewViewModel
 
@@ -39,7 +40,7 @@
             <thead>
                 <tr>
                     <th>
-                        Name (@multipleStartersCount) (P A/B; S A/B)
+                        Name (@multipleStartersCount) (P A/B; S A/B - Starts)
                     </th>
 
                     @foreach (var curDisplayInfo in displayInfos)
@@ -63,7 +64,7 @@
                     <tr>
                         <td class="text-nowrap">
                             @item.Name
-                            (@item.PointsA / @item.PointsB; @item.StartsA / @item.StartsB)
+                            (@item.PointsA / @item.PointsB; @item.StartsA / @item.StartsB - @item.CompetitionClasses.Count)
                         </td>
 
                         @foreach (var curDisplayInfo in displayInfos)
@@ -77,8 +78,8 @@
 
                                     <div class="text-nowrap">
                                         # <a asp-controller="@ParticipantController.RefName"
-                                            asp-action="@nameof(ParticipantController.ShowEdit)"
-                                            asp-route-id="@usePart?.ParticipantId">
+                                        asp-action="@nameof(ParticipantController.ShowEdit)"
+                                        asp-route-id="@usePart?.ParticipantId">
                                             @item.StartnumberByClassId[curDisplayInfo.ClassId]
                                         </a>
                                     </div>
@@ -91,7 +92,7 @@
             <tfoot>
                 <tr>
                     <th>
-                        Name (@multipleStartersCount) (P A/B; S A/B)
+                        Name (@multipleStartersCount) (P A/B; S A/B - Starts)
                     </th>
 
                     @foreach (var curDisplayInfo in displayInfos)
@@ -104,38 +105,33 @@
             </tfoot>
         </table>
     </div>
-        
+
     <div class="row d-flex justify-content-center py-1">
         <div class="col">
             <a asp-controller="@CompetitionClassController.RefName"
-               asp-action="@nameof(CompetitionClassController.Index)"
-               asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
-               title="Back">
-               Back
+            asp-action="@nameof(CompetitionClassController.Index)"
+            asp-route-id="@Model.Competition?.CompetitionId"
+            class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
+            title="Back">
+                Back
             </a>
         </div>
     </div>
 </div>
 
-<div class="container text-center">
-    <div class="row d-flex justify-content-center py-1">
-        <form asp-controller="@CompetitionClassController.RefName"
-              asp-action="@nameof(CompetitionClassController.PdfMultipleStarters)" 
-              method="get"
-              class="form-horizontal needs-validation border rounded"              
-              role="form">
-            <input id="@nameof(PdfViewModel.CompetitionId)"
-                    name="@nameof(PdfViewModel.CompetitionId)"
-                    type="hidden" 
-                    value="@Model.Competition?.CompetitionId"/>
-
-            <button type="submit"
-                    class="btn btn-primary bi bi-filetype-pdf"
-                    title="Get Multiple Starters as PDF">
-                Multiple Starters
-            </button>
-        </form>
-    </div>
-</div>
-
+@{
+    var toDisplay = new PdfViewModel()
+    {
+        CompetitionId = Model.Competition?.CompetitionId,
+        PageFormat = PageFormat.A4,
+        Orientation = Orientation.Landscape
+    };
+}
+@Html.DisplayFor(
+    m => toDisplay,
+    new 
+    {
+        AspController = CompetitionClassController.RefName,
+        AspAction = nameof(CompetitionClassController.PdfMultipleStarters),
+        ButtonText = "Multiple Starters"
+    })

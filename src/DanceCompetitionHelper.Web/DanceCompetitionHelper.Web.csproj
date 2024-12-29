@@ -38,8 +38,14 @@
 
   <ItemGroup>
     <Folder Include="Enum\" />
-    <Folder Include="Views\Shared\DisplayTemplates\" />
     <Folder Include="wwwroot\lib\bootstrap-icons\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\Shared\DisplayTemplates\PdfViewModel.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

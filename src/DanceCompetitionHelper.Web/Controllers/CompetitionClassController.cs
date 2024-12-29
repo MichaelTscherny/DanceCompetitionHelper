@@ -386,9 +386,6 @@ namespace DanceCompetitionHelper.Web.Controllers
             PdfViewModel pdf,
             CancellationToken cancellationToken)
         {
-            pdf.PageFormat = MigraDoc.DocumentObjectModel.PageFormat.A4;
-            pdf.Orientation = MigraDoc.DocumentObjectModel.Orientation.Landscape;
-
             return GetPdfDocumentHelper()
                 .GetMultipleStarters(
                     pdf,
@@ -447,6 +444,17 @@ namespace DanceCompetitionHelper.Web.Controllers
                                      cToken),
                         };
                     },
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> PdfPossiblePromotions(
+            PdfViewModel pdf,
+            CancellationToken cancellationToken)
+        {
+            return GetPdfDocumentHelper()
+                .GetPossiblePromotions(
+                    pdf,
                     cancellationToken);
         }
 

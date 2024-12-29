@@ -26,7 +26,6 @@
             x => x.DisplayInfo != null
             && x.DisplayInfo.PromotionInfo != null)
         ?? Enumerable.Empty<Participant>())
-
     {
         var curClasses = curPossibleProm?.DisplayInfo?.PromotionInfo?.IncludedCompetitionClasses 
             ?? new List<CompetitionClass>();
@@ -81,15 +80,14 @@
 <div class="text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
-
     @foreach (var curPossPromotion in Model.OverviewItems ?? Enumerable.Empty<Participant>())
     {
         <div class="table-responsive-xxl">
             @{
                 var curClassesByClassId = curPossPromotion.DisplayInfo?.PromotionInfo?.IncludedCompetitionClasses
-                .ToDictionary(
-                    x => x.CompetitionClassId) 
-                    ?? new Dictionary<Guid, CompetitionClass>();
+                    .ToDictionary(
+                        x => x.CompetitionClassId) 
+                        ?? new Dictionary<Guid, CompetitionClass>();
             }
             <table class="table table-striped table-hover table-striped-columns">
                 <thead>
@@ -114,7 +112,7 @@
 
                                         if (curClass?.Ignore ?? false)
                                         {
-                                        infoString = "[IGNORE!]";
+                                            infoString = "[IGNORE!]";
                                         }
                                     }
 
@@ -286,3 +284,18 @@
         </div>
     </div>
 </div>
+
+@{
+    var toDisplay = new PdfViewModel()
+    {
+        CompetitionId = Model.Competition?.CompetitionId,
+    };
+}
+@Html.DisplayFor(
+    m => toDisplay,
+    new
+    {
+        AspController = CompetitionClassController.RefName,
+        AspAction = nameof(CompetitionClassController.PdfPossiblePromotions),
+        ButtonText = "Possible Promotions"
+    })

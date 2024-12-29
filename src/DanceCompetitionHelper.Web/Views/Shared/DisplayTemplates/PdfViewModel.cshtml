@@ -1,0 +1,98 @@
+﻿@using DanceCompetitionHelper.Database.Enum
+@using DanceCompetitionHelper.Database.Tables
+@using DanceCompetitionHelper.Database.Extensions
+@using DanceCompetitionHelper.Web.Controllers
+@using DanceCompetitionHelper.Web.Models.ConfigurationModels
+@using MigraDoc.DocumentObjectModel
+
+@model PdfViewModel
+
+@{
+    var aspController = ViewData["AspController"];
+    var aspAction = ViewData["AspAction"];
+
+    var buttonText = ViewData["ButtonText"];
+    var formTitle = ViewData["FormTitle"] ?? buttonText;
+
+    var allFormats = Html
+        .GetEnumSelectList<PageFormat>()
+        .ToList();
+    var usePageFormat = ((int)Model.PageFormat).ToString();
+    var allFormatsSelect = allFormats.FirstOrDefault(
+        x => x.Value == usePageFormat);
+    if (allFormatsSelect != null)
+    {
+        allFormatsSelect.Selected = true;
+    }
+
+    var allOrientations = Html
+        .GetEnumSelectList<Orientation>()
+        .ToList();
+    var useOrientation = ((int)Model.Orientation).ToString();
+    var allOrientationsSelect = allOrientations.FirstOrDefault(
+        x => x.Value == useOrientation);
+    if (allOrientationsSelect != null)
+    {
+        allOrientationsSelect.Selected = true;
+    }
+}
+<div class="container text-center m-0 mb-2">
+    <form asp-controller="@aspController"
+          asp-action="@aspAction"
+          method="get"
+          class="form-horizontal row needs-validation border rounded"
+          role="form">
+        <input id="@nameof(PdfViewModel.CompetitionId)"
+               name="@nameof(PdfViewModel.CompetitionId)"
+               type="hidden"
+               value="@Model.CompetitionId" />
+        <input id="@nameof(PdfViewModel.CompetitionClassId)"
+               name="@nameof(PdfViewModel.CompetitionClassId)"
+               type="hidden"
+               value="@Model.CompetitionClassId" />
+
+        <div class="col-12 text-start fw-bold">
+            PDF @formTitle
+        </div>
+
+        <div class="col-2 mb-2">
+            <div class="input-group">
+                <div class="input-group-text mb-0">
+                    <label for="@nameof(PdfViewModel.PageFormat)"
+                           class="form-label mb-0">
+                        Format
+                    </label>
+                </div>
+                <select asp-items="@allFormats"
+                        id="@nameof(PdfViewModel.PageFormat)"
+                        name="@nameof(PdfViewModel.PageFormat)"
+                        class="form-control">
+                </select>
+            </div>
+        </div>
+
+        <div class="col-2">
+            <div class="input-group">
+                <div class="input-group-text mb-0">
+                    <label for="@nameof(PdfViewModel.Orientation)"
+                           class="form-label mb-0">
+                        Orientation
+                    </label>
+                </div>
+                <select asp-items="@allOrientations"
+                        id="@nameof(PdfViewModel.Orientation)"
+                        name="@nameof(PdfViewModel.Orientation)"
+                        class="form-control">
+                </select>
+            </div>
+        </div>
+
+        <div class="col-2">
+            <button type="submit"
+                    class="btn btn-primary bi bi-filetype-pdf"
+                    title="Get @buttonText as PDF">
+                @buttonText
+            </button>
+        </div>
+    </form>
+</div>
