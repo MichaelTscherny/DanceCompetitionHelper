@@ -2,7 +2,7 @@
 
 using PdfSharp.Pdf;
 
-namespace DanceCompetitionHelper.Web.Models
+namespace DanceCompetitionHelper.Web.Models.Pdfs
 {
     public class PdfViewModel : ViewModelBase
     {

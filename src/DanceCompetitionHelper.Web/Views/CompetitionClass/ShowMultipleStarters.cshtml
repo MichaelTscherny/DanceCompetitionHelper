@@ -4,6 +4,7 @@
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+@using DanceCompetitionHelper.Web.Models.Pdfs
 @using MigraDoc.DocumentObjectModel
 
 @model ShowMultipleStartersOverviewViewModel
@@ -120,18 +121,19 @@
 </div>
 
 @{
-    var toDisplay = new PdfViewModel()
-    {
-        CompetitionId = Model.Competition?.CompetitionId,
-        PageFormat = PageFormat.A4,
-        Orientation = Orientation.Landscape
-    };
-}
-@Html.DisplayFor(
-    m => toDisplay,
-    new 
+    var toDisplay = new PdfViewModelWrapper()
     {
         AspController = CompetitionClassController.RefName,
         AspAction = nameof(CompetitionClassController.PdfMultipleStarters),
-        ButtonText = "Multiple Starters"
-    })
+        ButtonText = "Multiple Starters",
+        //
+        PdfViewModel = new PdfViewModel()
+        {
+            CompetitionId = Model.Competition?.CompetitionId,
+            PageFormat = PageFormat.A4,
+            Orientation = Orientation.Landscape
+        }
+    };
+}
+@Html.DisplayFor(
+    m => toDisplay)

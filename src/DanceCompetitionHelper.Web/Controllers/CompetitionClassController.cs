@@ -4,8 +4,8 @@ using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Helper.Request;
-using DanceCompetitionHelper.Web.Models;
 using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+using DanceCompetitionHelper.Web.Models.Pdfs;
 
 using Microsoft.AspNetCore.Mvc;
 

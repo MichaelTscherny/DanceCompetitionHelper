@@ -5,6 +5,7 @@
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+@using DanceCompetitionHelper.Web.Models.Pdfs
 
 @model ShowPossiblePromotionsViewModel
 
@@ -120,7 +121,7 @@
                                 </th>
                             }
                         }
-                        
+
                         @for (var leftColumns = displayedColumns; leftColumns < maxDisplayClasses; leftColumns++)
                         {
                             <th style="width: @columnWith%">
@@ -144,8 +145,8 @@
                         <td class="text-nowrap">
                             @(curPossPromotion.GetNames())
                             (<a asp-controller="@ParticipantController.RefName"
-                               asp-action="@nameof(ParticipantController.ShowEdit)"
-                               asp-route-id="@curPossPromotion.ParticipantId">Edit</a>)
+                            asp-action="@nameof(ParticipantController.ShowEdit)"
+                            asp-route-id="@curPossPromotion.ParticipantId">Edit</a>)
                         </td>
 
                         @{
@@ -187,7 +188,7 @@
                                         curClass.MinPointsForPromotion,
                                         curClass.MinStartsForPromotion);
                                 }
-                                
+
                                 <td>
                                     @curClassPointsInfo<br>
                                     #@useStartNumber
@@ -257,7 +258,7 @@
                                     </td>
                                 }
                             }
-    
+
                             @for (var leftColumns = displayedColumns; leftColumns < maxDisplayClasses; leftColumns++)
                             {
                                 <td>
@@ -271,31 +272,32 @@
             </table>
         </div>
     }
-        
+
     <div class="row d-flex justify-content-center py-1">
         <div class="col">
             <a asp-controller="@CompetitionClassController.RefName"
-               asp-action="@nameof(CompetitionClassController.Index)"
-               asp-route-id="@Model.Competition?.CompetitionId"
-               class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
-               title="Back">
-               Back
+            asp-action="@nameof(CompetitionClassController.Index)"
+            asp-route-id="@Model.Competition?.CompetitionId"
+            class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
+            title="Back">
+                Back
             </a>
         </div>
     </div>
 </div>
 
 @{
-    var toDisplay = new PdfViewModel()
-    {
-        CompetitionId = Model.Competition?.CompetitionId,
-    };
-}
-@Html.DisplayFor(
-    m => toDisplay,
-    new
+    var toDisplay = new PdfViewModelWrapper()
     {
         AspController = CompetitionClassController.RefName,
         AspAction = nameof(CompetitionClassController.PdfPossiblePromotions),
-        ButtonText = "Possible Promotions"
-    })
+        ButtonText = "Possible Promotions",
+        // 
+        PdfViewModel = new PdfViewModel()
+        {
+            CompetitionId = Model.Competition?.CompetitionId,
+        }
+    };
+}
+@Html.DisplayFor(
+    m => toDisplay)

@@ -3,21 +3,23 @@
 @using DanceCompetitionHelper.Database.Extensions
 @using DanceCompetitionHelper.Web.Controllers
 @using DanceCompetitionHelper.Web.Models.ConfigurationModels
+@using DanceCompetitionHelper.Web.Models.Pdfs
 @using MigraDoc.DocumentObjectModel
 
-@model PdfViewModel
+@model PdfViewModelWrapper
 
 @{
-    var aspController = ViewData["AspController"];
-    var aspAction = ViewData["AspAction"];
+    var PdfViewModel = Model.PdfViewModel;
+    var aspController = Model.AspController;
+    var aspAction = Model.AspAction;
 
-    var buttonText = ViewData["ButtonText"];
-    var formTitle = ViewData["FormTitle"] ?? buttonText;
+    var buttonText = Model.ButtonText;
+    var formTitle = Model.FormTitle ?? buttonText;
 
     var allFormats = Html
         .GetEnumSelectList<PageFormat>()
         .ToList();
-    var usePageFormat = ((int)Model.PageFormat).ToString();
+    var usePageFormat = ((int)PdfViewModel.PageFormat).ToString();
     var allFormatsSelect = allFormats.FirstOrDefault(
         x => x.Value == usePageFormat);
     if (allFormatsSelect != null)
@@ -28,7 +30,7 @@
     var allOrientations = Html
         .GetEnumSelectList<Orientation>()
         .ToList();
-    var useOrientation = ((int)Model.Orientation).ToString();
+    var useOrientation = ((int)PdfViewModel.Orientation).ToString();
     var allOrientationsSelect = allOrientations.FirstOrDefault(
         x => x.Value == useOrientation);
     if (allOrientationsSelect != null)
@@ -45,11 +47,11 @@
         <input id="@nameof(PdfViewModel.CompetitionId)"
                name="@nameof(PdfViewModel.CompetitionId)"
                type="hidden"
-               value="@Model.CompetitionId" />
+               value="@PdfViewModel.CompetitionId" />
         <input id="@nameof(PdfViewModel.CompetitionClassId)"
                name="@nameof(PdfViewModel.CompetitionClassId)"
                type="hidden"
-               value="@Model.CompetitionClassId" />
+               value="@PdfViewModel.CompetitionClassId" />
 
         <div class="col-12 text-start fw-bold">
             PDF @formTitle

@@ -3,7 +3,7 @@
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Controllers;
-using DanceCompetitionHelper.Web.Models;
+using DanceCompetitionHelper.Web.Models.Pdfs;
 
 using Microsoft.AspNetCore.Mvc;
 

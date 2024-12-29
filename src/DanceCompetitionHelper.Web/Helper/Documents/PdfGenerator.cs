@@ -1,7 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
-using DanceCompetitionHelper.Web.Models;
+using DanceCompetitionHelper.Web.Models.Pdfs;
 
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
