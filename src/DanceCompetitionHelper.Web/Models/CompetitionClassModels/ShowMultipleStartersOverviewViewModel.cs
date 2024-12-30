@@ -4,5 +4,6 @@ namespace DanceCompetitionHelper.Web.Models.CompetitionClassModels
 {
     public class ShowMultipleStartersOverviewViewModel : OverviewModelBase<MultipleStarter>
     {
+        public bool GroupedClassesView { get; set; }
     }
 }

@@ -1,0 +1,171 @@
+﻿@using DanceCompetitionHelper.Database.DisplayInfo;
+@using DanceCompetitionHelper.Database.Extensions;
+@using DanceCompetitionHelper.Database.Tables;
+@using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Extensions;
+@using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+@using DanceCompetitionHelper.Web.Models.Pdfs
+@using MigraDoc.DocumentObjectModel
+
+@model ShowMultipleStartersOverviewViewModel
+
+@{
+    var compInfo = Model.Competition;
+    var compInfoStr = compInfo.GetCompetitionName();
+    var multipleStartersCount = -1;
+
+    ViewData["Title"] = string.Format(
+        "Grouped Classes View for Multiple Starters of {0}",
+        compInfoStr);
+
+    var (linkedClassIdsAndParticipants, displayInfos) = ViewModelExtensions.ExtractMultipleStarterLinkedClasses(
+        Model.OverviewItems);
+
+}
+
+<div class="text-center">
+    <h1 class="display-6">@ViewData["Title"]</h1>
+
+    @foreach (var (curClassIds, curMultipleStarters) in linkedClassIdsAndParticipants)
+    {
+        multipleStartersCount = curMultipleStarters.Count;
+
+        <div class="table-responsive-xxl">
+            <table class="table table-striped table-hover table-striped-columns">
+                <thead>
+                    <tr>
+                        <th>
+                            Name (@multipleStartersCount x @curClassIds.Count) (P A/B; S A/B - Starts)
+                        </th>
+
+                        @foreach (var curDisplayInfo in displayInfos)
+                        {
+                            if(curClassIds.Contains(
+                                curDisplayInfo.ClassId))
+                            {
+                                var infoString = string.Empty;
+
+                                if (curDisplayInfo.Ignore)
+                                {
+                                    infoString = "[IGNORE!]";
+                                }
+
+                                <th>
+                                    @curDisplayInfo.ClassName @infoString
+                                </th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in curMultipleStarters)
+                    {
+                        if (curClassIds.Intersect(
+                            item
+                                .CompetitionClassNamesByClassId
+                                .Keys)
+                            .Any() == false) 
+                        {
+                            continue;
+                        }
+
+                        multipleStartersCount++;
+
+                        <tr>
+                            <td class="text-nowrap">
+                                @item.Name
+                                (@item.PointsA / @item.PointsB; @item.StartsA / @item.StartsB - @item.CompetitionClasses.Count)
+                            </td>
+
+                            @foreach (var curDisplayInfo in displayInfos)
+                            {
+                                if (curClassIds.Contains(
+                                    curDisplayInfo.ClassId)) 
+                                {
+                                    <td>
+                                        @if (item.CompetitionClassNamesByClassId.ContainsKey(curDisplayInfo.ClassId))
+                                        {
+                                            var usePart = item.Participants
+                                            .FirstOrDefault(
+                                            x => x.CompetitionClassId == curDisplayInfo.ClassId);
+
+                                            <div class="text-nowrap">
+                                                # <a asp-controller="@ParticipantController.RefName"
+                                                     asp-action="@nameof(ParticipantController.ShowEdit)"
+                                                     asp-route-id="@usePart?.ParticipantId">
+                                                    @item.StartnumberByClassId[curDisplayInfo.ClassId]
+                                                </a>
+                                            </div>
+                                        }
+                                    </td>
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>
+                            Name (@multipleStartersCount) (P A/B; S A/B - Starts)
+                        </th>
+                        
+                        @foreach (var curDisplayInfo in displayInfos)
+                        {
+                            if(curClassIds.Contains(
+                                curDisplayInfo.ClassId))
+                            {
+                                var infoString = string.Empty;
+
+                                if (curDisplayInfo.Ignore)
+                                {
+                                    infoString = "[IGNORE!]";
+                                }
+
+                                <th>
+                                    @curDisplayInfo.ClassName @infoString
+                                </th>
+                            }
+                        }
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <br />
+    }
+
+    <div class="hstack gap-2 justify-content-center">
+        <a asp-controller="@CompetitionClassController.RefName"
+           asp-action="@nameof(CompetitionClassController.Index)"
+           asp-route-id="@Model.Competition?.CompetitionId"
+           class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
+           title="Back">
+            Back
+        </a>
+        <div class="vr"></div>
+        <a asp-controller="@CompetitionClassController.RefName"
+           asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
+           asp-route-id="@Model.Competition?.CompetitionId"
+           class="btn btn-primary bi bi-bezier"
+           title="Normal View">
+            Normal View
+        </a>
+    </div>
+</div>
+
+@{
+    var toDisplay = new PdfViewModelWrapper()
+    {
+        AspController = CompetitionClassController.RefName,
+        AspAction = nameof(CompetitionClassController.PdfMultipleStartersGroupedClassesView),
+        ButtonText = "Grouped Class View Multiple Starters",
+        //
+        PdfViewModel = new PdfViewModel()
+        {
+            CompetitionId = Model.Competition?.CompetitionId,
+            PageFormat = PageFormat.A4, // PageFormat.A3,
+            Orientation = Orientation.Landscape
+        }
+    };
+}
+@Html.DisplayFor(
+    m => toDisplay)

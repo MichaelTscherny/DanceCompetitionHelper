@@ -16,6 +16,7 @@ namespace DanceCompetitionHelper.Web.Models.Pdfs
         public PageFormat PageFormat { get; set; } = PageFormat.A4;
         public Orientation Orientation { get; set; } = Orientation.Portrait;
         public bool Shading { get; set; } = true;
+
         public string FileName { get; set; } = default!;
         public Stream PdtStream { get; set; } = default!;
 

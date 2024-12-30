@@ -130,6 +130,44 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 cancellationToken);
         }
 
+        public Task<IActionResult> GetMultipleStartersGroupedClassesView(
+            PdfViewModel pdfViewModel,
+            CancellationToken cancellationToken)
+        {
+            return ReturnPdfViewModel(
+                pdfViewModel,
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                {
+                    var foundComp = await dcH.FindCompetitionAsync(
+                        pdfModel.CompetitionId,
+                        cToken)
+                        ?? throw new NoDataFoundException(
+                            string.Format(
+                                "{0} with id '{1}' not found!",
+                                nameof(Competition),
+                                pdfModel.CompetitionId));
+
+                    // pdfGen.DefaultFontSize = 12;
+
+                    return new PdfViewModel()
+                    {
+                        PdtStream = pdfGen.GetMultipleStartersGroupedClassesView(
+                            foundComp,
+                            await dcH
+                                .GetMultipleStarterAsync(
+                                    foundComp.CompetitionId,
+                                    cToken)
+                                .ToListAsync(
+                                    cToken),
+                            pdfModel),
+                        FileName = string.Format(
+                            "Multiple Starters {0}.pdf",
+                            foundComp.OrgCompetitionId),
+                    };
+                },
+                cancellationToken);
+        }
+
         public Task<IActionResult> GetPossiblePromotions(
             PdfViewModel pdfViewModel,
             CancellationToken cancellationToken)

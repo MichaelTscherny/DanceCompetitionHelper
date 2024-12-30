@@ -344,11 +344,14 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public Task<IActionResult> ShowMultipleStarters(
             Guid id,
+            bool groupedClassesView,
             CancellationToken cancellationToken)
         {
             return GetDefaultRequestHandler<CompetitionClass, ShowMultipleStartersOverviewViewModel>()
                 .SetOnSuccess(
-                    nameof(ShowMultipleStarters))
+                    groupedClassesView
+                        ? nameof(ShowMultipleStartersGroupedClassesView)
+                        : nameof(ShowMultipleStarters))
                 .SetOnNoData(
                     nameof(Index))
                 .DefaultShowAsync(
@@ -376,6 +379,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     cToken)
                                 .ToListAsync(
                                     cToken),
+                            GroupedClassesView = groupedClassesView,
                         };
                     },
                     cancellationToken);
@@ -383,11 +387,33 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         [HttpGet]
         public Task<IActionResult> PdfMultipleStarters(
-            PdfViewModel pdf,
-            CancellationToken cancellationToken)
+        PdfViewModel pdf,
+        CancellationToken cancellationToken)
         {
             return GetPdfDocumentHelper()
                 .GetMultipleStarters(
+                    pdf,
+                    cancellationToken);
+        }
+
+        public Task<IActionResult> ShowMultipleStartersGroupedClassesView(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            return ShowMultipleStarters(
+                id,
+                true,
+                cancellationToken);
+        }
+
+
+        [HttpGet]
+        public Task<IActionResult> PdfMultipleStartersGroupedClassesView(
+        PdfViewModel pdf,
+        CancellationToken cancellationToken)
+        {
+            return GetPdfDocumentHelper()
+                .GetMultipleStartersGroupedClassesView(
                     pdf,
                     cancellationToken);
         }

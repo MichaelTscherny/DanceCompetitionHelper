@@ -308,15 +308,14 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
             // ----
             var dispCunksSize = GetMaxColumnsCount(
                 document.LastSection.PageSetup);
-            var allDisplayInfos = ViewModelExtensions
+            var helpAllDisplayInfos = ViewModelExtensions
                 .ExtractDisplayInfo(
                     multipleStarters)
+                .ToList();
+            var allDisplayInfos = helpAllDisplayInfos
                 .Chunk(
                     dispCunksSize)
                 .ToList();
-
-            var allInfoChunks = allDisplayInfos.Count;
-            var curSectionCount = 1;
 
             foreach (var displayInfos in allDisplayInfos)
             {
@@ -354,8 +353,9 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 var curCellId = 0;
                 curRow.Cells[curCellId].AddParagraph(
                     string.Format(
-                        "Name ({0}) (P A/B; S A/B - Starts)",
-                        multipleStarters?.Count ?? 0));
+                        "Name ({0} x {1}) (P A/B; S A/B - Starts)",
+                        multipleStarters?.Count ?? 0,
+                        helpAllDisplayInfos.Count));
 
                 foreach (var curDisplayInfo in displayInfos)
                 {
@@ -420,28 +420,181 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                     }
                 }
 
-                // -- some stylings...
-                /*
-                table.SetEdge(
-                    0,
-                    0,
-                    table.Columns.Count,
-                    table.Rows.Count,
-                    Edge.Box,
-                    BorderStyle.Single,
-                    0.75,
-                    Colors.Black);
-                */
-
+                // -- add table
                 curSection.Add(
                     table);
 
-                curSectionCount++;
-                if (curSectionCount <= allInfoChunks)
+                document.AddSection();
+            }
+
+            // remove last section...
+            document.Sections.RemoveObjectAt(
+                document.Sections.Count - 1);
+
+            // ----
+            return ToPdfStream(
+                document,
+                model);
+        }
+
+        public Stream GetMultipleStartersGroupedClassesView(
+            Competition? competition,
+            List<MultipleStarter> multipleStarters,
+            PdfViewModel model)
+        {
+            var document = CreateDefaultDocument(
+                "Multiple Starters",
+                string.Empty,
+                competition);
+            SetDefaultStyle(
+                document);
+            SetDefaultHeaderFooter(
+                document,
+                competition,
+                null,
+                string.Format(
+                    "Group Classes for Multiple Starters",
+                    multipleStarters.Count));
+            SetDefaultPageSetup(
+                document,
+                model);
+
+            // ----
+            var dispCunksSize = GetMaxColumnsCount(
+                document.LastSection.PageSetup);
+            var (linkedClassIdsAndParticipants, allDisplayInfos) = ViewModelExtensions
+                .ExtractMultipleStarterLinkedClasses(
+                    multipleStarters);
+
+            foreach (var (curClassIds, curMultipleStarters) in linkedClassIdsAndParticipants)
+            {
+                foreach (var curClassesByChunk in curClassIds.Chunk(
+                    dispCunksSize))
                 {
+                    var curSection = document.LastSection;
+
+                    var table = new Table
+                    {
+                        Borders =
+                        {
+                            Width = 0.75,
+                            Visible = true,
+                        },
+                    };
+
+                    // -- prepare the table...
+                    table.AddColumn(
+                        Unit.FromCentimeter(
+                            6));
+
+                    foreach (var curDisplayInfo in curClassesByChunk)
+                    {
+                        table.AddColumn();
+                    }
+
+                    // -- fill header
+                    var curRow = table.AddRow();
+                    curRow.HeadingFormat = true;
+                    curRow.Format.Font.Bold = true;
+
+                    if (model.Shading)
+                    {
+                        curRow.Shading.Color = DefaultTableHeaderColor;
+                    }
+
+                    var curCellId = 0;
+                    curRow.Cells[curCellId].AddParagraph(
+                        string.Format(
+                            "Name ({0} x {1}) (P A/B; S A/B - Starts)",
+                            curMultipleStarters?.Count ?? 0,
+                            curClassIds.Count));
+
+                    foreach (var curDisplayInfo in allDisplayInfos)
+                    {
+                        if (curClassesByChunk.Contains(
+                            curDisplayInfo.ClassId) == false)
+                        {
+                            continue;
+                        }
+
+                        curCellId++;
+                        curRow.Cells[curCellId].AddParagraph(
+                            string.Format(
+                                "{0}{1}",
+                                curDisplayInfo.ClassName,
+                                curDisplayInfo.Ignore
+                                    ? " [IGNORE!]"
+                                    : string.Empty));
+                    }
+
+                    // -- fill data
+                    foreach (var item in curMultipleStarters ?? Enumerable.Empty<MultipleStarter>())
+                    {
+                        curRow = table.AddRow();
+                        curCellId = 0;
+                        Color? curShading = (curRow.Index % 2 == 0)
+                            ? DefaultTableShadingColor
+                            : null;
+
+                        curRow.Cells[curCellId].AddParagraph(
+                            string.Format(
+                                "{0} ({1} / {2}; {3} / {4} - {5})",
+                                item.Name,
+                                // 1
+                                item.PointsA,
+                                item.PointsB,
+                                // 3
+                                item.StartsA,
+                                item.StartsB,
+                                // 5
+                                item.CompetitionClasses.Count));
+
+                        foreach (var curDisplayInfo in allDisplayInfos)
+                        {
+                            if (curClassesByChunk.Contains(
+                                curDisplayInfo.ClassId) == false)
+                            {
+                                continue;
+                            }
+
+                            curCellId++;
+                            var curCellText = string.Empty;
+
+                            if (item.CompetitionClassNamesByClassId.ContainsKey(curDisplayInfo.ClassId))
+                            {
+                                var usePart = item.Participants
+                                    .FirstOrDefault(
+                                        x => x.CompetitionClassId == curDisplayInfo.ClassId);
+
+                                curCellText = string.Format(
+                                    "# {0}",
+                                    item.StartnumberByClassId[curDisplayInfo.ClassId]);
+                            }
+
+                            curRow[curCellId].VerticalAlignment = VerticalAlignment.Center;
+                            var newPara = curRow[curCellId].AddParagraph(
+                                curCellText);
+                            newPara.Format.Alignment = ParagraphAlignment.Center;
+                        }
+
+                        if (model.Shading
+                            && curShading != null)
+                        {
+                            curRow.Shading.Color = curShading ?? Colors.White;
+                        }
+                    }
+
+                    // -- add table
+                    curSection.Add(
+                        table);
+
                     document.AddSection();
                 }
             }
+
+            // remove last section...
+            document.Sections.RemoveObjectAt(
+                document.Sections.Count - 1);
 
             // ----
             return ToPdfStream(
@@ -683,19 +836,6 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 // -- DATA -- ROW 3 (dummy)
                 curCellId = 0;
                 curRow = table.AddRow();
-                */
-
-                // -- some stylings...
-                /*
-                table.SetEdge(
-                    0,
-                    0,
-                    table.Columns.Count,
-                    table.Rows.Count,
-                    Edge.Box,
-                    BorderStyle.Single,
-                    0.75,
-                    Colors.Black);
                 */
 
                 curSection.AddParagraph();

@@ -31,7 +31,7 @@
             <thead>
                 <tr>
                     <th>
-                        Name (@multipleStartersCount) (P A/B; S A/B - Starts)
+                        Name (@multipleStartersCount x @displayInfos.Count) (P A/B; S A/B - Starts)
                     </th>
 
                     @foreach (var curDisplayInfo in displayInfos)
@@ -97,16 +97,22 @@
         </table>
     </div>
 
-    <div class="row d-flex justify-content-center py-1">
-        <div class="col">
-            <a asp-controller="@CompetitionClassController.RefName"
+    <div class="hstack gap-2 justify-content-center">
+        <a asp-controller="@CompetitionClassController.RefName"
             asp-action="@nameof(CompetitionClassController.Index)"
             asp-route-id="@Model.Competition?.CompetitionId"
             class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
             title="Back">
-                Back
-            </a>
-        </div>
+            Back
+        </a>
+        <div class="vr"></div>
+        <a asp-controller="@CompetitionClassController.RefName"
+            asp-action="@nameof(CompetitionClassController.ShowMultipleStartersGroupedClassesView)"
+            asp-route-id="@Model.Competition?.CompetitionId"
+            class="btn btn-primary bi bi-bezier2"
+            title="Grouped Class View">
+            Grouped Class View
+        </a>
     </div>
 </div>
 
