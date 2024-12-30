@@ -5,28 +5,36 @@ namespace DanceCompetitionHelper.Database.Extensions
     public static class HumanReadableExtensions
     {
         public static string GetCompetitionName(
-            this Competition? forCompetition) =>
+            this Competition? forCompetition,
+            bool orgClassIdFirst = false) =>
                 string.Format(
-                    "{0} ({1})",
+                    orgClassIdFirst
+                        ? "({1}) {0}"
+                        : "{0} ({1})",
                     forCompetition?.CompetitionName ?? "??",
                     forCompetition?.OrgCompetitionId ?? "??");
 
         public static string GetCompetitionClassName(
-            this CompetitionClass? forCompetitionClass) =>
+            this CompetitionClass? forCompetitionClass,
+            bool orgClassIdFirst = false) =>
                 string.Format(
-                    "{0} ({1})",
+                    orgClassIdFirst
+                        ? "({1}) {0}"
+                        : "{0} ({1})",
                     forCompetitionClass?.CompetitionClassName ?? "??",
                     forCompetitionClass?.OrgClassId ?? "??");
 
         public static string GetCompetitionClasseNames(
-            this IEnumerable<CompetitionClass>? forCompetitionClasses) =>
+            this IEnumerable<CompetitionClass>? forCompetitionClasses,
+            bool orgClassIdFirst = false) =>
                 string.Join(
                     "; ",
                     (forCompetitionClasses ?? Enumerable.Empty<CompetitionClass>())
                         .OrderBy(
                             x => x.OrgClassId)
                         .Select(
-                            x => x.GetCompetitionClassName()));
+                            x => x.GetCompetitionClassName(
+                                orgClassIdFirst)));
 
         public static string GetStartNumber(
             this IEnumerable<Participant>? forParticipants) =>

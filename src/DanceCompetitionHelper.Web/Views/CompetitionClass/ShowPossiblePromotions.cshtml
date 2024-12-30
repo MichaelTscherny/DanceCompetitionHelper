@@ -19,35 +19,13 @@
         possiblePromotionsCount,
         compInfoStr);
 
-    var helpIncludedClasses = new List<CompetitionClass>();
-    var maxDisplayClasses = 0;
 
-    foreach (var curPossibleProm in Model.OverviewItems
-        ?.Where(
-            x => x.DisplayInfo != null
-            && x.DisplayInfo.PromotionInfo != null)
-        ?? Enumerable.Empty<Participant>())
-    {
-        var curClasses = curPossibleProm?.DisplayInfo?.PromotionInfo?.IncludedCompetitionClasses 
-            ?? new List<CompetitionClass>();
 
-        maxDisplayClasses = Math.Max(
-            maxDisplayClasses,
-            curClasses.Count);
-
-        helpIncludedClasses.AddRange(
-            curClasses);
-    }
-
-    var displayInfoCompClasses = new List<(string ClassName, Guid ClassId, bool Ignore)>(
-        helpIncludedClasses
-            .OrderBy(
-                x => x.OrgClassId)
-            .Select(
-                x => (x.GetCompetitionClassName(),
-                    x.CompetitionClassId,
-                    x.Ignore))
-            .Distinct());
+    var (helpIncludedClasses, maxDisplayClasses) = ViewModelExtensions
+        .ExtractPossiblePromotionCompetitionClasses(
+            Model.OverviewItems);    
+    var displayInfoCompClasses = ViewModelExtensions.ExtractDisplayInfo(
+        helpIncludedClasses);
     var displayInfoCompClassesIds = new List<Guid>(
         displayInfoCompClasses.Select(
             x => x.ClassId));

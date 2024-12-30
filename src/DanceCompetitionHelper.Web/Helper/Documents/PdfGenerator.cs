@@ -1,6 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.Pdfs;
 
 using MigraDoc.DocumentObjectModel;
@@ -307,22 +308,12 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
             // ----
             var dispCunksSize = GetMaxColumnsCount(
                 document.LastSection.PageSetup);
-            var allDisplayInfos =
-                (multipleStarters
-                    ?.SelectMany(
-                        x => x.CompetitionClasses)
-                    .OrderBy(
-                        x => x.OrgClassId)
-                    .Select(
-                        x => (x.GetCompetitionClassName(),
-                            x.CompetitionClassId,
-                            x.Ignore))
-                    .Distinct()
-                    .ToList()
-                    ?? Enumerable.Empty<(string ClassName, Guid ClassId, bool Ignore)>())
-                    .Chunk(
-                        dispCunksSize)
-                    .ToList();
+            var allDisplayInfos = ViewModelExtensions
+                .ExtractDisplayInfo(
+                    multipleStarters)
+                .Chunk(
+                    dispCunksSize)
+                .ToList();
 
             var allInfoChunks = allDisplayInfos.Count;
             var curSectionCount = 1;
@@ -343,7 +334,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 // -- prepare the table...
                 table.AddColumn(
                     Unit.FromCentimeter(
-                        5));
+                        6));
 
                 foreach (var curDisplayInfo in displayInfos)
                 {
@@ -354,7 +345,11 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 var curRow = table.AddRow();
                 curRow.HeadingFormat = true;
                 curRow.Format.Font.Bold = true;
-                curRow.Shading.Color = DefaultTableHeaderColor;
+
+                if (model.Shading)
+                {
+                    curRow.Shading.Color = DefaultTableHeaderColor;
+                }
 
                 var curCellId = 0;
                 curRow.Cells[curCellId].AddParagraph(
@@ -418,7 +413,8 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                         newPara.Format.Alignment = ParagraphAlignment.Center;
                     }
 
-                    if (curShading != null)
+                    if (model.Shading
+                        && curShading != null)
                     {
                         curRow.Shading.Color = curShading ?? Colors.White;
                     }
@@ -477,35 +473,11 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 model);
 
             // ----
-            var helpIncludedClasses = new List<CompetitionClass>();
-            var maxDisplayClasses = 0;
-
-            foreach (var curPossibleProm in possiblePromotions
-                ?.Where(
-                    x => x.DisplayInfo != null
-                    && x.DisplayInfo.PromotionInfo != null)
-                ?? Enumerable.Empty<Participant>())
-            {
-                var curClasses = curPossibleProm?.DisplayInfo?.PromotionInfo?.IncludedCompetitionClasses
-                    ?? new List<CompetitionClass>();
-
-                maxDisplayClasses = Math.Max(
-                    maxDisplayClasses,
-                    curClasses.Count);
-
-                helpIncludedClasses.AddRange(
-                    curClasses);
-            }
-
-            var displayInfoCompClasses = new List<(string ClassName, Guid ClassId, bool Ignore)>(
-                helpIncludedClasses
-                    .OrderBy(
-                        x => x.OrgClassId)
-                    .Select(
-                        x => (x.GetCompetitionClassName(),
-                            x.CompetitionClassId,
-                            x.Ignore))
-                    .Distinct());
+            var (helpIncludedClasses, maxDisplayClasses) = ViewModelExtensions
+                .ExtractPossiblePromotionCompetitionClasses(
+                    possiblePromotions);
+            var displayInfoCompClasses = ViewModelExtensions.ExtractDisplayInfo(
+                helpIncludedClasses);
             var displayInfoCompClassesIds = new List<Guid>(
                 displayInfoCompClasses.Select(
                     x => x.ClassId));
@@ -555,7 +527,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 // -- prepare the table...
                 table.AddColumn(
                     Unit.FromCentimeter(
-                        5));
+                        6));
 
                 // -- prepare columns
                 foreach (var curColumn in curClassesByClassId)
@@ -609,7 +581,15 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
 
                 if (isAlreadyPromoted)
                 {
-                    curRow[curCellId].Shading.Color = Colors.PaleVioletRed;
+                    if (model.Shading)
+                    {
+                        curRow[curCellId].Shading.Color = Colors.PaleVioletRed;
+                    }
+                    else
+                    {
+                        curRow[curCellId].AddParagraph(
+                            "!!!");
+                    }
                 }
 
                 // -- Points/Starts

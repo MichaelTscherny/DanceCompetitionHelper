@@ -2,6 +2,7 @@
 @using DanceCompetitionHelper.Database.Tables
 @using DanceCompetitionHelper.Database.Extensions
 @using DanceCompetitionHelper.Web.Controllers
+@using DanceCompetitionHelper.Web.Extensions
 @using DanceCompetitionHelper.Web.Models.ConfigurationModels
 @using DanceCompetitionHelper.Web.Models.Pdfs
 @using MigraDoc.DocumentObjectModel
@@ -16,46 +17,48 @@
     var buttonText = Model.ButtonText;
     var formTitle = Model.FormTitle ?? buttonText;
 
-    var allFormats = Html
-        .GetEnumSelectList<PageFormat>()
-        .ToList();
-    var usePageFormat = ((int)PdfViewModel.PageFormat).ToString();
-    var allFormatsSelect = allFormats.FirstOrDefault(
-        x => x.Value == usePageFormat);
-    if (allFormatsSelect != null)
-    {
-        allFormatsSelect.Selected = true;
-    }
+    var allFormats = BlazorExtensions
+        .ToSelectListItems(
+            PdfViewModel.PageFormat);
 
-    var allOrientations = Html
-        .GetEnumSelectList<Orientation>()
-        .ToList();
-    var useOrientation = ((int)PdfViewModel.Orientation).ToString();
-    var allOrientationsSelect = allOrientations.FirstOrDefault(
-        x => x.Value == useOrientation);
-    if (allOrientationsSelect != null)
-    {
-        allOrientationsSelect.Selected = true;
-    }
+    var allOrientations = BlazorExtensions
+        .ToSelectListItems(
+            PdfViewModel.Orientation);
 }
-<div class="container text-center m-0 mb-2">
+
+<div class="text-center">
     <form asp-controller="@aspController"
-          asp-action="@aspAction"
-          method="get"
-          class="form-horizontal row needs-validation border rounded"
-          role="form">
+    asp-action="@aspAction"
+    method="get"
+    class="form-horizontal row needs-validation border rounded m-md-1"
+    role="form">
         <input id="@nameof(PdfViewModel.CompetitionId)"
-               name="@nameof(PdfViewModel.CompetitionId)"
-               type="hidden"
-               value="@PdfViewModel.CompetitionId" />
-        <input id="@nameof(PdfViewModel.CompetitionClassId)"
-               name="@nameof(PdfViewModel.CompetitionClassId)"
-               type="hidden"
-               value="@PdfViewModel.CompetitionClassId" />
+        name="@nameof(PdfViewModel.CompetitionId)"
+        type="hidden"
+        value="@PdfViewModel.CompetitionId" />
 
         <div class="col-12 text-start fw-bold">
             PDF @formTitle
         </div>
+
+        @if (PdfViewModel.CompetitionClasses.Count >= 1)
+        {
+            <div class="col-3 mb-2">
+                <div class="input-group">
+                    <div class="input-group-text mb-0">
+                        <label for="@nameof(PdfViewModel.CompetitionClasses)"
+                               class="form-label mb-0">
+                            Class
+                        </label>
+                    </div>
+                    <select asp-items="@PdfViewModel.CompetitionClasses"
+                            id="@nameof(PdfViewModel.CompetitionClassId)"
+                            name="@nameof(PdfViewModel.CompetitionClassId)"
+                            class="form-select">
+                    </select>
+                </div>
+            </div>
+        }
 
         <div class="col-2 mb-2">
             <div class="input-group">
@@ -68,7 +71,7 @@
                 <select asp-items="@allFormats"
                         id="@nameof(PdfViewModel.PageFormat)"
                         name="@nameof(PdfViewModel.PageFormat)"
-                        class="form-control">
+                        class="form-select">
                 </select>
             </div>
         </div>
@@ -78,23 +81,41 @@
                 <div class="input-group-text mb-0">
                     <label for="@nameof(PdfViewModel.Orientation)"
                            class="form-label mb-0">
-                        Orientation
+                        Orien.
                     </label>
                 </div>
                 <select asp-items="@allOrientations"
                         id="@nameof(PdfViewModel.Orientation)"
                         name="@nameof(PdfViewModel.Orientation)"
-                        class="form-control">
+                        class="form-select">
                 </select>
             </div>
         </div>
 
-        <div class="col-2">
+        <div class="col-1 d-flex align-items-center">
+            <div class="form-check align-middle">
+                <input id="@nameof(PdfViewModel.Shading)"
+                       type="checkbox"
+                       name="@nameof(PdfViewModel.Shading)"
+                       class="form-check-input"
+                       @(PdfViewModel.Shading ? "checked" : "") />
+                <label for="@nameof(PdfViewModel.Shading)"
+                       class="form-label mb-0">
+                    Shading
+                </label>
+            </div>
+        </div>
+
+        <div class="col"></div>
+
+        <div class="col-auto">
             <button type="submit"
-                    class="btn btn-primary bi bi-filetype-pdf"
+                    class="btn btn-primary bi bi-filetype-pdf text-nowrap"
                     title="Get @buttonText as PDF">
                 @buttonText
             </button>
         </div>
+
+        <input name="@nameof(PdfViewModel.Shading)" type="hidden" value="false" />
     </form>
 </div>

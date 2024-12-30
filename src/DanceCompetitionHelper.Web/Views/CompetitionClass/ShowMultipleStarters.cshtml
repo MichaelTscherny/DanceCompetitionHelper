@@ -19,18 +19,8 @@
         multipleStartersCount,
         compInfoStr);
 
-    var displayInfos = new List<(string ClassName, Guid ClassId, bool Ignore)>(
-        Model.OverviewItems
-            ?.SelectMany(
-                x => x.CompetitionClasses)
-            .OrderBy(
-                x => x.OrgClassId)
-            .Select(
-                x => (x.GetCompetitionClassName(), 
-                    x.CompetitionClassId,
-                    x.Ignore))
-            .Distinct()
-            ?? Enumerable.Empty<(string, Guid, bool)>());
+    var displayInfos = ViewModelExtensions.ExtractDisplayInfo(
+        Model.OverviewItems);
 }
 
 <div class="text-center">
@@ -130,7 +120,7 @@
         PdfViewModel = new PdfViewModel()
         {
             CompetitionId = Model.Competition?.CompetitionId,
-            PageFormat = PageFormat.A4,
+            PageFormat = PageFormat.A4, // PageFormat.A3,
             Orientation = Orientation.Landscape
         }
     };
