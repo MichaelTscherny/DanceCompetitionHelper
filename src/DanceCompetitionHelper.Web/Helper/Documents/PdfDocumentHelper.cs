@@ -18,14 +18,6 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         private readonly ILogger<TLogger> _logger;
         private readonly IMapper _mapper;
 
-        static PdfDocumentHelper()
-        {
-#if CORE
-            // Core build does not use Windows fonts, so set a FontResolver that handles the fonts our samples need.
-            GlobalFontSettings.FontResolver = new SamplesFontResolver();
-#endif
-        }
-
         public PdfDocumentHelper(
             ControllerBase<TLogger> controllerBase,
             IDanceCompetitionHelper danceCompHelper,
@@ -214,6 +206,44 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                             pdfModel),
                         FileName = string.Format(
                             "Possible Promotions {0}.pdf",
+                            foundComp.OrgCompetitionId),
+                    };
+                },
+                cancellationToken);
+        }
+
+        public Task<IActionResult> GetNumberCards(
+            PdfViewModel pdfViewModel,
+            CancellationToken cancellationToken)
+        {
+            return ReturnPdfViewModel(
+                pdfViewModel,
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                {
+                    var foundComp = await dcH.FindCompetitionAsync(
+                        pdfModel.CompetitionId,
+                        cToken)
+                        ?? throw new NoDataFoundException(
+                            string.Format(
+                                "{0} with id '{1}' not found!",
+                                nameof(Competition),
+                                pdfModel.CompetitionId));
+
+                    return new PdfViewModel()
+                    {
+                        PdtStream = pdfGen.GetNumberCards(
+                            foundComp,
+                            await dcH
+                                 .GetParticipantsAsync(
+                                     foundComp.CompetitionId,
+                                     pdfModel.CompetitionClassId,
+                                     cToken,
+                                     true)
+                                 .ToListAsync(
+                                     cToken),
+                            pdfModel),
+                        FileName = string.Format(
+                            "Number Cards {0}.pdf",
                             foundComp.OrgCompetitionId),
                     };
                 },

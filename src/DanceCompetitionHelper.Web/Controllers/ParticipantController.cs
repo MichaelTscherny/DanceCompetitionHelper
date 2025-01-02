@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.ParticipantModels;
+using DanceCompetitionHelper.Web.Models.Pdfs;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
@@ -325,6 +328,17 @@ namespace DanceCompetitionHelper.Web.Controllers
                             Id = helpComp?.CompetitionId ?? Guid.Empty,
                         };
                     },
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> PdfNumberCards(
+            PdfViewModel pdf,
+            CancellationToken cancellationToken)
+        {
+            return GetPdfDocumentHelper()
+                .GetNumberCards(
+                    pdf,
                     cancellationToken);
         }
     }

@@ -8,6 +8,9 @@ using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
 
+using PdfSharp.Drawing;
+using PdfSharp.Fonts;
+
 namespace DanceCompetitionHelper.Web.Helper.Documents
 {
     public class PdfGenerator
@@ -19,6 +22,15 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         public Color DefaultTableShadingColor { get; set; } = new Color(0xe0, 0xe0, 0xe0);
 
         #region General Stuff
+
+        static PdfGenerator()
+        {
+            // #if CORE
+            // Core build does not use Windows fonts, so set a FontResolver that handles the fonts our samples need.
+            GlobalFontSettings.FontResolver = new UserFontResolver();
+            // #endif
+        }
+
 
         #endregion General Stuff
 
@@ -842,6 +854,131 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 curSection.Add(
                     table);
             }
+
+            // ----
+            return ToPdfStream(
+                document,
+                model);
+        }
+
+        public Stream GetNumberCards(
+            Competition? competition,
+            List<Participant> possiblePromotions,
+            PdfViewModel model)
+        {
+            var document = CreateDefaultDocument(
+                "Number Cards",
+                string.Empty,
+                competition);
+            SetDefaultStyle(
+                document);
+            SetDefaultPageSetup(
+                document,
+                model);
+
+            // our special stuff...
+            var curSection = document.LastSection;
+            var useMargin = Unit.FromMillimeter(5);
+            curSection.PageSetup.LeftMargin = useMargin; // Unit.Zero;
+            curSection.PageSetup.RightMargin = useMargin; // Unit.Zero;
+            curSection.PageSetup.TopMargin = useMargin; // Unit.Zero;
+            curSection.PageSetup.BottomMargin = useMargin; // Unit.Zero;
+
+            var (useWidht, useHeight) = GetEffectiveContentSizes(
+                curSection.PageSetup);
+
+            // why?..
+            curSection.PageSetup.LeftMargin = useMargin * 2; // Unit.Zero;
+
+            // ----
+            var table = new Table
+            {
+                Borders =
+                {
+                    Width = 0.75,
+                    Visible = true, // false,
+                },
+                LeftPadding = useMargin,
+            };
+
+            // -- prepare the table...
+            var tableColumn = table.AddColumn(
+                useWidht);
+            tableColumn.Format.Alignment = ParagraphAlignment.Center;
+
+            var numberInfoHeight = Unit.FromCentimeter(1);
+            var numberFitHeight = Unit.FromMillimeter(3);
+            var useNumberFontSize = Unit.FromPoint(250);
+            var useNumberInfoFontSize = Unit.FromPoint(8);
+
+            var test = GlobalFontSettings.FontResolver;
+            var test02 = GlobalFontSettings.DefaultFontEncoding;
+
+            var testFont = new XFont(
+                "Arial",
+                useNumberFontSize,
+                XFontStyleEx.Bold);
+
+            // ------
+            // first row...
+            var firstNumber = table.AddRow();
+            firstNumber[0].VerticalAlignment = VerticalAlignment.Center;
+            firstNumber.Height = (useHeight / 2.0) - numberInfoHeight - numberFitHeight;
+            firstNumber.HeightRule = RowHeightRule.Exactly;
+            var firstNumberPara = firstNumber.Cells[0].AddParagraph(
+                "1234");
+            firstNumberPara.Format.Alignment = ParagraphAlignment.Center;
+            firstNumberPara.Format.Font.Size = useNumberFontSize;
+
+            // firstNumberPara.Format.Font.Name = "segoe ui";
+            // firstNumberPara.Format.Font.Name = "Arial Narrow";
+            // firstNumberPara.Format.Font.Name = "Noto Sans";
+            // firstNumberPara.Format.Font.Name = "formiena";
+            // firstNumberPara.Format.Font.Name = "fs-regulate";
+            // firstNumberPara.Format.Font.Size = Unit.FromPoint(380); // useNumberFontSize;
+            firstNumberPara.Format.Font.Bold = true;
+
+            var firstNumberInfo = table.AddRow();
+            firstNumberInfo[0].VerticalAlignment = VerticalAlignment.Center;
+            firstNumberInfo.Height = numberInfoHeight;
+            firstNumberInfo.HeightRule = RowHeightRule.Exactly;
+
+            var firstNumberInfoPara = firstNumberInfo.Cells[0].AddParagraph(
+                "Some number info");
+            firstNumberInfoPara.Format.Font.Size = useNumberInfoFontSize;
+
+            // ------
+            // filler row...
+            var filler = table.AddRow();
+            filler.Height = Unit.FromMillimeter(3);
+            filler.HeightRule = RowHeightRule.Exactly;
+
+            // ------
+            // second row...
+            var secondNumber = table.AddRow();
+            secondNumber[0].VerticalAlignment = VerticalAlignment.Center;
+            secondNumber.Height = (useHeight / 2.0) - numberInfoHeight - numberFitHeight;
+            secondNumber.HeightRule = RowHeightRule.Exactly;
+            var secondNumberPara = secondNumber.Cells[0].AddParagraph(
+                "5678");
+
+            // secondNumberPara.Format.Borders.Distance = Unit.Zero;
+            // secondNumberPara.Format.Borders.Left.Width = Unit.Zero;
+            // secondNumberPara.Format.Font.Name = "segoe ui";
+            secondNumberPara.Format.Font.Size = useNumberFontSize;
+            secondNumberPara.Format.Font.Bold = true;
+
+            var secondNumberInfo = table.AddRow();
+            secondNumberInfo[0].VerticalAlignment = VerticalAlignment.Center;
+            secondNumberInfo.Height = numberInfoHeight;
+            secondNumberInfo.HeightRule = RowHeightRule.Exactly;
+            var secondNumberInfoPara = secondNumberInfo.Cells[0].AddParagraph(
+                "other number info");
+            secondNumberInfoPara.Format.Font.Size = useNumberInfoFontSize;
+
+            // ----
+            curSection.Add(
+                table);
 
             // ----
             return ToPdfStream(

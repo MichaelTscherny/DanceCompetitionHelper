@@ -3,6 +3,8 @@
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models.ParticipantModels;
+@using DanceCompetitionHelper.Web.Models.Pdfs
+@using MigraDoc.DocumentObjectModel
 
 @model ParticipantOverviewViewModel
 
@@ -340,3 +342,22 @@
     </div>
     <br />
 </div>
+
+@{
+    var toDisplay = new PdfViewModelWrapper()
+    {
+        AspController = ParticipantController.RefName,
+        AspAction = nameof(ParticipantController.PdfNumberCards),
+        ButtonText = "Number Cards",        
+        //
+        PdfViewModel = new PdfViewModel()
+        {
+            CompetitionId = Model.Competition?.CompetitionId,
+            PageFormat = PageFormat.A4, // PageFormat.A3,
+            Orientation = Orientation.Portrait,
+            Shading = false,
+        }
+    };
+}
+@Html.DisplayFor(
+    m => toDisplay)
