@@ -10,6 +10,8 @@ using DanceCompetitionHelper.Web.Models.Pdfs;
 
 using Microsoft.AspNetCore.Mvc;
 
+using MigraDoc.DocumentObjectModel;
+
 namespace DanceCompetitionHelper.Web.Controllers
 {
     public class ParticipantController : ControllerBase<ParticipantController>
@@ -291,6 +293,68 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
+        public Task<IActionResult> Ignore(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<Participant, ParticipantViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
+                    {
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            _viewData,
+                            cToken);
+
+                        model.CompetitionClasses = await dcH
+                            .GetCompetitionClassesAsync(
+                                model.CompetitionId,
+                                cancellationToken)
+                            .ToSelectListItemAsync(
+                                model.CompetitionClassId)
+                            .ToListAsync(
+                                cancellationToken);
+
+                        return null;
+                    })
+                .DefaultEditSaveAsync(
+                    new ParticipantViewModel()
+                    {
+                        ParticipantId = id,
+                    },
+                    async (model, dcH, mapper, _, cToken) =>
+                    {
+                        var foundPart = await dcH.GetParticipantAsync(
+                            model.ParticipantId ?? Guid.Empty,
+                            cancellationToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(Participant),
+                                    model.ParticipantId));
+
+                        // override the values...
+                        foundPart.Ignore = true;
+
+                        return new
+                        {
+                            Id = foundPart?.CompetitionClassId ?? Guid.Empty
+                        };
+                    },
+                    cancellationToken);
+        }
+
         public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
@@ -336,6 +400,10 @@ namespace DanceCompetitionHelper.Web.Controllers
             PdfViewModel pdf,
             CancellationToken cancellationToken)
         {
+            // CAUTION: only "A4" implemented yet!..
+            pdf.PageFormat = PageFormat.A4;
+            pdf.PageOrientation = Orientation.Portrait;
+
             return GetPdfDocumentHelper()
                 .GetNumberCards(
                     pdf,

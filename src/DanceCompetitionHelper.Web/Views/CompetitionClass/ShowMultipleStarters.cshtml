@@ -19,83 +19,86 @@
         multipleStartersCount,
         compInfoStr);
 
-    var displayInfos = ViewModelExtensions.ExtractDisplayInfo(
+    var displayInfoBlocks = ViewModelExtensions.ExtractDisplayInfo(
         Model.OverviewItems);
 }
 
 <div class="text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
 
-    <div class="table-responsive-xxl">
-        <table class="table table-striped table-hover table-striped-columns">
-            <thead>
-                <tr>
-                    <th>
-                        Name (@multipleStartersCount x @displayInfos.Count) (P A/B; S A/B - Starts)
-                    </th>
-
-                    @foreach (var curDisplayInfo in displayInfos)
-                    {
-                        var infoString = string.Empty;
-
-                        if(curDisplayInfo.Ignore)
-                        {
-                            infoString = "[IGNORE!]";
-                        }
-
-                        <th>
-                            @curDisplayInfo.ClassName @infoString
-                        </th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<MultipleStarter>())
-                {
+    @foreach (var displayInfos in displayInfoBlocks) 
+    {
+        <div class="table-responsive-xxl">
+            <table class="table table-striped table-hover table-striped-columns">
+                <thead>
                     <tr>
-                        <td class="text-nowrap">
-                            @item.Name
-                            (@item.PointsA / @item.PointsB; @item.StartsA / @item.StartsB - @item.CompetitionClasses.Count)
-                        </td>
+                        <th>
+                            Name (@multipleStartersCount x @displayInfos.Count) (P A/B; S A/B - Starts)
+                        </th>
 
                         @foreach (var curDisplayInfo in displayInfos)
                         {
-                            <td>
-                                @if (item.CompetitionClassNamesByClassId.ContainsKey(curDisplayInfo.ClassId))
-                                {
-                                    var usePart = item.Participants
-                                        .FirstOrDefault(
-                                            x => x.CompetitionClassId == curDisplayInfo.ClassId);
+                            var infoString = string.Empty;
 
-                                    <div class="text-nowrap">
-                                        # <a asp-controller="@ParticipantController.RefName"
-                                        asp-action="@nameof(ParticipantController.ShowEdit)"
-                                        asp-route-id="@usePart?.ParticipantId">
-                                            @item.StartnumberByClassId[curDisplayInfo.ClassId]
-                                        </a>
-                                    </div>
-                                }
-                            </td>
+                            if(curDisplayInfo.Ignore)
+                            {
+                                infoString = "[IGNORE!]";
+                            }
+
+                            <th>
+                                @curDisplayInfo.ClassName @infoString
+                            </th>
                         }
                     </tr>
-                }
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th>
-                        Name (@multipleStartersCount) (P A/B; S A/B - Starts)
-                    </th>
-
-                    @foreach (var curDisplayInfo in displayInfos)
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<MultipleStarter>())
                     {
-                        <th>
-                            @curDisplayInfo.ClassName
-                        </th>
+                        <tr>
+                            <td class="text-nowrap">
+                                @item.Name
+                                (@item.PointsA / @item.PointsB; @item.StartsA / @item.StartsB - @item.CompetitionClasses.Count)
+                            </td>
+
+                            @foreach (var curDisplayInfo in displayInfos)
+                            {
+                                <td>
+                                    @if (item.CompetitionClassNamesByClassId.ContainsKey(curDisplayInfo.ClassId))
+                                    {
+                                        var usePart = item.Participants
+                                            .FirstOrDefault(
+                                                x => x.CompetitionClassId == curDisplayInfo.ClassId);
+
+                                        <div class="text-nowrap">
+                                            # <a asp-controller="@ParticipantController.RefName"
+                                            asp-action="@nameof(ParticipantController.ShowEdit)"
+                                            asp-route-id="@usePart?.ParticipantId">
+                                                @item.StartnumberByClassId[curDisplayInfo.ClassId]
+                                            </a>
+                                        </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
                     }
-                </tr>
-            </tfoot>
-        </table>
-    </div>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>
+                            Name (@multipleStartersCount) (P A/B; S A/B - Starts)
+                        </th>
+
+                        @foreach (var curDisplayInfo in displayInfos)
+                        {
+                            <th>
+                                @curDisplayInfo.ClassName
+                            </th>
+                        }
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
 
     <div class="hstack gap-2 justify-content-center">
         <a asp-controller="@CompetitionClassController.RefName"
@@ -107,11 +110,11 @@
         </a>
         <div class="vr"></div>
         <a asp-controller="@CompetitionClassController.RefName"
-            asp-action="@nameof(CompetitionClassController.ShowMultipleStartersGroupedClassesView)"
+            asp-action="@nameof(CompetitionClassController.ShowMultipleStartersDependentClassesView)"
             asp-route-id="@Model.Competition?.CompetitionId"
             class="btn btn-primary bi bi-bezier2"
-            title="Grouped Class View">
-            Grouped Class View
+            title="Dependent Classes View">
+            Dependent Classes View
         </a>
     </div>
 </div>
@@ -122,12 +125,13 @@
         AspController = CompetitionClassController.RefName,
         AspAction = nameof(CompetitionClassController.PdfMultipleStarters),
         ButtonText = "Multiple Starters",
+        ShowGroupForView = true,
         //
         PdfViewModel = new PdfViewModel()
         {
             CompetitionId = Model.Competition?.CompetitionId,
-            PageFormat = PageFormat.A4, // PageFormat.A3,
-            Orientation = Orientation.Landscape
+            PageFormat = PageFormat.A4,
+            PageOrientation = Orientation.Landscape
         }
     };
 }

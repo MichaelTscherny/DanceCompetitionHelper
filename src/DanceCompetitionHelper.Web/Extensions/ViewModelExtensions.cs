@@ -1,37 +1,73 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Extensions;
+using DanceCompetitionHelper.Web.Enums;
 
 namespace DanceCompetitionHelper.Web.Extensions
 {
     public static class ViewModelExtensions
     {
-        public static List<(string ClassName, Guid ClassId, bool Ignore)> ExtractDisplayInfo(
-            IEnumerable<MultipleStarter>? multipleStarters)
+        public static List<List<(string ClassName, Guid ClassId, bool Ignore)>> ExtractDisplayInfo(
+            IEnumerable<MultipleStarter>? multipleStarters,
+            GroupForViewEnum groupForView = GroupForViewEnum.None)
         {
             return ExtractDisplayInfo(
                 multipleStarters
                     ?.SelectMany(
-                        x => x.CompetitionClasses));
+                        x => x.CompetitionClasses),
+                groupForView);
         }
 
-        public static List<(string ClassName, Guid ClassId, bool Ignore)> ExtractDisplayInfo(
-            IEnumerable<CompetitionClass>? multipleStarters)
+        public static List<List<(string ClassName, Guid ClassId, bool Ignore)>> ExtractDisplayInfo(
+            IEnumerable<CompetitionClass>? competitionClasses,
+            GroupForViewEnum groupForView = GroupForViewEnum.None)
         {
-            return new List<(string ClassName, Guid ClassId, bool Ignore)>(
-                multipleStarters
-                    ?.OrderBy(
-                        x => x.OrgClassId)
-                    .Select(
-                        x => (x.GetCompetitionClassName(),
-                            x.CompetitionClassId,
-                            x.Ignore))
-                    .Distinct()
-                    ?? Enumerable.Empty<(string, Guid, bool)>());
+            var classesByDiscipline = new Dictionary<string, List<CompetitionClass>>();
+            foreach (var curCompClass in competitionClasses
+                ?.OrderBy(
+                    x => x.OrgClassId)
+                ?? Enumerable.Empty<CompetitionClass>())
+            {
+                switch (groupForView)
+                {
+                    case GroupForViewEnum.None:
+                        classesByDiscipline.AddToBucket(
+                            "nameof(classesByDiscipline)",
+                            curCompClass);
+                        break;
+
+                    case GroupForViewEnum.ByDisciplineAndOrgClassId:
+                        classesByDiscipline.AddToBucket(
+                            curCompClass.Discipline ?? "xxxxx",
+                            curCompClass);
+                        break;
+                }
+            }
+
+            var retDisplayInfosGrouped = new List<List<(string ClassName, Guid ClassId, bool Ignore)>>();
+
+            foreach (var curClassByDisp in classesByDiscipline.OrderBy(
+                x => x.Key))
+            {
+                retDisplayInfosGrouped.Add(
+                    new List<(string ClassName, Guid ClassId, bool Ignore)>(
+                        curClassByDisp.Value
+                            .OrderBy(
+                                x => x.OrgClassId)
+                            .Select(
+                                x => (x.GetCompetitionClassName(),
+                                    x.CompetitionClassId,
+                                    x.Ignore))
+                            .Distinct()));
+            }
+
+            return retDisplayInfosGrouped;
         }
 
-        public static (List<(HashSet<Guid> LinkedClasses, List<MultipleStarter> MultipleStarters)> LinkedClassIdsAndMultipleStarters, List<(string ClassName, Guid ClassId, bool Ignore)> DisplayInfo) ExtractMultipleStarterLinkedClasses(
-            IEnumerable<MultipleStarter>? multipleStarters)
+        public static (List<(HashSet<Guid> LinkedClasses, List<MultipleStarter> MultipleStarters)> LinkedClassIdsAndMultipleStarters, List<List<(string ClassName, Guid ClassId, bool Ignore)>> DisplayInfos) ExtractMultipleStarterDependentClasses(
+            IEnumerable<MultipleStarter>? multipleStarters,
+            GroupForViewEnum groupForView = GroupForViewEnum.None)
         {
             var linkedClassIds = new List<HashSet<Guid>>();
             var classesByIds = new Dictionary<Guid, CompetitionClass>();
@@ -130,7 +166,8 @@ namespace DanceCompetitionHelper.Web.Extensions
             return (
                 retLinkedClassIdsAndMultStarters,
                 ExtractDisplayInfo(
-                    multipleStarters));
+                    multipleStarters,
+                    groupForView));
         }
 
         public static (List<CompetitionClass> IncludedClasses, int MaxDisplayClasses) ExtractPossiblePromotionCompetitionClasses(

@@ -8,7 +8,6 @@ using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
 
-using PdfSharp.Drawing;
 using PdfSharp.Fonts;
 
 namespace DanceCompetitionHelper.Web.Helper.Documents
@@ -25,12 +24,8 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
 
         static PdfGenerator()
         {
-            // #if CORE
-            // Core build does not use Windows fonts, so set a FontResolver that handles the fonts our samples need.
             GlobalFontSettings.FontResolver = new UserFontResolver();
-            // #endif
         }
-
 
         #endregion General Stuff
 
@@ -145,7 +140,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
             // CAUTION: Do not use "document.DefaultPageSetup.Clone()";
             // the PageFormat will not change any sizes
             document.LastSection.PageSetup.PageFormat = model.PageFormat;
-            document.LastSection.PageSetup.Orientation = model.Orientation;
+            document.LastSection.PageSetup.Orientation = model.PageOrientation;
 
             return document;
         }
@@ -161,7 +156,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 PdfDocument =
                 {
                     // Change some settings before rendering the MigraDoc document.
-                    PageLayout = model.PdfPageLayout,
+                    PageLayout = model.PageLayout,
                     ViewerPreferences =
                     {
                         // FitWindow = true,
@@ -320,168 +315,21 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
             // ----
             var dispCunksSize = GetMaxColumnsCount(
                 document.LastSection.PageSetup);
-            var helpAllDisplayInfos = ViewModelExtensions
+            var allDisplayInfoBlocks = ViewModelExtensions
                 .ExtractDisplayInfo(
-                    multipleStarters)
-                .ToList();
-            var allDisplayInfos = helpAllDisplayInfos
-                .Chunk(
-                    dispCunksSize)
-                .ToList();
+                    multipleStarters,
+                    model.GroupForView);
 
-            foreach (var displayInfos in allDisplayInfos)
+            // for (var blockIdx = 0; blockIdx < allDisplayInfoBlocks.Count; blockIdx++)
+            // foreach (var allDisplayInfos in allDisplayInfoBlocks)
+            foreach (var allDisplayInfo in allDisplayInfoBlocks)
             {
-                var curSection = document.LastSection;
+                // var allDisplayInfo = allDisplayInfoBlocks[blockIdx];
+                var allDisplayInfoCount = allDisplayInfo.Count;
 
-                var table = new Table
-                {
-                    Borders =
-                    {
-                        Width = 0.75,
-                        Visible = true,
-                    },
-                };
-
-                // -- prepare the table...
-                table.AddColumn(
-                    Unit.FromCentimeter(
-                        6));
-
-                foreach (var curDisplayInfo in displayInfos)
-                {
-                    table.AddColumn();
-                }
-
-                // -- fill header
-                var curRow = table.AddRow();
-                curRow.HeadingFormat = true;
-                curRow.Format.Font.Bold = true;
-
-                if (model.Shading)
-                {
-                    curRow.Shading.Color = DefaultTableHeaderColor;
-                }
-
-                var curCellId = 0;
-                curRow.Cells[curCellId].AddParagraph(
-                    string.Format(
-                        "Name ({0} x {1}) (P A/B; S A/B - Starts)",
-                        multipleStarters?.Count ?? 0,
-                        helpAllDisplayInfos.Count));
-
-                foreach (var curDisplayInfo in displayInfos)
-                {
-                    curCellId++;
-                    curRow.Cells[curCellId].AddParagraph(
-                        string.Format(
-                            "{0}{1}",
-                            curDisplayInfo.ClassName,
-                            curDisplayInfo.Ignore
-                                ? " [IGNORE!]"
-                                : string.Empty));
-                }
-
-                // -- fill data
-                foreach (var item in multipleStarters ?? Enumerable.Empty<MultipleStarter>())
-                {
-                    curRow = table.AddRow();
-                    curCellId = 0;
-                    Color? curShading = (curRow.Index % 2 == 0)
-                        ? DefaultTableShadingColor
-                        : null;
-
-                    curRow.Cells[curCellId].AddParagraph(
-                        string.Format(
-                            "{0} ({1} / {2}; {3} / {4} - {5})",
-                            item.Name,
-                            // 1
-                            item.PointsA,
-                            item.PointsB,
-                            // 3
-                            item.StartsA,
-                            item.StartsB,
-                            // 5
-                            item.CompetitionClasses.Count));
-
-                    foreach (var curDisplayInfo in displayInfos)
-                    {
-                        curCellId++;
-                        var curCellText = string.Empty;
-
-                        if (item.CompetitionClassNamesByClassId.ContainsKey(curDisplayInfo.ClassId))
-                        {
-                            var usePart = item.Participants
-                                .FirstOrDefault(
-                                    x => x.CompetitionClassId == curDisplayInfo.ClassId);
-
-                            curCellText = string.Format(
-                                "# {0}",
-                                item.StartnumberByClassId[curDisplayInfo.ClassId]);
-                        }
-
-                        curRow[curCellId].VerticalAlignment = VerticalAlignment.Center;
-                        var newPara = curRow[curCellId].AddParagraph(
-                            curCellText);
-                        newPara.Format.Alignment = ParagraphAlignment.Center;
-                    }
-
-                    if (model.Shading
-                        && curShading != null)
-                    {
-                        curRow.Shading.Color = curShading ?? Colors.White;
-                    }
-                }
-
-                // -- add table
-                curSection.Add(
-                    table);
-
-                document.AddSection();
-            }
-
-            // remove last section...
-            document.Sections.RemoveObjectAt(
-                document.Sections.Count - 1);
-
-            // ----
-            return ToPdfStream(
-                document,
-                model);
-        }
-
-        public Stream GetMultipleStartersGroupedClassesView(
-            Competition? competition,
-            List<MultipleStarter> multipleStarters,
-            PdfViewModel model)
-        {
-            var document = CreateDefaultDocument(
-                "Multiple Starters",
-                string.Empty,
-                competition);
-            SetDefaultStyle(
-                document);
-            SetDefaultHeaderFooter(
-                document,
-                competition,
-                null,
-                string.Format(
-                    "Group Classes for Multiple Starters",
-                    multipleStarters.Count));
-            SetDefaultPageSetup(
-                document,
-                model);
-
-            // ----
-            var dispCunksSize = GetMaxColumnsCount(
-                document.LastSection.PageSetup);
-            var (linkedClassIdsAndParticipants, allDisplayInfos) = ViewModelExtensions
-                .ExtractMultipleStarterLinkedClasses(
-                    multipleStarters);
-
-            foreach (var (curClassIds, curMultipleStarters) in linkedClassIdsAndParticipants)
-            {
-                foreach (var curClassesByChunk in curClassIds.Chunk(
-                    dispCunksSize))
+                foreach (var curDisplayInfos in allDisplayInfo
+                    .Chunk(
+                        dispCunksSize))
                 {
                     var curSection = document.LastSection;
 
@@ -499,7 +347,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                         Unit.FromCentimeter(
                             6));
 
-                    foreach (var curDisplayInfo in curClassesByChunk)
+                    foreach (var curDisplayInfo in curDisplayInfos)
                     {
                         table.AddColumn();
                     }
@@ -518,17 +366,11 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                     curRow.Cells[curCellId].AddParagraph(
                         string.Format(
                             "Name ({0} x {1}) (P A/B; S A/B - Starts)",
-                            curMultipleStarters?.Count ?? 0,
-                            curClassIds.Count));
+                            multipleStarters?.Count ?? 0,
+                            allDisplayInfoCount));
 
-                    foreach (var curDisplayInfo in allDisplayInfos)
+                    foreach (var curDisplayInfo in curDisplayInfos)
                     {
-                        if (curClassesByChunk.Contains(
-                            curDisplayInfo.ClassId) == false)
-                        {
-                            continue;
-                        }
-
                         curCellId++;
                         curRow.Cells[curCellId].AddParagraph(
                             string.Format(
@@ -540,7 +382,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                     }
 
                     // -- fill data
-                    foreach (var item in curMultipleStarters ?? Enumerable.Empty<MultipleStarter>())
+                    foreach (var item in multipleStarters ?? Enumerable.Empty<MultipleStarter>())
                     {
                         curRow = table.AddRow();
                         curCellId = 0;
@@ -561,14 +403,8 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                                 // 5
                                 item.CompetitionClasses.Count));
 
-                        foreach (var curDisplayInfo in allDisplayInfos)
+                        foreach (var curDisplayInfo in curDisplayInfos)
                         {
-                            if (curClassesByChunk.Contains(
-                                curDisplayInfo.ClassId) == false)
-                            {
-                                continue;
-                            }
-
                             curCellId++;
                             var curCellText = string.Empty;
 
@@ -614,6 +450,177 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 model);
         }
 
+        public Stream GetMultipleStartersDependentClassesView(
+            Competition? competition,
+            List<MultipleStarter> multipleStarters,
+            PdfViewModel model)
+        {
+            var document = CreateDefaultDocument(
+                "Multiple Starters - Dependent Classes",
+                string.Empty,
+                competition);
+            SetDefaultStyle(
+                document);
+            SetDefaultHeaderFooter(
+                document,
+                competition,
+                null,
+                string.Format(
+                    "Dependent Classes for Multiple Starters",
+                    multipleStarters.Count));
+            SetDefaultPageSetup(
+                document,
+                model);
+
+            // ----
+            var dispCunksSize = GetMaxColumnsCount(
+                document.LastSection.PageSetup);
+            var (dependentClassIdsAndParticipants, allDisplayInfoBlocks) = ViewModelExtensions
+                .ExtractMultipleStarterDependentClasses(
+                    multipleStarters,
+                    model.GroupForView);
+
+            foreach (var allDisplayInfo in allDisplayInfoBlocks)
+            {
+                var allDisplayInfoCount = allDisplayInfo.Count;
+
+                foreach (var (curClassIds, curMultipleStarters) in dependentClassIdsAndParticipants)
+                {
+                    foreach (var curClassesByChunk in curClassIds.Chunk(
+                        dispCunksSize))
+                    {
+                        var curSection = document.LastSection;
+
+                        var table = new Table
+                        {
+                            Borders =
+                            {
+                                Width = 0.75,
+                                Visible = true,
+                            },
+                        };
+
+                        // -- prepare the table...
+                        table.AddColumn(
+                            Unit.FromCentimeter(
+                                6));
+
+                        foreach (var curDisplayInfo in curClassesByChunk)
+                        {
+                            table.AddColumn();
+                        }
+
+                        // -- fill header
+                        var curRow = table.AddRow();
+                        curRow.HeadingFormat = true;
+                        curRow.Format.Font.Bold = true;
+
+                        if (model.Shading)
+                        {
+                            curRow.Shading.Color = DefaultTableHeaderColor;
+                        }
+
+                        var curCellId = 0;
+                        curRow.Cells[curCellId].AddParagraph(
+                            string.Format(
+                                "Name ({0} x {1}) (P A/B; S A/B - Starts)",
+                                curMultipleStarters?.Count ?? 0,
+                                allDisplayInfoCount));
+
+                        foreach (var curDisplayInfo in allDisplayInfo)
+                        {
+                            if (curClassesByChunk.Contains(
+                                curDisplayInfo.ClassId) == false)
+                            {
+                                continue;
+                            }
+
+                            curCellId++;
+                            curRow.Cells[curCellId].AddParagraph(
+                                string.Format(
+                                    "{0}{1}",
+                                    curDisplayInfo.ClassName,
+                                    curDisplayInfo.Ignore
+                                        ? " [IGNORE!]"
+                                        : string.Empty));
+                        }
+
+                        // -- fill data
+                        foreach (var item in curMultipleStarters ?? Enumerable.Empty<MultipleStarter>())
+                        {
+                            curRow = table.AddRow();
+                            curCellId = 0;
+                            Color? curShading = (curRow.Index % 2 == 0)
+                                ? DefaultTableShadingColor
+                                : null;
+
+                            curRow.Cells[curCellId].AddParagraph(
+                                string.Format(
+                                    "{0} ({1} / {2}; {3} / {4} - {5})",
+                                    item.Name,
+                                    // 1
+                                    item.PointsA,
+                                    item.PointsB,
+                                    // 3
+                                    item.StartsA,
+                                    item.StartsB,
+                                    // 5
+                                    item.CompetitionClasses.Count));
+
+                            foreach (var curDisplayInfo in allDisplayInfo)
+                            {
+                                if (curClassesByChunk.Contains(
+                                    curDisplayInfo.ClassId) == false)
+                                {
+                                    continue;
+                                }
+
+                                curCellId++;
+                                var curCellText = string.Empty;
+
+                                if (item.CompetitionClassNamesByClassId.ContainsKey(curDisplayInfo.ClassId))
+                                {
+                                    var usePart = item.Participants
+                                        .FirstOrDefault(
+                                            x => x.CompetitionClassId == curDisplayInfo.ClassId);
+
+                                    curCellText = string.Format(
+                                        "# {0}",
+                                        item.StartnumberByClassId[curDisplayInfo.ClassId]);
+                                }
+
+                                curRow[curCellId].VerticalAlignment = VerticalAlignment.Center;
+                                var newPara = curRow[curCellId].AddParagraph(
+                                    curCellText);
+                                newPara.Format.Alignment = ParagraphAlignment.Center;
+                            }
+
+                            if (model.Shading
+                                && curShading != null)
+                            {
+                                curRow.Shading.Color = curShading ?? Colors.White;
+                            }
+                        }
+
+                        // -- add table
+                        curSection.Add(
+                            table);
+
+                        document.AddSection();
+                    }
+                }
+            }
+
+            // remove last section...
+            document.Sections.RemoveObjectAt(
+                document.Sections.Count - 1);
+
+            // ----
+            return ToPdfStream(
+                document,
+                model);
+        }
+
         public Stream GetPossiblePromotions(
             Competition? competition,
             List<Participant> possiblePromotions,
@@ -642,7 +649,10 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 .ExtractPossiblePromotionCompetitionClasses(
                     possiblePromotions);
             var displayInfoCompClasses = ViewModelExtensions.ExtractDisplayInfo(
-                helpIncludedClasses);
+                helpIncludedClasses,
+                Enums.GroupForViewEnum.None)
+                .FirstOrDefault()
+                ?? new List<(string ClassName, Guid ClassId, bool Ignore)>();
             var displayInfoCompClassesIds = new List<Guid>(
                 displayInfoCompClasses.Select(
                     x => x.ClassId));
@@ -710,28 +720,29 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 curRow[curCellId].AddParagraph(
                     "Name");
 
-                foreach (var curColumn in curClassesByClassId)
+                foreach (var curClassId in displayInfoCompClassesIds)
                 {
-                    curCellId++;
                     var classInfo = string.Empty;
 
-                    foreach (var curClassId in displayInfoCompClassesIds)
+                    if (curClassesByClassId.TryGetValue(
+                        curClassId,
+                        out var curClass))
                     {
-                        if (curClassesByClassId.TryGetValue(
-                            curClassId,
-                            out var curClass))
-                        {
-                            classInfo = curClass.GetCompetitionClassName();
+                        classInfo = curClass.GetCompetitionClassName();
 
-                            if (curClass?.Ignore ?? false)
-                            {
-                                classInfo += " [IGNORE!]";
-                            }
+                        if (curClass?.Ignore ?? false)
+                        {
+                            classInfo += " [IGNORE!]";
                         }
                     }
 
-                    curRow[curCellId].AddParagraph(
-                        classInfo);
+                    if (string.IsNullOrEmpty(
+                        classInfo) == false)
+                    {
+                        curCellId++;
+                        curRow[curCellId].AddParagraph(
+                            classInfo);
+                    }
                 }
 
                 var useStartNumber = -1;
@@ -855,6 +866,11 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                     table);
             }
 
+            /* ?? remove last section...
+            document.Sections.RemoveObjectAt(
+                document.Sections.Count - 1);
+            */
+
             // ----
             return ToPdfStream(
                 document,
@@ -863,7 +879,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
 
         public Stream GetNumberCards(
             Competition? competition,
-            List<Participant> possiblePromotions,
+            List<Participant> pariticpants,
             PdfViewModel model)
         {
             var document = CreateDefaultDocument(
@@ -887,98 +903,138 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
             var (useWidht, useHeight) = GetEffectiveContentSizes(
                 curSection.PageSetup);
 
-            // why?..
-            curSection.PageSetup.LeftMargin = useMargin * 2; // Unit.Zero;
+            curSection.PageSetup.BottomMargin = Unit.Zero;
 
-            // ----
-            var table = new Table
+            foreach (var curParts in pariticpants.Chunk(2))
             {
-                Borders =
+                Participant firstPart = curParts[0];
+                Participant? secondPart = curParts.Length >= 2
+                    ? curParts[1]
+                    : null;
+
+                // ----
+                var table = new Table
+                {
+                    Borders =
                 {
                     Width = 0.75,
-                    Visible = true, // false,
+                    // Visible = true,
+                    Visible =  false,
                 },
-                LeftPadding = useMargin,
-            };
+                    // LeftPadding = useMargin,
+                };
 
-            // -- prepare the table...
-            var tableColumn = table.AddColumn(
-                useWidht);
-            tableColumn.Format.Alignment = ParagraphAlignment.Center;
+                // -- prepare the table...
+                var tableColumn = table.AddColumn(
+                    useWidht);
+                tableColumn.Format.Alignment = ParagraphAlignment.Center;
+                tableColumn.LeftPadding = Unit.Zero;
+                tableColumn.RightPadding = Unit.Zero;
 
-            var numberInfoHeight = Unit.FromCentimeter(1);
-            var numberFitHeight = Unit.FromMillimeter(3);
-            var useNumberFontSize = Unit.FromPoint(250);
-            var useNumberInfoFontSize = Unit.FromPoint(8);
+                var numberInfoHeight = Unit.FromCentimeter(1);
+                var numberHeight = (useHeight / 2.0) - numberInfoHeight - useMargin;
+                // var numberTopHeight = Unit.FromMillimeter(5);
 
-            var test = GlobalFontSettings.FontResolver;
-            var test02 = GlobalFontSettings.DefaultFontEncoding;
+                // "Arial Narrow"
+                var useNumberFontSize3Digits = Unit.FromPoint(420);
+                var useNumberFontSize4Digits = Unit.FromPoint(320);
+                var useNumberInfoFontSize = Unit.FromPoint(8);
 
-            var testFont = new XFont(
-                "Arial",
-                useNumberFontSize,
-                XFontStyleEx.Bold);
+                // ------
+                // first row...
+                var firstNumber = table.AddRow();
+                firstNumber[0].VerticalAlignment = VerticalAlignment.Center;
+                firstNumber.Height = numberHeight;
+                firstNumber.HeightRule = RowHeightRule.Exactly;
+                firstNumber.TopPadding = Unit.Zero;
+                firstNumber.BottomPadding = Unit.Zero;
+                firstNumber.KeepWith = 1;
 
-            // ------
-            // first row...
-            var firstNumber = table.AddRow();
-            firstNumber[0].VerticalAlignment = VerticalAlignment.Center;
-            firstNumber.Height = (useHeight / 2.0) - numberInfoHeight - numberFitHeight;
-            firstNumber.HeightRule = RowHeightRule.Exactly;
-            var firstNumberPara = firstNumber.Cells[0].AddParagraph(
-                "1234");
-            firstNumberPara.Format.Alignment = ParagraphAlignment.Center;
-            firstNumberPara.Format.Font.Size = useNumberFontSize;
+                var firstNumberString = firstPart.StartNumber.ToString("D0");
 
-            // firstNumberPara.Format.Font.Name = "segoe ui";
-            // firstNumberPara.Format.Font.Name = "Arial Narrow";
-            // firstNumberPara.Format.Font.Name = "Noto Sans";
-            // firstNumberPara.Format.Font.Name = "formiena";
-            // firstNumberPara.Format.Font.Name = "fs-regulate";
-            // firstNumberPara.Format.Font.Size = Unit.FromPoint(380); // useNumberFontSize;
-            firstNumberPara.Format.Font.Bold = true;
+                var firstNumberPara = firstNumber.Cells[0].AddParagraph(
+                    firstNumberString);
+                // firstNumberPara.Format.Borders.Visible = true;
+                firstNumberPara.Format.Alignment = ParagraphAlignment.Center;
+                firstNumberPara.Format.Font.Name = "Arial Narrow";
+                firstNumberPara.Format.Font.Size = firstNumberString.Length <= 3
+                    ? useNumberFontSize3Digits
+                    : useNumberFontSize4Digits;
+                firstNumberPara.Format.Font.Bold = true;
 
-            var firstNumberInfo = table.AddRow();
-            firstNumberInfo[0].VerticalAlignment = VerticalAlignment.Center;
-            firstNumberInfo.Height = numberInfoHeight;
-            firstNumberInfo.HeightRule = RowHeightRule.Exactly;
+                var firstNumberInfo = table.AddRow();
+                firstNumberInfo[0].VerticalAlignment = VerticalAlignment.Center;
+                firstNumberInfo.Height = numberInfoHeight;
+                firstNumberInfo.HeightRule = RowHeightRule.Exactly;
+                firstNumberInfo.TopPadding = Unit.Zero;
+                firstNumberInfo.BottomPadding = Unit.Zero;
 
-            var firstNumberInfoPara = firstNumberInfo.Cells[0].AddParagraph(
-                "Some number info");
-            firstNumberInfoPara.Format.Font.Size = useNumberInfoFontSize;
+                var firstNumberInfoPara = firstNumberInfo.Cells[0].AddParagraph(
+                    string.Format(
+                        "{0} - {1}",
+                        firstPart.Competition.CompetitionDate.ToShortDateString(),
+                        firstPart.CompetitionClass.GetCompetitionClassName()));
+                firstNumberInfoPara.Format.Font.Size = useNumberInfoFontSize;
 
-            // ------
-            // filler row...
-            var filler = table.AddRow();
-            filler.Height = Unit.FromMillimeter(3);
-            filler.HeightRule = RowHeightRule.Exactly;
+                // ------
+                // filler row...
+                var filler = table.AddRow();
+                filler.Height = useMargin + Unit.FromMillimeter(4); //  Unit.FromMillimeter(2);
+                filler.HeightRule = RowHeightRule.Exactly;
+                filler.TopPadding = Unit.Zero;
+                filler.BottomPadding = Unit.Zero;
 
-            // ------
-            // second row...
-            var secondNumber = table.AddRow();
-            secondNumber[0].VerticalAlignment = VerticalAlignment.Center;
-            secondNumber.Height = (useHeight / 2.0) - numberInfoHeight - numberFitHeight;
-            secondNumber.HeightRule = RowHeightRule.Exactly;
-            var secondNumberPara = secondNumber.Cells[0].AddParagraph(
-                "5678");
+                // ------
+                // second row...
+                var secondNumber = table.AddRow();
+                secondNumber[0].VerticalAlignment = VerticalAlignment.Center;
+                secondNumber.Height = numberHeight; // - useMargin;
+                secondNumber.HeightRule = RowHeightRule.Exactly;
+                secondNumber.TopPadding = Unit.Zero;
+                secondNumber.BottomPadding = Unit.Zero;
+                secondNumber.KeepWith = 1;
 
-            // secondNumberPara.Format.Borders.Distance = Unit.Zero;
-            // secondNumberPara.Format.Borders.Left.Width = Unit.Zero;
-            // secondNumberPara.Format.Font.Name = "segoe ui";
-            secondNumberPara.Format.Font.Size = useNumberFontSize;
-            secondNumberPara.Format.Font.Bold = true;
+                if (secondPart != null)
+                {
+                    var secondNumberString = secondPart.StartNumber.ToString("D0");
+                    var secondNumberPara = secondNumber.Cells[0].AddParagraph(
+                        secondNumberString);
+                    secondNumberPara.Format.Alignment = ParagraphAlignment.Center;
+                    secondNumberPara.Format.Font.Name = "Arial Narrow";
+                    secondNumberPara.Format.Font.Size = secondNumberString.Length <= 3
+                        ? useNumberFontSize3Digits
+                        : useNumberFontSize4Digits;
+                    secondNumberPara.Format.Font.Bold = true;
+                }
 
-            var secondNumberInfo = table.AddRow();
-            secondNumberInfo[0].VerticalAlignment = VerticalAlignment.Center;
-            secondNumberInfo.Height = numberInfoHeight;
-            secondNumberInfo.HeightRule = RowHeightRule.Exactly;
-            var secondNumberInfoPara = secondNumberInfo.Cells[0].AddParagraph(
-                "other number info");
-            secondNumberInfoPara.Format.Font.Size = useNumberInfoFontSize;
+                var secondNumberInfo = table.AddRow();
+                secondNumberInfo[0].VerticalAlignment = VerticalAlignment.Center;
+                secondNumberInfo.Height = numberInfoHeight;
+                secondNumberInfo.HeightRule = RowHeightRule.Exactly;
+                secondNumberInfo.TopPadding = Unit.Zero;
+                secondNumberInfo.BottomPadding = Unit.Zero;
 
-            // ----
-            curSection.Add(
-                table);
+                if (secondPart != null)
+                {
+                    var secondNumberInfoPara = secondNumberInfo.Cells[0].AddParagraph(
+                        string.Format(
+                            "{0} - {1}",
+                            secondPart.Competition.CompetitionDate.ToShortDateString(),
+                            secondPart.CompetitionClass.GetCompetitionClassName()));
+                    secondNumberInfoPara.Format.Font.Size = useNumberInfoFontSize;
+                }
+
+                // ----
+                curSection.Add(
+                    table);
+
+                // document.AddSection();
+            }
+
+            /* remove last section...
+            document.Sections.RemoveObjectAt(
+                document.Sections.Count - 1);
+            */
 
             // ----
             return ToPdfStream(

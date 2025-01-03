@@ -1,6 +1,8 @@
 ﻿using DanceCompetitionHelper.Database;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+
 using System.ComponentModel.DataAnnotations;
 
 namespace DanceCompetitionHelper.Web.Models.ParticipantModels

@@ -46,6 +46,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             where TModel : ViewModelBase
         {
             return new DefaultRequestHandler<TLogger, TType, TModel>(
+                this,
                 _danceCompHelper,
                 _logger,
                 _mapper);

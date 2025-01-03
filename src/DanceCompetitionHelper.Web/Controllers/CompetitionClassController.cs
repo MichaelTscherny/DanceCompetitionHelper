@@ -2,6 +2,7 @@
 
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
+using DanceCompetitionHelper.Web.Enums;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
@@ -306,6 +307,65 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
+        public Task<IActionResult> Ignore(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(Index))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
+                    {
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            _viewData,
+                            cToken);
+
+                        await FillCompetitionClassViewModel(
+                            dcH,
+                            model.CompetitionId,
+                            model,
+                            cToken);
+
+                        return null;
+                    })
+                .DefaultEditSaveAsync(
+                    new CompetitionClassViewModel()
+                    {
+                        CompetitionClassId = id,
+                    },
+                    async (model, dcH, mapper, _, cToken) =>
+                    {
+                        var foundCompClass = await dcH.GetCompetitionClassAsync(
+                            model.CompetitionClassId ?? Guid.Empty,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(CompetitionClass),
+                                    model.CompetitionClassId));
+
+                        // override the values...
+                        foundCompClass.Ignore = true;
+
+                        return new
+                        {
+                            Id = foundCompClass.CompetitionId
+                        };
+                    },
+                    cancellationToken);
+        }
+
         public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
@@ -345,12 +405,13 @@ namespace DanceCompetitionHelper.Web.Controllers
         public Task<IActionResult> ShowMultipleStarters(
             Guid id,
             bool groupedClassesView,
+            GroupForViewEnum? groupForView,
             CancellationToken cancellationToken)
         {
             return GetDefaultRequestHandler<CompetitionClass, ShowMultipleStartersOverviewViewModel>()
                 .SetOnSuccess(
                     groupedClassesView
-                        ? nameof(ShowMultipleStartersGroupedClassesView)
+                        ? nameof(ShowMultipleStartersDependentClassesView)
                         : nameof(ShowMultipleStarters))
                 .SetOnNoData(
                     nameof(Index))
@@ -379,7 +440,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     cToken)
                                 .ToListAsync(
                                     cToken),
-                            GroupedClassesView = groupedClassesView,
+                            DependentClassesView = groupedClassesView,
+                            GroupForView = groupForView ?? GroupForViewEnum.None,
                         };
                     },
                     cancellationToken);
@@ -396,24 +458,26 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
-        public Task<IActionResult> ShowMultipleStartersGroupedClassesView(
+        public Task<IActionResult> ShowMultipleStartersDependentClassesView(
             Guid id,
+            GroupForViewEnum? groupForView,
             CancellationToken cancellationToken)
         {
             return ShowMultipleStarters(
                 id,
                 true,
+                groupForView,
                 cancellationToken);
         }
 
 
         [HttpGet]
-        public Task<IActionResult> PdfMultipleStartersGroupedClassesView(
+        public Task<IActionResult> PdfMultipleStartersDependentClassesView(
         PdfViewModel pdf,
         CancellationToken cancellationToken)
         {
             return GetPdfDocumentHelper()
-                .GetMultipleStartersGroupedClassesView(
+                .GetMultipleStartersDependentClassesView(
                     pdf,
                     cancellationToken);
         }

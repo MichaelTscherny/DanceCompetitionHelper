@@ -1,21 +1,26 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Models;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace DanceCompetitionHelper.Web.Helper.Request
 {
-    public class DefaultRequestHandler<TLogger, TEntity, TModel> : Controller
+    public class DefaultRequestHandler<TLogger, TEntity, TModel> // : Controller
         where TEntity : TableBase
         where TModel : ViewModelBase
     {
         protected readonly IDanceCompetitionHelper _danceCompHelper;
         protected readonly ILogger<TLogger> _logger;
         protected readonly IMapper _mapper;
+
+        public Controller BaseController { get; }
 
         public string? ViewOnSuccess { get; private set; }
         public Func<TModel, IDanceCompetitionHelper, IMapper, ViewDataDictionary, CancellationToken, Task<object?>>? FuncOnSuccess { get; private set; }
@@ -30,10 +35,15 @@ namespace DanceCompetitionHelper.Web.Helper.Request
         public object? RouteValuesOnNoData { get; private set; }
 
         public DefaultRequestHandler(
+            Controller baseController,
             IDanceCompetitionHelper danceCompHelper,
             ILogger<TLogger> logger,
             IMapper mapper)
+
         {
+            BaseController = baseController
+                ?? throw new ArgumentNullException(
+                    nameof(baseController));
             _danceCompHelper = danceCompHelper
                 ?? throw new ArgumentNullException(
                     nameof(danceCompHelper));
@@ -148,17 +158,17 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                             indexId,
                             dcH,
                             _mapper,
-                            ViewData,
+                            BaseController.ViewData,
                             cToken);
 
                         if (foundData == null)
                         {
-                            return RedirectToAction(
+                            return BaseController.RedirectToAction(
                                ViewOnNoData,
                                RouteValuesOnNoData);
                         }
 
-                        return View(
+                        return BaseController.View(
                             ViewOnSuccess,
                             foundData);
                     }
@@ -170,7 +180,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                             memberName,
                             noDataExc.Message);
 
-                        return RedirectToAction(
+                        return BaseController.RedirectToAction(
                             ViewOnNoData,
                             RouteValuesOnNoData);
                     }
@@ -217,17 +227,17 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                             showId,
                             dcH,
                             _mapper,
-                            ViewData,
+                            BaseController.ViewData,
                             cToken);
 
                         if (foundData == null)
                         {
-                            return RedirectToAction(
+                            return BaseController.RedirectToAction(
                                ViewOnNoData,
                                RouteValuesOnNoData);
                         }
 
-                        return View(
+                        return BaseController.View(
                             ViewOnSuccess,
                             _mapper.Map<TModel>(
                                 foundData));
@@ -240,7 +250,7 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                             memberName,
                             noDataExc.Message);
 
-                        return RedirectToAction(
+                        return BaseController.RedirectToAction(
                             ViewOnNoData,
                             RouteValuesOnNoData);
                     }
@@ -294,10 +304,10 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     nameof(funcCreateNew));
             }
 
-            if (ModelState.IsValid == false)
+            if (BaseController.ModelState.IsValid == false)
             {
                 modelView.AddErrors(
-                    ModelState);
+                    BaseController.ModelState);
 
                 if (FuncOnModelStateInvalid != null)
                 {
@@ -305,11 +315,11 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                         modelView,
                         _danceCompHelper,
                         _mapper,
-                        ViewData,
+                        BaseController.ViewData,
                         cancellationToken);
                 }
 
-                return View(
+                return BaseController.View(
                     ViewOnModelStateInvalid,
                     modelView);
             }
@@ -319,10 +329,10 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     dcH,
                     newEntity,
                     _mapper,
-                    ViewData,
+                    BaseController.ViewData,
                     cToken),
                 (routeObjects, cToken) => Task.FromResult<IActionResult>(
-                    RedirectToAction(
+                    BaseController.RedirectToAction(
                         ViewOnSuccess,
                         routeObjects)),
                 null,
@@ -337,11 +347,11 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                             modelView,
                             _danceCompHelper,
                             _mapper,
-                            ViewData,
+                            BaseController.ViewData,
                             cToken);
                     }
 
-                    return View(
+                    return BaseController.View(
                         ViewOnError,
                         modelView
                         /* TODO: needed?.. 
@@ -388,10 +398,10 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     nameof(funcEdit));
             }
 
-            if (ModelState.IsValid == false)
+            if (BaseController.ModelState.IsValid == false)
             {
                 modelView.AddErrors(
-                    ModelState);
+                    BaseController.ModelState);
 
                 if (FuncOnModelStateInvalid != null)
                 {
@@ -399,11 +409,11 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                         modelView,
                         _danceCompHelper,
                         _mapper,
-                        ViewData,
+                        BaseController.ViewData,
                         cancellationToken);
                 }
 
-                return View(
+                return BaseController.View(
                     ViewOnModelStateInvalid,
                     modelView);
             }
@@ -413,14 +423,14 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     modelView,
                     dcH,
                     _mapper,
-                    ViewData,
+                    BaseController.ViewData,
                     cToken),
                 (routeObjects, cToken) => Task.FromResult<IActionResult>(
-                    RedirectToAction(
+                    BaseController.RedirectToAction(
                         ViewOnSuccess,
                         routeObjects)),
                 (routeObjects, cToken) => Task.FromResult<IActionResult>(
-                    RedirectToAction(
+                    BaseController.RedirectToAction(
                         ViewOnNoData,
                         routeObjects)),
                 async (exc, routeObjects, cToken) =>
@@ -434,11 +444,11 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                             modelView,
                             _danceCompHelper,
                             _mapper,
-                            ViewData,
+                            BaseController.ViewData,
                             cToken);
                     }
 
-                    return View(
+                    return BaseController.View(
                         ViewOnError,
                         modelView);
                 },
@@ -466,25 +476,24 @@ namespace DanceCompetitionHelper.Web.Helper.Request
                     id,
                     dcH,
                     _mapper,
-                    ViewData,
+                    BaseController.ViewData,
                     cToken),
                 (routeObjects, cToken) => Task.FromResult<IActionResult>(
-                    RedirectToAction(
+                    BaseController.RedirectToAction(
                         ViewOnSuccess,
                         routeObjects)),
                 (routeObjects, cToken) => Task.FromResult<IActionResult>(
-                    RedirectToAction(
+                    BaseController.RedirectToAction(
                         ViewOnNoData,
                         routeObjects)),
                 (exc, routeObjects, cToken) => Task.FromResult<IActionResult>(
-                    RedirectToAction(
+                    BaseController.RedirectToAction(
                         ViewOnError,
                         routeObjects)),
                 cancellationToken))
                 ?? Error(
                     "Delete failed");
         }
-
 
         #endregion Methods
 
@@ -494,10 +503,10 @@ namespace DanceCompetitionHelper.Web.Helper.Request
         public IActionResult Error(
             string errorMessage)
         {
-            return View(
+            return BaseController.View(
                 new ErrorViewModel
                 {
-                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                    RequestId = Activity.Current?.Id ?? BaseController.HttpContext.TraceIdentifier,
                     Errors = new List<string>()
                     {
                         errorMessage,

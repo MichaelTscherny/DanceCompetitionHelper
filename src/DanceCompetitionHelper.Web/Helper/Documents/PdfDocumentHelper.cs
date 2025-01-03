@@ -122,7 +122,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 cancellationToken);
         }
 
-        public Task<IActionResult> GetMultipleStartersGroupedClassesView(
+        public Task<IActionResult> GetMultipleStartersDependentClassesView(
             PdfViewModel pdfViewModel,
             CancellationToken cancellationToken)
         {
@@ -139,11 +139,9 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                                 nameof(Competition),
                                 pdfModel.CompetitionId));
 
-                    // pdfGen.DefaultFontSize = 12;
-
                     return new PdfViewModel()
                     {
-                        PdtStream = pdfGen.GetMultipleStartersGroupedClassesView(
+                        PdtStream = pdfGen.GetMultipleStartersDependentClassesView(
                             foundComp,
                             await dcH
                                 .GetMultipleStarterAsync(
@@ -153,7 +151,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                                     cToken),
                             pdfModel),
                         FileName = string.Format(
-                            "Multiple Starters {0}.pdf",
+                            "Multiple Starters Dependent Classes {0}.pdf",
                             foundComp.OrgCompetitionId),
                     };
                 },
@@ -229,19 +227,39 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                                 nameof(Competition),
                                 pdfModel.CompetitionId));
 
+                    var showParticipants = new List<Participant>();
+                    if (pdfModel.ParticipantId.HasValue)
+                    {
+                        var foundPart = await dcH.GetParticipantAsync(
+                            pdfModel.ParticipantId.Value,
+                            cToken,
+                            includeCompetition: true,
+                            includeCompetitionClass: true);
+
+                        if (foundComp.CompetitionId == foundPart?.CompetitionId)
+                        {
+                            showParticipants.Add(
+                                foundPart);
+                        }
+                    }
+                    else
+                    {
+                        showParticipants = await dcH
+                            .GetParticipantsAsync(
+                                foundComp.CompetitionId,
+                                pdfModel.CompetitionClassId,
+                                cToken,
+                                filter: pdfModel.ToParticipantFilter())
+                            .ToListAsync(
+                                cToken);
+                    }
+
                     return new PdfViewModel()
                     {
                         PdtStream = pdfGen.GetNumberCards(
-                            foundComp,
-                            await dcH
-                                 .GetParticipantsAsync(
-                                     foundComp.CompetitionId,
-                                     pdfModel.CompetitionClassId,
-                                     cToken,
-                                     true)
-                                 .ToListAsync(
-                                     cToken),
-                            pdfModel),
+                foundComp,
+                showParticipants,
+                pdfModel),
                         FileName = string.Format(
                             "Number Cards {0}.pdf",
                             foundComp.OrgCompetitionId),

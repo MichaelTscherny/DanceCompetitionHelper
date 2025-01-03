@@ -126,11 +126,6 @@
                                asp-route-id="@item.CompetitionId"
                                class="bi bi-arrow-repeat"
                                title="Refresh"></a> |
-                            <a asp-controller="@CompetitionController.RefName"                                
-                               asp-action="@nameof(CompetitionController.Delete)"
-                               asp-route-id="@item.CompetitionId"
-                               class="bi bi-trash3-fill link-danger"
-                               title="Delete"></a> |
                             <a asp-controller="@CompetitionController.RefName"
                                asp-action="@nameof(CompetitionController.CreateTableHistory)"
                                asp-route-id="@item.CompetitionId"

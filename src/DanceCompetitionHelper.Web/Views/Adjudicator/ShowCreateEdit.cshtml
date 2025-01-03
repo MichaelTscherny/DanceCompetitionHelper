@@ -128,6 +128,18 @@
                 class="btn btn-secondary px-lg-4">
                 Cancel
             </a>
+
+            @if(isCreate == false) 
+            {
+                <div class="vr"></div>
+                <a asp-controller="@AdjudicatorController.RefName"
+                   asp-action="@nameof(AdjudicatorController.Delete)"
+                   asp-route-id="@Model.AdjudicatorId"
+                   class="btn btn-danger bi bi-trash3-fill"
+                   title="Delete">
+                   Delete
+               </a>
+            }
         </div>
         <br />
     </form>

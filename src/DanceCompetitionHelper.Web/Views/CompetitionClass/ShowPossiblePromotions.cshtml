@@ -3,6 +3,7 @@
 @using DanceCompetitionHelper.Database.Tables;
 @using DanceCompetitionHelper.Extensions;
 @using DanceCompetitionHelper.Web.Controllers;
+@using DanceCompetitionHelper.Web.Enums
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 @using DanceCompetitionHelper.Web.Models.Pdfs
@@ -19,13 +20,14 @@
         possiblePromotionsCount,
         compInfoStr);
 
-
-
     var (helpIncludedClasses, maxDisplayClasses) = ViewModelExtensions
         .ExtractPossiblePromotionCompetitionClasses(
             Model.OverviewItems);    
     var displayInfoCompClasses = ViewModelExtensions.ExtractDisplayInfo(
-        helpIncludedClasses);
+        helpIncludedClasses,
+        GroupForViewEnum.None)
+        .FirstOrDefault()
+        ?? new List<(string ClassName, Guid ClassId, bool Ignore)>(); 
     var displayInfoCompClassesIds = new List<Guid>(
         displayInfoCompClasses.Select(
             x => x.ClassId));

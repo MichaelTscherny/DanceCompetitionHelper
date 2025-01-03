@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PdfGenerator: creates Pdfs using [MigraDoc](https://docs.pdfsharp.net/)
     - Multiple Starters
     - Possible Promotions
-- Multiple Starters: add view "grouped by linked classes"
+- Multiple Starters: add view "grouped by dependent classes"
 - PdfViewModelWrapper model/view: to get "consistent pdf download button" 
     - mandatory parameters - page format, orientation, etc.
     - optional select for Competition Classes
@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Selects/Drop Downs with Competition Classes: OrigId first
+- Move all "Delete" buttons to the "Edit" view to availd "deleted by ooopps!.."
+- Add several (https://xkcd.com/1070/) "Ignore" buttons instead of "Delete"
 
 ### Removed
 

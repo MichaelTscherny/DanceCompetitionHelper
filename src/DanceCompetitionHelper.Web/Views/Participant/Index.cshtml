@@ -12,6 +12,7 @@
     var compInfo = Model.Competition;
     var compInfoStr = compInfo.GetCompetitionName();
     var participantsCount = Model.OverviewItems?.Count() ?? 0;
+    var allCompClasses = new Dictionary<Guid, CompetitionClass>();
 
     ViewData["Title"] = string.Format(
         Model.DetailedView
@@ -23,7 +24,7 @@
 
 <div class="text-center">
     <h1 class="display-6">@ViewData["Title"]</h1>
-    
+
     <div class="table-responsive-xxl">
         <table class="table table-striped table-hover">
             <thead>
@@ -96,6 +97,7 @@
                 {
                     var extraTrClass = string.Empty;
                     var isAlreadyPromoted = item.DisplayInfo?.PromotionInfo?.AlreadyPromoted ?? false;
+                    allCompClasses[item.CompetitionClassId] = item.CompetitionClass;
 
                     if (isAlreadyPromoted)
                     {
@@ -222,15 +224,24 @@
                         </td>
                         <td class ="text-nowrap">
                             <a asp-controller="@ParticipantController.RefName"
+                               asp-action="@nameof(ParticipantController.PdfNumberCards)"
+                               asp-all-route-data="@new Dictionary<string, string>
+                               {
+                                   { nameof(item.CompetitionId), item.CompetitionId.ToString() },
+                                   { nameof(item.ParticipantId), item.ParticipantId.ToString() },
+                               }"
+                               class="bi bi-9-square"
+                               title="Number Card"></a> |
+                            <a asp-controller="@ParticipantController.RefName"
                                asp-action="@nameof(ParticipantController.ShowEdit)"
                                asp-route-id="@item.ParticipantId"
                                class="bi bi-pencil-square"
                                title="Edit"></a> |
                             <a asp-controller="@ParticipantController.RefName"
-                               asp-action="@nameof(ParticipantController.Delete)"
+                               asp-action="@nameof(ParticipantController.Ignore)"
                                asp-route-id="@item.ParticipantId"
-                               class="bi bi-trash3-fill link-danger"
-                               title="Delete"></a>
+                               class="bi bi-file-x"
+                               title="Ignore"></a>
                         </td>
                     </tr>
                 }
@@ -348,13 +359,26 @@
     {
         AspController = ParticipantController.RefName,
         AspAction = nameof(ParticipantController.PdfNumberCards),
-        ButtonText = "Number Cards",        
+        ButtonText = "Number Cards",
+        ShowPageFormat = false,
+        ShowPageOrientation = false,
+        ShowSearchString = true,
+        ShowFromTo = true,
+        ShowShading = false,
         //
         PdfViewModel = new PdfViewModel()
         {
             CompetitionId = Model.Competition?.CompetitionId,
-            PageFormat = PageFormat.A4, // PageFormat.A3,
-            Orientation = Orientation.Portrait,
+            CompetitionClasses = await allCompClasses.Values
+                .ToAsyncEnumerable()
+                .OrderBy(
+                    x => x.OrgClassId)
+                 .ToSelectListItemAsync(
+                    addEmpty: true,
+                    emptyText: "All")
+                 .ToListAsync(),
+            PageFormat = PageFormat.A4,
+            PageOrientation = Orientation.Portrait,
             Shading = false,
         }
     };

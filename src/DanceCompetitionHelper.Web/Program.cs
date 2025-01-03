@@ -5,9 +5,12 @@ using DanceCompetitionHelper.Database.Diagnostic;
 using DanceCompetitionHelper.Helper;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
 using DanceCompetitionHelper.Web.Controllers;
+
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+
 using NLog.Web;
+
 using System.Diagnostics;
 
 namespace DanceCompetitionHelper.Web
@@ -38,7 +41,8 @@ namespace DanceCompetitionHelper.Web
                     .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
                     .AddHttpClient();
                 builder.Services
-                    .AddControllersWithViews();
+                    .AddControllersWithViews()
+                    .AddDataAnnotationsLocalization();
                 builder.Services
                     .AddDbContext<DanceCompetitionHelperDbContext>()
                     .AddScoped<IDanceCompetitionHelper, DanceCompetitionHelper>()

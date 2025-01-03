@@ -45,7 +45,7 @@
                 {
                     <tr>
                         <td class="text-nowrap">
-                            @Html.DisplayFor(modelItem => item.Name)                            
+                            @Html.DisplayFor(modelItem => item.Name)
                         </td>
                         <td>
                             @item.LengthInMeter / @item.WidthInMeter
@@ -59,12 +59,7 @@
                                asp-action="@nameof(CompetitionVenueController.ShowEdit)"
                                asp-route-id="@item.CompetitionVenueId" 
                                class="bi bi-pencil-square"
-                               title="Edit"></a> |
-                            <a asp-controller="@CompetitionVenueController.RefName"
-                               asp-action="@nameof(CompetitionVenueController.Delete)"
-                               asp-route-id="@item.CompetitionVenueId"
-                               class="bi bi-trash3-fill link-danger"
-                               title="Delete"></a>
+                               title="Edit"></a>
                         </td>
                     </tr>
                 }

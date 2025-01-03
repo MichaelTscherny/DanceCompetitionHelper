@@ -10,14 +10,15 @@ namespace DanceCompetitionHelper.Web.Extensions
         public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
             this IAsyncEnumerable<Competition> competitions,
             Guid? selectedItem = null,
-            bool addEmpty = false)
+            bool addEmpty = false,
+            string emptyText = "None")
         {
             if (addEmpty)
             {
                 yield return new SelectListItem()
                 {
                     Value = string.Empty,
-                    Text = "None",
+                    Text = emptyText ?? "None",
                     Selected = false
                 };
             }
@@ -37,14 +38,15 @@ namespace DanceCompetitionHelper.Web.Extensions
         public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
             this IAsyncEnumerable<CompetitionClass> competitionClasses,
             Guid? selectedItem = null,
-            bool addEmpty = false)
+            bool addEmpty = false,
+            string emptyText = "None")
         {
             if (addEmpty)
             {
                 yield return new SelectListItem()
                 {
                     Value = string.Empty,
-                    Text = "None",
+                    Text = emptyText ?? "None",
                     Selected = false
                 };
             }
@@ -64,14 +66,15 @@ namespace DanceCompetitionHelper.Web.Extensions
         public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
             this IAsyncEnumerable<CompetitionVenue> competitionVenues,
             Guid? selectedItem = null,
-            bool addEmpty = false)
+            bool addEmpty = false,
+            string emptyText = "None")
         {
             if (addEmpty)
             {
                 yield return new SelectListItem()
                 {
                     Value = string.Empty,
-                    Text = "None",
+                    Text = emptyText ?? "None",
                     Selected = false
                 };
             }

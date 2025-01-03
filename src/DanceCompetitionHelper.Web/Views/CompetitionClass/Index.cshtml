@@ -204,10 +204,10 @@
                                class="bi bi-pencil-square"
                                title="Edit"></a> |
                             <a asp-controller="@CompetitionClassController.RefName"
-                               asp-action="@nameof(CompetitionController.Delete)"
+                               asp-action="@nameof(CompetitionClassController.Ignore)"
                                asp-route-id="@item.CompetitionClassId"
-                               class="bi bi-trash3-fill link-danger"
-                               title="Delete"></a>
+                               class="bi bi-file-x"
+                               title="Ignore"></a>
                         </td>
                     </tr>
                 }
@@ -307,6 +307,15 @@
                Detailed View
             </a>
         }
+
+        <div class="vr"></div>
+        <a asp-controller="@CompetitionController.RefName"
+           asp-action="@nameof(CompetitionController.Delete)"
+           asp-route-id="@Model.Competition?.CompetitionId"
+           class="btn btn-danger bi bi-trash3-fill"
+           title="Delete">
+           Delete
+       </a>
     </div>
     <br />
 </div>
