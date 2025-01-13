@@ -1,6 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Helper;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.Pdfs;
 
@@ -313,6 +314,8 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 model);
 
             // ----
+            var (useWidht, _) = GetEffectiveContentSizes(
+                document.LastSection.PageSetup);
             var dispCunksSize = GetMaxColumnsCount(
                 document.LastSection.PageSetup);
             var allDisplayInfoBlocks = ViewModelExtensions
@@ -343,14 +346,15 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                     };
 
                     // -- prepare the table...
-                    table.AddColumn(
+                    var helpLayouter = new SimplePdfTableLayouter(
+                        useWidht);
+                    helpLayouter.AddColumn(
                         Unit.FromCentimeter(
                             6));
-
-                    foreach (var curDisplayInfo in curDisplayInfos)
-                    {
-                        table.AddColumn();
-                    }
+                    helpLayouter.AddColumns(
+                        curDisplayInfos.Length);
+                    helpLayouter.ApplyTo(
+                        table);
 
                     // -- fill header
                     var curRow = table.AddRow();
@@ -473,6 +477,8 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 model);
 
             // ----
+            var (useWidht, _) = GetEffectiveContentSizes(
+                document.LastSection.PageSetup);
             var dispCunksSize = GetMaxColumnsCount(
                 document.LastSection.PageSetup);
             var (dependentClassIdsAndParticipants, allDisplayInfoBlocks) = ViewModelExtensions
@@ -501,14 +507,16 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                         };
 
                         // -- prepare the table...
-                        table.AddColumn(
+                        var helpLayouter = new SimplePdfTableLayouter(
+                            useWidht);
+                        helpLayouter.AddColumn(
                             Unit.FromCentimeter(
                                 6));
-
-                        foreach (var curDisplayInfo in curClassesByChunk)
-                        {
-                            table.AddColumn();
-                        }
+                        // TODO: min/max width??
+                        helpLayouter.AddColumns(
+                            curClassesByChunk.Length);
+                        helpLayouter.ApplyTo(
+                            table);
 
                         // -- fill header
                         var curRow = table.AddRow();
@@ -645,6 +653,8 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 model);
 
             // ----
+            var (useWidht, _) = GetEffectiveContentSizes(
+                document.LastSection.PageSetup);
             var (helpIncludedClasses, maxDisplayClasses) = ViewModelExtensions
                 .ExtractPossiblePromotionCompetitionClasses(
                     possiblePromotions);
@@ -700,17 +710,17 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 };
 
                 // -- prepare the table...
-                table.AddColumn(
+                var helpLayouter = new SimplePdfTableLayouter(
+                    useWidht);
+                helpLayouter.AddColumn(
                     Unit.FromCentimeter(
                         6));
-
-                // -- prepare columns
-                foreach (var curColumn in curClassesByClassId)
-                {
-                    table.AddColumn(
-                        Unit.FromCentimeter(
-                            3));
-                }
+                helpLayouter.AddColumns(
+                    curClassesByClassId.Count,
+                    Unit.FromCentimeter(
+                        3));
+                helpLayouter.ApplyTo(
+                    table);
 
                 // -- fill header
                 var curCellId = 0;
