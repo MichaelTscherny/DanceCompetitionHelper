@@ -240,7 +240,7 @@
                             <a asp-controller="@ParticipantController.RefName"
                                asp-action="@nameof(ParticipantController.Ignore)"
                                asp-route-id="@item.ParticipantId"
-                               class="bi bi-file-x"
+                               class="bi bi-ban"
                                title="Ignore"></a>
                         </td>
                     </tr>
@@ -364,6 +364,36 @@
         ShowPageOrientation = false,
         ShowSearchString = true,
         ShowFromTo = true,
+        ShowShading = false,
+        //
+        PdfViewModel = new PdfViewModel()
+        {
+            CompetitionId = Model.Competition?.CompetitionId,
+            CompetitionClasses = await allCompClasses.Values
+                .ToAsyncEnumerable()
+                .OrderBy(
+                    x => x.OrgClassId)
+                 .ToSelectListItemAsync(
+                    addEmpty: true,
+                    emptyText: "All")
+                 .ToListAsync(),
+            PageFormat = PageFormat.A4,
+            PageOrientation = Orientation.Portrait,
+            Shading = false,
+        }
+    };
+}
+@Html.DisplayFor(
+    m => toDisplay)
+
+@{
+    toDisplay = new PdfViewModelWrapper()
+    {
+        AspController = ParticipantController.RefName,
+        AspAction = nameof(ParticipantController.PdfParticipants),
+        ButtonText = "Participants",
+        ShowPageFormat = false,
+        ShowPageOrientation = false,
         ShowShading = false,
         //
         PdfViewModel = new PdfViewModel()

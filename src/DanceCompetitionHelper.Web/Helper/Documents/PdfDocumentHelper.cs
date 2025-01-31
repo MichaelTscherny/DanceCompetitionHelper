@@ -268,6 +268,43 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 cancellationToken);
         }
 
+        public Task<IActionResult> GetParticipants(
+            PdfViewModel pdfViewModel,
+            CancellationToken cancellationToken)
+        {
+            return ReturnPdfViewModel(
+                pdfViewModel,
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                {
+                    var foundComp = await dcH.FindCompetitionAsync(
+                        pdfModel.CompetitionId,
+                        cToken)
+                        ?? throw new NoDataFoundException(
+                            string.Format(
+                                "{0} with id '{1}' not found!",
+                                nameof(Competition),
+                                pdfModel.CompetitionId));
+
+                    return new PdfViewModel()
+                    {
+                        PdtStream = pdfGen.GetParticipants(
+                            foundComp,
+                            await dcH
+                                .GetParticipantsAsync(
+                                    foundComp.CompetitionId,
+                                    pdfModel.CompetitionClassId,
+                                    cToken)
+                                .ToListAsync(
+                                    cToken),
+                            pdfModel),
+                        FileName = string.Format(
+                            "Participants {0}.pdf",
+                            foundComp.OrgCompetitionId),
+                    };
+                },
+                cancellationToken);
+        }
+
         public Task<IActionResult> GetDummyPdf(
             PdfViewModel pdfViewModel,
             CancellationToken cancellationToken)

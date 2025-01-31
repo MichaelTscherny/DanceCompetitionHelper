@@ -1052,6 +1052,121 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 model);
         }
 
+        public Stream GetParticipants(
+            Competition? competition,
+            List<Participant> participants,
+            PdfViewModel model)
+        {
+            var document = CreateDefaultDocument(
+                "Participants",
+                string.Empty,
+                competition);
+            SetDefaultStyle(
+                document);
+            SetDefaultHeaderFooter(
+                document,
+                competition,
+                null,
+                string.Format(
+                    "{0} Participants",
+                    participants.Count));
+            SetDefaultPageSetup(
+                document,
+                model);
+
+            var partsByCompetitionId = participants
+                .GroupBy(
+                    x => x.CompetitionClassId,
+                    (compClassId, parts) => new
+                    {
+                        CompetitionClassId = compClassId,
+                        Participants = parts
+                            .OrderBy(
+                                x => x.StartNumber)
+                            .ThenBy(
+                                x => x.NamePartA)
+                            .ThenBy(
+                                x => x.NamePartB)
+                            .ToList()
+                    });
+
+            var (useWidht, _) = GetEffectiveContentSizes(
+                document.LastSection.PageSetup);
+
+            var sectionsAdded = 0;
+
+            var curCompClass = string.Empty;
+            foreach (var curPartsByCompClass in partsByCompetitionId)
+            {
+                var firstPart = curPartsByCompClass.Participants.First();
+
+                var curSection = sectionsAdded == 0
+                    ? document.LastSection
+                    : document.AddSection();
+
+                sectionsAdded++;
+                var curPar = curSection.AddParagraph(
+                    string.Format(
+                        "{0} - {1} Participants",
+                        firstPart.CompetitionClass.GetCompetitionClassName(),
+                        curPartsByCompClass.Participants.Count),
+                    StyleNames.Heading1);
+                curPar.Format.SpaceAfter = Unit.FromMillimeter(2);
+                curPar.Format.Font.Bold = true;
+
+                var table = new Table
+                {
+                    Borders =
+                    {
+                        Width = 0.75,
+                        // Visible = true,
+                        Visible = false,
+                    },
+                    // LeftPadding = useMargin,
+                };
+
+                // -- prepare the table...
+                var helpLayouter = new SimplePdfTableLayouter(
+                    useWidht);
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(2));
+                helpLayouter.AddColumn(
+                    0.0);
+                helpLayouter.ApplyTo(
+                    table);
+
+                foreach (var curPart in curPartsByCompClass.Participants)
+                {
+                    var curRow = table.AddRow();
+                    curRow.KeepWith = 1;
+                    curRow.TopPadding = Unit.FromMillimeter(2);
+
+                    curRow.Cells[0].AddParagraph(
+                        curPart.StartNumber.ToString("D0"));
+                    curRow.Cells[0].MergeDown = 1;
+                    curRow.Cells[1].AddParagraph(
+                        curPart.GetNames());
+
+                    curRow = table.AddRow();
+                    curRow[1].AddParagraph(
+                        curPart.ClubName ?? "-");
+
+                    curRow.Borders.Bottom.Visible = true;
+                    curRow.BottomPadding = Unit.FromMillimeter(2);
+
+                }
+
+                // ----
+                curSection.Add(
+                    table);
+            }
+
+            // ----
+            return ToPdfStream(
+                document,
+                model);
+        }
+
         public Stream GetDummyPdf(
             Competition? competition,
             CompetitionClass? competitionClass,

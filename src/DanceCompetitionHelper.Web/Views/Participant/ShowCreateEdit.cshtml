@@ -1,4 +1,5 @@
 ﻿@using DanceCompetitionHelper.Database.Enum;
+@using DanceCompetitionHelper.Database.Extensions;
 @using DanceCompetitionHelper.Database.Tables;
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Models.ParticipantModels;
@@ -468,7 +469,30 @@
 
             @if(isCreate == false) 
             {
+
+                var toDisplay = new DeleteModalWrapper()
+                {
+                    AspController = ParticipantController.RefName,
+                    AspAction = nameof(ParticipantController.Delete),
+                    RouteId = (Model.ParticipantId ?? Guid.Empty).ToString(),
+                    FormTitle = "Delete Participant",
+                    InfoText = string.Format(
+                        "Really delete Participant #{0} {1}?",
+                        Model.StartNumber,
+                        HumanReadableExtensions.GetNames(
+                            Model.NamePartA,
+                            Model.NamePartB)),
+                };
+            
+
                 <div class="vr"></div>
+
+                @* TODO: go on here!..
+                  https://getbootstrap.com/docs/5.3/components/modal/
+                *@
+                @Html.DisplayFor(
+                    m => toDisplay)
+
                 <a asp-controller="@ParticipantController.RefName"
                    asp-action="@nameof(ParticipantController.Delete)"
                    asp-route-id="@Model.ParticipantId"

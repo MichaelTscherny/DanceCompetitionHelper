@@ -409,5 +409,16 @@ namespace DanceCompetitionHelper.Web.Controllers
                     pdf,
                     cancellationToken);
         }
+
+        [HttpGet]
+        public Task<IActionResult> PdfParticipants(
+            PdfViewModel pdf,
+            CancellationToken cancellationToken)
+        {
+            return GetPdfDocumentHelper()
+                .GetParticipants(
+                    pdf,
+                    cancellationToken);
+        }
     }
 }
