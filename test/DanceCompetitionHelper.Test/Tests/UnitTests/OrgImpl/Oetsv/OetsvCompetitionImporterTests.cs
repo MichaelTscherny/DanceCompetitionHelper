@@ -70,7 +70,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                              new CompetitionClassImport()
                              {
                                  OrgClassIdRaw = "1",
-                                 OrgClassId = "001",
+                                 OrgClassId = "01",
 
                                  AgeClassRaw = "ALG",
                                  AgeClass = OetsvConstants.AgeClasses.Adult,
@@ -94,7 +94,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                              new CompetitionClassImport()
                              {
                                  OrgClassIdRaw = "2",
-                                 OrgClassId = "002",
+                                 OrgClassId = "02",
 
                                  AgeClassRaw = "ALG",
                                  AgeClass = OetsvConstants.AgeClasses.Adult,
@@ -118,7 +118,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                              new CompetitionClassImport()
                              {
                                  OrgClassIdRaw = "3",
-                                 OrgClassId = "003",
+                                 OrgClassId = "03",
 
                                  AgeClassRaw = "ALG",
                                  AgeClass = OetsvConstants.AgeClasses.Adult,
@@ -142,7 +142,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                              new CompetitionClassImport()
                              {
                                  OrgClassIdRaw = "4",
-                                 OrgClassId = "004",
+                                 OrgClassId = "04",
 
                                  AgeClassRaw = "ALG",
                                  AgeClass = OetsvConstants.AgeClasses.Adult,
@@ -166,7 +166,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                              new CompetitionClassImport()
                              {
                                  OrgClassIdRaw = "5",
-                                 OrgClassId = "005",
+                                 OrgClassId = "05",
 
                                  AgeClassRaw = "ALG",
                                  AgeClass = OetsvConstants.AgeClasses.Adult,
@@ -235,7 +235,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                         new CompetitionParticipantImport()
                         {
                             RegOrgClassIdRaw = "1",
-                            RegOrgClassId = "001",
+                            RegOrgClassId = "01",
 
                             RegStartNumberRaw = "1",
                             RegStartNumber = 1,
@@ -296,7 +296,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                         new CompetitionParticipantImport()
                         {
                             RegOrgClassIdRaw = "2",
-                            RegOrgClassId = "002",
+                            RegOrgClassId = "02",
 
                             RegStartNumberRaw = "2",
                             RegStartNumber = 2,

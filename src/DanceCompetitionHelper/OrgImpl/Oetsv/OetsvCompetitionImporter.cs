@@ -504,7 +504,10 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             switch (orgInfoType)
             {
                 case "TKNR":
-                    OrgCompetitionId = orgInfoValue;
+                    OrgCompetitionId = orgInfoValue
+                        ?.Trim()
+                        ?.PadLeft(4, '0')
+                        ?? "????";
                     break;
 
                 case "ORGANISATOR":
@@ -556,7 +559,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
 
             if (string.IsNullOrEmpty(OrgCompetitionId))
             {
-                OrgCompetitionId = competitionInfo[1].Trim();
+                OrgCompetitionId = competitionInfo[1]
+                    .Trim()
+                    .PadLeft(4, '0');
             }
 
             CompetitionClasses.Add(
@@ -564,7 +569,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
                 {
                     OrgClassIdRaw = competitionInfo[CompExcelOrgClassId],
                     // for sorting
-                    OrgClassId = competitionInfo[CompExcelOrgClassId].Trim().PadLeft(3, '0'),
+                    OrgClassId = competitionInfo[CompExcelOrgClassId].Trim().PadLeft(2, '0'),
 
                     AgeClassRaw = competitionInfo[CompExcelAgeClass],
                     AgeClass = OetsvConstants.AgeClasses.ToAgeClasses(
@@ -639,7 +644,9 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
         {
             if (string.IsNullOrEmpty(OrgCompetitionId))
             {
-                OrgCompetitionId = participantInfo[PartExcelRegOrgCompId].Trim();
+                OrgCompetitionId = participantInfo[PartExcelRegOrgCompId]
+                    .Trim()
+                    .PadLeft(4, '0');
             }
 
             if (participantInfo.Length < 32
@@ -652,7 +659,7 @@ namespace DanceCompetitionHelper.OrgImpl.Oetsv
             {
                 RegOrgClassIdRaw = participantInfo[PartExcelRegOrgCompClassId],
                 // for sorting
-                RegOrgClassId = participantInfo[PartExcelRegOrgCompClassId].Trim().PadLeft(3, '0'),
+                RegOrgClassId = participantInfo[PartExcelRegOrgCompClassId].Trim().PadLeft(2, '0'),
 
                 RegStartNumberRaw = participantInfo[PartExcelRegStartNumber],
                 RegStartNumber = int.Parse(
