@@ -317,7 +317,8 @@
                 RouteId = (Model.Competition?.CompetitionId ?? Guid.Empty).ToString(),
                 ModalTitle = "Delete Competition",
                 InfoText = string.Format(
-                    "Really delete Competition<br><b><i>{0} ({1})</i></b><br> on <b>{2}</b>?",
+                    "Really delete <b>{0}</b> Competition<br><b><i>{1} ({2})</i></b><br> on <b>{3}</b>?",
+                    Model.Competition?.Organization,
                     Model.Competition?.CompetitionName ?? "??",
                     Model.Competition?.OrgCompetitionId ?? "??",
                     Model.Competition?.CompetitionDate.ToShortDateString() ?? "-")

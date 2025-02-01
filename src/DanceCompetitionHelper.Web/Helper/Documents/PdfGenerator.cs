@@ -1167,6 +1167,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 model);
         }
 
+        [Obsolete("do not use! Just a test dummy!")]
         public Stream GetDummyPdf(
             Competition? competition,
             CompetitionClass? competitionClass,

@@ -257,9 +257,9 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                     return new PdfViewModel()
                     {
                         PdtStream = pdfGen.GetNumberCards(
-                foundComp,
-                showParticipants,
-                pdfModel),
+                            foundComp,
+                            showParticipants,
+                            pdfModel),
                         FileName = string.Format(
                             "Number Cards {0}.pdf",
                             foundComp.OrgCompetitionId),
@@ -285,6 +285,13 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                                 nameof(Competition),
                                 pdfModel.CompetitionId));
 
+                    var extraToFileName = string.Empty;
+                    if (pdfModel.CompetitionClassId.HasValue
+                        && Guid.Empty != pdfModel.CompetitionClassId)
+                    {
+                        extraToFileName = " Class ";
+                    }
+
                     return new PdfViewModel()
                     {
                         PdtStream = pdfGen.GetParticipants(
@@ -298,13 +305,15 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                                     cToken),
                             pdfModel),
                         FileName = string.Format(
-                            "Participants {0}.pdf",
+                            "Participants {0}{1}.pdf",
+                            extraToFileName,
                             foundComp.OrgCompetitionId),
                     };
                 },
                 cancellationToken);
         }
 
+        [Obsolete("do not use! Just a test dummy!")]
         public Task<IActionResult> GetDummyPdf(
             PdfViewModel pdfViewModel,
             CancellationToken cancellationToken)
