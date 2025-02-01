@@ -308,14 +308,23 @@
             </a>
         }
 
-        <div class="vr"></div>
-        <a asp-controller="@CompetitionController.RefName"
-           asp-action="@nameof(CompetitionController.Delete)"
-           asp-route-id="@Model.Competition?.CompetitionId"
-           class="btn btn-danger bi bi-trash3-fill"
-           title="Delete">
-           Delete
-       </a>
+        @{
+            <div class="vr"></div>
+            var toDisplay = new DeleteModalWrapper()
+            {
+                AspController = CompetitionController.RefName,
+                AspAction = nameof(CompetitionController.Delete),
+                RouteId = (Model.Competition?.CompetitionId ?? Guid.Empty).ToString(),
+                ModalTitle = "Delete Competition",
+                InfoText = string.Format(
+                    "Really delete Competition<br><b><i>{0} ({1})</i></b><br> on <b>{2}</b>?",
+                    Model.Competition?.CompetitionName ?? "??",
+                    Model.Competition?.OrgCompetitionId ?? "??",
+                    Model.Competition?.CompetitionDate.ToShortDateString() ?? "-")
+            };
+            @Html.DisplayFor(
+                m => toDisplay)
+        }
     </div>
     <br />
 </div>

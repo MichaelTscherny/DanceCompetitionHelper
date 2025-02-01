@@ -470,36 +470,22 @@
             @if(isCreate == false) 
             {
 
+                <div class="vr"></div>
                 var toDisplay = new DeleteModalWrapper()
                 {
                     AspController = ParticipantController.RefName,
                     AspAction = nameof(ParticipantController.Delete),
                     RouteId = (Model.ParticipantId ?? Guid.Empty).ToString(),
-                    FormTitle = "Delete Participant",
+                    ModalTitle = "Delete Participant",
                     InfoText = string.Format(
-                        "Really delete Participant #{0} {1}?",
+                        "Really delete participant<br><b>#{0} <i>{1}</i></b>?",
                         Model.StartNumber,
                         HumanReadableExtensions.GetNames(
                             Model.NamePartA,
                             Model.NamePartB)),
                 };
-            
-
-                <div class="vr"></div>
-
-                @* TODO: go on here!..
-                  https://getbootstrap.com/docs/5.3/components/modal/
-                *@
                 @Html.DisplayFor(
                     m => toDisplay)
-
-                <a asp-controller="@ParticipantController.RefName"
-                   asp-action="@nameof(ParticipantController.Delete)"
-                   asp-route-id="@Model.ParticipantId"
-                   class="btn btn-danger bi bi-trash3-fill"
-                   title="Delete">
-                   Delete
-               </a>
             }
         </div>
         <br />

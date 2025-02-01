@@ -136,13 +136,19 @@
             @if(isCreate== false)
             {
                 <div class="vr"></div>
-                <a asp-controller="@CompetitionVenueController.RefName"
-                   asp-action="@nameof(CompetitionVenueController.Delete)"
-                   asp-route-id="@Model.CompetitionVenueId"
-                   class="btn btn-danger bi bi-trash3-fill"
-                   title="Delete">
-                   Delete
-               </a>
+                var toDisplay = new DeleteModalWrapper()
+                {
+                    AspController = CompetitionClassController.RefName,
+                    AspAction = nameof(CompetitionClassController.Delete),
+                    RouteId = (Model.CompetitionVenueId ?? Guid.Empty).ToString(),
+                    ModalTitle = "Delete Venue",
+                    InfoText = string.Format(
+                        "Really delete Venue<br><b>{0}</b> for <br><b><i>{1}</i></b>?",
+                        Model.Name,
+                        Model.CompetitionName)
+                };
+                @Html.DisplayFor(
+                    m => toDisplay)
             }
         </div>
         <br />

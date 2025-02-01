@@ -132,13 +132,19 @@
             @if(isCreate == false) 
             {
                 <div class="vr"></div>
-                <a asp-controller="@AdjudicatorController.RefName"
-                   asp-action="@nameof(AdjudicatorController.Delete)"
-                   asp-route-id="@Model.AdjudicatorId"
-                   class="btn btn-danger bi bi-trash3-fill"
-                   title="Delete">
-                   Delete
-               </a>
+                var toDisplay = new DeleteModalWrapper()
+                {
+                    AspController = AdjudicatorController.RefName,
+                    AspAction = nameof(AdjudicatorController.Delete),
+                    RouteId = (Model.AdjudicatorId ?? Guid.Empty).ToString(),
+                    ModalTitle = "Delete Adjudicator",
+                    InfoText = string.Format(
+                        "Really delete adjudicator<br><b>#{0} <i>{1}</i></b>?",
+                        Model.Abbreviation,
+                        Model.Name),
+                };
+                @Html.DisplayFor(
+                    m => toDisplay)
             }
         </div>
         <br />
