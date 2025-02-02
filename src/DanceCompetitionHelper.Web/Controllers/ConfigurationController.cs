@@ -46,7 +46,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                         return await ShowConfig(
                             id,
                             _viewData,
-                            cancellationToken);
+                            cToken);
                     },
                     cancellationToken);
         }

@@ -78,6 +78,26 @@ namespace DanceCompetitionHelper.Database.Extensions
                 useNameB);
         }
 
+        public static (int CountParticipants, int ByWinning, int ByPromotion, int ExtraManualStarter, int SumParticipants) GetCompetitionParticipantCounts(
+            this CompetitionClass competitionClass)
+        {
+            var useCountParticipants = competitionClass.DisplayInfo?.CountParticipants ?? 0;
+            var useByWinning = competitionClass.DisplayInfo?.ExtraParticipants.ByWinning ?? 0;
+            var useByPromotion = competitionClass.DisplayInfo?.ExtraParticipants.ByPromotion ?? 0;
+            var useExtraManualStarter = competitionClass.ExtraManualStarter;
+            var useSum = useCountParticipants
+                + useByWinning
+                + useByPromotion
+                + useExtraManualStarter;
+
+            return (
+                useCountParticipants,
+                useByWinning,
+                useByPromotion,
+                useExtraManualStarter,
+                useSum);
+        }
+
         public static string DefaultTrim(
             this string forString)
         {

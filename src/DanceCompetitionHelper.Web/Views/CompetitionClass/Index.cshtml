@@ -5,6 +5,8 @@
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models;
 @using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+@using DanceCompetitionHelper.Web.Models.Pdfs
+@using MigraDoc.DocumentObjectModel
 
 @model CompetitionClassOverviewViewModel
 
@@ -82,7 +84,8 @@
                 @foreach (var item in Model.OverviewItems ?? Enumerable.Empty<CompetitionClass>())
                 {
                     <tr>
-                        <td class="text-nowrap" style="background-color: @item.CompetitionColor">
+                        <td class="text-nowrap" 
+                            style="background-color: @item.CompetitionColor">
                             @item.GetCompetitionClassName()
                         </td>
                         @{
@@ -101,7 +104,8 @@
                             }
                         }
 
-                        <td class="text-nowrap" style="background-color: @(followUpBackgroundColor)">
+                        <td class="text-nowrap" 
+                        style="background-color: @(followUpBackgroundColor)">
                             @displayFollowUp
                         </td>
                         <td>
@@ -146,22 +150,22 @@
                                     {
                                         toolTipString = "-";
                                     }
+
+                                    var partCount = item.GetCompetitionParticipantCounts();
+
                                 }
                                 <div class="col-auto text-end"
                                      data-bs-toggle="tooltip"
                                      data-bs-custom-class="custom-tooltip"
                                      data-bs-title="@(toolTipString)">
                                     <a asp-controller="@ParticipantController.RefName"
-                                       asp-action="@nameof(ParticipantController.Index)"
-                                       asp-route-id="@item.CompetitionId">
-                                        @(item.DisplayInfo?.CountParticipants ?? -1)
-                                        + @(item.DisplayInfo?.ExtraParticipants.ByWinning ?? -1)
-                                        + @(item.DisplayInfo?.ExtraParticipants.ByPromotion ?? -1)
-                                        + @(item.ExtraManualStarter)
-                                        = @((item.DisplayInfo?.CountParticipants ?? 0)
-                                          + (item.DisplayInfo?.ExtraParticipants.ByWinning ?? 0)
-                                          + (item.DisplayInfo?.ExtraParticipants.ByPromotion ?? 0)
-                                          + (item.ExtraManualStarter))
+                                    asp-action="@nameof(ParticipantController.Index)"
+                                    asp-route-id="@item.CompetitionId">
+                                        @(partCount.CountParticipants)
+                                        + @(partCount.ByWinning)
+                                        + @(partCount.ByPromotion)
+                                        + @(partCount.ExtraManualStarter)
+                                        = @(partCount.SumParticipants)
                                     </a>
                                 </div>
                             </div>
@@ -180,8 +184,8 @@
                                      data-bs-custom-class="custom-tooltip"
                                      data-bs-title="@multiStartInfo">
                                     <a asp-controller="@CompetitionClassController.RefName"
-                                       asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
-                                       asp-route-id="@item.CompetitionId">
+                                    asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
+                                    asp-route-id="@item.CompetitionId">
                                         @(item.DisplayInfo?.CountMultipleStarters ?? -1)
                                     </a>
                                 </div>
@@ -271,21 +275,22 @@
            asp-route-id="@Model.Competition?.CompetitionId"
            class="btn btn-primary bi bi-file-earmark-plus"
            title="Create new">
-           Create new
+            Create new
         </a>
         <a asp-controller="@CompetitionController.RefName"
            asp-action="@nameof(CompetitionController.ShowImport)"
            asp-route-id="@Model.Competition?.CompetitionId"
            class="btn btn-primary bi bi-cloud-download"
            title="Import update">
-           Import update
+            Import update
         </a>
         <a asp-controller="@CompetitionController.RefName"
            asp-action="@nameof(CompetitionController.Index)"
            class="btn btn-secondary bi bi-box-arrow-in-left"
            title="Back">
-           Back
+            Back
         </a>
+
         <div class="vr"></div>
         @if (Model.DetailedView)
         {
@@ -294,7 +299,7 @@
                asp-route-id="@Model.Competition?.CompetitionId"
                class="btn btn-primary bi bi-zoom-out"
                title="Normal View">
-               Normal View
+                Normal View
             </a>
         }
         else
@@ -304,7 +309,7 @@
                asp-route-id="@Model.Competition?.CompetitionId"
                class="btn btn-primary bi bi-zoom-in"
                title="Detailed Viewout">
-               Detailed View
+                Detailed View
             </a>
         }
 
@@ -324,9 +329,55 @@
                     Model.Competition?.CompetitionDate.ToShortDateString() ?? "-")
             };
             @Html.DisplayFor(
-                m => toDisplay)
+                                                                                                 m => toDisplay)
         }
     </div>
     <br />
+
+    @{
+        var compVenues = new List<SelectListItem>();
+        if (Model.CompetitionVenues != null) {
+
+            compVenues = await Model.CompetitionVenues
+                .ToAsyncEnumerable()
+                .OrderBy(
+                    x => x.Name)
+                .ToSelectListItemAsync(
+                    addEmpty: true,
+                    emptyText: "All at once")
+                .ToListAsync();
+
+            compVenues.Insert(
+                1,
+                new SelectListItem()
+                {
+                    Text = "All by Venue",
+                    Value = Guid.Empty.ToString()
+                });
+        }
+
+        var toDisplayPdf = new PdfViewModelWrapper()
+        {
+            AspController = CompetitionClassController.RefName,
+            AspAction = nameof(CompetitionClassController.PdfCompetitionClasses),
+            ButtonText = "Competition Classes",
+            ShowPageFormat = false,
+            ShowPageOrientation = false,
+            ShowSearchString = false,
+            ShowFromTo = false,
+            ShowShading = true,
+            //
+            PdfViewModel = new PdfViewModel()
+            {
+                CompetitionId = Model.Competition?.CompetitionId,
+                CompetitionVenues = compVenues,
+                PageFormat = PageFormat.A4,
+                PageOrientation = Orientation.Portrait,
+                Shading = false,
+            }
+        };
+    }
+    @Html.DisplayFor(
+        m => toDisplayPdf)
 </div>
 

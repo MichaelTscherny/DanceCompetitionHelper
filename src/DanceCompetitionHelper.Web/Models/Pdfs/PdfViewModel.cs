@@ -16,6 +16,9 @@ namespace DanceCompetitionHelper.Web.Models.Pdfs
         public Guid? CompetitionId { get; set; }
         public Guid? CompetitionClassId { get; set; }
         public List<SelectListItem> CompetitionClasses { get; set; } = new List<SelectListItem>();
+        public Guid? CompetitionVenueId { get; set; }
+        public List<SelectListItem> CompetitionVenues { get; set; } = new List<SelectListItem>();
+
         public Guid? ParticipantId { get; set; }
 
         public PdfPageLayout PageLayout { get; set; } = PdfPageLayout.SinglePage;

@@ -313,6 +313,68 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                 cancellationToken);
         }
 
+        public Task<IActionResult> GetCompetitionClasses(
+            PdfViewModel pdfViewModel,
+            CancellationToken cancellationToken)
+        {
+            return ReturnPdfViewModel(
+                pdfViewModel,
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                {
+                    var foundComp = await dcH.FindCompetitionAsync(
+                        pdfModel.CompetitionId,
+                        cToken)
+                        ?? throw new NoDataFoundException(
+                            string.Format(
+                                "{0} with id '{1}' not found!",
+                                nameof(Competition),
+                                pdfModel.CompetitionId));
+
+                    var compClassVenues = new Dictionary<Guid, HashSet<Guid>>();
+
+                    var extraToFileName = string.Empty;
+                    if (pdfModel.CompetitionClassId.HasValue
+                        && Guid.Empty != pdfModel.CompetitionClassId)
+                    {
+                        extraToFileName = " Venue ";
+
+                        /* TODO: linke comps with venues
+                        compClassVenues
+                        */
+                    }
+
+                    return new PdfViewModel()
+                    {
+                        PdtStream = pdfGen.GetCompetitionClasses(
+                            foundComp,
+                            await dcH
+                                .GetCompetitionClassesAsync(
+                                    foundComp.CompetitionId,
+                                    cToken,
+                                    true,
+                                    false)
+                                .ToListAsync(
+                                    cToken),
+                            await dcH
+                                .GetCompetitionVenuesAsync(
+                                    foundComp.CompetitionId,
+                                    cToken)
+                                // TODO: just for testing
+                                .OrderBy(
+                                    x => x.Name)
+                                .ToListAsync(
+                                    cToken),
+                            compClassVenues,
+                            pdfModel),
+                        FileName = string.Format(
+                            "Competition Classes {0}{1}.pdf",
+                            extraToFileName,
+                            foundComp.OrgCompetitionId),
+                    };
+                },
+                cancellationToken);
+        }
+
         [Obsolete("do not use! Just a test dummy!")]
         public Task<IActionResult> GetDummyPdf(
             PdfViewModel pdfViewModel,

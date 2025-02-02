@@ -371,6 +371,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                 doImportView);
         }
 
+        [Obsolete("to be removed, dummy onyl!")]
         public Task<IActionResult> DownloadDummyFile(
             CancellationToken cancellationToken)
         {

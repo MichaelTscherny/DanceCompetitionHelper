@@ -63,11 +63,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                                 .GetParticipantsAsync(
                                     foundCompId,
                                     null,
-                                    cancellationToken,
+                                    cToken,
                                     true,
                                     detailedView)
                                 .ToListAsync(
-                                    cancellationToken),
+                                    cToken),
                             DetailedView = detailedView,
                         };
                     },
@@ -157,11 +157,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                         model.CompetitionClasses = await dcH
                             .GetCompetitionClassesAsync(
                                 createParticipant.CompetitionId,
-                                cancellationToken)
+                                cToken)
                             .ToSelectListItemAsync(
                                 createParticipant.CompetitionClassId)
                             .ToListAsync(
-                                cancellationToken);
+                                cToken);
 
                         return null;
                     })
@@ -175,7 +175,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
                         await dcH.CreateParticipantAsync(
                             newEntity,
-                            cancellationToken);
+                            cToken);
 
                         HttpContext.Session.SetString(
                             ParticipantLastCreatedCompetitionClassId,
@@ -204,7 +204,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         var foundPart = await dcH.GetParticipantAsync(
                             showId,
-                            cancellationToken)
+                            cToken)
                             ?? throw new NoDataFoundException(
                                 string.Format(
                                     "{0} with id '{1}' not found!",
@@ -220,11 +220,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                         partModel.CompetitionClasses = await dcH
                             .GetCompetitionClassesAsync(
                                 foundPart.CompetitionId,
-                                cancellationToken)
+                                cToken)
                             .ToSelectListItemAsync(
                                 foundPart.CompetitionClassId)
                             .ToListAsync(
-                                cancellationToken);
+                                cToken);
 
                         return partModel;
                     },
@@ -259,11 +259,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                         model.CompetitionClasses = await dcH
                             .GetCompetitionClassesAsync(
                                 model.CompetitionId,
-                                cancellationToken)
+                                cToken)
                             .ToSelectListItemAsync(
                                 model.CompetitionClassId)
                             .ToListAsync(
-                                cancellationToken);
+                                cToken);
 
                         return null;
                     })
@@ -273,7 +273,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         var foundPart = await dcH.GetParticipantAsync(
                             model.ParticipantId ?? Guid.Empty,
-                            cancellationToken)
+                            cToken)
                             ?? throw new NoDataFoundException(
                                 string.Format(
                                     "{0} with id '{1}' not found!",
@@ -320,11 +320,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                         model.CompetitionClasses = await dcH
                             .GetCompetitionClassesAsync(
                                 model.CompetitionId,
-                                cancellationToken)
+                                cToken)
                             .ToSelectListItemAsync(
                                 model.CompetitionClassId)
                             .ToListAsync(
-                                cancellationToken);
+                                cToken);
 
                         return null;
                     })
@@ -372,7 +372,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         var helpComp = await _danceCompHelper.FindCompetitionAsync(
                             id,
-                            cancellationToken);
+                            cToken);
 
                         var foundPart = await dcH.GetParticipantAsync(
                             delId,

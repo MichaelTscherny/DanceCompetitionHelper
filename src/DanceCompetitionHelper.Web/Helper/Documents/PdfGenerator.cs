@@ -1,6 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Extensions;
 using DanceCompetitionHelper.Helper;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.Pdfs;
@@ -1154,6 +1155,306 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                     curRow.Borders.Bottom.Visible = true;
                     curRow.BottomPadding = Unit.FromMillimeter(2);
 
+                }
+
+                // ----
+                curSection.Add(
+                    table);
+            }
+
+            // ----
+            return ToPdfStream(
+                document,
+                model);
+        }
+
+        private class CompClassGrouping()
+        {
+            public Guid? CompetitionVenueId { get; set; }
+            public List<CompetitionClass> CompetitionClasses { get; set; } = default!;
+        }
+
+        public Stream GetCompetitionClasses(
+            Competition? competition,
+            List<CompetitionClass> competitionClasses,
+            List<CompetitionVenue> competitionVenues,
+            Dictionary<Guid, HashSet<Guid>> competitionClasseVenues,
+            PdfViewModel model)
+        {
+            var document = CreateDefaultDocument(
+                "Competition Classes",
+                string.Empty,
+                competition);
+            SetDefaultStyle(
+                document);
+            SetDefaultHeaderFooter(
+                document,
+                competition,
+                null,
+                string.Format(
+                    "{0} Competition Classes",
+                    competitionClasses.Count));
+            SetDefaultPageSetup(
+                document,
+                model);
+
+            var (useWidht, _) = GetEffectiveContentSizes(
+                document.LastSection.PageSetup);
+
+            var compClassesById = competitionClasses.ToDictionary(
+                k => k.CompetitionClassId,
+                v => v);
+            var compVenuesById = competitionVenues.ToDictionary(
+                k => k.CompetitionVenueId,
+                v => v);
+
+            IEnumerable<CompClassGrouping> compClassGrouping;
+
+            switch (model.CompetitionVenueId)
+            {
+                case null:
+                    compClassGrouping = new List<CompClassGrouping>()
+                    {
+                        new CompClassGrouping()
+                        {
+                            CompetitionVenueId = null,
+                            CompetitionClasses = competitionClasses,
+                        }
+                    };
+                    break;
+
+                case Guid guid when guid == Guid.Empty:
+                    var useCompClassesByVenue = new Dictionary<Guid, List<CompetitionClass>>();
+
+                    var useCompVenueId = competitionVenues
+                        .OrderBy(
+                            x => x.Name)
+                        .Select(
+                            x => x.CompetitionVenueId);
+                    foreach (var curCompVenId in useCompVenueId)
+                    {
+                        foreach (var curCompClass in competitionClasses)
+                        {
+                            if (competitionClasseVenues.TryGetValue(
+                                curCompClass.CompetitionClassId,
+                                out var useCompClassVenues) == false)
+                            {
+                                continue;
+                            }
+
+                            if (useCompClassVenues.Contains(
+                                curCompVenId) == false)
+                            {
+                                continue;
+                            }
+
+                            useCompClassesByVenue.AddToBucket(
+                                curCompVenId,
+                                curCompClass);
+                        }
+                    }
+
+                    var useGroups = new List<CompClassGrouping>();
+                    foreach (var curCompVenId in useCompVenueId)
+                    {
+                        if (useCompClassesByVenue.TryGetValue(
+                            curCompVenId,
+                            out var allClasses) == false)
+                        {
+                            continue;
+                        }
+                        useGroups.Add(
+                            new CompClassGrouping()
+                            {
+                                CompetitionVenueId = curCompVenId,
+                                CompetitionClasses = allClasses,
+                            });
+
+                    }
+
+                    compClassGrouping = useGroups;
+
+                    break;
+
+                default:
+                    var useCompetitionVenueId = model.CompetitionVenueId ?? Guid.Empty;
+                    var foundCompClasses = new List<CompetitionClass>();
+
+                    foreach (var curCompClass in competitionClasses)
+                    {
+                        if (competitionClasseVenues.TryGetValue(
+                            curCompClass.CompetitionClassId,
+                            out var curCompClassVens) == false)
+                        {
+                            continue;
+                        }
+
+                        if (curCompClassVens.Contains(
+                            useCompetitionVenueId) == false)
+                        {
+                            continue;
+                        }
+
+                        foundCompClasses.Add(
+                            curCompClass);
+                    }
+
+                    compClassGrouping = new List<CompClassGrouping>()
+                    {
+                        new CompClassGrouping()
+                        {
+                            CompetitionVenueId = useCompetitionVenueId,
+                            CompetitionClasses = foundCompClasses,
+                        }
+                    };
+                    break;
+            }
+
+            var sectionsAdded = 0;
+            foreach (var curCompClassesByVenue in compClassGrouping)
+            {
+                var curSection = sectionsAdded == 0
+                    ? document.LastSection
+                    : document.AddSection();
+                sectionsAdded++;
+
+                compVenuesById.TryGetValue(
+                    curCompClassesByVenue.CompetitionVenueId ?? Guid.Empty,
+                    out var curCompVenue);
+
+                if (curCompVenue != null)
+                {
+                    var curPar = curSection.AddParagraph(
+                        string.Format(
+                            "Venue {0}",
+                            curCompVenue.Name),
+                    StyleNames.Heading1);
+                    curPar.Format.SpaceAfter = Unit.FromMillimeter(2);
+                    curPar.Format.Font.Bold = true;
+                }
+
+
+                var table = new Table
+                {
+                    Borders =
+                    {
+                        Width = 0.75,
+                        // Visible = true,
+                        Visible = false,
+                    },
+                    // LeftPadding = useMargin,
+                };
+
+                // -- prepare the table...
+                var helpLayouter = new SimplePdfTableLayouter(
+                    useWidht);
+                // -- Mark 01 --
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(1.2));
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(1.2));
+                helpLayouter.AddColumn(
+                    0.0);
+                // -- Mark 02 --
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(1));
+                // -- Mark 03 --
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(1));
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(1));
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(1));
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(1));
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(1));
+                // -- Mark 04 --
+                helpLayouter.AddColumn(
+                    Unit.FromCentimeter(1));
+
+                helpLayouter.ApplyTo(
+                    table);
+
+                var curRow = table.AddRow();
+                curRow.Format.Font.Bold = true;
+                curRow.BottomPadding = Unit.FromMillimeter(2);
+
+                // -- Mark 01 --
+                curRow.Cells[0].AddParagraph(
+                    "OrgId");
+                curRow.Cells[1].AddParagraph(
+                    "F-Up   ");
+                curRow.Cells[2].AddParagraph(
+                    "Name");
+                // -- Mark 02 --
+                curRow.Cells[3].AddParagraph(
+                    "Rnds");
+                // -- Mark 03 --
+                curRow.Cells[4].AddParagraph(
+                    "Reg");
+                curRow.Cells[5].AddParagraph(
+                    "Win");
+                curRow.Cells[6].AddParagraph(
+                    "Prom");
+                curRow.Cells[7].AddParagraph(
+                    "Man");
+                curRow.Cells[8].AddParagraph(
+                    "Sum");
+                // -- Mark 04 --
+                curRow.Cells[9].AddParagraph(
+                    "Panel");
+
+                foreach (var curCompClass in curCompClassesByVenue.CompetitionClasses)
+                {
+                    curRow = table.AddRow();
+                    // curRow.KeepWith = 1;
+                    // curRow.TopPadding = Unit.FromMillimeter(2);
+
+                    // -- Mark 01 --
+                    curRow.Cells[0].AddParagraph(
+                        curCompClass.OrgClassId);
+                    curRow.Cells[1].AddParagraph(
+                        curCompClass.FollowUpCompetitionClass?.OrgClassId ?? string.Empty);
+                    // curRow.Cells[0].MergeDown = 1;
+                    curRow.Cells[2].AddParagraph(
+                        curCompClass.CompetitionClassName);
+
+                    // -- Mark 02 --
+                    curRow.Cells[3].AddParagraph(
+                        "??");
+                    curRow.Cells[3].Format.Alignment = ParagraphAlignment.Right;
+
+                    // -- Mark 03 --
+                    var partcount = curCompClass.GetCompetitionParticipantCounts();
+                    curRow.Cells[4].AddParagraph(
+                        partcount.CountParticipants.ToString());
+                    curRow.Cells[4].Format.Alignment = ParagraphAlignment.Right;
+                    curRow.Cells[5].AddParagraph(
+                        partcount.ByWinning.ToString());
+                    curRow.Cells[5].Format.Alignment = ParagraphAlignment.Right;
+                    curRow.Cells[6].AddParagraph(
+                        partcount.ByPromotion.ToString());
+                    curRow.Cells[6].Format.Alignment = ParagraphAlignment.Right;
+                    curRow.Cells[7].AddParagraph(
+                        partcount.ExtraManualStarter.ToString());
+                    curRow.Cells[7].Format.Alignment = ParagraphAlignment.Right;
+                    curRow.Cells[8].AddParagraph(
+                        partcount.SumParticipants.ToString());
+                    curRow.Cells[8].Format.Alignment = ParagraphAlignment.Right;
+
+                    // -- Mark 03 --
+                    curRow.Cells[9].AddParagraph(
+                        curCompClass.AdjudicatorPanel.Name);
+
+                    /*
+                    curRow = table.AddRow();
+                    curRow[1].AddParagraph(
+                        curCompClass.ClubName ?? "-");
+                    */
+
+                    curRow.Borders.Bottom.Visible = true;
+                    // curRow.BottomPadding = Unit.FromMillimeter(2);
                 }
 
                 // ----

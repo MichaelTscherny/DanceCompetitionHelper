@@ -64,6 +64,25 @@
             </div>
         }
 
+        @if (PdfViewModel.CompetitionVenues.Count > 3)
+        {
+            <div class="col-3 mb-2">
+                <div class="input-group">
+                    <div class="input-group-text mb-0">
+                        <label for="@nameof(PdfViewModel.CompetitionVenueId)"
+                               class="form-label mb-0">
+                            Venue
+                        </label>
+                    </div>
+                    <select asp-items="@PdfViewModel.CompetitionVenues"
+                            id="@nameof(PdfViewModel.CompetitionVenueId)"
+                            name="@nameof(PdfViewModel.CompetitionVenueId)"
+                            class="form-select">
+                    </select>
+                </div>
+            </div>
+        }
+
         @if (Model.ShowPageFormat)
         {
             <div class="col-2 mb-2">
@@ -188,7 +207,7 @@
 
         <div class="col"></div>
 
-        <div class="col-auto">
+        <div class="col-auto mb-2">
             <button type="submit"
                     class="btn btn-primary bi bi-filetype-pdf text-nowrap"
                     title="Get @buttonText as PDF">

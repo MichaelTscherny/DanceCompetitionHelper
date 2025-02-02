@@ -9,6 +9,7 @@ using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
 using DanceCompetitionHelper.Web.Models.Pdfs;
 
 using Microsoft.AspNetCore.Mvc;
+using MigraDoc.DocumentObjectModel;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
@@ -57,6 +58,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                         return new CompetitionClassOverviewViewModel()
                         {
                             Competition = foundComp,
+                            CompetitionVenues = await dcH
+                                .GetCompetitionVenuesAsync(
+                                    foundCompId,
+                                    cToken)
+                                .ToListAsync(
+                                    cToken),
                             OverviewItems = await dcH
                                 .GetCompetitionClassesAsync(
                                     foundCompId,
@@ -497,7 +504,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         var foundComp = await dcH.FindCompetitionAsync(
                             showId,
-                            cancellationToken);
+                            cToken);
 
                         if (foundComp == null)
                         {
@@ -544,6 +551,21 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
             return GetPdfDocumentHelper()
                 .GetPossiblePromotions(
+                    pdf,
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> PdfCompetitionClasses(
+            PdfViewModel pdf,
+            CancellationToken cancellationToken)
+        {
+            // CAUTION: only "A4" implemented yet!..
+            pdf.PageFormat = PageFormat.A4;
+            pdf.PageOrientation = Orientation.Landscape;
+
+            return GetPdfDocumentHelper()
+                .GetCompetitionClasses(
                     pdf,
                     cancellationToken);
         }
