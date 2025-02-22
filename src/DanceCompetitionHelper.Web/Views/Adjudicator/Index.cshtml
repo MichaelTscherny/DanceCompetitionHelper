@@ -14,8 +14,8 @@
 
     ViewData["Title"] = string.Format(
         Model.DetailedView
-            ? "{0} Adjudicator Details of {1}"
-            : "{0} Adjudicators of {1}",
+            ? "{0} Adjudicator Details"
+            : "{0} Adjudicator(s)",
         adjudicatorsCount,
         compInfoStr);
 }
@@ -98,8 +98,8 @@
            title="Create new">
            Create new
         </a>
-        <a asp-controller="@CompetitionClassController.RefName"
-           asp-action="@nameof(CompetitionClassController.Index)"
+        <a asp-controller="@AdjudicatorController.RefName"
+           asp-action="@nameof(AdjudicatorController.Index)"
            asp-route-id="@Model.Competition?.CompetitionId"
            class="btn btn-secondary px-lg-4 bi bi-box-arrow-in-left"
            title="Back">

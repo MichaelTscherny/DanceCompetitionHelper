@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.AdjudicatorPanelModels;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
@@ -23,6 +25,7 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
         }
 
+        [HttpGet]
         public Task<IActionResult> Index(
             Guid id,
             CancellationToken cancellationToken)
@@ -36,25 +39,23 @@ namespace DanceCompetitionHelper.Web.Controllers
                     id,
                     async (indexId, dcH, _, _viewData, cToken) =>
                     {
-                        var foundComp = await _danceCompHelper
-                            .FindCompetitionAsync(
-                                id,
-                                cToken);
+                        var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
+                            dcH,
+                            indexId,
+                            _viewData,
+                            cToken);
 
                         if (foundComp == null)
                         {
                             return null;
                         }
 
-                        var foundCompId = foundComp.CompetitionId;
-                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
                         return new AdjudicatorPanelOverviewViewModel()
                         {
                             Competition = foundComp,
                             OverviewItems = await _danceCompHelper
                                 .GetAdjudicatorPanelsAsync(
-                                    foundCompId,
+                                    foundComp.CompetitionId,
                                     cToken,
                                     true)
                                 .ToListAsync(
@@ -64,6 +65,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public Task<IActionResult> ShowCreateEdit(
             Guid id,
             CancellationToken cancellationToken)
@@ -77,22 +79,20 @@ namespace DanceCompetitionHelper.Web.Controllers
                     id,
                     async (showId, dcH, _, _viewData, cToken) =>
                     {
-                        var foundComp = await _danceCompHelper
-                            .FindCompetitionAsync(
-                                id,
-                                cToken);
+                        var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
+                            dcH,
+                            showId,
+                            _viewData,
+                            cToken);
 
                         if (foundComp == null)
                         {
                             return null;
                         }
 
-                        var foundCompId = foundComp.CompetitionId;
-                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
                         return new AdjudicatorPanelViewModel()
                         {
-                            CompetitionId = foundCompId,
+                            CompetitionId = foundComp.CompetitionId,
                             CompetitionName = foundComp.GetCompetitionName(),
                         };
                     },
@@ -100,7 +100,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public Task<IActionResult> CreateNew(
             AdjudicatorPanelViewModel createAdjudicatorPanel,
             CancellationToken cancellationToken)
@@ -116,7 +115,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
                     async (model, dcH, _, _viewData, cToken) =>
                     {
-                        await DefaultGetCompetitionAndSetViewData(
+                        await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
                             createAdjudicatorPanel.CompetitionId,
                             _viewData,
@@ -142,6 +141,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public Task<IActionResult> ShowEdit(
             Guid id,
             CancellationToken cancellationToken)
@@ -165,7 +165,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                             return null;
                         }
 
-                        _viewData["Use" + nameof(CompetitionClass)] = foundAdjPanel.CompetitionId;
+                        var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
+                            dcH,
+                            foundAdjPanel.CompetitionId,
+                            _viewData,
+                            cToken);
 
                         return new AdjudicatorPanelViewModel()
                         {
@@ -180,7 +184,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public Task<IActionResult> EditSave(
             AdjudicatorPanelViewModel editAdjudicatorPanel,
             CancellationToken cancellationToken)
@@ -198,7 +201,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
                     async (model, dcH, _, _viewData, cToken) =>
                     {
-                        await DefaultGetCompetitionAndSetViewData(
+                        await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
                             model.CompetitionId,
                             _viewData,
@@ -211,13 +214,13 @@ namespace DanceCompetitionHelper.Web.Controllers
                     async (model, dcH, mapper, _, cToken) =>
                     {
                         var foundAdjPanel = await dcH.GetAdjudicatorPanelAsync(
-                        editAdjudicatorPanel.AdjudicatorPanelId ?? Guid.Empty,
-                        cToken)
-                        ?? throw new NoDataFoundException(
-                            string.Format(
-                                "{0} with id '{1}' not found!",
-                                nameof(AdjudicatorPanel),
-                                editAdjudicatorPanel.AdjudicatorPanelId));
+                            editAdjudicatorPanel.AdjudicatorPanelId ?? Guid.Empty,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(AdjudicatorPanel),
+                                    editAdjudicatorPanel.AdjudicatorPanelId));
 
                         // override the values...
                         mapper.Map(
@@ -232,6 +235,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
@@ -248,13 +252,13 @@ namespace DanceCompetitionHelper.Web.Controllers
                     async (delId, dcH, _, _, cToken) =>
                     {
                         var foundAdjPanel = await dcH.GetAdjudicatorPanelAsync(
-                        delId,
-                        cToken)
-                        ?? throw new NoDataFoundException(
-                            string.Format(
-                                "{0} with id '{1}' not found!",
-                                nameof(AdjudicatorPanel),
-                                delId));
+                            delId,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(AdjudicatorPanel),
+                                    delId));
 
                         await dcH.RemoveAdjudicatorPanelAsync(
                             foundAdjPanel,

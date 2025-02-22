@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 
+using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Web.Helper.Documents;
 using DanceCompetitionHelper.Web.Helper.Request;
@@ -13,6 +14,7 @@ using System.Runtime.CompilerServices;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public abstract class ControllerBase<TLogger> : Controller
     {
         protected readonly IDanceCompetitionHelper _danceCompHelper;
@@ -66,7 +68,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         #endregion Chaining
 
-        public async Task<Competition?> DefaultGetCompetitionAndSetViewData(
+        public async Task<Competition?> DefaultGetCompetitionAndSetViewDataAsync(
             IDanceCompetitionHelper danceCompetitionHelper,
             Guid? competitionId,
             ViewDataDictionary? viewData,
@@ -81,11 +83,14 @@ namespace DanceCompetitionHelper.Web.Controllers
                 return null;
             }
 
-            (viewData ?? ViewData)["Use" + nameof(CompetitionClass)] = foundComp.CompetitionId;
+            var useViewData = viewData ?? ViewData;
+
+            useViewData[WebConstants.ViewData.Parameter.CompetitionName] = foundComp.GetCompetitionName();
+            useViewData[WebConstants.ViewData.Parameter.UseCompetitionClass] = foundComp.CompetitionId;
+            // useViewData[WebConstants.ViewData.Parameter.Header] = header;
 
             return foundComp;
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error(

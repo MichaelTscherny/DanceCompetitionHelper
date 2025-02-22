@@ -11,13 +11,11 @@
     var availableCompetitionsCount = Model?.OverviewItems?.Count();
 
     ViewData["Title"] = string.Format(
-        "{0} Competitions",
+        "Overview of {0} Competitions",
         availableCompetitionsCount);
 }
 
 <div class="text-center">
-    <h1 class="display-6">@ViewData["Title"]</h1>
-    
     <div class="table-responsive-xxl">
         <table class="table table-striped table-hover">
             <thead>
@@ -126,6 +124,11 @@
                                asp-route-id="@item.CompetitionId"
                                class="bi bi-arrow-repeat"
                                title="Refresh"></a> |
+                            <a asp-controller="@CompetitionController.RefName"
+                               asp-action="@nameof(CompetitionController.BackupCompetition)"
+                               asp-route-id="@item.CompetitionId"
+                               class="bi bi-floppy2-fill"
+                               title="Backup"></a> |
                             <a asp-controller="@CompetitionController.RefName"
                                asp-action="@nameof(CompetitionController.CreateTableHistory)"
                                asp-route-id="@item.CompetitionId"

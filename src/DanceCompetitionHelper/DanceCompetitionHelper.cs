@@ -1,4 +1,7 @@
-﻿using DanceCompetitionHelper.Data;
+﻿using AutoMapper;
+
+using DanceCompetitionHelper.Data;
+using DanceCompetitionHelper.Data.Backup;
 using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
@@ -16,6 +19,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DanceCompetitionHelper
 {
@@ -178,7 +183,57 @@ namespace DanceCompetitionHelper
                 _danceCompHelperDb,
                 foundComp.CompetitionId,
                 comment);
+        }
 
+        public async Task<(Stream? BackupStream, string CompetitionName)> BackupCompeitionAsStreamAsync(
+            Guid competitionId,
+            IMapper mapper,
+            CancellationToken cancellationToken)
+        {
+            var retStream = new MemoryStream();
+
+            var curComp = await GetCompetitionAsync(
+                competitionId,
+                cancellationToken);
+
+            if (curComp == null)
+            {
+                return (null, string.Empty);
+            }
+
+            var backupData = new CompetitionBackupRoot()
+            {
+                Competition = mapper.Map<CompetitionBackup>(
+                    curComp),
+                CompetitionClasses = await GetCompetitionClassesAsync(
+                    competitionId,
+                    cancellationToken,
+                    false,
+                    true)
+                    .Select(
+                        x => mapper.Map<CompetitionClassBackup>(
+                            x))
+                    .ToListAsync(
+                        cancellationToken),
+            };
+
+            await JsonSerializer.SerializeAsync(
+                retStream,
+                backupData,
+                new JsonSerializerOptions()
+                {
+                    WriteIndented = true,
+                    // MaxDepth = 4,                    
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                },
+                cancellationToken);
+
+            retStream.Seek(
+                0,
+                SeekOrigin.Begin);
+
+            return (retStream,
+                curComp.GetCompetitionName());
         }
 
         #endregion Administration stuff

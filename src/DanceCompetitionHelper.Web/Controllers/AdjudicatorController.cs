@@ -27,6 +27,7 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
         }
 
+        [HttpGet]
         public Task<IActionResult> Index(
             Guid id,
             CancellationToken cancellationToken)
@@ -40,28 +41,26 @@ namespace DanceCompetitionHelper.Web.Controllers
                     id,
                     async (indexId, dcH, _, _viewData, cToken) =>
                     {
-                        var foundComp = await _danceCompHelper
-                            .FindCompetitionAsync(
-                                id,
-                                cToken);
+                        var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
+                            dcH,
+                            indexId,
+                            _viewData,
+                            cToken);
 
                         if (foundComp == null)
                         {
                             return null;
                         }
 
-                        var foundCompId = foundComp.CompetitionId;
-                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
                         return
                             new AdjudicatorOverviewViewModel()
                             {
                                 Competition = await _danceCompHelper.GetCompetitionAsync(
-                                    foundCompId,
+                                    foundComp.CompetitionId,
                                     cToken),
                                 OverviewItems = await _danceCompHelper
                                     .GetAdjudicatorsAsync(
-                                        foundCompId,
+                                        foundComp.CompetitionId,
                                         null,
                                         cToken)
                                     .ToListAsync(
@@ -71,6 +70,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public Task<IActionResult> ShowCreateEdit(
             Guid id,
             CancellationToken cancellationToken)
@@ -84,8 +84,10 @@ namespace DanceCompetitionHelper.Web.Controllers
                     id,
                     async (showId, dcH, mapper, _viewData, cToken) =>
                     {
-                        var foundComp = await _danceCompHelper.FindCompetitionAsync(
-                            id,
+                        var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
+                            dcH,
+                            showId,
+                            _viewData,
                             cToken);
 
                         if (foundComp == null)
@@ -93,15 +95,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                             return null;
                         }
 
-                        var foundCompId = foundComp.CompetitionId;
-                        _viewData["Use" + nameof(CompetitionClass)] = foundCompId;
-
                         return await FillAdjudicatorViewModel(
                             dcH,
                             foundComp,
                             new AdjudicatorViewModel()
                             {
-                                CompetitionId = foundCompId,
+                                CompetitionId = foundComp.CompetitionId,
                                 CompetitionName = foundComp.GetCompetitionName(),
                             },
                             cToken);
@@ -110,7 +109,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public Task<IActionResult> CreateNew(
             AdjudicatorViewModel createAdjudicator,
             CancellationToken cancellationToken)
@@ -126,7 +124,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
                     async (model, dcH, _, _viewData, cToken) =>
                     {
-                        await DefaultGetCompetitionAndSetViewData(
+                        await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
                             createAdjudicator.CompetitionId,
                             _viewData,
@@ -164,6 +162,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public Task<IActionResult> ShowEdit(
             Guid id,
             CancellationToken cancellationToken)
@@ -186,16 +185,16 @@ namespace DanceCompetitionHelper.Web.Controllers
                             return null;
                         }
 
-                        var foundComp = await _danceCompHelper.GetCompetitionAsync(
+                        var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
+                            dcH,
                             foundAdjucator.AdjudicatorPanel.CompetitionId,
+                            _viewData,
                             cToken);
 
                         if (foundComp == null)
                         {
                             return null;
                         }
-
-                        _viewData["Use" + nameof(CompetitionClass)] = foundComp.CompetitionId;
 
                         return await FillAdjudicatorViewModel(
                             dcH,
@@ -216,7 +215,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public Task<IActionResult> EditSave(
             AdjudicatorViewModel editAdjudicator,
             CancellationToken cancellationToken)
@@ -234,7 +232,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
                     async (model, dcH, _, _viewData, cToken) =>
                     {
-                        var foundComp = await DefaultGetCompetitionAndSetViewData(
+                        var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
                             model.CompetitionId,
                             _viewData,
@@ -274,6 +272,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)

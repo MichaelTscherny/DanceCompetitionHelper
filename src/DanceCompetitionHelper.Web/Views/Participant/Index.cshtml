@@ -3,8 +3,8 @@
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Extensions;
 @using DanceCompetitionHelper.Web.Models.ParticipantModels;
-@using DanceCompetitionHelper.Web.Models.Pdfs
-@using MigraDoc.DocumentObjectModel
+@using DanceCompetitionHelper.Web.Models.Pdfs;
+@using MigraDoc.DocumentObjectModel;
 
 @model ParticipantOverviewViewModel
 
@@ -16,8 +16,8 @@
 
     ViewData["Title"] = string.Format(
         Model.DetailedView
-            ? "{0} Participants Details of {1}"
-            : "{0} Participants of {1}",
+            ? "{0} Participants Details"
+            : "{0} Participant(s)",
         participantsCount,
         compInfoStr);
 }

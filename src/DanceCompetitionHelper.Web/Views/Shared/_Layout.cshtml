@@ -2,8 +2,8 @@
 @using DanceCompetitionHelper.Web.Controllers;
 
 @{
-    var useCompetitionClass = ViewData["Use" + nameof(CompetitionClass)] as Guid?;
-    var currentViewName = (ViewData["CurrentShowing"] as string) ?? string.Empty;
+    var useCompetitionClass = ViewData[WebConstants.ViewData.Parameter.UseCompetitionClass] as Guid?;
+    @*var currentViewName = (ViewData[WebConstants.ViewData.Parameter.CurrentShowing] as string) ?? string.Empty;*@
 
     var currentControllerName = string.Empty;
     var currentControllerAction = string.Empty;
@@ -14,6 +14,7 @@
     {
         currentControllerName = curControllerName?.ToString();
     }
+
     if(ViewContext.RouteData.Values.TryGetValue(
         "action",
         out var curControllerAction)) 
@@ -35,7 +36,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar nav-underline navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-controller="Competition" asp-action="Index">DaCH</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
@@ -44,59 +45,73 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        @if (useCompetitionClass != null)
-                        {
-                            <li class="nav-item ">
-                                <a class="nav-link @(currentControllerName == CompetitionClassController.RefName && currentControllerAction == nameof(CompetitionClassController.Index) ? "active" : "")"
-                                   asp-controller="@CompetitionClassController.RefName"
-                                   asp-action="@nameof(CompetitionClassController.Index)"
-                                   asp-route-id="@useCompetitionClass">Classes</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link @(currentControllerName == AdjudicatorPanelController.RefName ? "active" : "")"
-                                   asp-controller="@AdjudicatorPanelController.RefName"
-                                   asp-action="@nameof(AdjudicatorPanelController.Index)"
-                                   asp-route-id="@useCompetitionClass">Adj. Panels</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link @(currentControllerName == AdjudicatorController.RefName ? "active" : "")"
-                                   asp-controller="@AdjudicatorController.RefName"
-                                   asp-action="@nameof(AdjudicatorController.Index)"
-                                   asp-route-id="@useCompetitionClass">Adjudicators</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link @(currentControllerName == CompetitionVenueController.RefName ? "active" : "")"
-                                   asp-controller="@CompetitionVenueController.RefName"
-                                   asp-action="@nameof(CompetitionVenueController.Index)"
-                                   asp-route-id="@useCompetitionClass">Venues</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link @(currentControllerName == ParticipantController.RefName ? "active" : "")"
-                                   asp-controller="@ParticipantController.RefName"
-                                   asp-action="@nameof(ParticipantController.Index)"
-                                   asp-route-id="@useCompetitionClass">Participants</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link @(currentControllerName == CompetitionClassController.RefName && currentControllerAction == nameof(CompetitionClassController.ShowMultipleStarters) ? "active" : "")"
-                                   asp-controller="@CompetitionClassController.RefName"
-                                   asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
-                                   asp-route-id="@useCompetitionClass">Multiple Starters</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link @(currentControllerName == CompetitionClassController.RefName && currentControllerAction == nameof(CompetitionClassController.ShowPossiblePromotions) ? "active" : "")"
-                                   asp-controller="@CompetitionClassController.RefName"
-                                   asp-action="@nameof(CompetitionClassController.ShowPossiblePromotions)"
-                                   asp-route-id="@useCompetitionClass">Promotions</a>
-                            </li>
-                        }
-                        <li class="nav-item">
-                            <a class="nav-link @(currentControllerName == ConfigurationController.RefName ? "active" : "")"
-                               asp-controller="@ConfigurationController.RefName"
-                               asp-action="@nameof(ConfigurationController.Index)"
-                               asp-route-id="@useCompetitionClass">Config</a>
-                        </li>
-                    </ul>
+                    <div class="container-fluid ms-0 ps-0">
+                        <div class="row ps-2 fw-bold">
+                            @ViewData[WebConstants.ViewData.Parameter.CompetitionName]
+                        </div>
+                        <div class ="row ">
+                            <ul class="navbar-nav flex-grow-1">
+                                @if (useCompetitionClass != null)
+                                {
+                                    <li class="nav-item ">
+                                        <a class="nav-link @(currentControllerName == CompetitionClassController.RefName 
+                                            && currentControllerAction != nameof(CompetitionClassController.ShowMultipleStarters) 
+                                            && currentControllerAction != nameof(CompetitionClassController.ShowMultipleStartersDependentClassesView)
+                                            && currentControllerAction != nameof(CompetitionClassController.ShowPossiblePromotions) ? "active" : "")"
+                                           asp-controller="@CompetitionClassController.RefName"
+                                           asp-action="@nameof(CompetitionClassController.Index)"
+                                           asp-route-id="@useCompetitionClass">Classes</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentControllerName == AdjudicatorPanelController.RefName ? "active" : "")"
+                                           asp-controller="@AdjudicatorPanelController.RefName"
+                                           asp-action="@nameof(AdjudicatorPanelController.Index)"
+                                           asp-route-id="@useCompetitionClass">Adj. Panels</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentControllerName == AdjudicatorController.RefName ? "active" : "")"
+                                           asp-controller="@AdjudicatorController.RefName"
+                                           asp-action="@nameof(AdjudicatorController.Index)"
+                                           asp-route-id="@useCompetitionClass">Adjudicators</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentControllerName == CompetitionVenueController.RefName ? "active" : "")"
+                                           asp-controller="@CompetitionVenueController.RefName"
+                                           asp-action="@nameof(CompetitionVenueController.Index)"
+                                           asp-route-id="@useCompetitionClass">Venues</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentControllerName == ParticipantController.RefName ? "active" : "")"
+                                           asp-controller="@ParticipantController.RefName"
+                                           asp-action="@nameof(ParticipantController.Index)"
+                                           asp-route-id="@useCompetitionClass">Participants</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentControllerName == CompetitionClassController.RefName 
+                                            && (currentControllerAction == nameof(CompetitionClassController.ShowMultipleStarters) || currentControllerAction == nameof(CompetitionClassController.ShowMultipleStartersDependentClassesView)) ? "active" : "")"
+                                           asp-controller="@CompetitionClassController.RefName"
+                                           asp-action="@nameof(CompetitionClassController.ShowMultipleStarters)"
+                                           asp-route-id="@useCompetitionClass">Multiple Starters</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentControllerName == CompetitionClassController.RefName && currentControllerAction == nameof(CompetitionClassController.ShowPossiblePromotions) ? "active" : "")"
+                                           asp-controller="@CompetitionClassController.RefName"
+                                           asp-action="@nameof(CompetitionClassController.ShowPossiblePromotions)"
+                                           asp-route-id="@useCompetitionClass">Promotions</a>
+                                    </li>
+                                }
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentControllerName == ConfigurationController.RefName ? "active" : "")"
+                                       asp-controller="@ConfigurationController.RefName"
+                                       asp-action="@nameof(ConfigurationController.Index)"
+                                       asp-route-id="@useCompetitionClass">Config</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="row ps-2 fst-italic">
+                            @(ViewData["Title"])
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>

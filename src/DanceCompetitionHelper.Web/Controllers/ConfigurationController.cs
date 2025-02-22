@@ -29,7 +29,7 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
         }
 
-
+        [HttpGet]
         public Task<IActionResult> Index(
             Guid id,
             CancellationToken cancellationToken)
@@ -51,6 +51,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         private async Task<ConfigurationOverviewViewModel> ShowConfig(
              Guid? id,
              ViewDataDictionary? viewData,
@@ -59,8 +60,10 @@ namespace DanceCompetitionHelper.Web.Controllers
              string? errorsAdd = null,
              string? errorsChange = null)
         {
-            var foundComp = await _danceCompHelper.FindCompetitionAsync(
+            var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
+                _danceCompHelper,
                 id,
+                null,
                 cancellationToken);
 
             var foundCompId = foundComp?.CompetitionId ?? Guid.Empty;
@@ -190,7 +193,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public Task<IActionResult> CreateNew(
             ConfigurationViewModel createConfiguration,
             CancellationToken cancellationToken)
@@ -222,7 +224,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public Task<IActionResult> Edit(
             ConfigurationViewModel editConfiguration,
             CancellationToken cancellationToken)
@@ -238,7 +239,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultEditSaveAsync(
                     editConfiguration,
-                    async (model, dcH, mapper, _, cToken) =>
+                    async (model, dcH, mapper, _viewData, cToken) =>
                     {
                         model.SanityCheck();
 
@@ -251,6 +252,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     "{0} with id '{1}' not found!",
                                     nameof(ConfigurationValue),
                                     model.CompetitionId));
+
+                        var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
+                            dcH,
+                            foundConfig.CompetitionId,
+                            _viewData,
+                            cToken);
 
                         // override the values...
                         mapper.Map(
@@ -266,7 +273,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public Task<IActionResult> Delete(
             ConfigurationViewModel deleteConfiguration,
             CancellationToken cancellationToken)
