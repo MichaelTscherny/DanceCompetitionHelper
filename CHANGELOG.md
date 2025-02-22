@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PdfViewModelWrapper model/view: to get "consistent pdf download button" 
     - mandatory parameters - page format, orientation, etc.
     - optional select for Competition Classes
-
+- create (and import) backups
 
 ### Changed
 
@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move all "Delete" buttons to the "Edit" view to availd "deleted by ooopps!.."
     - Add "Modal Delete" for almost all delete buttons = "are you sure" "question
 - Add several (https://xkcd.com/1070/) "Ignore" buttons instead of "Delete"
+- Rework navigation bo be "smaller" - laptop usege
 
 
 ### Removed
