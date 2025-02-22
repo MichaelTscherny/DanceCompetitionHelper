@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.x] ????-??-??
+
+### Added
+
+- PdfGenerator: creates Pdfs using [MigraDoc](https://docs.pdfsharp.net/)
+    - Multiple Starters
+        - Overall
+        - Grouped by dependent classes
+    - Possible Promotions
+    - Participants
+- Multiple Starters: add view "grouped by dependent classes"
+- PdfViewModelWrapper model/view: to get "consistent pdf download button" 
+    - mandatory parameters - page format, orientation, etc.
+    - optional select for Competition Classes
+
+
+### Changed
+
+- Selects/Drop Downs with Competition Classes: OrigId first
+- Move all "Delete" buttons to the "Edit" view to availd "deleted by ooopps!.."
+    - Add "Modal Delete" for almost all delete buttons = "are you sure" "question
+- Add several (https://xkcd.com/1070/) "Ignore" buttons instead of "Delete"
+
+
+### Removed
+
+- none
+
+
 ## [0.6.x] 2024-12-20
 
 ### Added

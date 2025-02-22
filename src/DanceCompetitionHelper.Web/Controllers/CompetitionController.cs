@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.CompetitionModels;
+using DanceCompetitionHelper.Web.Models.Pdfs;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
@@ -317,7 +320,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             if (ModelState.IsValid == false)
             {
                 doImportView.AddErrors(
-                    ModelState); ;
+                    ModelState);
 
                 return View(
                     nameof(ShowImport),
@@ -366,6 +369,23 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             return View(
                 doImportView);
+        }
+
+        [Obsolete("to be removed, dummy onyl!")]
+        public Task<IActionResult> DownloadDummyFile(
+            CancellationToken cancellationToken)
+        {
+            return GetPdfDocumentHelper()
+                .GetDummyPdf(
+                    new PdfViewModel()
+                    {
+                        CompetitionId = Guid.Parse("0623cd95-0929-4d3f-8767-daa17b65d63b"),
+                        CompetitionClassId = Guid.Parse("0c2d36f9-31f8-48ce-86ab-67915bda2df3"),
+
+                        // PageFormat = MigraDoc.DocumentObjectModel.PageFormat.A5,
+                        // Orientation = MigraDoc.DocumentObjectModel.Orientation.Landscape,
+                    },
+                    cancellationToken);
         }
 
         public IActionResult Privacy()

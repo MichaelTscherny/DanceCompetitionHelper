@@ -22,7 +22,8 @@
 }
 
 <div role="group">
-    <form asp-action="@nameof(ConfigurationController.Edit)" method="post">
+    <form asp-controller="@ConfigurationController.RefName"
+          asp-action="@nameof(ConfigurationController.Edit)" method="post">
         <input id="@nameof(ConfigurationViewModel.OriginCompetitionId)"
                name="@nameof(ConfigurationViewModel.OriginCompetitionId)"
                type="hidden"

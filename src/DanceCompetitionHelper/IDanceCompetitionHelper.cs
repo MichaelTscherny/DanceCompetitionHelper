@@ -3,7 +3,9 @@ using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
+
 using Microsoft.EntityFrameworkCore.Storage;
+
 using System.Runtime.CompilerServices;
 
 namespace DanceCompetitionHelper
@@ -41,7 +43,8 @@ namespace DanceCompetitionHelper
             Guid? competitionClassId,
             CancellationToken cancellationToken,
             bool includeInfos = false,
-            bool showAll = false);
+            bool showAll = false,
+            ParticipantFilter? filter = null);
         IAsyncEnumerable<AdjudicatorPanel> GetAdjudicatorPanelsAsync(
             Guid? competitionId,
             CancellationToken cancellationToken,
@@ -77,7 +80,9 @@ namespace DanceCompetitionHelper
             bool includeCompetition = false);
         Task<Participant?> GetParticipantAsync(
             Guid participantId,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken,
+            bool includeCompetition = false,
+            bool includeCompetitionClass = false);
 
         Task<AdjudicatorPanel?> GetAdjudicatorPanelAsync(
             Guid adjudicatorPanelId,
@@ -131,25 +136,6 @@ namespace DanceCompetitionHelper
 
         Task CreateCompetitionClassAsync(
             CompetitionClass createCompetitionClass,
-            CancellationToken cancellationToken);
-
-        Task EditCompetitionClassAsync(
-            Guid competitionClassId,
-            string competitionClassName,
-            Guid? followUpCompetitionClassId,
-            Guid adjudicatorPanelId,
-            string orgClassId,
-            string? discipline,
-            string? ageClass,
-            string? ageGroup,
-            string? className,
-            int minStartsForPromotion,
-            double minPointsForPromotion,
-            double pointsForFirst,
-            int extraManualStarter,
-            string? comment,
-            bool ignore,
-            string? competitionColor,
             CancellationToken cancellationToken);
 
         Task RemoveCompetitionClassAsync(

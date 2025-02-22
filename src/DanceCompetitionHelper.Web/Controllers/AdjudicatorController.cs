@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.AdjudicatorModels;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace DanceCompetitionHelper.Web.Controllers
@@ -83,8 +85,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     async (showId, dcH, mapper, _viewData, cToken) =>
                     {
                         var foundComp = await _danceCompHelper.FindCompetitionAsync(
-                         id,
-                         cancellationToken);
+                            id,
+                            cToken);
 
                         if (foundComp == null)
                         {
@@ -176,8 +178,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     async (showId, dcH, mapper, _viewData, cToken) =>
                     {
                         var foundAdjucator = await _danceCompHelper.GetAdjudicatorAsync(
-                        id,
-                        cancellationToken);
+                            id,
+                            cToken);
 
                         if (foundAdjucator == null)
                         {
@@ -186,7 +188,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
                         var foundComp = await _danceCompHelper.GetCompetitionAsync(
                             foundAdjucator.AdjudicatorPanel.CompetitionId,
-                            cancellationToken);
+                            cToken);
 
                         if (foundComp == null)
                         {
@@ -289,7 +291,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         var helpComp = await _danceCompHelper.FindCompetitionAsync(
                             id,
-                            cancellationToken);
+                            cToken);
 
                         var foundAdj = await dcH.GetAdjudicatorAsync(
                             delId,

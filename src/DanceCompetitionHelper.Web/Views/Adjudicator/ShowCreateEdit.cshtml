@@ -33,7 +33,8 @@
         </div>
     }
 
-    <form asp-action="@formAction" method="post">
+    <form asp-controller="@AdjudicatorController.RefName"
+          asp-action="@formAction" method="post">
         <input asp-for="CompetitionId" />
         <input asp-for="AdjudicatorId" />
 
@@ -127,6 +128,24 @@
                 class="btn btn-secondary px-lg-4">
                 Cancel
             </a>
+
+            @if(isCreate == false) 
+            {
+                <div class="vr"></div>
+                var toDisplay = new DeleteModalWrapper()
+                {
+                    AspController = AdjudicatorController.RefName,
+                    AspAction = nameof(AdjudicatorController.Delete),
+                    RouteId = (Model.AdjudicatorId ?? Guid.Empty).ToString(),
+                    ModalTitle = "Delete Adjudicator",
+                    InfoText = string.Format(
+                        "Really delete adjudicator<br><b>#{0} <i>{1}</i></b>?",
+                        Model.Abbreviation,
+                        Model.Name),
+                };
+                @Html.DisplayFor(
+                    m => toDisplay)
+            }
         </div>
         <br />
     </form>

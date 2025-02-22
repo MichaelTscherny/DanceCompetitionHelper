@@ -9,10 +9,12 @@ using DanceCompetitionHelper.Extensions;
 using DanceCompetitionHelper.Helper;
 using DanceCompetitionHelper.OrgImpl;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using System.Runtime.CompilerServices;
 
 namespace DanceCompetitionHelper
@@ -22,6 +24,10 @@ namespace DanceCompetitionHelper
         private readonly DanceCompetitionHelperDbContext _danceCompHelperDb;
         private readonly ILogger<DanceCompetitionHelperDbContext> _logger;
         private readonly IServiceProvider _serviceProvider;
+
+        public static readonly string DanceCompetitionHelperInfoString = string.Format(
+            "DanceCompetitionHelper (c) 2022-{0}",
+            DateTime.Now.ToString("yyyy"));
 
         public IReadOnlyList<ConfigurationValue> MandatoryConfigurationValues { get; } = new List<ConfigurationValue>()
         {
@@ -561,7 +567,8 @@ namespace DanceCompetitionHelper
             Guid? competitionClassId,
             [EnumeratorCancellation] CancellationToken cancellationToken,
             bool includeInfos = false,
-            bool showAll = false)
+            bool showAll = false,
+            ParticipantFilter? filter = null)
         {
             if (competitionId == null)
             {
@@ -645,6 +652,12 @@ namespace DanceCompetitionHelper
             {
                 qryParticipants = qryParticipants.Where(
                     x => x.CompetitionClassId == foundCompClass.CompetitionClassId);
+            }
+
+            if (filter != null)
+            {
+                qryParticipants = filter.Where(
+                    qryParticipants);
             }
 
             await foreach (var curPart in qryParticipants
@@ -1115,16 +1128,31 @@ namespace DanceCompetitionHelper
                 cancellationToken);
         }
 
-        public async Task<Participant?> GetParticipantAsync(
+        public Task<Participant?> GetParticipantAsync(
             Guid participantId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool includeCompetition = false,
+            bool includeCompetitionClass = false)
         {
-            return await _danceCompHelperDb.Participants
+            var dbSet = _danceCompHelperDb.Participants
                 .TagWith(
-                    nameof(GetParticipantAsync) + "(Guid)[0]")
-                .FirstOrDefaultAsync(
-                    x => x.ParticipantId == participantId,
-                    cancellationToken);
+                    nameof(GetParticipantAsync) + "(Guid)[0]");
+
+            if (includeCompetition)
+            {
+                dbSet = dbSet.Include(
+                    x => x.Competition);
+            }
+
+            if (includeCompetitionClass)
+            {
+                dbSet = dbSet.Include(
+                    x => x.CompetitionClass);
+            }
+
+            return dbSet.FirstOrDefaultAsync(
+                x => x.ParticipantId == participantId,
+                cancellationToken);
         }
 
         public Task<AdjudicatorPanel?> GetAdjudicatorPanelAsync(
@@ -1165,7 +1193,6 @@ namespace DanceCompetitionHelper
 
         #region Competition Crud
 
-        // TODO: rework do "AddCompetition"
         public Task CreateCompetitionAsync(
             Competition newCompetition,
             CancellationToken cancellationToken)
@@ -1248,7 +1275,6 @@ namespace DanceCompetitionHelper
 
         #region CompetitionClass Crud
 
-        // TODO: rework to "AddCompetitionClassAsync"
         public async Task CreateCompetitionClassAsync(
             CompetitionClass createCompetitionClass,
             CancellationToken cancellationToken)
@@ -1283,62 +1309,6 @@ namespace DanceCompetitionHelper
                     "{Method}() done",
                     nameof(CreateCompetitionClassAsync));
             }
-        }
-
-        [Obsolete("do not use", true)]
-        public async Task EditCompetitionClassAsync(
-            Guid competitionClassId,
-            string competitionClassName,
-            Guid? followUpCompetitionClassId,
-            Guid adjudicatorPanelId,
-            string orgClassId,
-            string? discipline,
-            string? ageClass,
-            string? ageGroup,
-            string? className,
-            int minStartsForPromotion,
-            double minPointsForPromotion,
-            double pointsForFirst,
-            int extraManualStarter,
-            string? comment,
-            bool ignore,
-            string? competitionColor,
-            CancellationToken cancellationToken)
-        {
-            var foundCompClass = await GetCompetitionClassAsync(
-                competitionClassId,
-                cancellationToken);
-
-            if (foundCompClass == null)
-            {
-                throw new ArgumentException(
-                    string.Format(
-                        "{0} with id '{1}' not found!",
-                        nameof(CompetitionClass),
-                        competitionClassId));
-            }
-
-            foundCompClass.OrgClassId = orgClassId;
-            foundCompClass.CompetitionClassName = competitionClassName;
-            foundCompClass.FollowUpCompetitionClassId = followUpCompetitionClassId == Guid.Empty
-                ? null
-                : followUpCompetitionClassId;
-            foundCompClass.AdjudicatorPanelId = adjudicatorPanelId;
-            foundCompClass.Discipline = discipline;
-            foundCompClass.AgeClass = ageClass;
-            foundCompClass.AgeGroup = ageGroup;
-            foundCompClass.Class = className;
-            foundCompClass.MinStartsForPromotion = minStartsForPromotion;
-            foundCompClass.MinPointsForPromotion = minPointsForPromotion;
-            foundCompClass.PointsForFirst = pointsForFirst;
-            foundCompClass.ExtraManualStarter = extraManualStarter;
-            foundCompClass.Comment = comment;
-            foundCompClass.Ignore = ignore;
-            foundCompClass.CompetitionColor = competitionColor;
-
-            // TODO: needed?..
-            await _danceCompHelperDb.SaveChangesAsync(
-                cancellationToken);
         }
 
         public Task RemoveCompetitionClassAsync(

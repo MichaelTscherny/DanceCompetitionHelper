@@ -63,11 +63,7 @@
                                asp-route-id="@item.AdjudicatorPanelId"
                                class="bi bi-pencil-square"
                                title="Edit"></a> |
-                            <a asp-controller="@AdjudicatorPanelController.RefName"
-                               asp-action="@nameof(AdjudicatorPanelController.Delete)"
-                               asp-route-id="@item.AdjudicatorPanelId"
-                               class="bi bi-trash3-fill link-danger"
-                               title="Delete"></a>
+                            <i class="bi bi-copy" title="Clone"></i>
                         </td>
                     </tr>
                 }

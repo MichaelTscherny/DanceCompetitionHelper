@@ -46,9 +46,9 @@ for a competition registration.
 ## Technical base
 
 - [C# dotNet core 8.0](https://dotnet.microsoft.com/en-us/) - Win & Linux (x64 each)
-- [ASP.NET Core-Web SDK](https://learn.microsoft.com/de-de/aspnet/core/razor-pages/web-sdk?view=aspnetcore-7.0) for HTTP interfaces
-- [Entity Framework 7](https://learn.microsoft.com/en-us/ef/core/) - [SQLite](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.Sqlite)
-- [MigraDoc](http://www.pdfsharp.net/migradocoverview.ashx?AspxAutoDetectCookieSupport=1) for PDFs
+- [ASP.NET Core-Web 8.0 SDK](https://learn.microsoft.com/en-us/aspnet/core/razor-pages/web-sdk?view=aspnetcore-8.0) for HTTP interfaces
+- [Entity Framework Core 9](https://learn.microsoft.com/en-us/ef/core/) - [SQLite](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.Sqlite)
+- [MigraDoc](https://docs.pdfsharp.net/) for PDFs
 - [NUnit](https://www.nuget.org/packages/NUnit)
 - [req'n'roll](https://reqnroll.net/) (R.I.P: [SpecFlow](https://www.nuget.org/packages/SpecFlow/) :/)
 

@@ -126,11 +126,6 @@
                                asp-route-id="@item.CompetitionId"
                                class="bi bi-arrow-repeat"
                                title="Refresh"></a> |
-                            <a asp-controller="@CompetitionController.RefName"                                
-                               asp-action="@nameof(CompetitionController.Delete)"
-                               asp-route-id="@item.CompetitionId"
-                               class="bi bi-trash3-fill link-danger"
-                               title="Delete"></a> |
                             <a asp-controller="@CompetitionController.RefName"
                                asp-action="@nameof(CompetitionController.CreateTableHistory)"
                                asp-route-id="@item.CompetitionId"
@@ -179,14 +174,21 @@
     </div>
 
     <div class="hstack gap-2 justify-content-center">
-        <a asp-action="@nameof(CompetitionController.ShowCreateEdit)"
+        <a asp-controller="@CompetitionController.RefName" 
+           asp-action="@nameof(CompetitionController.ShowCreateEdit)"
            class="btn btn-primary px-lg-4 bi bi-file-earmark-plus"
            title="Create new">
            Create new</a>&nbsp;
-        <a asp-action="@nameof(CompetitionController.ShowImport)" 
+        <a asp-controller="@CompetitionController.RefName" 
+           asp-action="@nameof(CompetitionController.ShowImport)"
            class="btn btn-primary px-lg-4 bi bi-cloud-download"
            title="Import new/update">
            Import new/update</a>
+        <a asp-controller="@CompetitionController.RefName"
+           asp-action="@nameof(CompetitionController.DownloadDummyFile)" 
+           class="btn btn-primary px-lg-4 bi bi-cloud-download"
+           title="dummy file">
+           dummy file</a>
     </div>
     <br />
 </div>

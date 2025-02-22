@@ -1,4 +1,5 @@
 ﻿@using DanceCompetitionHelper.Database.Enum;
+@using DanceCompetitionHelper.Database.Extensions;
 @using DanceCompetitionHelper.Database.Tables;
 @using DanceCompetitionHelper.Web.Controllers;
 @using DanceCompetitionHelper.Web.Models.ParticipantModels;
@@ -32,7 +33,8 @@
         </div>
     }
 
-    <form asp-action="@formAction" method="post">
+    <form asp-controller="@ParticipantController.RefName"
+          asp-action="@formAction" method="post">
         <input asp-for="CompetitionId" />
         <input asp-for="ParticipantId" />
 
@@ -66,6 +68,8 @@
                 <input asp-for="StartNumber"
                        class="form-control"
                        placeholder="Start Number"
+                       min="0"
+                       max="@int.MaxValue"
                        style="width: 100%" />
                 <span asp-validation-for="StartNumber"
                       class="text-danger"></span>
@@ -122,6 +126,10 @@
             <div class="col-md-4">
                 <input asp-for="OrgPointsPartA"
                        class="form-control"
+                       type="number"
+                       step="0.01"
+                       min="0"
+                       max="@int.MaxValue"
                        placeholder="Points Part-A"
                        style="width: 100%" />
                 <span asp-validation-for="OrgPointsPartA"
@@ -141,6 +149,8 @@
             <div class="col-md-4">
                 <input asp-for="OrgStartsPartA"
                        class="form-control"
+                       min="0"
+                       max="@int.MaxValue"
                        placeholder="Starts Part-A"
                        style="width: 100%" />
                 <span asp-validation-for="OrgStartsPartA"
@@ -160,6 +170,8 @@
             <div class="col-md-4">
                 <input asp-for="MinStartsForPromotionPartA"
                        class="form-control"
+                       min="0"
+                       max="@int.MaxValue"
                        placeholder="Min Starts Part-A for Promotion"
                        style="width: 100%" />
                 <span asp-validation-for="MinStartsForPromotionPartA"
@@ -263,6 +275,10 @@
             <div class="col-md-4">
                 <input asp-for="OrgPointsPartB"
                        class="form-control"
+                       type="number"
+                       step="0.01"
+                       min="0"
+                       max="@int.MaxValue"
                        placeholder="Points Part-B"
                        style="width: 100%" />
                 <span asp-validation-for="OrgPointsPartB"
@@ -282,7 +298,9 @@
             <div class="col-md-4">
                 <input asp-for="OrgStartsPartB"
                        class="form-control"
-                       placeholder="Starts Part-B" 
+                       min="0"
+                       max="@int.MaxValue"
+                       placeholder="Starts Part-B"
                        style="width: 100%" />
                 <span asp-validation-for="OrgStartsPartB"
                       class="text-danger"></span>
@@ -301,6 +319,8 @@
             <div class="col-md-4">
                 <input asp-for="MinStartsForPromotionPartB"
                        class="form-control"
+                       min="0"
+                       max="@int.MaxValue"
                        placeholder="Min Starts Part-B for Promotion"
                        style="width: 100%" />
                 <span asp-validation-for="MinStartsForPromotionPartB"
@@ -446,6 +466,27 @@
                class="btn btn-secondary px-lg-4">
                 Cancel
             </a>
+
+            @if(isCreate == false) 
+            {
+
+                <div class="vr"></div>
+                var toDisplay = new DeleteModalWrapper()
+                {
+                    AspController = ParticipantController.RefName,
+                    AspAction = nameof(ParticipantController.Delete),
+                    RouteId = (Model.ParticipantId ?? Guid.Empty).ToString(),
+                    ModalTitle = "Delete Participant",
+                    InfoText = string.Format(
+                        "Really delete participant<br><b>#{0} <i>{1}</i></b>?",
+                        Model.StartNumber,
+                        HumanReadableExtensions.GetNames(
+                            Model.NamePartA,
+                            Model.NamePartB)),
+                };
+                @Html.DisplayFor(
+                    m => toDisplay)
+            }
         </div>
         <br />
     </form>

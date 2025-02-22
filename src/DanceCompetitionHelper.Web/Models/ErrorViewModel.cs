@@ -6,7 +6,7 @@ namespace DanceCompetitionHelper.Web.Models
     {
         public string? RequestId { get; set; }
 
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+        public bool ShowRequestId => string.IsNullOrEmpty(RequestId) == false;
 
         public List<ModelStateEntry> ModelErrors { get; set; } = new List<ModelStateEntry>();
     }

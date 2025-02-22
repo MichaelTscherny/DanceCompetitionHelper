@@ -1,11 +1,16 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.ParticipantModels;
+using DanceCompetitionHelper.Web.Models.Pdfs;
+
 using Microsoft.AspNetCore.Mvc;
+
+using MigraDoc.DocumentObjectModel;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
@@ -58,11 +63,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                                 .GetParticipantsAsync(
                                     foundCompId,
                                     null,
-                                    cancellationToken,
+                                    cToken,
                                     true,
                                     detailedView)
                                 .ToListAsync(
-                                    cancellationToken),
+                                    cToken),
                             DetailedView = detailedView,
                         };
                     },
@@ -152,11 +157,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                         model.CompetitionClasses = await dcH
                             .GetCompetitionClassesAsync(
                                 createParticipant.CompetitionId,
-                                cancellationToken)
+                                cToken)
                             .ToSelectListItemAsync(
                                 createParticipant.CompetitionClassId)
                             .ToListAsync(
-                                cancellationToken);
+                                cToken);
 
                         return null;
                     })
@@ -170,7 +175,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
                         await dcH.CreateParticipantAsync(
                             newEntity,
-                            cancellationToken);
+                            cToken);
 
                         HttpContext.Session.SetString(
                             ParticipantLastCreatedCompetitionClassId,
@@ -199,7 +204,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         var foundPart = await dcH.GetParticipantAsync(
                             showId,
-                            cancellationToken)
+                            cToken)
                             ?? throw new NoDataFoundException(
                                 string.Format(
                                     "{0} with id '{1}' not found!",
@@ -215,11 +220,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                         partModel.CompetitionClasses = await dcH
                             .GetCompetitionClassesAsync(
                                 foundPart.CompetitionId,
-                                cancellationToken)
+                                cToken)
                             .ToSelectListItemAsync(
                                 foundPart.CompetitionClassId)
                             .ToListAsync(
-                                cancellationToken);
+                                cToken);
 
                         return partModel;
                     },
@@ -254,11 +259,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                         model.CompetitionClasses = await dcH
                             .GetCompetitionClassesAsync(
                                 model.CompetitionId,
-                                cancellationToken)
+                                cToken)
                             .ToSelectListItemAsync(
                                 model.CompetitionClassId)
                             .ToListAsync(
-                                cancellationToken);
+                                cToken);
 
                         return null;
                     })
@@ -268,7 +273,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         var foundPart = await dcH.GetParticipantAsync(
                             model.ParticipantId ?? Guid.Empty,
-                            cancellationToken)
+                            cToken)
                             ?? throw new NoDataFoundException(
                                 string.Format(
                                     "{0} with id '{1}' not found!",
@@ -283,6 +288,68 @@ namespace DanceCompetitionHelper.Web.Controllers
                         return new
                         {
                             Id = model.CompetitionClassId ?? Guid.Empty
+                        };
+                    },
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> Ignore(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<Participant, ParticipantViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(ShowCreateEdit))
+                .SetOnError(
+                    nameof(ShowCreateEdit))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
+                    {
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            _viewData,
+                            cToken);
+
+                        model.CompetitionClasses = await dcH
+                            .GetCompetitionClassesAsync(
+                                model.CompetitionId,
+                                cToken)
+                            .ToSelectListItemAsync(
+                                model.CompetitionClassId)
+                            .ToListAsync(
+                                cToken);
+
+                        return null;
+                    })
+                .DefaultEditSaveAsync(
+                    new ParticipantViewModel()
+                    {
+                        ParticipantId = id,
+                    },
+                    async (model, dcH, mapper, _, cToken) =>
+                    {
+                        var foundPart = await dcH.GetParticipantAsync(
+                            model.ParticipantId ?? Guid.Empty,
+                            cancellationToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(Participant),
+                                    model.ParticipantId));
+
+                        // override the values...
+                        foundPart.Ignore = true;
+
+                        return new
+                        {
+                            Id = foundPart?.CompetitionClassId ?? Guid.Empty
                         };
                     },
                     cancellationToken);
@@ -305,7 +372,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         var helpComp = await _danceCompHelper.FindCompetitionAsync(
                             id,
-                            cancellationToken);
+                            cToken);
 
                         var foundPart = await dcH.GetParticipantAsync(
                             delId,
@@ -325,6 +392,32 @@ namespace DanceCompetitionHelper.Web.Controllers
                             Id = helpComp?.CompetitionId ?? Guid.Empty,
                         };
                     },
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> PdfNumberCards(
+            PdfViewModel pdf,
+            CancellationToken cancellationToken)
+        {
+            // CAUTION: only "A4" implemented yet!..
+            pdf.PageFormat = PageFormat.A4;
+            pdf.PageOrientation = Orientation.Portrait;
+
+            return GetPdfDocumentHelper()
+                .GetNumberCards(
+                    pdf,
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> PdfParticipants(
+            PdfViewModel pdf,
+            CancellationToken cancellationToken)
+        {
+            return GetPdfDocumentHelper()
+                .GetParticipants(
+                    pdf,
                     cancellationToken);
         }
     }

@@ -32,7 +32,6 @@ namespace DanceCompetitionHelper.Database.Extensions
                     x => x.StartNumber);
         }
 
-        // TODO: how to harmonize?..
         public static IOrderedAsyncEnumerable<Participant> ThenByDefault(
             this IOrderedAsyncEnumerable<Participant> byOrderBy)
         {

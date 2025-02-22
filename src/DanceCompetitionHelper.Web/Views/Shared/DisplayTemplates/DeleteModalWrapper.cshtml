@@ -1,0 +1,50 @@
+﻿@using DanceCompetitionHelper.Web.Models
+
+
+@model DeleteModalWrapper
+
+<!-- Button trigger modal -->
+<button type="button"
+        class="btn btn-danger bi bi-trash3-fill" 
+        data-bs-toggle="modal" 
+        data-bs-target="#deleteMoadl_@(Model.ModalId)"
+        title="Delete">
+    Delete
+</button>
+
+<!-- Modal -->
+<div class="modal fade"
+     id="deleteMoadl_@(Model.ModalId)"
+     tabindex="-1" 
+    aria-labelledby="exampleModalLabel" 
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">
+                    @Model.ModalTitle</h1>
+                <button type="button" 
+                    class="btn-close" 
+                    data-bs-dismiss="modal" 
+                    aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+               @Html.Raw(Model.InfoText)
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+
+                <a asp-controller="@Model.AspController"
+                   asp-action="@Model.AspAction"
+                   asp-route-id="@Model.RouteId"
+                   class="btn btn-danger bi bi-trash3-fill"
+                   title="Delete">
+                    Delete
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

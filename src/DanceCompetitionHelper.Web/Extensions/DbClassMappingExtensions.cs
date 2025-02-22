@@ -1,6 +1,6 @@
-﻿using DanceCompetitionHelper.Database.Enum;
-using DanceCompetitionHelper.Database.Extensions;
+﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
+
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DanceCompetitionHelper.Web.Extensions
@@ -8,44 +8,17 @@ namespace DanceCompetitionHelper.Web.Extensions
     public static class DbClassMappingExtensions
     {
         public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
-            this IAsyncEnumerable<OrganizationEnum> organizations,
-            OrganizationEnum? selectedItem = null,
-            bool addEmpty = false)
-        {
-            var retList = new List<SelectListItem>();
-
-            if (addEmpty)
-            {
-                yield return new SelectListItem()
-                {
-                    Value = string.Empty,
-                    Text = "None",
-                    Selected = false,
-                };
-            }
-
-            await foreach (var curItem in organizations ?? AsyncEnumerable.Empty<OrganizationEnum>())
-            {
-                yield return new SelectListItem()
-                {
-                    Value = curItem.ToString(),
-                    Text = curItem.ToString(),
-                    Selected = curItem == selectedItem
-                };
-            }
-        }
-
-        public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
             this IAsyncEnumerable<Competition> competitions,
             Guid? selectedItem = null,
-            bool addEmpty = false)
+            bool addEmpty = false,
+            string emptyText = "None")
         {
             if (addEmpty)
             {
                 yield return new SelectListItem()
                 {
                     Value = string.Empty,
-                    Text = "None",
+                    Text = emptyText ?? "None",
                     Selected = false
                 };
             }
@@ -55,7 +28,8 @@ namespace DanceCompetitionHelper.Web.Extensions
                 yield return new SelectListItem()
                 {
                     Value = curItem.CompetitionId.ToString(),
-                    Text = curItem.GetCompetitionName(),
+                    Text = curItem.GetCompetitionName(
+                        true),
                     Selected = curItem.CompetitionId == selectedItem
                 };
             }
@@ -64,14 +38,15 @@ namespace DanceCompetitionHelper.Web.Extensions
         public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
             this IAsyncEnumerable<CompetitionClass> competitionClasses,
             Guid? selectedItem = null,
-            bool addEmpty = false)
+            bool addEmpty = false,
+            string emptyText = "None")
         {
             if (addEmpty)
             {
                 yield return new SelectListItem()
                 {
                     Value = string.Empty,
-                    Text = "None",
+                    Text = emptyText ?? "None",
                     Selected = false
                 };
             }
@@ -81,7 +56,8 @@ namespace DanceCompetitionHelper.Web.Extensions
                 yield return new SelectListItem()
                 {
                     Value = curItem.CompetitionClassId.ToString(),
-                    Text = curItem.GetCompetitionClassName(),
+                    Text = curItem.GetCompetitionClassName(
+                        true),
                     Selected = curItem.CompetitionClassId == selectedItem
                 };
             }
@@ -90,14 +66,15 @@ namespace DanceCompetitionHelper.Web.Extensions
         public static async IAsyncEnumerable<SelectListItem> ToSelectListItemAsync(
             this IAsyncEnumerable<CompetitionVenue> competitionVenues,
             Guid? selectedItem = null,
-            bool addEmpty = false)
+            bool addEmpty = false,
+            string emptyText = "None")
         {
             if (addEmpty)
             {
                 yield return new SelectListItem()
                 {
                     Value = string.Empty,
-                    Text = "None",
+                    Text = emptyText ?? "None",
                     Selected = false
                 };
             }

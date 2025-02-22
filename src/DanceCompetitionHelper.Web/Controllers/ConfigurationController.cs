@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
-using DanceCompetitionHelper.Extensions;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Models.CompetitionModels;
 using DanceCompetitionHelper.Web.Models.ConfigurationModels;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -45,7 +46,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                         return await ShowConfig(
                             id,
                             _viewData,
-                            cancellationToken);
+                            cToken);
                     },
                     cancellationToken);
         }
@@ -86,15 +87,12 @@ namespace DanceCompetitionHelper.Web.Controllers
 
             if (foundComp == null)
             {
-                availOrgs = await EnumExtensions
-                    .GetValues<OrganizationEnum>()
-                    .ToAsyncEnumerable()
-                    .ToSelectListItemAsync(
-                        anyError
+                availOrgs = BlazorExtensions
+                    .ToSelectListItems(
+                        (anyError
                             ? showConfiguration?.Organization
-                            : null)
-                    .ToListAsync(
-                        cancellationToken);
+                            : null) ?? OrganizationEnum.Any)
+                    .ToList();
 
                 if (useComps != null)
                 {
@@ -111,18 +109,16 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
             else
             {
-                availOrgs = await new[]
+                availOrgs = new[]
                     {
                         foundComp.Organization
                     }
-                    .ToAsyncEnumerable()
-                    .ToSelectListItemAsync(
+                    .ToSelectListItems(
                         anyError
                             ? showConfiguration?.Organization ?? foundComp.Organization
                             : foundComp.Organization,
                         addEmpty: false)
-                    .ToListAsync(
-                        cancellationToken);
+                    .ToList();
                 availComps = await new[]
                     {
                         foundComp

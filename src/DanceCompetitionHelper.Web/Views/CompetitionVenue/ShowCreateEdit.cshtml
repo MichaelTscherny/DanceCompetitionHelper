@@ -34,7 +34,8 @@
         </div>
     }
 
-    <form asp-action="@formAction" method="post">
+    <form asp-controller="@CompetitionVenueController.RefName"
+          asp-action="@formAction" method="post">
         <input asp-for="CompetitionId" />
         <input asp-for="CompetitionVenueId" />
 
@@ -67,7 +68,9 @@
                 <div class="input-group">
                     <span class="input-group-text col-md-3">Length:</span>
                     <input asp-for="LengthInMeter"
-                           class="form-control" />
+                           class="form-control" 
+                           min ="0"
+                           max="@int.MaxValue" />
                 </div>
             </div>
             <div class="col-md text-start">
@@ -86,7 +89,9 @@
                 <div class="input-group">
                     <span class="input-group-text col-md-3">Width:&nbsp;</span>
                     <input asp-for="WidthInMeter"
-                           class="form-control" />
+                           class="form-control"
+                           min="0"
+                           max="@int.MaxValue" />
                 </div>
             </div>
             <div class="col-md text-start">
@@ -127,6 +132,24 @@
                class="btn btn-secondary px-lg-4">
                Cancel
             </a>
+
+            @if(isCreate== false)
+            {
+                <div class="vr"></div>
+                var toDisplay = new DeleteModalWrapper()
+                {
+                    AspController = CompetitionClassController.RefName,
+                    AspAction = nameof(CompetitionClassController.Delete),
+                    RouteId = (Model.CompetitionVenueId ?? Guid.Empty).ToString(),
+                    ModalTitle = "Delete Venue",
+                    InfoText = string.Format(
+                        "Really delete Venue<br><b>{0}</b> for <br><b><i>{1}</i></b>?",
+                        Model.Name,
+                        Model.CompetitionName)
+                };
+                @Html.DisplayFor(
+                    m => toDisplay)
+            }
         </div>
         <br />
     </form>

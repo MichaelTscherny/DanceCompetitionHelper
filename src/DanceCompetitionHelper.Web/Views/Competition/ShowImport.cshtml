@@ -26,7 +26,9 @@
         </div>
     }
 
-    <form asp-action="@nameof(CompetitionController.DoImport)" method="post"
+    <form asp-controller="@CompetitionController.RefName"
+          asp-action="@nameof(CompetitionController.DoImport)" 
+          method="post"
           class="form-horizontal needs-validation border rounded"
           enctype="multipart/form-data"
           role="form">

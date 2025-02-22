@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Web.Helper.Documents;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -42,6 +46,19 @@ namespace DanceCompetitionHelper.Web.Controllers
             where TModel : ViewModelBase
         {
             return new DefaultRequestHandler<TLogger, TType, TModel>(
+                this,
+                _danceCompHelper,
+                _logger,
+                _mapper);
+        }
+
+        public PdfDocumentHelper<TLogger> GetPdfDocumentHelper(
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            return new PdfDocumentHelper<TLogger>(
+                this,
                 _danceCompHelper,
                 _logger,
                 _mapper);

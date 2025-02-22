@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
+
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
+using DanceCompetitionHelper.Web.Enums;
 using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.CompetitionClassModels;
+using DanceCompetitionHelper.Web.Models.Pdfs;
+
 using Microsoft.AspNetCore.Mvc;
+using MigraDoc.DocumentObjectModel;
 
 namespace DanceCompetitionHelper.Web.Controllers
 {
@@ -25,11 +30,11 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
         }
 
-        public async Task<IActionResult> Index(
+        public Task<IActionResult> Index(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await GetDefaultRequestHandler<CompetitionClass, CompetitionClassOverviewViewModel>()
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassOverviewViewModel>()
                 .SetOnSuccess(
                     nameof(Index))
                 .SetOnNoData(
@@ -53,6 +58,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                         return new CompetitionClassOverviewViewModel()
                         {
                             Competition = foundComp,
+                            CompetitionVenues = await dcH
+                                .GetCompetitionVenuesAsync(
+                                    foundCompId,
+                                    cToken)
+                                .ToListAsync(
+                                    cToken),
                             OverviewItems = await dcH
                                 .GetCompetitionClassesAsync(
                                     foundCompId,
@@ -303,6 +314,65 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
+        public Task<IActionResult> Ignore(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            return GetDefaultRequestHandler<CompetitionClass, CompetitionClassViewModel>()
+                .SetOnSuccess(
+                    nameof(Index))
+                .SetOnNoData(
+                    nameof(Index))
+                .SetOnModelStateInvalid(
+                    nameof(Index))
+                .SetOnError(
+                    nameof(Index))
+                .SetOnFunc(
+                    SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
+                    async (model, dcH, _, _viewData, cToken) =>
+                    {
+                        await DefaultGetCompetitionAndSetViewData(
+                            dcH,
+                            model.CompetitionId,
+                            _viewData,
+                            cToken);
+
+                        await FillCompetitionClassViewModel(
+                            dcH,
+                            model.CompetitionId,
+                            model,
+                            cToken);
+
+                        return null;
+                    })
+                .DefaultEditSaveAsync(
+                    new CompetitionClassViewModel()
+                    {
+                        CompetitionClassId = id,
+                    },
+                    async (model, dcH, mapper, _, cToken) =>
+                    {
+                        var foundCompClass = await dcH.GetCompetitionClassAsync(
+                            model.CompetitionClassId ?? Guid.Empty,
+                            cToken)
+                            ?? throw new NoDataFoundException(
+                                string.Format(
+                                    "{0} with id '{1}' not found!",
+                                    nameof(CompetitionClass),
+                                    model.CompetitionClassId));
+
+                        // override the values...
+                        foundCompClass.Ignore = true;
+
+                        return new
+                        {
+                            Id = foundCompClass.CompetitionId
+                        };
+                    },
+                    cancellationToken);
+        }
+
         public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
@@ -341,11 +411,15 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public Task<IActionResult> ShowMultipleStarters(
             Guid id,
+            bool groupedClassesView,
+            GroupForViewEnum? groupForView,
             CancellationToken cancellationToken)
         {
             return GetDefaultRequestHandler<CompetitionClass, ShowMultipleStartersOverviewViewModel>()
                 .SetOnSuccess(
-                    nameof(ShowMultipleStarters))
+                    groupedClassesView
+                        ? nameof(ShowMultipleStartersDependentClassesView)
+                        : nameof(ShowMultipleStarters))
                 .SetOnNoData(
                     nameof(Index))
                 .DefaultShowAsync(
@@ -373,8 +447,45 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     cToken)
                                 .ToListAsync(
                                     cToken),
+                            DependentClassesView = groupedClassesView,
+                            GroupForView = groupForView ?? GroupForViewEnum.None,
                         };
                     },
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> PdfMultipleStarters(
+        PdfViewModel pdf,
+        CancellationToken cancellationToken)
+        {
+            return GetPdfDocumentHelper()
+                .GetMultipleStarters(
+                    pdf,
+                    cancellationToken);
+        }
+
+        public Task<IActionResult> ShowMultipleStartersDependentClassesView(
+            Guid id,
+            GroupForViewEnum? groupForView,
+            CancellationToken cancellationToken)
+        {
+            return ShowMultipleStarters(
+                id,
+                true,
+                groupForView,
+                cancellationToken);
+        }
+
+
+        [HttpGet]
+        public Task<IActionResult> PdfMultipleStartersDependentClassesView(
+        PdfViewModel pdf,
+        CancellationToken cancellationToken)
+        {
+            return GetPdfDocumentHelper()
+                .GetMultipleStartersDependentClassesView(
+                    pdf,
                     cancellationToken);
         }
 
@@ -393,7 +504,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         var foundComp = await dcH.FindCompetitionAsync(
                             showId,
-                            cancellationToken);
+                            cToken);
 
                         if (foundComp == null)
                         {
@@ -430,6 +541,32 @@ namespace DanceCompetitionHelper.Web.Controllers
                                      cToken),
                         };
                     },
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> PdfPossiblePromotions(
+            PdfViewModel pdf,
+            CancellationToken cancellationToken)
+        {
+            return GetPdfDocumentHelper()
+                .GetPossiblePromotions(
+                    pdf,
+                    cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> PdfCompetitionClasses(
+            PdfViewModel pdf,
+            CancellationToken cancellationToken)
+        {
+            // CAUTION: only "A4" implemented yet!..
+            pdf.PageFormat = PageFormat.A4;
+            pdf.PageOrientation = Orientation.Landscape;
+
+            return GetPdfDocumentHelper()
+                .GetCompetitionClasses(
+                    pdf,
                     cancellationToken);
         }
 
