@@ -17,15 +17,13 @@
 
     ViewData["Title"] = string.Format(
         Model.DetailedView
-            ? "{0} Competition Class Details of {1}"
-            : "{0} Competition Classes of {1}",
+            ? "{0} Competition Class Details"
+            : "{0} Competition Class(es)",
         competitionClassesCount,
         compInfoStr);
 }
 
 <div class="text-center">
-    <h1 class="display-6">@ViewData["Title"]</h1>
-
     <div class="table-responsive-xxl">
         <table class="table table-striped table-hover">
             <thead>

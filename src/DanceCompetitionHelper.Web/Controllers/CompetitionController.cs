@@ -9,6 +9,8 @@ using DanceCompetitionHelper.Web.Models.Pdfs;
 
 using Microsoft.AspNetCore.Mvc;
 
+using System.Net.Mime;
+
 namespace DanceCompetitionHelper.Web.Controllers
 {
     public class CompetitionController : ControllerBase<CompetitionController>
@@ -49,6 +51,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             }
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index(
             CancellationToken cancellationToken)
         {
@@ -78,6 +81,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public IActionResult ShowCreateEdit()
         {
             return View(
@@ -85,7 +89,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public Task<IActionResult> CreateNew(
             CompetitionViewModel createCompetition,
             CancellationToken cancellationToken)
@@ -101,7 +104,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
                     async (model, dcH, _, _viewData, cToken) =>
                     {
-                        await DefaultGetCompetitionAndSetViewData(
+                        await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
                             model.CompetitionId,
                             _viewData,
@@ -125,6 +128,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public Task<IActionResult> ShowEdit(
             Guid id,
             CancellationToken cancellationToken)
@@ -136,10 +140,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultShowAsync(
                     id,
-                    async (showId, dcH, mapper, _, cToken) =>
+                    async (showId, dcH, mapper, _viewData, cToken) =>
                     {
-                        var foundComp = await dcH.GetCompetitionAsync(
+                        var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
+                            dcH,
                             showId,
+                            _viewData,
                             cToken)
                             ?? throw new NoDataFoundException(
                                 string.Format(
@@ -154,7 +160,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public Task<IActionResult> EditSave(
             CompetitionViewModel editCompetition,
             CancellationToken cancellationToken)
@@ -172,7 +177,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
                     async (model, dcH, _, _viewData, cToken) =>
                     {
-                        await DefaultGetCompetitionAndSetViewData(
+                        await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
                             model.CompetitionId,
                             _viewData,
@@ -203,6 +208,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public Task<IActionResult> Delete(
             Guid id,
             CancellationToken cancellationToken)
@@ -236,6 +242,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public async Task<IActionResult> CreateTableHistory(
             Guid id,
             CancellationToken cancellationToken)
@@ -276,6 +283,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     "Create History failed");
         }
 
+        [HttpGet]
         public Task<IActionResult> ShowImport(
             Guid? id,
             CancellationToken cancellationToken)
@@ -313,6 +321,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
+        [HttpGet]
         public async Task<IActionResult> DoImport(
             DoImportViewModel doImportView,
             CancellationToken cancellationToken)
@@ -336,14 +345,14 @@ namespace DanceCompetitionHelper.Web.Controllers
                     useParams.Add(
                         nameof(OetsvCompetitionImporter.FindFollowUpClasses),
                         "true");
-                };
+                }
 
                 if (doImportView.UpdateData)
                 {
                     useParams.Add(
                         nameof(OetsvCompetitionImporter.UpdateData),
                         "true");
-                };
+                }
 
                 // TODO: implement more options/file-uploads/etc...
                 var workStatus = await _danceCompHelper.ImportOrUpdateCompetitionAsync(
@@ -371,9 +380,34 @@ namespace DanceCompetitionHelper.Web.Controllers
                 doImportView);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> BackupCompetition(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            var (backupStream, competitionName) = await _danceCompHelper.BackupCompeitionAsStreamAsync(
+                id,
+                _mapper,
+                cancellationToken);
+
+            if (backupStream == null)
+            {
+                return NotFound();
+            }
+
+            return File(
+                backupStream,
+                MediaTypeNames.Application.Json,
+                string.Format(
+                    "Backup {0} {1}.json",
+                    competitionName,
+                    DateTime.Now.ToString("yyyyMMdd_HHmmss")));
+        }
+
+        [HttpGet]
         [Obsolete("to be removed, dummy onyl!")]
         public Task<IActionResult> DownloadDummyFile(
-            CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
         {
             return GetPdfDocumentHelper()
                 .GetDummyPdf(

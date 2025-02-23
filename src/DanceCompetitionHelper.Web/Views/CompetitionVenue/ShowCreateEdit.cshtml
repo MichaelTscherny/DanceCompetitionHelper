@@ -11,7 +11,7 @@
     var isCreate = Model.CompetitionVenueId.HasValue == false;
 
     ViewData["Title"] = string.Format(
-        "{0} Venue for {1}",
+        "{0} Venue",
         isCreate
             ? "Create new"
             : "Edit ",
@@ -138,8 +138,8 @@
                 <div class="vr"></div>
                 var toDisplay = new DeleteModalWrapper()
                 {
-                    AspController = CompetitionClassController.RefName,
-                    AspAction = nameof(CompetitionClassController.Delete),
+                    AspController = CompetitionVenueController.RefName,
+                    AspAction = nameof(CompetitionVenueController.Delete),
                     RouteId = (Model.CompetitionVenueId ?? Guid.Empty).ToString(),
                     ModalTitle = "Delete Venue",
                     InfoText = string.Format(
