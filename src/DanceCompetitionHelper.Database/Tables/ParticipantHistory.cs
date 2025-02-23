@@ -1,5 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
+
 using Microsoft.EntityFrameworkCore;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -82,8 +84,6 @@ namespace DanceCompetitionHelper.Database.Tables
         public bool? OrgAlreadyPromotedPartB { get; set; }
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? OrgAlreadyPromotedInfoPartB { get; set; }
-
-
 
         [MaxLength(DanceCompetitionHelperConstants.MaxLengthStringsShort)]
         public string? Comment { get; set; }

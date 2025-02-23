@@ -201,20 +201,93 @@ namespace DanceCompetitionHelper
                 return (null, string.Empty);
             }
 
+            var allAdjudicatorPanels = await GetAdjudicatorPanelsAsync(
+                competitionId,
+                cancellationToken)
+                .ToListAsync(
+                    cancellationToken);
+            var allAdjudicatorPanelIds = allAdjudicatorPanels
+                .Select(
+                    x => x.AdjudicatorPanelId)
+                .ToHashSet();
+
             var backupData = new CompetitionBackupRoot()
             {
                 Competition = mapper.Map<CompetitionBackup>(
                     curComp),
+                Adjudicators = await GetAdjudicatorsAsync(
+                    competitionId,
+                    null,
+                    cancellationToken)
+                    .Select(
+                        mapper.Map<AdjudicatorBackup>)
+                    .ToListAsync(
+                        cancellationToken),
+                AdjudicatorPanels = await GetAdjudicatorPanelsAsync(
+                    competitionId,
+                    cancellationToken)
+                    .Select(
+                        mapper.Map<AdjudicatorPanelBackup>)
+                    .ToListAsync(
+                        cancellationToken),
                 CompetitionClasses = await GetCompetitionClassesAsync(
                     competitionId,
                     cancellationToken,
                     false,
                     true)
                     .Select(
-                        x => mapper.Map<CompetitionClassBackup>(
-                            x))
+                        mapper.Map<CompetitionClassBackup>)
                     .ToListAsync(
                         cancellationToken),
+                CompetitionVenues = await GetCompetitionVenuesAsync(
+                    competitionId,
+                    cancellationToken)
+                    .Select(
+                        mapper.Map<CompetitionVenueBackup>)
+                    .ToListAsync(
+                        cancellationToken),
+                ConfigurationValues = (await GetConfigurationsAsync(
+                    competitionId,
+                    cancellationToken))
+                    .ConfigurationValues
+                    ?.Select(
+                        mapper.Map<ConfigurationValueBackup>)
+                    ?.ToList()
+                    ?? new List<ConfigurationValueBackup>(),
+                Participants = await GetParticipantsAsync(
+                    competitionId,
+                    null,
+                    cancellationToken)
+                    .Select(
+                        mapper.Map<ParticipantBackup>)
+                    .ToListAsync(
+                        cancellationToken),
+                // History stuff
+                AdjudicatorsHistory = _danceCompHelperDb.AdjudicatorsHistory
+                    .Where(
+                        x => allAdjudicatorPanelIds.Contains(
+                            x.AdjudicatorPanelHistoryId))
+                    .Select(
+                        mapper.Map<AdjudicatorHistoryBackup>)
+                    .ToList(),
+                AdjudicatorPanelHistory = _danceCompHelperDb.AdjudicatorPanelsHistroy
+                    .Where(
+                        x => x.CompetitionId == competitionId)
+                    .Select(
+                        mapper.Map<AdjudicatorPanelHistoryBackup>)
+                    .ToList(),
+                CompetitionClassesHistory = _danceCompHelperDb.CompetitionClassesHistory
+                    .Where(
+                        x => x.CompetitionId == competitionId)
+                    .Select(
+                        mapper.Map<CompetitionClassHistoryBackup>)
+                    .ToList(),
+                ParticipantHistory = _danceCompHelperDb.ParticipantsHistory
+                    .Where(
+                        x => x.CompetitionId == competitionId)
+                    .Select(
+                        mapper.Map<ParticipantHistoryBackup>)
+                    .ToList(),
             };
 
             await JsonSerializer.SerializeAsync(

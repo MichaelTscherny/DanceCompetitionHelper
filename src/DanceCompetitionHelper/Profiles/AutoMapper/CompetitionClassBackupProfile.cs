@@ -10,6 +10,7 @@ namespace DanceCompetitionHelper.Profiles.AutoMapper
         public CompetitionClassBackupProfile()
         {
             CreateMap<CompetitionClass, CompetitionClassBackup>();
+            CreateMap<CompetitionClassBackup, CompetitionClass>();
         }
     }
 }
