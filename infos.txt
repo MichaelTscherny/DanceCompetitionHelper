@@ -1,0 +1,15 @@
+https://www.google.com/search?client=firefox-b-d&q=c%23+asp+net+core+mix+mvc+and+rest
+    https://learn.microsoft.com/en-us/answers/questions/1051702/can-i-have-asp-net-core-mvc-and-web-api-as-single7
+
+https://www.google.com/search?client=firefox-b-d&q=html+drag+and+drop
+    https://www.w3schools.com/html/html5_draganddrop.asp
+    https://www.w3schools.com/html/html5_webstorage.asp
+    
+https://www.google.com/search?client=firefox-b-d&q=bootstrap+drag+and+drjop
+    https://bootsnipp.com/snippets/aMbRy
+    
+https://www.google.com/search?q=html+font+size+depending+on+div+size&client=firefox-b-d&sca_esv=46569ed30a7cac77&ei=qAmdZ6-RLJDPxc8P-p7y0Ac&ved=0ahUKEwivhYulv6CLAxWQZ_EDHXqPHHoQ4dUDCBE&uact=5&oq=html+font+size+depending+on+div+size&gs_lp=Egxnd3Mtd2l6LXNlcnAiJGh0bWwgZm9udCBzaXplIGRlcGVuZGluZyBvbiBkaXYgc2l6ZTIFECEYoAFI6VtQnBhY81pwAXgBkAEAmAGYBKABozOqAQwwLjE3LjYuNS4wLjG4AQPIAQD4AQGYAh6gAvI2wgIKEAAYsAMY1gQYR8ICChAAGIAEGEMYigXCAgUQABiABMICBhAAGBYYHsICCBAAGIAEGKIEwgIFEAAY7wXCAgUQIRifBcICBxAhGKABGAqYAwCIBgGQBgiSBwoxLjEzLjkuNi4xoAfUkwE&sclient=gws-wiz-serp
+    https://stackoverflow.com/questions/16056591/font-scaling-based-on-size-of-container
+    https://www.geeksforgeeks.org/font-scaling-based-on-width-of-container-using-css/
+    https://codepen.io/aknip/pen/GpGevp
+    
