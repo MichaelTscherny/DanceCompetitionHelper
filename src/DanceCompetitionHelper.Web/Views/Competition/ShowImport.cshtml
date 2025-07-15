@@ -24,6 +24,7 @@
         </div>
     }
 
+    <!-- OeTSV IMPORT -->
     <form asp-controller="@CompetitionController.RefName"
           asp-action="@nameof(CompetitionController.DoImport)" 
           method="post"
@@ -36,6 +37,11 @@
         <input asp-for="Organization" value="@nameof(OrganizationEnum.Oetsv)" />
         
         <div class="container">
+            <div class="row row-cols-4 py-1 bg-light">
+                <div class="col-3 text-center fw-bold">
+                    ÖTSV
+                </div>
+            </div>
             <div class="row row-cols-4 py-1">
                 <div class="col-3 text-end">
                     ÖTSV ID
@@ -105,6 +111,50 @@
         </div>
     </form>
     <br />
+    
+    <!-- BACKUP Import -->
+    <form asp-controller="@CompetitionController.RefName"
+          asp-action="@nameof(CompetitionController.DoImport)" 
+          method="post"
+          class="form-horizontal needs-validation border rounded"
+          enctype="multipart/form-data"
+          role="form">
+        
+        <div class="container">
+            <div class="row row-cols-4 py-1 bg-light">
+                <div class="col-3 text-center fw-bold">
+                    From JSON Backup
+                </div>
+            </div>
+            <div class="row row-cols-4 py-1">
+                <div class="col-3 text-end ">
+                    JSON Backup file
+                </div>
+                <div class="col-3">
+                    <input id="backupFile" 
+                           type="file"
+                           class="form-control"
+                           placeholder="JSON Backup File"
+                           style="width: 100%" 
+                           tabindex="1"/>
+                </div>
+                <div class="col-3 text-start">
+                    &nbsp;
+                </div>
+                <div class="col-3 text-start">
+                    <!-- TODO: go on here -->
+                    <button class="btn btn-primary px-lg-4  bi bi-cloud-download" 
+                            type="submit"
+                            disabled
+                            tabindex="10">
+                        Restore Backup
+                    </button>
+                </div>
+            </div>            
+        </div>
+    </form>
+    <br />
+
     <div class="hstack gap-2 justify-content-center">
         <a asp-controller="@CompetitionController.RefName"
            asp-action="@nameof(CompetitionController.Index)"
