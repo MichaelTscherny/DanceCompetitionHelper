@@ -36,11 +36,7 @@ namespace TestHelper.Extensions
             var contextItems = scenarioContext.GetContextPart<T>(
                 contextPart);
 
-            if (contextItems == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(contextPart));
-            }
+            ArgumentNullException.ThrowIfNull(contextItems);
 
             contextItems.Add(
                 itemName,

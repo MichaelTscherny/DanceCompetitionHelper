@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-using DanceCompetitionHelper.Database.Enum;
+﻿using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
@@ -20,12 +18,10 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public ConfigurationController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<ConfigurationController> logger,
-            IMapper mapper)
+            ILogger<ConfigurationController> logger)
             : base(
                 danceCompHelper,
-                logger,
-                mapper)
+                logger)
         {
         }
 
@@ -41,7 +37,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultIndexAsync(
                     Guid.Empty,
-                    async (_, dcH, _, _viewData, cToken) =>
+                    async (_, dcH, _viewData, cToken) =>
                     {
                         return await ShowConfig(
                             id,
@@ -206,10 +202,9 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultCreateNewAsync(
                     createConfiguration,
-                    _mapper.Map<ConfigurationValue>(
-                        createConfiguration),
+                    createConfiguration.Map()!,
                     // ----
-                    async (dcH, newEntity, _, _, cToken) =>
+                    async (dcH, newEntity, _, cToken) =>
                     {
                         await dcH.CreateConfigurationAsync(
                             newEntity,
@@ -239,13 +234,12 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultEditSaveAsync(
                     editConfiguration,
-                    async (model, dcH, mapper, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         model.SanityCheck();
 
                         var foundConfig = await dcH.GetConfigurationAsync(
-                            mapper.Map<ConfigurationValue>(
-                                model),
+                            model.Map(),
                             cToken)
                             ?? throw new NoDataFoundException(
                                 string.Format(
@@ -260,9 +254,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                             cToken);
 
                         // override the values...
+                        /* TODO how to change?..
                         mapper.Map(
                             model,
                             foundConfig);
+                        */
 
                         return new
                         {
@@ -286,11 +282,10 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultDeleteAsync(
                     deleteConfiguration,
-                    async (delConf, dcH, mapper, _, cToken) =>
+                    async (delConf, dcH, _, cToken) =>
                     {
                         var foundConfig = await dcH.GetConfigurationAsync(
-                            mapper.Map<ConfigurationValue>(
-                                delConf),
+                            delConf.Map(),
                             cToken)
                             ?? throw new NoDataFoundException(
                                 string.Format(

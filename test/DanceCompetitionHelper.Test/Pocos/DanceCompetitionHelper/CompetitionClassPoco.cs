@@ -12,8 +12,8 @@
         public string? AgeGroup { get; set; }
         public string? Class { get; set; }
         public int? MinStartsForPromotion { get; set; }
-        public int? MinPointsForPromotion { get; set; }
-        public int? PointsForFirst { get; set; }
+        public double? MinPointsForPromotion { get; set; }
+        public double? PointsForFirst { get; set; }
 
         public int CountParticipants { get; set; }
         public int ExtraPartByWinning { get; set; }
@@ -29,7 +29,7 @@
 
         public CompetitionClassPoco AssertCreate()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     CompetitionName,
@@ -54,7 +54,7 @@
                     Is.Not.Null
                         .And.No.Empty,
                     nameof(AdjudicatorPanelName));
-            });
+            }
 
             return this;
         }

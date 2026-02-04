@@ -38,7 +38,6 @@ namespace DanceCompetitionHelper.Web
                 // Add services to the container.
                 // set up
                 builder.Services
-                    .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
                     .AddHttpClient();
                 builder.Services
                     .AddControllersWithViews()

@@ -1,8 +1,7 @@
-﻿using AutoMapper;
-
-using DanceCompetitionHelper.Database.Tables;
+﻿using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
+using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.CompetitionModels;
 using DanceCompetitionHelper.Web.Models.Pdfs;
@@ -24,12 +23,10 @@ namespace DanceCompetitionHelper.Web.Controllers
         public CompetitionController(
             IDanceCompetitionHelper danceCompHelper,
             ILogger<CompetitionController> logger,
-            IHostApplicationLifetime appLifetime,
-            IMapper mapper)
+            IHostApplicationLifetime appLifetime)
                 : base(
                       danceCompHelper,
-                      logger,
-                      mapper)
+                      logger)
         {
             _appLifetime = appLifetime
                 ?? throw new ArgumentNullException(
@@ -66,7 +63,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultIndexAsync(
                     Guid.Empty,
-                    async (_, dcH, _, _, cToken) =>
+                    async (_, dcH, _, cToken) =>
                     {
                         return new CompetitionOverviewViewModel()
                         {
@@ -102,7 +99,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -114,10 +111,9 @@ namespace DanceCompetitionHelper.Web.Controllers
                     })
                 .DefaultCreateNewAsync(
                     createCompetition,
-                    _mapper.Map<Competition>(
-                        createCompetition),
+                    createCompetition.Map()!,
                     // ----
-                    async (dcH, newEntity, _, _, cToken) =>
+                    async (dcH, newEntity, _, cToken) =>
                     {
                         await dcH.CreateCompetitionAsync(
                             newEntity,
@@ -140,7 +136,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultShowAsync(
                     id,
-                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    async (showId, dcH, _viewData, cToken) =>
                     {
                         var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -153,8 +149,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     nameof(Competition),
                                     id));
 
-                        return mapper.Map<CompetitionViewModel>(
-                            foundComp);
+                        return foundComp.Map();
                     },
                     cancellationToken);
         }
@@ -175,7 +170,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -187,7 +182,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     })
                 .DefaultEditSaveAsync(
                     editCompetition,
-                    async (model, dcH, mapper, _, cToken) =>
+                    async (model, dcH, _, cToken) =>
                     {
                         var foundComp = await dcH.GetCompetitionAsync(
                             model.CompetitionId,
@@ -199,9 +194,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     model.CompetitionId));
 
                         // override the values...
+                        /* TODO: how to change?..
                         mapper.Map(
                             model,
                             foundComp);
+                        */
 
                         return null;
                     },
@@ -222,7 +219,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultDeleteAsync(
                     id,
-                    async (delId, dcH, _, _, cToken) =>
+                    async (delId, dcH, _, cToken) =>
                     {
                         var foundComp = await dcH.GetCompetitionAsync(
                             delId,
@@ -295,7 +292,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultShowAsync(
                     id,
-                    async (showId, dcH, mapper, _, cToken) =>
+                    async (showId, dcH, _, cToken) =>
                     {
                         var retDoImport = new DoImportViewModel()
                         {
@@ -387,7 +384,6 @@ namespace DanceCompetitionHelper.Web.Controllers
         {
             var (backupStream, competitionName) = await _danceCompHelper.BackupCompeitionAsStreamAsync(
                 id,
-                _mapper,
                 cancellationToken);
 
             if (backupStream == null)

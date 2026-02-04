@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-using DanceCompetitionHelper.Database.Extensions;
+﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
@@ -18,12 +16,10 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public AdjudicatorController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<AdjudicatorController> logger,
-            IMapper mapper)
+            ILogger<AdjudicatorController> logger)
             : base(
                 danceCompHelper,
-                logger,
-                mapper)
+                logger)
         {
         }
 
@@ -39,7 +35,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultIndexAsync(
                     id,
-                    async (indexId, dcH, _, _viewData, cToken) =>
+                    async (indexId, dcH, _viewData, cToken) =>
                     {
                         var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -82,7 +78,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultShowAsync(
                     id,
-                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    async (showId, dcH, _viewData, cToken) =>
                     {
                         var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -122,7 +118,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -140,9 +136,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     })
                 .DefaultCreateNewAsync(
                     createAdjudicator,
-                    _mapper.Map<Adjudicator>(
-                        createAdjudicator),
-                    async (dcH, newEntity, _, _, cToken) =>
+                    createAdjudicator.Map()!,
+                    async (dcH, newEntity, _, cToken) =>
                     {
                         newEntity.Abbreviation = newEntity.Abbreviation.ToUpper();
 
@@ -174,7 +169,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultShowAsync(
                     id,
-                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    async (showId, dcH, _viewData, cToken) =>
                     {
                         var foundAdjucator = await _danceCompHelper.GetAdjudicatorAsync(
                             id,
@@ -230,7 +225,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -248,7 +243,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     })
                 .DefaultEditSaveAsync(
                     editAdjudicator,
-                    async (model, dcH, mapper, _, cToken) =>
+                    async (model, dcH, _, cToken) =>
                     {
                         var foundAdjudicator = await dcH.GetAdjudicatorAsync(
                             editAdjudicator.AdjudicatorId ?? Guid.Empty,
@@ -260,9 +255,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     editAdjudicator.AdjudicatorId));
 
                         // override the values...
+                        /* TODO: how to change?..
                         mapper.Map(
                             editAdjudicator,
                             foundAdjudicator);
+                        */
 
                         return new
                         {
@@ -286,7 +283,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultDeleteAsync(
                     id,
-                    async (delId, dcH, _, _, cToken) =>
+                    async (delId, dcH, _, cToken) =>
                     {
                         var helpComp = await _danceCompHelper.FindCompetitionAsync(
                             id,

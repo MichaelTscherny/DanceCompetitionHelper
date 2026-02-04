@@ -2,7 +2,9 @@
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test.Pocos;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
+
 using Microsoft.EntityFrameworkCore;
+
 using TestHelper.Extensions;
 
 namespace DanceCompetitionHelper.Test.Bindings
@@ -76,11 +78,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             DanceCompetitionHelperDbContext dbCtx,
             string byCompetitionName)
         {
-            if (dbCtx == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(dbCtx));
-            }
+            ArgumentNullException.ThrowIfNull(dbCtx);
 
             if (_competitionsByName.TryGetValue(
                 dbCtx,
@@ -111,11 +109,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             Guid byCompetitionId,
             string byAdjudicatorPanelName)
         {
-            if (dbCtx == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(dbCtx));
-            }
+            ArgumentNullException.ThrowIfNull(dbCtx);
 
             if (_adjudicatorPanelsByCompIdAndName.TryGetValue(
                 dbCtx,
@@ -156,11 +150,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             Guid byCompetitionId,
             string? byCompetitionClassName)
         {
-            if (dbCtx == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(dbCtx));
-            }
+            ArgumentNullException.ThrowIfNull(dbCtx);
 
             if (_competitionClassesByCompIdAndName.TryGetValue(
                 dbCtx,
@@ -206,11 +196,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             Guid byCompetitionId,
             string? byCompetitionClassName)
         {
-            if (dbCtx == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(dbCtx));
-            }
+            ArgumentNullException.ThrowIfNull(dbCtx);
 
             if (_competitionClassesHistoryByCompIdAndName.TryGetValue(
                 dbCtx,
@@ -256,11 +242,7 @@ namespace DanceCompetitionHelper.Test.Bindings
             Guid byCompetitionId,
             string? byCompetitionVenueName)
         {
-            if (dbCtx == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(dbCtx));
-            }
+            ArgumentNullException.ThrowIfNull(dbCtx);
 
             if (_competitionVanesByCompIdAndName.TryGetValue(
                 dbCtx,

@@ -2,7 +2,7 @@
 
 namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
 {
-    internal class CompetitionPoco
+    public class CompetitionPoco
     {
         public string CompetitionName { get; set; } = default!;
         public OrganizationEnum Organization { get; set; }
@@ -12,7 +12,7 @@ namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
 
         public CompetitionPoco AssertCreate()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     OrgCompetitionId,
@@ -25,7 +25,7 @@ namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
                     Is.Not.Null
                         .And.No.Empty,
                     nameof(CompetitionName));
-            });
+            }
 
             return this;
         }

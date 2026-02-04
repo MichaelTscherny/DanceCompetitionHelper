@@ -1,6 +1,6 @@
 ﻿namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
 {
-    internal class ParticipantPoco
+    public class ParticipantPoco
     {
         public string CompetitionName { get; set; } = default!;
         public string CompetitionClassName { get; set; } = default!;
@@ -11,13 +11,13 @@
         public string? OrgIdPartB { get; set; }
         public string? ClubName { get; set; }
         public string? OrgIdClub { get; set; }
-        public int OrgPointsPartA { get; set; }
+        public double OrgPointsPartA { get; set; }
         public int OrgStartsPartA { get; set; }
         public int? MinStartsForPromotionPartA { get; set; }
         public bool? OrgAlreadyPromotedPartA { get; set; }
         public string? OrgAlreadyPromotedInfoPartA { get; set; }
 
-        public int? OrgPointsPartB { get; set; }
+        public double? OrgPointsPartB { get; set; }
         public int? OrgStartsPartB { get; set; }
         public int? MinStartsForPromotionPartB { get; set; }
         public bool? OrgAlreadyPromotedPartB { get; set; }
@@ -35,7 +35,7 @@
 
         public ParticipantPoco AssertCreate()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     CompetitionName,
@@ -54,7 +54,7 @@
                     Is.Not.Null
                         .And.No.Empty,
                     nameof(NamePartA));
-            });
+            }
 
             return this;
         }

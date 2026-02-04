@@ -26,6 +26,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
 
         static PdfGenerator()
         {
+            GlobalFontSettings.UseWindowsFontsUnderWindows = true;
             GlobalFontSettings.FontResolver = new UserFontResolver();
         }
 

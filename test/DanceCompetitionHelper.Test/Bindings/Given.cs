@@ -1,15 +1,18 @@
-﻿using AutoMapper;
-using DanceCompetitionHelper.Database;
+﻿using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Database.Test;
 using DanceCompetitionHelper.Database.Test.Pocos;
 using DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
+using DanceCompetitionHelper.Test.Extensions;
 using DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 using System.Diagnostics;
+
 using TestHelper.Extensions;
 
 namespace DanceCompetitionHelper.Test.Bindings
@@ -26,12 +29,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                   scenarioContext)
         {
             _useHost = TestConfiguration.CreateDefaultTestHost(
-                GetNewDbName());
-        }
-
-        public IMapper GetMapper()
-        {
-            return _useHost.Services.GetRequiredService<IMapper>();
+                () => GetNewDbName());
         }
 
         #region Dance Competition Helper Database
@@ -99,7 +97,6 @@ namespace DanceCompetitionHelper.Test.Bindings
             var newComps = table.CreateSet<CompetitionPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
-            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -111,9 +108,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                 try
                 {
                     useDb.Competitions.Add(
-                        mapper.Map<Competition>(
-                            newComp
-                                .AssertCreate()));
+                        newComp
+                            .AssertCreate()
+                            .Map()!);
 
                     await useDb.SaveChangesAsync();
                 }
@@ -140,7 +137,6 @@ namespace DanceCompetitionHelper.Test.Bindings
             var newAdjPanels = table.CreateSet<AdjudicatorPanelPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
-            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -160,9 +156,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.Not.Null,
                         $"{nameof(Competition)} '{newAdjPanel.CompetitionName}' not found!");
 
-                    var newAdjPanelEntity = mapper.Map<AdjudicatorPanel>(
-                        newAdjPanel
-                            .AssertCreate());
+                    var newAdjPanelEntity = newAdjPanel
+                        .AssertCreate()
+                        .Map()!;
                     newAdjPanelEntity.CompetitionId = useComp.CompetitionId;
 
                     useDb.AdjudicatorPanels.Add(
@@ -198,7 +194,6 @@ namespace DanceCompetitionHelper.Test.Bindings
                 CancellationToken.None)
                 ?? throw new ArgumentNullException(
                     "dbTrans");
-            var mapper = GetMapper();
 
             foreach (var newAdj in newAdjs)
             {
@@ -224,9 +219,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.Not.Null,
                         $"{nameof(AdjudicatorPanel)} '{useAdjPanelName}' not found!");
 
-                    var newAdjEntity = mapper.Map<Adjudicator>(
-                        newAdj
-                            .AssertCreate());
+                    var newAdjEntity = newAdj
+                        .AssertCreate()
+                        .Map()!;
                     newAdjEntity.AdjudicatorPanelId = useAdjPanel.AdjudicatorPanelId;
 
                     useDb.Adjudicators.Add(
@@ -261,7 +256,6 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
-            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -305,9 +299,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                 try
                 {
-                    var newComClassEntity = mapper.Map<CompetitionClass>(
-                        newCompClass
-                            .AssertCreate());
+                    var newComClassEntity = newCompClass
+                        .AssertCreate()
+                        .Map()!;
 
                     newComClassEntity.Competition = useComp;
                     newComClassEntity.FollowUpCompetitionClass = useFollowUpCopmpClass;
@@ -342,7 +336,6 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
-            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -362,9 +355,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                 try
                 {
-                    var newCompClassHistEntity = mapper.Map<CompetitionClassHistory>(
-                        newCompClassHist
-                            .AssertCreate());
+                    var newCompClassHistEntity = newCompClassHist
+                        .AssertCreate()
+                        .Map()!;
                     newCompClassHistEntity.Competition = useComp;
 
                     useDb.CompetitionClassesHistory.Add(
@@ -395,7 +388,6 @@ namespace DanceCompetitionHelper.Test.Bindings
             var newCompVenues = table.CreateSet<CompetitionVenuePoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
-            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -415,9 +407,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                         Is.Not.Null,
                         $"{nameof(Competition)} '{newCompVenue.CompetitionName}' not found!");
 
-                    var newCompVenueEntity = mapper.Map<CompetitionVenue>(
-                        newCompVenue
-                            .AssertCreate());
+                    var newCompVenueEntity = newCompVenue
+                        .AssertCreate()
+                        .Map()!;
                     newCompVenueEntity.CompetitionId = useComp.CompetitionId;
 
                     useDb.CompetitionVenues.Add(
@@ -448,7 +440,6 @@ namespace DanceCompetitionHelper.Test.Bindings
             var newParticipants = table.CreateSet<ParticipantPoco>();
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
-            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -478,9 +469,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                 try
                 {
-                    var newPartEntity = mapper.Map<Participant>(
-                        newPart
-                            .AssertCreate());
+                    var newPartEntity = newPart
+                        .AssertCreate()
+                        .Map()!;
 
                     newPartEntity.Competition = useComp;
                     newPartEntity.CompetitionClass = useCompClass;
@@ -514,7 +505,6 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
-            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -544,9 +534,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                 try
                 {
-                    var newPartHistEntity = mapper.Map<ParticipantHistory>(
-                        newPartHist
-                            .AssertCreate());
+                    var newPartHistEntity = newPartHist
+                        .AssertCreate()
+                        .Map()!;
 
                     newPartHistEntity.Competition = useComp;
                     newPartHistEntity.CompetitionClassHistory = useCompClassHist;
@@ -582,7 +572,6 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             var useDb = GetDanceCompetitionHelperDbContext(
                 danceCompHelperDb);
-            var mapper = GetMapper();
 
             using var dbTrans = await useDb.BeginTransactionAsync(
                 CancellationToken.None)
@@ -663,9 +652,9 @@ namespace DanceCompetitionHelper.Test.Bindings
 
                     newCfg.SanityCheck();
 
-                    var newCfgEntity = mapper.Map<ConfigurationValue>(
-                        newCfg
-                            .AssertCreate());
+                    var newCfgEntity = newCfg
+                        .AssertCreate()
+                        .Map()!;
 
                     newCfgEntity.Organization = useOrganization;
                     newCfgEntity.CompetitionId = useCompId;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 using System.Diagnostics;
 
 namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
@@ -12,7 +13,7 @@ namespace DanceCompetitionHelper.Database.Test.Tests.UnitTests
         public DanceCompetitionHelperDbContextTests()
         {
             _useHost = TestConfiguration.CreateDefaultTestHost(
-                GetNewDbName());
+                () => GetNewDbName());
         }
 
         private static long _dbCounter = 0;

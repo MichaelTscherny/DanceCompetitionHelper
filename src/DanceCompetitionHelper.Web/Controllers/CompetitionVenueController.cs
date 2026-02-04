@@ -1,8 +1,7 @@
-﻿using AutoMapper;
-
-using DanceCompetitionHelper.Database.Extensions;
+﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
+using DanceCompetitionHelper.Web.Extensions;
 using DanceCompetitionHelper.Web.Helper.Request;
 using DanceCompetitionHelper.Web.Models.CompetitionVenueModels;
 
@@ -16,12 +15,10 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public CompetitionVenueController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<CompetitionVenueController> logger,
-            IMapper mapper)
+            ILogger<CompetitionVenueController> logger)
             : base(
                 danceCompHelper,
-                logger,
-                mapper)
+                logger)
         {
         }
 
@@ -37,7 +34,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultIndexAsync(
                     id,
-                    async (indexId, dcH, _, _viewData, cToken) =>
+                    async (indexId, dcH, _viewData, cToken) =>
                     {
                         var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -76,7 +73,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultShowAsync(
                     id,
-                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    async (showId, dcH, _viewData, cToken) =>
                     {
                         var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -112,7 +109,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -124,9 +121,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     })
                 .DefaultCreateNewAsync(
                     createCompetitionVenue,
-                    _mapper.Map<CompetitionVenue>(
-                        createCompetitionVenue),
-                    async (dcH, newEntity, _, _, cToken) =>
+                    createCompetitionVenue.Map()!,
+                    async (dcH, newEntity, _, cToken) =>
                     {
                         await dcH.CreateCompetitionVenueAsync(
                         newEntity,
@@ -152,7 +148,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultShowAsync(
                     id,
-                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    async (showId, dcH, _viewData, cToken) =>
                     {
                         var foundCompVenue = await dcH
                             .GetCompetitionVenueAsync(
@@ -202,7 +198,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -214,7 +210,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     })
                 .DefaultEditSaveAsync(
                     editCompetitionVenue,
-                    async (model, dcH, mapper, _, cToken) =>
+                    async (model, dcH, _, cToken) =>
                     {
                         var foundAdjPanel = await dcH.GetCompetitionVenueAsync(
                             editCompetitionVenue.CompetitionVenueId ?? Guid.Empty,
@@ -226,9 +222,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     editCompetitionVenue.CompetitionVenueId));
 
                         // override the values...
+                        /* TODO: how to change?..
                         mapper.Map(
                             editCompetitionVenue,
                             foundAdjPanel);
+                        */
 
                         return new
                         {
@@ -252,7 +250,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultDeleteAsync(
                     id,
-                    async (delId, dcH, _, _, cToken) =>
+                    async (delId, dcH, _, cToken) =>
                     {
                         var foundCompVenue = await dcH.GetCompetitionVenueAsync(
                             delId,

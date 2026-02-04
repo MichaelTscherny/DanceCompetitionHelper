@@ -1,6 +1,7 @@
 ﻿namespace DanceCompetitionHelper.Database.Tables
 {
     using Microsoft.EntityFrameworkCore;
+
     using System.ComponentModel.DataAnnotations;
 
     [Index(nameof(Created), IsUnique = false)]

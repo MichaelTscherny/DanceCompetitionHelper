@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-using DanceCompetitionHelper.Database.Extensions;
+﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Web.Helper.Documents;
 using DanceCompetitionHelper.Web.Helper.Request;
@@ -19,12 +17,10 @@ namespace DanceCompetitionHelper.Web.Controllers
     {
         protected readonly IDanceCompetitionHelper _danceCompHelper;
         protected readonly ILogger<TLogger> _logger;
-        protected readonly IMapper _mapper;
 
         protected ControllerBase(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<TLogger> logger,
-            IMapper mapper)
+            ILogger<TLogger> logger)
         {
             _danceCompHelper = danceCompHelper
                 ?? throw new ArgumentNullException(
@@ -32,9 +28,6 @@ namespace DanceCompetitionHelper.Web.Controllers
             _logger = logger
                 ?? throw new ArgumentNullException(
                     nameof(logger));
-            _mapper = mapper
-                ?? throw new ArgumentNullException(
-                    nameof(mapper));
         }
 
         #region Chaining
@@ -50,8 +43,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             return new DefaultRequestHandler<TLogger, TType, TModel>(
                 this,
                 _danceCompHelper,
-                _logger,
-                _mapper);
+                _logger);
         }
 
         public PdfDocumentHelper<TLogger> GetPdfDocumentHelper(
@@ -62,8 +54,7 @@ namespace DanceCompetitionHelper.Web.Controllers
             return new PdfDocumentHelper<TLogger>(
                 this,
                 _danceCompHelper,
-                _logger,
-                _mapper);
+                _logger);
         }
 
         #endregion Chaining

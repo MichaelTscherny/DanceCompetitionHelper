@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-using DanceCompetitionHelper.Database.Tables;
+﻿using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Controllers;
 using DanceCompetitionHelper.Web.Models.Pdfs;
@@ -16,13 +14,11 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         private readonly ControllerBase<TLogger> _controllerBase;
         private readonly IDanceCompetitionHelper _danceCompHelper;
         private readonly ILogger<TLogger> _logger;
-        private readonly IMapper _mapper;
 
         public PdfDocumentHelper(
             ControllerBase<TLogger> controllerBase,
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<TLogger> logger,
-            IMapper mapper)
+            ILogger<TLogger> logger)
         {
             _controllerBase = controllerBase
                 ?? throw new ArgumentNullException(
@@ -33,14 +29,11 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
             _logger = logger
                 ?? throw new ArgumentNullException(
                     nameof(logger));
-            _mapper = mapper
-                ?? throw new ArgumentNullException(
-                    nameof(mapper));
         }
 
         public async Task<IActionResult> ReturnPdfViewModel<TModel>(
             TModel model,
-            Func<TModel, PdfDocumentHelper<TLogger>, PdfGenerator, IDanceCompetitionHelper, IMapper, CancellationToken, Task<TModel>> geneeratePdfFunc,
+            Func<TModel, PdfDocumentHelper<TLogger>, PdfGenerator, IDanceCompetitionHelper, CancellationToken, Task<TModel>> geneeratePdfFunc,
             CancellationToken cancellationToken)
             where TModel : PdfViewModel
         {
@@ -54,7 +47,6 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
                             this,
                             new PdfGenerator(),
                             dcH,
-                            _mapper,
                             cToken);
                     },
                     cancellationToken);
@@ -90,7 +82,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         {
             return ReturnPdfViewModel(
                 pdfViewModel,
-                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
                         pdfModel.CompetitionId,
@@ -128,7 +120,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         {
             return ReturnPdfViewModel(
                 pdfViewModel,
-                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
                         pdfModel.CompetitionId,
@@ -164,7 +156,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         {
             return ReturnPdfViewModel(
                 pdfViewModel,
-                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
                         pdfModel.CompetitionId,
@@ -216,7 +208,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         {
             return ReturnPdfViewModel(
                 pdfViewModel,
-                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
                         pdfModel.CompetitionId,
@@ -274,7 +266,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         {
             return ReturnPdfViewModel(
                 pdfViewModel,
-                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
                         pdfModel.CompetitionId,
@@ -319,7 +311,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         {
             return ReturnPdfViewModel(
                 pdfViewModel,
-                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, cToken) =>
                 {
                     var foundComp = await dcH.FindCompetitionAsync(
                         pdfModel.CompetitionId,
@@ -382,7 +374,7 @@ namespace DanceCompetitionHelper.Web.Helper.Documents
         {
             return ReturnPdfViewModel(
                 pdfViewModel,
-                async (pdfModel, pdfDocHelper, pdfGen, dcH, mapper, cToken) =>
+                async (pdfModel, pdfDocHelper, pdfGen, dcH, cToken) =>
                 {
                     return new PdfViewModel()
                     {

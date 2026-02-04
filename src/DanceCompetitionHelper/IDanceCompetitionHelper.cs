@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-using DanceCompetitionHelper.Data;
+﻿using DanceCompetitionHelper.Data;
 using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Enum;
@@ -29,7 +27,6 @@ namespace DanceCompetitionHelper
 
         Task<(Stream? BackupStream, string CompetitionName)> BackupCompeitionAsStreamAsync(
             Guid competitionId,
-            IMapper mapper,
             CancellationToken cancellationToken);
 
         #endregion Administration stuff

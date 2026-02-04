@@ -1430,7 +1430,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Helper
         {
             var expectedLength = usePercentages.Length;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     useTableWidths,
@@ -1447,7 +1447,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Helper
                     Has.Length.EqualTo(
                         expectedLength),
                     $"[{name}]: expectedColumnWidths.Length");
-            });
+            }
 
             var test = new SimplePdfTableLayouter(
                 useTableWidth);
@@ -1477,7 +1477,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Helper
 
             test.DoLayout();
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     test.ColumnWidthsPercent,
@@ -1504,7 +1504,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Helper
                             expectedColumnWidths)
                         .AsCollection,
                     $"[{name}]: test.ColumnWidths Values");
-            });
+            }
         }
 
         [Test]
@@ -1521,7 +1521,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Helper
         {
             var expectedLength = usePercentages.Length;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     useTableWidths,
@@ -1538,7 +1538,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Helper
                     Has.Length.EqualTo(
                         expectedLength),
                     $"[{name}]: expectedColumnWidths.Length");
-            });
+            }
 
             var test = new SimplePdfTableLayouter(
                 useTableWidth);
@@ -1577,7 +1577,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Helper
             test.ApplyTo(
                 testTable);
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     testTable.Columns,
@@ -1593,7 +1593,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.Helper
                             expectedColumnWidths[idx]),
                         $"[{name}]: testTable.Column[{idx}]");
                 }
-            });
+            }
         }
     }
 }

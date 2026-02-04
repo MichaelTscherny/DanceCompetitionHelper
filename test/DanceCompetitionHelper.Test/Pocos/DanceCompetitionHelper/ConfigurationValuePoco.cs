@@ -2,7 +2,7 @@
 
 namespace DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper
 {
-    internal class ConfigurationValuePoco
+    public class ConfigurationValuePoco
     {
         public OrganizationEnum? Organization { get; set; }
         public string? CompetitionName { get; set; }
@@ -71,14 +71,14 @@ namespace DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper
 
         public ConfigurationValuePoco AssertCreate()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     Key,
                     Is.Not.Null
                         .And.No.Empty,
                     nameof(Key));
-            });
+            }
 
             return this;
         }

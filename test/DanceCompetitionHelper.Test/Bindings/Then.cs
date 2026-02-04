@@ -35,7 +35,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             try
             {
-                Assert.Multiple(() =>
+                using (Assert.EnterMultipleScope())
                 {
                     foreach (var toChk in checkComps)
                     {
@@ -53,7 +53,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             continue;
                         }
 
-                        Assert.Multiple(() =>
+                        using (Assert.EnterMultipleScope())
                         {
                             Assert.That(
                                 foundComp.CompetitionName,
@@ -80,9 +80,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 Is.EqualTo(
                                     toChk.CompetitionDate ?? UseNow),
                                 $"{toChk}: {nameof(foundComp.CompetitionDate)}");
-                        });
+                        }
                     }
-                });
+                }
             }
             finally
             {
@@ -105,7 +105,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                     "dbTrans");
             try
             {
-                Assert.Multiple(() =>
+                using (Assert.EnterMultipleScope())
                 {
                     foreach (var curChk in checkCompClasses)
                     {
@@ -167,7 +167,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             continue;
                         }
 
-                        Assert.Multiple(() =>
+                        using (Assert.EnterMultipleScope())
                         {
                             Assert.That(
                                 foundCompClass.CompetitionId,
@@ -226,9 +226,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 Is.EqualTo(
                                     curChk.MinPointsForPromotion),
                                 $"{curChk}: {nameof(curChk.MinPointsForPromotion)}");
-                        });
+                        }
                     }
-                });
+                }
             }
             finally
             {
@@ -252,7 +252,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             try
             {
-                Assert.Multiple(() =>
+                using (Assert.EnterMultipleScope())
                 {
                     foreach (var curChk in checkAdjPanels)
                     {
@@ -285,7 +285,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             continue;
                         }
 
-                        Assert.Multiple(() =>
+                        using (Assert.EnterMultipleScope())
                         {
                             Assert.That(
                                 foundAdjPanel.CompetitionId,
@@ -302,9 +302,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 Is.Null.Or.Empty.Or.EqualTo(
                                     curChk.Comment),
                                 $"{curChk}: {nameof(foundComp.Comment)}");
-                        });
+                        }
                     }
-                });
+                }
             }
             finally
             {
@@ -328,7 +328,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             try
             {
-                Assert.Multiple(() =>
+                using (Assert.EnterMultipleScope())
                 {
                     foreach (var curChk in checkAdjs)
                     {
@@ -375,7 +375,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             continue;
                         }
 
-                        Assert.Multiple(() =>
+                        using (Assert.EnterMultipleScope())
                         {
                             Assert.That(
                                 foundAdj.AdjudicatorPanelId,
@@ -397,9 +397,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 Is.Null.Or.Empty.Or.EqualTo(
                                     curChk.Comment),
                                 $"{curChk}: {nameof(curChk.Comment)}");
-                        });
+                        }
                     }
-                });
+                }
             }
             finally
             {
@@ -423,7 +423,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             try
             {
-                Assert.Multiple(() =>
+                using (Assert.EnterMultipleScope())
                 {
                     foreach (var curChkHist in checkCompClassesHist)
                     {
@@ -455,7 +455,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             continue;
                         }
 
-                        Assert.Multiple(() =>
+                        using (Assert.EnterMultipleScope())
                         {
                             Assert.That(
                                 foundCompClassHist.CompetitionId,
@@ -508,9 +508,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 Is.EqualTo(
                                     curChkHist.MinPointsForPromotion),
                                 $"{curChkHist}: {nameof(curChkHist.MinPointsForPromotion)}");
-                        });
+                        }
                     }
-                });
+                }
             }
             finally
             {
@@ -534,7 +534,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             try
             {
-                Assert.Multiple(() =>
+                using (Assert.EnterMultipleScope())
                 {
                     foreach (var curChk in checkCompVanes)
                     {
@@ -567,7 +567,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             continue;
                         }
 
-                        Assert.Multiple(() =>
+                        using (Assert.EnterMultipleScope())
                         {
                             Assert.That(
                                 foundCompVenue.CompetitionId,
@@ -584,9 +584,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 Is.Null.Or.Empty.Or.EqualTo(
                                     curChk.Comment),
                                 $"{curChk}: {nameof(foundComp.Comment)}");
-                        });
+                        }
                     }
-                });
+                }
             }
             finally
             {
@@ -610,7 +610,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             try
             {
-                Assert.Multiple(() =>
+                using (Assert.EnterMultipleScope())
                 {
                     foreach (var curChk in checkParticipants)
                     {
@@ -659,7 +659,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             continue;
                         }
 
-                        Assert.Multiple(() =>
+                        using (Assert.EnterMultipleScope())
                         {
                             Assert.That(
                                 foundParticipant.CompetitionId,
@@ -735,9 +735,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 Is.EqualTo(
                                     curChk.MinStartsForPromotionPartB),
                                 $"{curChk}: {nameof(curChk.MinStartsForPromotionPartB)}");
-                        });
+                        }
                     }
-                });
+                }
             }
             finally
             {
@@ -761,7 +761,7 @@ namespace DanceCompetitionHelper.Test.Bindings
 
             try
             {
-                Assert.Multiple(() =>
+                using (Assert.EnterMultipleScope())
                 {
                     foreach (var curChkHist in checkParticipantsHist)
                     {
@@ -809,7 +809,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             continue;
                         }
 
-                        Assert.Multiple(() =>
+                        using (Assert.EnterMultipleScope())
                         {
                             Assert.That(
                                 foundParticipant.CompetitionId,
@@ -880,9 +880,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 Is.EqualTo(
                                     curChkHist.OrgStartsPartB),
                                 $"{curChkHist}: {nameof(curChkHist.OrgStartsPartB)}");
-                        });
+                        }
                     }
-                });
+                }
             }
             finally
             {
@@ -928,13 +928,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                         nameof(Competition),
                         foundComp.CompetitionName);
 
-                    Assert.Multiple(() =>
+                    using (Assert.EnterMultipleScope())
                     {
-                        if (foundComp == null)
-                        {
-                            throw new ArgumentNullException(
-                                nameof(foundComp));
-                        }
+                        ArgumentNullException.ThrowIfNull(foundComp);
 
                         Assert.That(
                             foundComp.CompetitionName,
@@ -973,7 +969,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                                     chkCmp.CompetitionDate),
                                 $"{compLogString}: {nameof(Competition.CompetitionDate)}");
                         }
-                    });
+                    }
                 }
             });
         }
@@ -1029,7 +1025,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         nameof(CompetitionClass),
                         chkCompClass.CompetitionClassName);
 
-                    Assert.Multiple(() =>
+                    using (Assert.EnterMultipleScope())
                     {
                         Assert.That(
                             foundCompClass,
@@ -1043,14 +1039,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundCompClass?.DisplayInfo?.ExtraParticipants,
                             Is.Not.Null,
                             $"{compClassLogString} not invalid - {nameof(CompetitionClass.DisplayInfo.ExtraParticipants)} missing");
-                    });
+                    }
 
-                    Assert.Multiple(() =>
+                    using (Assert.EnterMultipleScope())
                     {
-                        if (foundCompClass == null)
-                        {
-                            throw new ArgumentNullException();
-                        }
+                        ArgumentNullException.ThrowIfNull(foundCompClass);
 
                         Assert.That(
                             foundCompClass.OrgClassId,
@@ -1141,9 +1134,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                     chkCompClass.PointsForFirst),
                                 $"{compClassLogString}: {nameof(CompetitionClass.PointsForFirst)}");
                         }
-                    });
+                    }
 
-                    Assert.Multiple(() =>
+                    using (Assert.EnterMultipleScope())
                     {
                         if (foundCompClass == null
                             || foundCompClass.DisplayInfo == null
@@ -1178,7 +1171,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Null.Or.Empty.Or.EqualTo(
                                 chkCompClass.ExtraPartByPromotionInfo),
                             $"{compClassLogString}: {nameof(ExtraParticipants.ByPromotionInfo)}");
-                    });
+                    }
                 }
             });
         }
@@ -1227,7 +1220,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         continue;
                     }
 
-                    Assert.Multiple(() =>
+                    using (Assert.EnterMultipleScope())
                     {
                         Assert.That(
                             useCompVenue.Name,
@@ -1239,13 +1232,13 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Empty.Or.Null.Or.EqualTo(
                                 curChk.Comment),
                             $"{curChk.Name}: {nameof(CompetitionVenue.Comment)}");
-                    });
+                    }
                 }
             });
         }
 
         [Then(@"following Counts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
-        public Task ThenFollowingCountsExistsInDanceCompetitionsOfCompetitionHelper(
+        public async Task ThenFollowingCountsExistsInDanceCompetitionsOfCompetitionHelper(
             string danceCompHelper,
             DataTable table)
         {
@@ -1253,11 +1246,11 @@ namespace DanceCompetitionHelper.Test.Bindings
             var useDanceCompHelper = GetDanceCompetitionHelper(
                 danceCompHelper);
 
-            return Assert.MultipleAsync(async () =>
+            using (Assert.EnterMultipleScope())
             {
                 foreach (var curChk in checkCounts)
                 {
-                    await Assert.MultipleAsync(async () =>
+                    using (Assert.EnterMultipleScope())
                     {
                         var foundComp = await useDanceCompHelper.GetCompetitionAsync(
                             curChk.CompetitionName,
@@ -1288,9 +1281,9 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 .CountAsync(),
                             Is.EqualTo(curChk.CountParticipants),
                             "Count Participtans");
-                    });
+                    }
                 }
-            });
+            }
         }
 
         [Then(@"following multiple starts exists in Competitions of DanceCompetitionHelper ""([^""]*)""")]
@@ -1475,7 +1468,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                         chkPart.StartNumber,
                         chkPart.CompetitionClassName);
 
-                    Assert.Multiple(() =>
+                    using (Assert.EnterMultipleScope())
                     {
                         Assert.That(
                             foundPart,
@@ -1493,16 +1486,17 @@ namespace DanceCompetitionHelper.Test.Bindings
                             foundPart?.DisplayInfo?.MultipleStartInfo,
                             Is.Not.Null,
                             $"{partLogString} not invalid - {nameof(Participant.DisplayInfo)}.{nameof(ParticipantDisplayInfo.MultipleStartInfo)} missing");
-                    });
+                    }
 
-                    Assert.Multiple(() =>
+                    using (Assert.EnterMultipleScope())
                     {
                         if (foundPart == null
                             || foundPart.DisplayInfo == null
                             || foundPart.DisplayInfo.PromotionInfo == null
                             || foundPart.DisplayInfo.MultipleStartInfo == null)
                         {
-                            throw new ArgumentNullException();
+                            throw new ArgumentNullException(
+                                nameof(foundPart));
                         }
 
                         Assert.That(
@@ -1532,7 +1526,7 @@ namespace DanceCompetitionHelper.Test.Bindings
                             Is.Null.Or.Empty.Or.EqualTo(
                                 chkPart.PossiblePromotionBInfo),
                             $"{partLogString}: {nameof(CheckPromotionInfo.PossiblePromotionBInfo)}");
-                    });
+                    }
                 }
             });
         }

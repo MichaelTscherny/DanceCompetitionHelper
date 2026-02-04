@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-using DanceCompetitionHelper.Database.Extensions;
+﻿using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Tables;
 using DanceCompetitionHelper.Exceptions;
 using DanceCompetitionHelper.Web.Extensions;
@@ -21,12 +19,10 @@ namespace DanceCompetitionHelper.Web.Controllers
 
         public ParticipantController(
             IDanceCompetitionHelper danceCompHelper,
-            ILogger<ParticipantController> logger,
-            IMapper mapper)
+            ILogger<ParticipantController> logger)
             : base(
                 danceCompHelper,
-                logger,
-                mapper)
+                logger)
         {
         }
 
@@ -43,7 +39,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultIndexAsync(
                     id,
-                    async (showId, dcH, _, _viewData, cToken) =>
+                    async (showId, dcH, _viewData, cToken) =>
                     {
                         var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -97,7 +93,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultShowAsync(
                     id,
-                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    async (showId, dcH, _viewData, cToken) =>
                     {
                         var foundComp = await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -146,7 +142,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -167,9 +163,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                     })
                 .DefaultCreateNewAsync(
                     createParticipant,
-                    _mapper.Map<Participant>(
-                        createParticipant),
-                    async (dcH, newEntity, _, _, cToken) =>
+                    createParticipant.Map()!,
+                    async (dcH, newEntity, _, cToken) =>
                     {
                         var useCompetitionClassId = createParticipant.CompetitionClassId ?? Guid.Empty;
 
@@ -201,7 +196,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultShowAsync(
                     id,
-                    async (showId, dcH, mapper, _viewData, cToken) =>
+                    async (showId, dcH, _viewData, cToken) =>
                     {
                         var foundPart = await dcH.GetParticipantAsync(
                             showId,
@@ -219,17 +214,18 @@ namespace DanceCompetitionHelper.Web.Controllers
                             cToken);
 
                         // override the values...
-                        var partModel = mapper.Map<ParticipantViewModel>(
-                            foundPart);
-
-                        partModel.CompetitionClasses = await dcH
-                            .GetCompetitionClassesAsync(
-                                foundPart.CompetitionId,
-                                cToken)
-                            .ToSelectListItemAsync(
-                                foundPart.CompetitionClassId)
-                            .ToListAsync(
-                                cToken);
+                        var partModel = foundPart.Map();
+                        if (partModel != null)
+                        {
+                            partModel.CompetitionClasses = await dcH
+                                .GetCompetitionClassesAsync(
+                                    foundPart.CompetitionId,
+                                    cToken)
+                                .ToSelectListItemAsync(
+                                    foundPart.CompetitionClassId)
+                                .ToListAsync(
+                                    cToken);
+                        }
 
                         return partModel;
                     },
@@ -252,7 +248,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -273,7 +269,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     })
                 .DefaultEditSaveAsync(
                     editParticipant,
-                    async (model, dcH, mapper, _, cToken) =>
+                    async (model, dcH, _, cToken) =>
                     {
                         var foundPart = await dcH.GetParticipantAsync(
                             model.ParticipantId ?? Guid.Empty,
@@ -285,9 +281,11 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     model.ParticipantId));
 
                         // override the values...
+                        /* TODO: how to change?..
                         mapper.Map(
                             model,
                             foundPart);
+                        */
 
                         return new
                         {
@@ -313,7 +311,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(ShowCreateEdit))
                 .SetOnFunc(
                     SetOnEnum.OnModelStateInvalid | SetOnEnum.OnError,
-                    async (model, dcH, _, _viewData, cToken) =>
+                    async (model, dcH, _viewData, cToken) =>
                     {
                         await DefaultGetCompetitionAndSetViewDataAsync(
                             dcH,
@@ -337,7 +335,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     {
                         ParticipantId = id,
                     },
-                    async (model, dcH, mapper, _, cToken) =>
+                    async (model, dcH, _, cToken) =>
                     {
                         var foundPart = await dcH.GetParticipantAsync(
                             model.ParticipantId ?? Guid.Empty,
@@ -373,7 +371,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     nameof(Index))
                 .DefaultDeleteAsync(
                     id,
-                    async (delId, dcH, _, _, cToken) =>
+                    async (delId, dcH, _, cToken) =>
                     {
                         var helpComp = await _danceCompHelper.FindCompetitionAsync(
                             id,

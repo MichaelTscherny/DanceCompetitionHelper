@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-using DanceCompetitionHelper.Data;
+﻿using DanceCompetitionHelper.Data;
 using DanceCompetitionHelper.Data.Backup;
 using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.DisplayInfo;
@@ -187,7 +185,6 @@ namespace DanceCompetitionHelper
 
         public async Task<(Stream? BackupStream, string CompetitionName)> BackupCompeitionAsStreamAsync(
             Guid competitionId,
-            IMapper mapper,
             CancellationToken cancellationToken)
         {
             var retStream = new MemoryStream();
@@ -213,21 +210,20 @@ namespace DanceCompetitionHelper
 
             var backupData = new CompetitionBackupRoot()
             {
-                Competition = mapper.Map<CompetitionBackup>(
-                    curComp),
+                Competition = curComp.Map()!,
                 Adjudicators = await GetAdjudicatorsAsync(
                     competitionId,
                     null,
                     cancellationToken)
                     .Select(
-                        mapper.Map<AdjudicatorBackup>)
+                        x => x.Map()!)
                     .ToListAsync(
                         cancellationToken),
                 AdjudicatorPanels = await GetAdjudicatorPanelsAsync(
                     competitionId,
                     cancellationToken)
                     .Select(
-                        mapper.Map<AdjudicatorPanelBackup>)
+                        x => x.Map()!)
                     .ToListAsync(
                         cancellationToken),
                 CompetitionClasses = await GetCompetitionClassesAsync(
@@ -236,14 +232,14 @@ namespace DanceCompetitionHelper
                     false,
                     true)
                     .Select(
-                        mapper.Map<CompetitionClassBackup>)
+                        x => x.Map()!)
                     .ToListAsync(
                         cancellationToken),
                 CompetitionVenues = await GetCompetitionVenuesAsync(
                     competitionId,
                     cancellationToken)
                     .Select(
-                        mapper.Map<CompetitionVenueBackup>)
+                        x => x.Map()!)
                     .ToListAsync(
                         cancellationToken),
                 ConfigurationValues = (await GetConfigurationsAsync(
@@ -251,7 +247,7 @@ namespace DanceCompetitionHelper
                     cancellationToken))
                     .ConfigurationValues
                     ?.Select(
-                        mapper.Map<ConfigurationValueBackup>)
+                        x => x.Map()!)
                     ?.ToList()
                     ?? new List<ConfigurationValueBackup>(),
                 Participants = await GetParticipantsAsync(
@@ -259,35 +255,39 @@ namespace DanceCompetitionHelper
                     null,
                     cancellationToken)
                     .Select(
-                        mapper.Map<ParticipantBackup>)
+                        x => x.Map()!)
                     .ToListAsync(
                         cancellationToken),
                 // History stuff
-                AdjudicatorsHistory = _danceCompHelperDb.AdjudicatorsHistory
+                AdjudicatorsHistory = await _danceCompHelperDb.AdjudicatorsHistory
                     .Where(
                         x => allAdjudicatorPanelIds.Contains(
                             x.AdjudicatorPanelHistoryId))
                     .Select(
-                        mapper.Map<AdjudicatorHistoryBackup>)
-                    .ToList(),
-                AdjudicatorPanelHistory = _danceCompHelperDb.AdjudicatorPanelsHistroy
+                        x => x.Map()!)
+                    .ToListAsync(
+                        cancellationToken),
+                AdjudicatorPanelHistory = await _danceCompHelperDb.AdjudicatorPanelsHistroy
                     .Where(
                         x => x.CompetitionId == competitionId)
                     .Select(
-                        mapper.Map<AdjudicatorPanelHistoryBackup>)
-                    .ToList(),
-                CompetitionClassesHistory = _danceCompHelperDb.CompetitionClassesHistory
+                        x => x.Map()!)
+                    .ToListAsync(
+                        cancellationToken),
+                CompetitionClassesHistory = await _danceCompHelperDb.CompetitionClassesHistory
                     .Where(
                         x => x.CompetitionId == competitionId)
                     .Select(
-                        mapper.Map<CompetitionClassHistoryBackup>)
-                    .ToList(),
-                ParticipantHistory = _danceCompHelperDb.ParticipantsHistory
+                        x => x.Map()!)
+                    .ToListAsync(
+                        cancellationToken),
+                ParticipantHistory = await _danceCompHelperDb.ParticipantsHistory
                     .Where(
                         x => x.CompetitionId == competitionId)
                     .Select(
-                        mapper.Map<ParticipantHistoryBackup>)
-                    .ToList(),
+                        x => x.Map()!)
+                    .ToListAsync(
+                        cancellationToken),
             };
 
             await JsonSerializer.SerializeAsync(
@@ -2107,11 +2107,7 @@ namespace DanceCompetitionHelper
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
-            if (func == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(func));
-            }
+            ArgumentNullException.ThrowIfNull(func);
 
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
                 cancellationToken)
@@ -2157,11 +2153,7 @@ namespace DanceCompetitionHelper
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
-            if (func == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(func));
-            }
+            ArgumentNullException.ThrowIfNull(func);
 
             using var dbTrans = await _danceCompHelperDb.BeginTransactionAsync(
                 cancellationToken)

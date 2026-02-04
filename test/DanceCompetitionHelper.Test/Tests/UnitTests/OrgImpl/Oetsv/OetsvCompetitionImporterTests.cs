@@ -30,7 +30,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                     rootPath,
                     @"TestData\Importer\Oetsv\CompetitionImport01_Participants.csv"));
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     testImporter.Oranizer,
@@ -225,7 +225,7 @@ namespace DanceCompetitionHelper.Test.Tests.UnitTests.OrgImpl.Oetsv
                              "Adjudicator 05, Salzburg",
                          }),
                     nameof(testImporter.Adjudicators));
-            });
+            }
 
             Assert.That(
                 testImporter.Participants,

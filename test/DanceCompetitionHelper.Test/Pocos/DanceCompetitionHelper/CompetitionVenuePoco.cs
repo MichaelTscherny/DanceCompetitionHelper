@@ -8,7 +8,7 @@
 
         public CompetitionVenuePoco AssertCreate()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(
                     CompetitionName,
@@ -21,7 +21,7 @@
                     Is.Not.Null
                         .And.No.Empty,
                     nameof(Name));
-            });
+            }
 
             return this;
         }

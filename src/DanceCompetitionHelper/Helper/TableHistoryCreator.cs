@@ -1,5 +1,6 @@
 ﻿using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Tables;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -24,11 +25,7 @@ namespace DanceCompetitionHelper.Helper
         private TableVersionInfo GetTableVersion(
             string tableName)
         {
-            if (DbCtx == null)
-            {
-                throw new ArgumentNullException(
-                    nameof(DbCtx));
-            }
+            ArgumentNullException.ThrowIfNull(DbCtx);
 
             if (TableVersions.TryGetValue(
                 tableName,
@@ -82,12 +79,9 @@ namespace DanceCompetitionHelper.Helper
             CompetitionId = competitionId;
 
             Comment = comment;
-            if (string.IsNullOrEmpty(Comment)
-                || string.IsNullOrWhiteSpace(Comment))
-            {
-                throw new ArgumentNullException(
-                    nameof(comment));
-            }
+
+            ArgumentNullException.ThrowIfNullOrEmpty(comment);
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(comment);
 
             var foundComp = DbCtx.Competitions
                 .TagWith(

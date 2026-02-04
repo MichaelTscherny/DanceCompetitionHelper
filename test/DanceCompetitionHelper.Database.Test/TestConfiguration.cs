@@ -2,9 +2,11 @@
 using DanceCompetitionHelper.Database.Config;
 using DanceCompetitionHelper.Database.Diagnostic;
 using DanceCompetitionHelper.OrgImpl.Oetsv;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using System.Diagnostics;
 
 namespace DanceCompetitionHelper.Database.Test
@@ -12,16 +14,14 @@ namespace DanceCompetitionHelper.Database.Test
     public class TestConfiguration
     {
         public static IHost CreateDefaultTestHost(
-            string sqLiteDbFile) => Host.CreateDefaultBuilder()
+            Func<string> sqLiteDbFile) => Host.CreateDefaultBuilder()
                 .ConfigureServices((_, config) =>
                 {
-                    config.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
                     config.AddDbContext<DanceCompetitionHelperDbContext>();
                     config.AddTransient<IDbConfig>(
                         (srvProv) => new SqLiteDbConfig()
                         {
-                            SqLiteDbFile = sqLiteDbFile,
+                            SqLiteDbFile = sqLiteDbFile(),
                             // LogAllSqls = true,
                         });
                     config.AddTransient(

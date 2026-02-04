@@ -1,6 +1,7 @@
 ﻿using DanceCompetitionHelper.Database.Config;
 using DanceCompetitionHelper.Database.Interfaces;
 using DanceCompetitionHelper.Database.Tables;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -41,13 +42,9 @@ namespace DanceCompetitionHelper.Database
                 ?? throw new ArgumentNullException(
                     nameof(logger));
 
-            if (SqLiteDbConfig == null
-                || string.IsNullOrEmpty(SqLiteDbConfig.SqLiteDbFile)
-                || string.IsNullOrWhiteSpace(SqLiteDbConfig.SqLiteDbFile))
-            {
-                throw new ArgumentNullException(
-                    nameof(sqLiteDbConfig));
-            }
+            ArgumentNullException.ThrowIfNull(SqLiteDbConfig);
+            ArgumentNullException.ThrowIfNullOrEmpty(SqLiteDbConfig.SqLiteDbFile);
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(SqLiteDbConfig.SqLiteDbFile);
 
             SavingChanges += OnSavingChanges;
 
@@ -55,8 +52,9 @@ namespace DanceCompetitionHelper.Database
             if (testSqlFile.Exists == false)
             {
                 _logger.LogDebug(
-                    "Check/Create DB file-directory '{SqLiteDbFileDirectory}'",
-                    testSqlFile.Directory?.FullName);
+                    "Check/Create DB file-directory '{SqLiteDbFileDirectory}' ({SqLiteDbFile})",
+                    testSqlFile.Directory?.FullName,
+                    testSqlFile.FullName);
 
                 testSqlFile.Directory?.Create();
             }
