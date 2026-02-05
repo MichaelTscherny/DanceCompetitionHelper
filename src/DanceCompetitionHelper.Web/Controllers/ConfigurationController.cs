@@ -254,11 +254,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                             cToken);
 
                         // override the values...
-                        /* TODO how to change?..
-                        mapper.Map(
-                            model,
+                        model.Map(
                             foundConfig);
-                        */
 
                         return new
                         {

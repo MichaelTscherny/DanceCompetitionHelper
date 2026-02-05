@@ -9,6 +9,7 @@ namespace DanceCompetitionHelper.Database.Test.Pocos.DanceCompetitionHelper
         public string? OrgCompetitionId { get; set; }
         public string? CompetitionInfo { get; set; }
         public DateTime? CompetitionDate { get; set; }
+        public string? Comment { get; set; }
 
         public CompetitionPoco AssertCreate()
         {

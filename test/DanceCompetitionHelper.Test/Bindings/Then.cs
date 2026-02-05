@@ -699,6 +699,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                                 $"{curChk}: {nameof(curChk.OrgIdPartB)}");
 
                             Assert.That(
+                                foundParticipant.ClubName,
+                                Is.EqualTo(
+                                    curChk.ClubName),
+                                $"{curChk}: {nameof(curChk.ClubName)}");
+                            Assert.That(
                                 foundParticipant.OrgIdClub,
                                 Is.EqualTo(
                                     curChk.OrgIdClub),
@@ -853,6 +858,11 @@ namespace DanceCompetitionHelper.Test.Bindings
                                     curChkHist.OrgIdPartB),
                                 $"{curChkHist}: {nameof(curChkHist.OrgIdPartB)}");
 
+                            Assert.That(
+                                foundParticipant.ClubName,
+                                Is.EqualTo(
+                                    curChkHist.ClubName),
+                                $"{curChkHist}: {nameof(curChkHist.ClubName)}");
                             Assert.That(
                                 foundParticipant.OrgIdClub,
                                 Is.EqualTo(

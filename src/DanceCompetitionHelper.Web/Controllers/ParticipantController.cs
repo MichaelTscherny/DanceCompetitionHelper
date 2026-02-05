@@ -281,11 +281,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     model.ParticipantId));
 
                         // override the values...
-                        /* TODO: how to change?..
-                        mapper.Map(
-                            model,
+                        model.Map(
                             foundPart);
-                        */
 
                         return new
                         {
@@ -347,7 +344,9 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     model.ParticipantId));
 
                         // override the values...
-                        foundPart.Ignore = true;
+                        model.Map(
+                            foundPart);
+                        // foundPart.Ignore = true;
 
                         return new
                         {

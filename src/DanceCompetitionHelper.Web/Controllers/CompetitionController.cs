@@ -194,11 +194,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     model.CompetitionId));
 
                         // override the values...
-                        /* TODO: how to change?..
-                        mapper.Map(
-                            model,
+                        model.Map(
                             foundComp);
-                        */
 
                         return null;
                     },

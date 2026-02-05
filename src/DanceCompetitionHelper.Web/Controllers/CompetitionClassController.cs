@@ -295,11 +295,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     model.CompetitionClassId));
 
                         // override the values...
-                        /* TODO: how to change?..
-                        mapper.Map(
-                            model,
+                        model.Map(
                             foundCompClass);
-                        */
 
                         // mitigate loops...
                         if (foundCompClass.FollowUpCompetitionClassId == foundCompClass.CompetitionClassId)
@@ -309,7 +306,7 @@ namespace DanceCompetitionHelper.Web.Controllers
 
                         return new
                         {
-                            Id = model.CompetitionId
+                            Id = foundCompClass.CompetitionId
                         };
                     },
                     cancellationToken);
@@ -364,7 +361,8 @@ namespace DanceCompetitionHelper.Web.Controllers
                                     model.CompetitionClassId));
 
                         // override the values...
-                        foundCompClass.Ignore = true;
+                        model.Map(
+                            foundCompClass);
 
                         return new
                         {

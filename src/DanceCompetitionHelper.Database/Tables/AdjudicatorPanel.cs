@@ -1,7 +1,9 @@
 ﻿using DanceCompetitionHelper.Database.DisplayInfo;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

@@ -6,7 +6,7 @@
         public string CompetitionClassName { get; set; } = default!;
         public int StartNumber { get; set; }
         public string NamePartA { get; set; } = default!;
-        public string? OrgIdPartA { get; set; } = default!;
+        public string OrgIdPartA { get; set; } = default!;
         public string? NamePartB { get; set; }
         public string? OrgIdPartB { get; set; }
         public string? ClubName { get; set; }
@@ -22,6 +22,8 @@
         public int? MinStartsForPromotionPartB { get; set; }
         public bool? OrgAlreadyPromotedPartB { get; set; }
         public string? OrgAlreadyPromotedInfoPartB { get; set; }
+
+        public string? Comment { get; set; }
 
         public bool Ignore { get; set; }
 

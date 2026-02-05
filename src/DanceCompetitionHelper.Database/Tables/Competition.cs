@@ -2,7 +2,9 @@
 using DanceCompetitionHelper.Database.Enum;
 using DanceCompetitionHelper.Database.Extensions;
 using DanceCompetitionHelper.Database.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

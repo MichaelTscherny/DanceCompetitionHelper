@@ -213,20 +213,17 @@ namespace DanceCompetitionHelper.Web.Controllers
                     async (model, dcH, _, cToken) =>
                     {
                         var foundAdjPanel = await dcH.GetCompetitionVenueAsync(
-                            editCompetitionVenue.CompetitionVenueId ?? Guid.Empty,
+                            model.CompetitionVenueId ?? Guid.Empty,
                             cToken)
                             ?? throw new NoDataFoundException(
                                 string.Format(
                                     "{0} with id '{1}' not found!",
                                     nameof(CompetitionVenue),
-                                    editCompetitionVenue.CompetitionVenueId));
+                                    model.CompetitionVenueId));
 
                         // override the values...
-                        /* TODO: how to change?..
-                        mapper.Map(
-                            editCompetitionVenue,
+                        model.Map(
                             foundAdjPanel);
-                        */
 
                         return new
                         {

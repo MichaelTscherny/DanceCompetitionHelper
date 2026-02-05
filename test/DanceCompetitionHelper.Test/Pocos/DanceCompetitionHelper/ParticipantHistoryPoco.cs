@@ -8,9 +8,10 @@
         public int Version { get; set; }
         public int StartNumber { get; set; }
         public string NamePartA { get; set; } = default!;
-        public string? OrgIdPartA { get; set; } = default!;
+        public string? OrgIdPartA { get; set; }
         public string? NamePartB { get; set; }
         public string? OrgIdPartB { get; set; }
+        public string? ClubName { get; set; }
         public string? OrgIdClub { get; set; }
         public double OrgPointsPartA { get; set; }
         public int OrgStartsPartA { get; set; }
@@ -22,6 +23,7 @@
         public bool? OrgAlreadyPromotedPartB { get; set; }
         public string? OrgAlreadyPromotedInfoPartB { get; set; }
 
+        public string? Comment { get; set; }
         public bool Ignore { get; set; }
 
         public ParticipantHistoryPoco AssertCreate()

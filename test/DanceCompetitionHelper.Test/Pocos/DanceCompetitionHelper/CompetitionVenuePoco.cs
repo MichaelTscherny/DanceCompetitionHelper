@@ -4,6 +4,8 @@
     {
         public string CompetitionName { get; set; } = default!;
         public string Name { get; set; } = default!;
+        public int LengthInMeter { get; set; }
+        public int WidthInMeter { get; set; }
         public string? Comment { get; set; }
 
         public CompetitionVenuePoco AssertCreate()

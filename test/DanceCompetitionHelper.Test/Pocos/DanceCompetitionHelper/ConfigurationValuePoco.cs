@@ -11,6 +11,8 @@ namespace DanceCompetitionHelper.Test.Pocos.DanceCompetitionHelper
         public string Key { get; set; } = default!;
         public string? Value { get; set; }
 
+        public string? Comment { get; set; }
+
         public void SanityCheck()
         {
             var chkOrganizationEmpty = Organization == null || Organization == OrganizationEnum.Any;
