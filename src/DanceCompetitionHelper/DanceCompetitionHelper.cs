@@ -267,7 +267,7 @@ namespace DanceCompetitionHelper
                         x => x.Map()!)
                     .ToListAsync(
                         cancellationToken),
-                AdjudicatorPanelHistory = await _danceCompHelperDb.AdjudicatorPanelsHistroy
+                AdjudicatorPanelHistory = await _danceCompHelperDb.AdjudicatorPanelsHistory
                     .Where(
                         x => x.CompetitionId == competitionId)
                     .Select(

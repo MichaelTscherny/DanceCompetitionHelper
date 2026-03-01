@@ -7,7 +7,6 @@ namespace DanceCompetitionHelper.Data.Backup
         public Guid ParticipantHistoryId { get; set; }
         public Guid CompetitionId { get; set; }
         public Guid CompetitionClassHistoryId { get; set; }
-        public int CompetitionClassHistoryVersion { get; set; }
         public int Version { get; set; }
         public int StartNumber { get; set; }
         public string NamePartA { get; set; } = default!;

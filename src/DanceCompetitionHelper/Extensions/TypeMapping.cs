@@ -47,6 +47,28 @@ namespace DanceCompetitionHelper.Extensions
             return dbTypeMap.Map(source, ret);
         }
 
+        public static AdjudicatorHistory? Map(
+            this Adjudicator source,
+            TableVersionInfo versionInfoCompetition,
+            AdjudicatorHistory? destination = null)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var ret = destination ?? new AdjudicatorHistory();
+            ret.AdjudicatorHistoryId = source.AdjudicatorId;
+            ret.AdjudicatorPanelHistoryId = source.AdjudicatorPanelId;
+            ret.Version = versionInfoCompetition.CurrentVersion;
+            ret.Abbreviation = source.Abbreviation;
+            ret.Name = source.Name;
+            ret.Comment = source.Comment;
+
+            // CAUTION: that's new...
+            return ret;
+        }
+
         #endregion Adjudicator
 
         #region AdjudicatorHistory
@@ -63,7 +85,6 @@ namespace DanceCompetitionHelper.Extensions
             var ret = destination ?? new AdjudicatorHistoryBackup();
             ret.AdjudicatorHistoryId = source.AdjudicatorHistoryId;
             ret.AdjudicatorPanelHistoryId = source.AdjudicatorPanelHistoryId;
-            ret.AdjudicatorPanelHistoryVersion = source.AdjudicatorPanelHistoryVersion;
             ret.Version = source.Version;
             ret.Abbreviation = source.Abbreviation;
             ret.Name = source.Name;
@@ -85,7 +106,6 @@ namespace DanceCompetitionHelper.Extensions
 
             ret.AdjudicatorHistoryId = source.AdjudicatorHistoryId;
             ret.AdjudicatorPanelHistoryId = source.AdjudicatorPanelHistoryId;
-            ret.AdjudicatorPanelHistoryVersion = source.AdjudicatorPanelHistoryVersion;
             ret.Version = source.Version;
             ret.Abbreviation = source.Abbreviation;
             ret.Name = source.Name;
@@ -132,6 +152,27 @@ namespace DanceCompetitionHelper.Extensions
             ret.Comment = source.Comment;
 
             return dbTypeMap.Map(source, ret);
+        }
+
+        public static AdjudicatorPanelHistory? Map(
+            this AdjudicatorPanel source,
+            TableVersionInfo versionInfoCompetition,
+            AdjudicatorPanelHistory? destination = null)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var ret = destination ?? new AdjudicatorPanelHistory();
+            ret.AdjudicatorPanelHistoryId = source.AdjudicatorPanelId;
+            ret.CompetitionId = source.CompetitionId;
+            ret.Version = versionInfoCompetition.CurrentVersion;
+            ret.Name = source.Name;
+            ret.Comment = source.Comment;
+
+            // CAUTION: that's new...
+            return ret;
         }
 
         #endregion AdjudicatorPanel
@@ -288,6 +329,40 @@ namespace DanceCompetitionHelper.Extensions
             return dbTypeMap.Map(source, ret);
         }
 
+        public static CompetitionClassHistory? Map(
+            this CompetitionClass source,
+            TableVersionInfo versionInfoCompetition,
+            CompetitionClassHistory? destination = null)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var ret = destination ?? new CompetitionClassHistory();
+            ret.CompetitionClassHistoryId = source.CompetitionClassId;
+            ret.OrgClassId = source.OrgClassId;
+            ret.CompetitionId = source.CompetitionId;
+            ret.FollowUpCompetitionClassHistoryId = source.FollowUpCompetitionClassId;
+            ret.AdjudicatorPanelHistoryId = source.AdjudicatorPanelId;
+            ret.Version = versionInfoCompetition.CurrentVersion;
+            ret.CompetitionClassName = source.CompetitionClassName;
+            ret.Discipline = source.Discipline;
+            ret.AgeClass = source.AgeClass;
+            ret.AgeGroup = source.AgeGroup;
+            ret.Class = source.Class;
+            ret.MinStartsForPromotion = source.MinStartsForPromotion;
+            ret.MinPointsForPromotion = source.MinPointsForPromotion;
+            ret.PointsForFirst = source.PointsForFirst;
+            ret.ExtraManualStarter = source.ExtraManualStarter;
+            ret.Comment = source.Comment;
+            ret.CompetitionColor = source.CompetitionColor;
+            ret.Ignore = source.Ignore;
+
+            // CAUTION: that's new...
+            return ret;
+        }
+
         #endregion Competition
 
         #region CompetitionClassHistory
@@ -307,7 +382,6 @@ namespace DanceCompetitionHelper.Extensions
             ret.CompetitionId = source.CompetitionId;
             ret.FollowUpCompetitionClassHistoryId = source.FollowUpCompetitionClassHistoryId;
             ret.AdjudicatorPanelHistoryId = source.AdjudicatorPanelHistoryId;
-            ret.AdjudicatorPanelHistoryVersion = source.AdjudicatorPanelHistoryVersion;
             ret.Version = source.Version;
             ret.CompetitionClassName = source.CompetitionClassName;
             ret.Discipline = source.Discipline;
@@ -340,7 +414,6 @@ namespace DanceCompetitionHelper.Extensions
             ret.CompetitionId = source.CompetitionId;
             ret.FollowUpCompetitionClassHistoryId = source.FollowUpCompetitionClassHistoryId;
             ret.AdjudicatorPanelHistoryId = source.AdjudicatorPanelHistoryId;
-            ret.AdjudicatorPanelHistoryVersion = source.AdjudicatorPanelHistoryVersion;
             ret.Version = source.Version;
             ret.CompetitionClassName = source.CompetitionClassName;
             ret.Discipline = source.Discipline;
@@ -402,6 +475,29 @@ namespace DanceCompetitionHelper.Extensions
             return dbTypeMap.Map(source, ret);
         }
 
+        public static CompetitionVenueHistory? Map(
+            this CompetitionVenue source,
+            TableVersionInfo versionInfoCompetition,
+            CompetitionVenueHistory? destination = null)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var ret = destination ?? new CompetitionVenueHistory();
+            ret.CompetitionVenueHistoryId = source.CompetitionVenueId;
+            ret.CompetitionId = source.CompetitionId;
+            ret.Version = versionInfoCompetition.CurrentVersion;
+            ret.Name = source.Name;
+            ret.LengthInMeter = source.LengthInMeter;
+            ret.WidthInMeter = source.WidthInMeter;
+            ret.Comment = source.Comment;
+
+            // CAUTION: that's new...
+            return ret;
+        }
+
         #endregion CompetitionVenue
 
         #region ConfigurationValue
@@ -444,6 +540,30 @@ namespace DanceCompetitionHelper.Extensions
             ret.CompetitionId = source.CompetitionId;
             ret.CompetitionClassId = source.CompetitionClassId;
             ret.CompetitionVenueId = source.CompetitionVenueId;
+            ret.Key = source.Key;
+            ret.Value = source.Value;
+            ret.Comment = source.Comment;
+
+            return dbTypeMap.Map(source, ret);
+        }
+
+        public static ConfigurationValueHistory? Map(
+            this ConfigurationValue source,
+            TableVersionInfo versionInfoCompetition,
+            ConfigurationValueHistory? destination = null)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var ret = destination ?? new ConfigurationValueHistory();
+            ret.ConfigurationValueHistoryId = source.ConfigurationValueId;
+            ret.Organization = source.Organization;
+            ret.CompetitionId = source.CompetitionId;
+            ret.CompetitionClassHistroyId = source.CompetitionClassId;
+            ret.CompetitionVenueHistoryId = source.CompetitionVenueId;
+            ret.Version = versionInfoCompetition.CurrentVersion;
             ret.Key = source.Key;
             ret.Value = source.Value;
             ret.Comment = source.Comment;
@@ -527,6 +647,45 @@ namespace DanceCompetitionHelper.Extensions
             return dbTypeMap.Map(source, ret);
         }
 
+        public static ParticipantHistory? Map(
+            this Participant source,
+            TableVersionInfo versionInfoCompetition,
+            ParticipantHistory? destination = null)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var ret = destination ?? new ParticipantHistory();
+            ret.ParticipantHistoryId = source.ParticipantId;
+            ret.CompetitionId = source.CompetitionId;
+            ret.CompetitionClassHistoryId = source.CompetitionClassId;
+            ret.Version = versionInfoCompetition.CurrentVersion;
+            ret.StartNumber = source.StartNumber;
+            ret.NamePartA = source.NamePartA;
+            ret.OrgIdPartA = source.OrgIdPartA;
+            ret.NamePartB = source.NamePartB;
+            ret.OrgIdPartB = source.OrgIdPartB;
+            ret.ClubName = source.ClubName;
+            ret.OrgIdClub = source.OrgIdClub;
+            ret.OrgPointsPartA = source.OrgPointsPartA;
+            ret.OrgStartsPartA = source.OrgStartsPartA;
+            ret.MinStartsForPromotionPartA = source.MinStartsForPromotionPartA;
+            ret.OrgAlreadyPromotedPartA = source.OrgAlreadyPromotedPartA;
+            ret.OrgAlreadyPromotedInfoPartA = source.OrgAlreadyPromotedInfoPartA;
+            ret.OrgPointsPartB = source.OrgPointsPartB;
+            ret.OrgStartsPartB = source.OrgStartsPartB;
+            ret.MinStartsForPromotionPartB = source.MinStartsForPromotionPartB;
+            ret.OrgAlreadyPromotedPartB = source.OrgAlreadyPromotedPartB;
+            ret.OrgAlreadyPromotedInfoPartB = source.OrgAlreadyPromotedInfoPartB;
+            ret.Comment = source.Comment;
+            ret.Ignore = source.Ignore;
+
+            // CAUTION: that's new...
+            return ret;
+        }
+
         #endregion Participant
 
         #region ParticipantHistory
@@ -544,7 +703,6 @@ namespace DanceCompetitionHelper.Extensions
             ret.ParticipantHistoryId = source.ParticipantHistoryId;
             ret.CompetitionId = source.CompetitionId;
             ret.CompetitionClassHistoryId = source.CompetitionClassHistoryId;
-            ret.CompetitionClassHistoryVersion = source.CompetitionClassHistoryVersion;
             ret.Version = source.Version;
             ret.StartNumber = source.StartNumber;
             ret.NamePartA = source.NamePartA;
@@ -582,7 +740,6 @@ namespace DanceCompetitionHelper.Extensions
             ret.ParticipantHistoryId = source.ParticipantHistoryId;
             ret.CompetitionId = source.CompetitionId;
             ret.CompetitionClassHistoryId = source.CompetitionClassHistoryId;
-            ret.CompetitionClassHistoryVersion = source.CompetitionClassHistoryVersion;
             ret.Version = source.Version;
             ret.StartNumber = source.StartNumber;
             ret.NamePartA = source.NamePartA;

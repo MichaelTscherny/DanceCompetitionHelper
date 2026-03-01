@@ -6,8 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DanceCompetitionHelper.Database.Tables
 {
     [Comment("Histroy of an " + nameof(Tables.Adjudicator) + "of a " + nameof(CompetitionClass))]
-    [Index(nameof(AdjudicatorHistoryId), nameof(AdjudicatorPanelHistoryId), nameof(AdjudicatorPanelHistoryVersion), IsUnique = true)]
-    [Index(nameof(Name), nameof(AdjudicatorPanelHistoryId), nameof(AdjudicatorPanelHistoryVersion), IsUnique = true)]
+    [Index(nameof(AdjudicatorHistoryId), nameof(AdjudicatorPanelHistoryId), nameof(Version), IsUnique = true)]
+    [Index(nameof(Name), nameof(AdjudicatorPanelHistoryId), nameof(Version), IsUnique = true)]
     [PrimaryKey(nameof(AdjudicatorHistoryId), nameof(Version))]
     public class AdjudicatorHistory : TableBase
     {
@@ -20,11 +20,7 @@ namespace DanceCompetitionHelper.Database.Tables
         [Comment("Ref to " + nameof(Tables.AdjudicatorPanelHistory))]
         public Guid AdjudicatorPanelHistoryId { get; set; }
 
-        [Required]
-        [Range(0, int.MaxValue)]
-        public int AdjudicatorPanelHistoryVersion { get; set; }
-
-        [ForeignKey(nameof(AdjudicatorPanelHistoryId) + "," + nameof(AdjudicatorPanelHistoryVersion))]
+        [ForeignKey(nameof(AdjudicatorPanelHistoryId) + "," + nameof(Version))]
         public AdjudicatorPanelHistory AdjudicatorPanelHistory { get; set; } = default!;
 
         [Required]

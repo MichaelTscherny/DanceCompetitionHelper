@@ -1,5 +1,6 @@
 ﻿using DanceCompetitionHelper.Database;
 using DanceCompetitionHelper.Database.Tables;
+using DanceCompetitionHelper.Extensions;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,6 @@ namespace DanceCompetitionHelper.Helper
         private readonly ILogger<TableHistoryCreator> _logger;
 
         public DanceCompetitionHelperDbContext? DbCtx { get; private set; }
-        public Dictionary<string, TableVersionInfo> TableVersions { get; } = new Dictionary<string, TableVersionInfo>();
         public Guid CompetitionId { get; private set; }
         public string? Comment { get; private set; }
 
@@ -22,48 +22,37 @@ namespace DanceCompetitionHelper.Helper
                 nameof(logger));
         }
 
-        private TableVersionInfo GetTableVersion(
-            string tableName)
+        private TableVersionInfo GetTableVersion()
         {
             ArgumentNullException.ThrowIfNull(DbCtx);
 
-            if (TableVersions.TryGetValue(
-                tableName,
-                out var tableVersionInfo) == false)
+            var tableVersionInfo = DbCtx.TableVersionInfos
+                .TagWith(
+                    nameof(GetTableVersion))
+                .OrderByDescending(
+                    x => x.CurrentVersion)
+                .FirstOrDefault(
+                    x => x.CompetitionId == CompetitionId);
+
+            if (tableVersionInfo == null)
             {
-                tableVersionInfo = DbCtx.TableVersionInfos
-                    .TagWith(
-                        nameof(GetTableVersion))
-                    .OrderByDescending(
-                        x => x.CurrentVersion)
-                    .FirstOrDefault(
-                        x => x.CompetitionId == CompetitionId
-                        && x.TableName == tableName);
-
-                if (tableVersionInfo == null)
-                {
-                    tableVersionInfo = DbCtx.TableVersionInfos.Add(
-                        new TableVersionInfo()
-                        {
-                            CompetitionId = CompetitionId,
-                            TableName = tableName,
-                            CurrentVersion = 1,
-                            Comment = this.Comment ?? string.Empty,
-                        }).Entity;
-                }
-                else
-                {
-                    tableVersionInfo = DbCtx.TableVersionInfos.Add(
-                        new TableVersionInfo()
-                        {
-                            CompetitionId = CompetitionId,
-                            TableName = tableName,
-                            CurrentVersion = tableVersionInfo.CurrentVersion + 1,
-                            Comment = this.Comment ?? string.Empty,
-                        }).Entity;
-                }
-
-                TableVersions[tableName] = tableVersionInfo;
+                tableVersionInfo = DbCtx.TableVersionInfos.Add(
+                    new TableVersionInfo()
+                    {
+                        CompetitionId = CompetitionId,
+                        CurrentVersion = 1,
+                        Comment = this.Comment ?? string.Empty,
+                    }).Entity;
+            }
+            else
+            {
+                tableVersionInfo = DbCtx.TableVersionInfos.Add(
+                    new TableVersionInfo()
+                    {
+                        CompetitionId = CompetitionId,
+                        CurrentVersion = tableVersionInfo.CurrentVersion + 1,
+                        Comment = this.Comment ?? string.Empty,
+                    }).Entity;
             }
 
             return tableVersionInfo;
@@ -89,15 +78,7 @@ namespace DanceCompetitionHelper.Helper
                 .First(
                     x => x.CompetitionId == CompetitionId);
 
-            var foundAdjPanHistory = GetTableVersion(
-                nameof(DbCtx.AdjudicatorPanels));
-            var foundAdjHistory = GetTableVersion(
-                nameof(DbCtx.Adjudicators));
-
-            var foundCompClassesVersion = GetTableVersion(
-                nameof(DbCtx.CompetitionClasses));
-            var foundPartVersion = GetTableVersion(
-                nameof(DbCtx.Participants));
+            var foundCompHistory = GetTableVersion();
 
             foreach (var toBackup in DbCtx.AdjudicatorPanels
                 .TagWith(
@@ -105,15 +86,9 @@ namespace DanceCompetitionHelper.Helper
                 .Where(
                     x => x.CompetitionId == CompetitionId))
             {
-                DbCtx.AdjudicatorPanelsHistroy.Add(
-                    new AdjudicatorPanelHistory()
-                    {
-                        AdjudicatorPanelHistoryId = toBackup.AdjudicatorPanelId,
-                        CompetitionId = toBackup.CompetitionId,
-                        Version = foundAdjPanHistory.CurrentVersion,
-                        Name = toBackup.Name,
-                        Comment = toBackup.Comment,
-                    });
+                DbCtx.AdjudicatorPanelsHistory.Add(
+                    toBackup.Map(
+                        foundCompHistory)!);
 
                 foreach (var toBackupSub in DbCtx.Adjudicators
                     .TagWith(
@@ -122,16 +97,8 @@ namespace DanceCompetitionHelper.Helper
                         x => x.AdjudicatorPanelId == toBackup.AdjudicatorPanelId))
                 {
                     DbCtx.AdjudicatorsHistory.Add(
-                        new AdjudicatorHistory()
-                        {
-                            AdjudicatorHistoryId = toBackupSub.AdjudicatorId,
-                            AdjudicatorPanelHistoryId = toBackupSub.AdjudicatorPanelId,
-                            AdjudicatorPanelHistoryVersion = foundAdjPanHistory.CurrentVersion,
-                            Version = foundAdjHistory.CurrentVersion,
-                            Abbreviation = toBackupSub.Abbreviation,
-                            Name = toBackupSub.Name,
-                            Comment = toBackupSub.Comment,
-                        });
+                        toBackupSub.Map(
+                            foundCompHistory)!);
                 }
             }
 
@@ -142,26 +109,19 @@ namespace DanceCompetitionHelper.Helper
                     x => x.CompetitionId == CompetitionId))
             {
                 DbCtx.CompetitionClassesHistory.Add(
-                    new CompetitionClassHistory()
-                    {
-                        CompetitionClassHistoryId = toBackup.CompetitionClassId,
-                        OrgClassId = toBackup.OrgClassId,
-                        CompetitionId = toBackup.CompetitionId,
-                        AdjudicatorPanelHistoryId = toBackup.AdjudicatorPanelId,
-                        AdjudicatorPanelHistoryVersion = foundAdjPanHistory.CurrentVersion,
-                        Version = foundCompClassesVersion.CurrentVersion,
-                        CompetitionClassName = toBackup.CompetitionClassName,
-                        Discipline = toBackup.Discipline,
-                        AgeClass = toBackup.AgeClass,
-                        AgeGroup = toBackup.AgeGroup,
-                        Class = toBackup.Class,
-                        MinStartsForPromotion = toBackup.MinStartsForPromotion,
-                        MinPointsForPromotion = toBackup.MinPointsForPromotion,
-                        PointsForFirst = toBackup.PointsForFirst,
-                        ExtraManualStarter = toBackup.ExtraManualStarter,
-                        Comment = toBackup.Comment,
-                        Ignore = toBackup.Ignore,
-                    });
+                    toBackup.Map(
+                        foundCompHistory)!);
+            }
+
+            foreach (var toBackup in DbCtx.CompetitionVenues
+                .TagWith(
+                    nameof(CreateHistory) + "[CompetitionVenues]")
+                .Where(
+                    x => x.CompetitionId == CompetitionId))
+            {
+                DbCtx.CompetitionVenuesHistory.Add(
+                    toBackup.Map(
+                        foundCompHistory)!);
             }
 
             foreach (var toBackup in DbCtx.Participants
@@ -170,32 +130,20 @@ namespace DanceCompetitionHelper.Helper
                 .Where(
                     x => x.CompetitionId == CompetitionId))
             {
-                // foundPartVersion
-
                 DbCtx.ParticipantsHistory.Add(
-                    new ParticipantHistory()
-                    {
-                        ParticipantHistoryId = toBackup.ParticipantId,
-                        CompetitionId = toBackup.CompetitionId,
-                        CompetitionClassHistoryId = toBackup.CompetitionClassId,
-                        CompetitionClassHistoryVersion = foundCompClassesVersion.CurrentVersion,
-                        Version = foundPartVersion.CurrentVersion,
-                        StartNumber = toBackup.StartNumber,
-                        NamePartA = toBackup.NamePartA,
-                        OrgIdPartA = toBackup.OrgIdPartA,
-                        NamePartB = toBackup.NamePartB,
-                        OrgIdPartB = toBackup.OrgIdPartB,
-                        ClubName = toBackup.ClubName,
-                        OrgIdClub = toBackup.OrgIdClub,
-                        OrgPointsPartA = toBackup.OrgPointsPartA,
-                        OrgStartsPartA = toBackup.OrgStartsPartA,
-                        MinStartsForPromotionPartA = toBackup.MinStartsForPromotionPartA,
-                        OrgPointsPartB = toBackup.OrgPointsPartB,
-                        OrgStartsPartB = toBackup.OrgStartsPartB,
-                        MinStartsForPromotionPartB = toBackup.MinStartsForPromotionPartB,
-                        Comment = toBackup.Comment,
-                        Ignore = toBackup.Ignore,
-                    });
+                    toBackup.Map(
+                        foundCompHistory)!);
+            }
+
+            foreach (var toBackup in DbCtx.Configurations
+                .TagWith(
+                    nameof(CreateHistory) + "[Configurations]")
+                .Where(
+                    x => x.CompetitionId == CompetitionId))
+            {
+                DbCtx.ConfigurationsHistory.Add(
+                    toBackup.Map(
+                        foundCompHistory)!);
             }
         }
     }

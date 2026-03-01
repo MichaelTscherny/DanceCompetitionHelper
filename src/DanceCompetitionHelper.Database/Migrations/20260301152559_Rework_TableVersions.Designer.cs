@@ -3,6 +3,7 @@ using System;
 using DanceCompetitionHelper.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,12 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DanceCompetitionHelper.Database.Migrations
 {
     [DbContext(typeof(DanceCompetitionHelperDbContext))]
-    partial class DanceCompetitionHelperDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260301152559_Rework_TableVersions")]
+    partial class Rework_TableVersions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.Adjudicator", b =>
                 {
@@ -73,7 +76,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("Name", "AdjudicatorPanelId")
                         .IsUnique();
 
-                    b.ToTable("Adjudicators", null, t =>
+                    b.ToTable("Adjudicators", t =>
                         {
                             t.HasComment("An Adjudicatorof a CompetitionClass");
                         });
@@ -137,7 +140,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("Name", "AdjudicatorPanelHistoryId", "Version")
                         .IsUnique();
 
-                    b.ToTable("AdjudicatorsHistory", null, t =>
+                    b.ToTable("AdjudicatorsHistory", t =>
                         {
                             t.HasComment("Histroy of an Adjudicatorof a CompetitionClass");
                         });
@@ -194,7 +197,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("Name", "CompetitionId")
                         .IsUnique();
 
-                    b.ToTable("AdjudicatorPanels", null, t =>
+                    b.ToTable("AdjudicatorPanels", t =>
                         {
                             t.HasComment("An AdjudicatorPanelof a CompetitionClass");
                         });
@@ -253,7 +256,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("Name", "CompetitionId", "Version")
                         .IsUnique();
 
-                    b.ToTable("AdjudicatorPanelsHistory", null, t =>
+                    b.ToTable("AdjudicatorPanelsHistory", t =>
                         {
                             t.HasComment("History of an AdjudicatorPanelof a Competition");
                         });
@@ -317,7 +320,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("Organization", "OrgCompetitionId")
                         .IsUnique();
 
-                    b.ToTable("Competitions", null, t =>
+                    b.ToTable("Competitions", t =>
                         {
                             t.HasComment("A Competition 'root'");
                         });
@@ -425,7 +428,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("CompetitionId", "OrgClassId")
                         .IsUnique();
 
-                    b.ToTable("CompetitionClasses", null, t =>
+                    b.ToTable("CompetitionClasses", t =>
                         {
                             t.HasComment("The classes of a Competition");
                         });
@@ -535,7 +538,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("CompetitionId", "OrgClassId", "Version")
                         .IsUnique();
 
-                    b.ToTable("CompetitionClassesHistory", null, t =>
+                    b.ToTable("CompetitionClassesHistory", t =>
                         {
                             t.HasComment("History of Classes of a Competition");
                         });
@@ -593,7 +596,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("CompetitionId", "Name")
                         .IsUnique();
 
-                    b.ToTable("CompetitionVenues", (string)null);
+                    b.ToTable("CompetitionVenues");
                 });
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.CompetitionVenueHistory", b =>
@@ -651,7 +654,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("CompetitionId", "Name", "Version")
                         .IsUnique();
 
-                    b.ToTable("CompetitionVenuesHistory", (string)null);
+                    b.ToTable("CompetitionVenuesHistory");
                 });
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.ConfigurationValue", b =>
@@ -724,7 +727,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("Organization", "CompetitionId", "CompetitionClassId", "CompetitionVenueId", "Key")
                         .IsUnique();
 
-                    b.ToTable("Configurations", null, t =>
+                    b.ToTable("Configurations", t =>
                         {
                             t.HasComment("Configurations");
                         });
@@ -803,7 +806,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("Organization", "CompetitionId", "CompetitionClassHistroyId", "CompetitionVenueHistoryId", "Key", "Version")
                         .IsUnique();
 
-                    b.ToTable("ConfigurationsHistory", null, t =>
+                    b.ToTable("ConfigurationsHistory", t =>
                         {
                             t.HasComment("Configurations");
                         });
@@ -921,7 +924,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("CompetitionId", "ParticipantId")
                         .IsUnique();
 
-                    b.ToTable("Participants", null, t =>
+                    b.ToTable("Participants", t =>
                         {
                             t.HasComment("The Participants of a Competition");
                         });
@@ -1041,7 +1044,7 @@ namespace DanceCompetitionHelper.Database.Migrations
                     b.HasIndex("CompetitionId", "ParticipantHistoryId", "Version")
                         .IsUnique();
 
-                    b.ToTable("ParticipantsHistory", null, t =>
+                    b.ToTable("ParticipantsHistory", t =>
                         {
                             t.HasComment("History of Participants of a Competition");
                         });
@@ -1085,7 +1088,7 @@ namespace DanceCompetitionHelper.Database.Migrations
 
                     b.HasIndex("Created");
 
-                    b.ToTable("TableVersionInfos", (string)null);
+                    b.ToTable("TableVersionInfos");
                 });
 
             modelBuilder.Entity("DanceCompetitionHelper.Database.Tables.Adjudicator", b =>

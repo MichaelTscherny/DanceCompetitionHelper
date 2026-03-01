@@ -9,7 +9,6 @@ namespace DanceCompetitionHelper.Data.Backup
         public Guid CompetitionId { get; set; }
         public Guid? FollowUpCompetitionClassHistoryId { get; set; }
         public Guid AdjudicatorPanelHistoryId { get; set; }
-        public int AdjudicatorPanelHistoryVersion { get; set; }
         public int Version { get; set; }
         public string CompetitionClassName { get; set; } = default!;
         public string? Discipline { get; set; }

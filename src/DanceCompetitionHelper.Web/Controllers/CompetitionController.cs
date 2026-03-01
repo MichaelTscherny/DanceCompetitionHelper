@@ -315,7 +315,7 @@ namespace DanceCompetitionHelper.Web.Controllers
                     cancellationToken);
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> DoImport(
             DoImportViewModel doImportView,
             CancellationToken cancellationToken)

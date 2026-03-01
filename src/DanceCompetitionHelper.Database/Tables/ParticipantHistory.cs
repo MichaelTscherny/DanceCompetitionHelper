@@ -29,11 +29,7 @@ namespace DanceCompetitionHelper.Database.Tables
         [Comment("Ref to " + nameof(CompetitionClassHistory))]
         public Guid CompetitionClassHistoryId { get; set; }
 
-        [Required]
-        [Range(0, int.MaxValue)]
-        public int CompetitionClassHistoryVersion { get; set; }
-
-        [ForeignKey(nameof(CompetitionClassHistoryId) + "," + nameof(CompetitionClassHistoryVersion))]
+        [ForeignKey(nameof(CompetitionClassHistoryId) + "," + nameof(Version))]
         public CompetitionClassHistory CompetitionClassHistory { get; set; } = default!;
 
         [Required]

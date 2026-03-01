@@ -8,7 +8,7 @@ namespace DanceCompetitionHelper.Database.Tables
     [Comment("History of Classes of a " + nameof(Competition))]
     [Index(nameof(CompetitionId), nameof(OrgClassId), nameof(Version), IsUnique = true)]
     [Index(nameof(CompetitionId), nameof(CompetitionClassName), nameof(Version), IsUnique = true)]
-    [Index(nameof(AdjudicatorPanelHistoryId), nameof(AdjudicatorPanelHistoryVersion), IsUnique = false)]
+    [Index(nameof(AdjudicatorPanelHistoryId), nameof(Version), IsUnique = false)]
     [PrimaryKey(nameof(CompetitionClassHistoryId), nameof(Version))]
     public class CompetitionClassHistory : TableBase
     {
@@ -41,11 +41,7 @@ namespace DanceCompetitionHelper.Database.Tables
         [Comment("Ref to " + nameof(AdjudicatorPanelHistory))]
         public Guid AdjudicatorPanelHistoryId { get; set; }
 
-        [Required]
-        [Range(0, int.MaxValue)]
-        public int AdjudicatorPanelHistoryVersion { get; set; }
-
-        [ForeignKey(nameof(AdjudicatorPanelHistoryId) + "," + nameof(AdjudicatorPanelHistoryVersion))]
+        [ForeignKey(nameof(AdjudicatorPanelHistoryId) + "," + nameof(Version))]
         public AdjudicatorPanelHistory AdjudicatorPanelHistory { get; set; } = default!;
 
         [Required]
